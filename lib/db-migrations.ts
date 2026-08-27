@@ -54,11 +54,7 @@ import { johnDeere6RLoaderMountingFramesMigration } from '@/lib/migrations/20260
 import { johnDeere6RFrontPTOHydraulicKitsMigration } from '@/lib/migrations/20260827_130_6r_front_pto_hydraulic_kits';
 import { johnDeere6M6RPickupHitchValveKitMigration } from '@/lib/migrations/20260827_131_6m_6r_pickup_hitch_valve_kit';
 import { johnDeere6M6RHydraulicStabilizerPartsMigration } from '@/lib/migrations/20260827_132_6m_6r_hydraulic_stabilizer_parts';
-import { kubotaM7060CurrentSpecsMigration } from '@/lib/migrations/20260827_133_kubota_m7060_current_specs';
-import { kubotaM7060LA1154LoaderMigration } from '@/lib/migrations/20260827_134_kubota_m7060_la1154_loader';
-import { kubotaM7060CurrentHydraulicsPtoCorrectionMigration } from '@/lib/migrations/20260827_135_kubota_m7060_current_hydraulics_pto_correction';
-import { kubotaM7060ServiceCapacitiesMigration } from '@/lib/migrations/20260827_136_kubota_m7060_service_capacities';
-import { kubotaM7060CapacityProvenanceCorrectionMigration } from '@/lib/migrations/20260827_137_kubota_m7060_capacity_provenance_correction';
+import { kubotaMigrations } from '@/lib/migrations/kubota';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -122,11 +118,7 @@ const migrations: DbMigration[] = [
   johnDeere6RFrontPTOHydraulicKitsMigration,
   johnDeere6M6RPickupHitchValveKitMigration,
   johnDeere6M6RHydraulicStabilizerPartsMigration,
-  kubotaM7060CurrentSpecsMigration,
-  kubotaM7060LA1154LoaderMigration,
-  kubotaM7060CurrentHydraulicsPtoCorrectionMigration,
-  kubotaM7060ServiceCapacitiesMigration,
-  kubotaM7060CapacityProvenanceCorrectionMigration,
+  ...kubotaMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
