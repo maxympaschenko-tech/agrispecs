@@ -16,6 +16,13 @@ export type MaintenanceTask = {
   capacityUnit: string | null;
   intervalText: string;
   notes: string | null;
+  machineVersionId: number | null;
+  versionSlug: string | null;
+  versionMarketName: string | null;
+  versionModelYearStart: number | null;
+  versionModelYearEnd: number | null;
+  versionConfiguration: string | null;
+  versionIsCurrent: boolean | null;
   sourceTitle: string | null;
   sourceUrl: string | null;
   sourcePublishedDate: string | null;
@@ -36,6 +43,13 @@ type MaintenanceRow = RowDataPacket & {
   capacity_unit: string | null;
   interval_text: string;
   notes: string | null;
+  machine_version_id: number | null;
+  version_slug: string | null;
+  version_market_name: string | null;
+  version_model_year_start: number | null;
+  version_model_year_end: number | null;
+  version_configuration: string | null;
+  version_is_current: number | null;
   source_title: string | null;
   source_url: string | null;
   source_published_date: string | null;
@@ -62,14 +76,23 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
         mt.capacity_unit,
         mt.interval_text,
         mt.notes,
+        mt.machine_version_id,
+        mv.slug AS version_slug,
+        mv.market_name AS version_market_name,
+        mv.model_year_start AS version_model_year_start,
+        mv.model_year_end AS version_model_year_end,
+        mv.configuration AS version_configuration,
+        mv.is_current AS version_is_current,
         sr.title AS source_title,
         sr.url AS source_url,
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM maintenance_tasks mt
       LEFT JOIN parts p ON p.id = mt.part_id
+      LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
       LEFT JOIN source_records sr ON sr.id = mt.source_record_id
       WHERE mt.machine_id = ?
       ORDER BY
+        CASE WHEN mt.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
         CASE mt.section
           WHEN 'Engine' THEN 10
           WHEN 'Fuel & Air' THEN 20
@@ -99,6 +122,13 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
       capacityUnit: row.capacity_unit,
       intervalText: row.interval_text,
       notes: row.notes,
+      machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
+      versionSlug: row.version_slug,
+      versionMarketName: row.version_market_name,
+      versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
+      versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
+      versionConfiguration: row.version_configuration,
+      versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
       sourceTitle: row.source_title,
       sourceUrl: row.source_url,
       sourcePublishedDate: row.source_published_date,
