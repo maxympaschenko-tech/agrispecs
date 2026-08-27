@@ -1,21 +1,18 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDb } from '@/lib/db';
-
-type Migration = {
-  id: string;
-  description: string;
-  statements: string[];
-};
+import type { DbMigration } from '@/lib/db-migration-types';
+import { johnDeere3Series2026Migration } from '@/lib/migrations/20260827_010_john_deere_3_series';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
 
-const migrations: Migration[] = [
+const migrations: DbMigration[] = [
   {
     id: '20260827_000_existing_schema_baseline',
     description: 'Baseline for schema and data imported manually before automated migrations were enabled',
-    statements: [],
+    apply: async () => {},
   },
+  johnDeere3Series2026Migration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
@@ -51,15 +48,13 @@ async function applyMigrations() {
 
       await connection.beginTransaction();
       try {
-        for (const statement of migration.statements) {
-          if (statement.trim()) await connection.query(statement);
-        }
-
+        await migration.apply(connection);
         await connection.query(
           'INSERT INTO schema_migrations (id, description) VALUES (?, ?)',
           [migration.id, migration.description],
         );
         await connection.commit();
+        applied.add(migration.id);
       } catch (error) {
         await connection.rollback();
         throw error;
