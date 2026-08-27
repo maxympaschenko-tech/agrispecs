@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
-import { machines as seedMachines } from '@/lib/catalog';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type PageProps = {
   params: Promise<{ brand: string; model: string }>;
@@ -46,13 +48,6 @@ function formatSpecValue(spec: MachineSpec) {
   }
 
   return `${trimNumber(value, Number.isInteger(value) ? 0 : 1)}${spec.unit ? ` ${spec.unit}` : ''}`;
-}
-
-export function generateStaticParams() {
-  return seedMachines.map((machine) => ({
-    brand: machine.brandSlug,
-    model: machine.modelSlug,
-  }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
