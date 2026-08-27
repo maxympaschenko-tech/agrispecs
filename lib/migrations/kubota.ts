@@ -34,6 +34,7 @@ import { kubotaMXCurrentSpecsMigration } from '@/lib/migrations/20260827_164_kub
 import { kubotaMXAttachmentsMigration } from '@/lib/migrations/20260827_165_kubota_mx_attachments';
 import { kubotaMXServiceFiltersMigration } from '@/lib/migrations/20260827_166_kubota_mx_service_filters';
 import { kubotaMXHSTFilterSupersessionsMigration } from '@/lib/migrations/20260827_167_kubota_mx_hst_filter_supersessions';
+import { kubotaMX5400FFilterProvenanceMigration } from '@/lib/migrations/20260827_168_kubota_mx5400f_filter_provenance';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -71,4 +72,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaMXAttachmentsMigration,
   kubotaMXServiceFiltersMigration,
   kubotaMXHSTFilterSupersessionsMigration,
+  kubotaMX5400FFilterProvenanceMigration,
 ];
