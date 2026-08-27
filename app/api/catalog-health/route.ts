@@ -129,7 +129,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_117_3e_filter_pak_components',
+      expectedLatestMigration: '20260827_118_lva21128_components',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -144,7 +144,7 @@ export async function GET() {
         johnDeere3EFilterPakSerialFitments: filterPak3ESerialFitments,
         filterPakReplacementRelations,
         partComponents: partComponentRecords,
-        expectedPartComponentsAfter117: 68,
+        expectedPartComponentsAfter118: 73,
         johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
