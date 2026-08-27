@@ -10,13 +10,30 @@ type PageProps = {
   params: Promise<{ brand: string; attachment: string }>;
 };
 
+function attachmentTypeLabel(type: string) {
+  if (type === 'front-loader') return 'Front loader';
+  if (type === 'backhoe') return 'Backhoe';
+  return type
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || 'Attachment';
+}
+
+function specificationHeading(type: string) {
+  if (type === 'front-loader') return 'Loader specifications';
+  if (type === 'backhoe') return 'Backhoe specifications';
+  return 'Attachment specifications';
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand, attachment: slug } = await params;
   const item = await getAttachment(brand, slug);
   if (!item) return {};
 
-  const title = `${item.manufacturerName} ${item.modelName} Loader Compatibility`;
-  const description = `${item.manufacturerName} ${item.modelName} compatible tractors, lift capacity, lift height and source-backed configuration requirements.`;
+  const typeLabel = attachmentTypeLabel(item.attachmentType);
+  const title = `${item.manufacturerName} ${item.modelName} ${typeLabel} Compatibility`;
+  const description = `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatible tractors, published specifications and source-backed configuration requirements.`;
   return {
     title,
     description,
@@ -30,6 +47,10 @@ export default async function AttachmentPage({ params }: PageProps) {
   const item = await getAttachment(brand, slug);
   if (!item) notFound();
 
+  const typeLabel = attachmentTypeLabel(item.attachmentType);
+  const isLoader = item.attachmentType === 'front-loader';
+  const isBackhoe = item.attachmentType === 'backhoe';
+
   return (
     <main>
       <div className="container breadcrumbs">
@@ -38,20 +59,25 @@ export default async function AttachmentPage({ params }: PageProps) {
 
       <section className="section" style={{ paddingTop: 18 }}>
         <div className="container">
-          <span className="eyebrow">Front loader compatibility</span>
+          <span className="eyebrow">{typeLabel} compatibility</span>
           <h1>{item.manufacturerName} {item.modelName}</h1>
-          <p className="section-lead">Verified tractor compatibility and published loader specifications from the cited manufacturer source.</p>
+          <p className="section-lead">Verified tractor compatibility and published {typeLabel.toLowerCase()} information from the cited source.</p>
 
           <section className="data-section">
-            <h2>Loader specifications</h2>
-            {item.liftCapacityText && <div className="placeholder-row"><span>Lift capacity</span><span>{item.liftCapacityText}</span></div>}
-            {item.liftHeightText && <div className="placeholder-row"><span>Lift height</span><span>{item.liftHeightText}</span></div>}
-            {item.configurationText && <div className="placeholder-row"><span>Leveling options</span><span>{item.configurationText}</span></div>}
+            <h2>{specificationHeading(item.attachmentType)}</h2>
+            {item.liftCapacityText && <div className="placeholder-row"><span>{isLoader ? 'Lift capacity' : 'Capacity'}</span><span>{item.liftCapacityText}</span></div>}
+            {item.liftHeightText && <div className="placeholder-row"><span>{isLoader ? 'Lift height' : 'Working height'}</span><span>{item.liftHeightText}</span></div>}
+            {item.configurationText && (
+              <div className="placeholder-row">
+                <span>{isLoader ? 'Loader configuration' : isBackhoe ? 'Backhoe dimensions & configuration' : 'Configuration'}</span>
+                <span>{item.configurationText}</span>
+              </div>
+            )}
           </section>
 
           <section className="data-section">
             <h2>Compatible tractors</h2>
-            <p className="section-note">Configuration notes matter. A loader listed for one axle or leveling configuration should not be assumed compatible with every version of the same tractor model.</p>
+            <p className="section-note">Configuration notes matter. Compatibility for one driveline, transmission or equipment configuration should not be assumed for every version of the same tractor model.</p>
             {item.compatibleMachines.map((machine) => (
               <div className="part-fitment" key={machine.machineId}>
                 <div>
@@ -68,8 +94,8 @@ export default async function AttachmentPage({ params }: PageProps) {
             <section className="data-section">
               <h2>Source</h2>
               <div className="placeholder-row">
-                <span>Official source</span>
-                <span><a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{item.sourceTitle || 'John Deere loader compatibility'}</a></span>
+                <span>Compatibility source</span>
+                <span><a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{item.sourceTitle || `${item.manufacturerName} ${typeLabel.toLowerCase()} compatibility source`}</a></span>
               </div>
             </section>
           )}
