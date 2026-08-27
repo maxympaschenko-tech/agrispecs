@@ -6,6 +6,8 @@ import { kubotaM7060ServiceCapacitiesMigration } from '@/lib/migrations/20260827
 import { kubotaM7060CapacityProvenanceCorrectionMigration } from '@/lib/migrations/20260827_137_kubota_m7060_capacity_provenance_correction';
 import { kubotaM6060CurrentSpecsMigration } from '@/lib/migrations/20260827_138_kubota_m6060_current_specs';
 import { kubotaM6060LA1154LoaderMigration } from '@/lib/migrations/20260827_139_kubota_m6060_la1154_loader';
+import { kubotaM5660SUCurrentSpecsMigration } from '@/lib/migrations/20260827_140_kubota_m5660su_current_specs';
+import { kubotaM5660SULA1154SULoaderMigration } from '@/lib/migrations/20260827_141_kubota_m5660su_la1154su_loader';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -15,4 +17,6 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CapacityProvenanceCorrectionMigration,
   kubotaM6060CurrentSpecsMigration,
   kubotaM6060LA1154LoaderMigration,
+  kubotaM5660SUCurrentSpecsMigration,
+  kubotaM5660SULA1154SULoaderMigration,
 ];
