@@ -48,58 +48,56 @@ export async function GET() {
       count(`SELECT COUNT(*) AS count FROM machine_parts`),
     ]);
 
-    const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M] = await Promise.all([
+    const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
       hasMaintenance ? count(`SELECT COUNT(*) AS count FROM maintenance_tasks`) : Promise.resolve(0),
       hasCapacities ? count(`SELECT COUNT(*) AS count FROM machine_capacities`) : Promise.resolve(0),
       hasImages ? count(`SELECT COUNT(*) AS count FROM machine_images`) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('1023e','1025r')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('3025d','3035d','3043d')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('3025e','3032e','3038e')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('3033r','3039r','3046r')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('4044m','4052m','4066m','4044r','4052r','4066r','4075r')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
-        SELECT COUNT(*) AS count
-        FROM maintenance_tasks mt
-        JOIN machines m ON m.id=mt.machine_id
-        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('5075m','5095m','5105m')
       `) : Promise.resolve(0),
+      hasMaintenance ? count(`
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
+      `) : Promise.resolve(0),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug IN ('6m-95','6m-105','6m-115','6m-125','6m-130','6m-140','6m-150')
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_102_5m_verified_maintenance',
+      expectedLatestMigration: '20260827_104_6m_verified_fitment',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -107,6 +105,7 @@ export async function GET() {
       parts: {
         verified: verifiedParts,
         fitments,
+        johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
         total: maintenanceTasks,
@@ -116,6 +115,7 @@ export async function GET() {
         johnDeere3R: maintenance3R,
         johnDeere4Series: maintenance4Series,
         johnDeere5MVerified: maintenance5M,
+        johnDeere6RMY22: maintenance6R,
       },
       capacityRecords,
       machineImages,
