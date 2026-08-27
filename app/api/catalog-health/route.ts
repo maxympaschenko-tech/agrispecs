@@ -41,7 +41,7 @@ export async function GET() {
       };
     }
 
-    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences, alternativeRelations, serialConstrainedFitments, compactSerialFitments, filterPak3ESerialFitments] = await Promise.all([
+    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences, alternativeRelations, serialConstrainedFitments, compactSerialFitments, filterPak3ESerialFitments, filterPakReplacementRelations] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM parts WHERE data_status='verified'`),
@@ -65,6 +65,14 @@ export async function GET() {
         WHERE mf.slug='john-deere' AND m.slug IN ('3032e','3038e')
           AND p.normalized_part_number IN ('LVA21128','LVA21037','TA26997')
           AND (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL)
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM part_cross_references x
+        JOIN parts p ON p.id=x.part_id
+        JOIN parts cp ON cp.id=x.cross_part_id
+        WHERE x.relation_type='replaces'
+          AND ((p.normalized_part_number='LVA23615' AND cp.normalized_part_number='TA25767')
+            OR (p.normalized_part_number='LVA21038' AND cp.normalized_part_number='TA25768'))
       `),
     ]);
 
@@ -117,7 +125,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_111_3e_filter_pak_generations',
+      expectedLatestMigration: '20260827_112_filter_pak_replacements',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -130,6 +138,7 @@ export async function GET() {
         serialConstrainedFitments,
         compactSerialFitments,
         johnDeere3EFilterPakSerialFitments: filterPak3ESerialFitments,
+        filterPakReplacementRelations,
         johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
