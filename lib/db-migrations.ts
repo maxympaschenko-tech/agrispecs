@@ -39,6 +39,7 @@ import { ta25767SourceUrlCorrectionMigration } from '@/lib/migrations/20260827_1
 import { partComponentsMigration } from '@/lib/migrations/20260827_115_part_components';
 import { oneSeriesFilterPakComponentsMigration } from '@/lib/migrations/20260827_116_1_series_filter_pak_components';
 import { threeEFilterPakComponentsMigration } from '@/lib/migrations/20260827_117_3e_filter_pak_components';
+import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21128_components';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -87,6 +88,7 @@ const migrations: DbMigration[] = [
   partComponentsMigration,
   oneSeriesFilterPakComponentsMigration,
   threeEFilterPakComponentsMigration,
+  lva21128ComponentsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
