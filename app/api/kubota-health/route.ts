@@ -22,12 +22,13 @@ export async function GET() {
       serviceReferenceVersions,
       specs,
       serviceCapacities,
+      correctedCapacityProvenanceRows,
       verifiedLoaders,
       loaderCompatibilityRows,
       correctedPtoRows,
       hydraulicHitchBrakeRows,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_136_kubota_m7060_service_capacities'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_137_kubota_m7060_capacity_provenance_correction'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug='m7060' AND m.data_status IN ('partial','verified')
@@ -57,6 +58,15 @@ export async function GET() {
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
         JOIN machine_versions mv ON mv.id=mc.machine_version_id
         WHERE mf.slug='kubota' AND m.slug='m7060' AND mv.slug='us-service-reference-2017'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_capacities mc
+        JOIN machines m ON m.id=mc.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN source_records sr ON sr.id=mc.source_record_id
+        WHERE mf.slug='kubota' AND m.slug='m7060'
+          AND mc.system_key IN ('transmission-service-2017','front-differential-service-2017','front-axle-gear-service-2017')
+          AND sr.external_id='kubota-m7060-capacities-bid-spec-2013-02-25'
       `),
       count(`
         SELECT COUNT(*) AS count FROM attachments a
@@ -100,7 +110,7 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_136_kubota_m7060_service_capacities',
+      expectedLatestKubotaMigration: '20260827_137_kubota_m7060_capacity_provenance_correction',
       migrationApplied: migrationApplied === 1,
       publishableM7060,
       expectedPublishableM7060: 1,
@@ -112,6 +122,8 @@ export async function GET() {
       expectedSpecificationRecords: 46,
       serviceCapacities,
       expectedServiceCapacities: 5,
+      correctedCapacityProvenanceRows,
+      expectedCorrectedCapacityProvenanceRows: 3,
       correctedPtoRows,
       expectedCorrectedPtoRows: 2,
       hydraulicHitchBrakeRows,
