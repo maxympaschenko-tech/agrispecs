@@ -1,0 +1,30 @@
+[
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "5075e",
+    "sourceKey": "commons-bammental-jd-5075e-2016",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Bammental_-_Jubil%C3%A4umsumzug_-_John_Deere_5075_E_-_2016-07-17_14-45-54.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/5075e/main.jpg",
+    "publicUrl": "/media/machines/john-deere/5075e/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Bammental_-_Jubil%C3%A4umsumzug_-_John_Deere_5075_E_-_2016-07-17_14-45-54.jpg",
+    "author": "Radosław Drożdżewski (Zwiadowca21)",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 5075E in Bammental, Germany, 2016.",
+    "altText": "John Deere 5075E tractor"
+  },
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "1025r",
+    "sourceKey": "commons-jd-1025r-petrolia-2026",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Man_driving_John_Deere_1025R_on_street%2C_Petrolia%2C_Ontario%2C_2026-05-17.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/1025r/main.jpg",
+    "publicUrl": "/media/machines/john-deere/1025r/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Man_driving_John_Deere_1025R_on_street%2C_Petrolia%2C_Ontario%2C_2026-05-17.jpg",
+    "author": "Chris Woodrich",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 1025R in Petrolia, Ontario, 2026.",
+    "altText": "John Deere 1025R tractor"
+  }
+]
