@@ -8,6 +8,7 @@ import { johnDeere5MSeries2025Migration } from '@/lib/migrations/20260827_040_jo
 import { johnDeere6MSeriesCurrentMigration } from '@/lib/migrations/20260827_050_john_deere_6m_series';
 import { johnDeere6RSeriesCurrentMigration } from '@/lib/migrations/20260827_060_john_deere_6r_series';
 import { johnDeereFiltersPartsMigration } from '@/lib/migrations/20260827_070_john_deere_filters_parts';
+import { machineImagesMigration } from '@/lib/migrations/20260827_080_machine_images';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -25,6 +26,7 @@ const migrations: DbMigration[] = [
   johnDeere6MSeriesCurrentMigration,
   johnDeere6RSeriesCurrentMigration,
   johnDeereFiltersPartsMigration,
+  machineImagesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
