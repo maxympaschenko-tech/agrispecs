@@ -33,6 +33,7 @@ import { officialAftermarketAlternativesMigration } from '@/lib/migrations/20260
 import { johnDeereCompactSerialCutoversMigration } from '@/lib/migrations/20260827_109_compact_serial_cutovers';
 import { compactPinGenerationCorrectionMigration } from '@/lib/migrations/20260827_110_compact_pin_generation_correction';
 import { johnDeere3EFilterPakGenerationsMigration } from '@/lib/migrations/20260827_111_3e_filter_pak_generations';
+import { filterPakReplacementsMigration } from '@/lib/migrations/20260827_112_filter_pak_replacements';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -75,6 +76,7 @@ const migrations: DbMigration[] = [
   johnDeereCompactSerialCutoversMigration,
   compactPinGenerationCorrectionMigration,
   johnDeere3EFilterPakGenerationsMigration,
+  filterPakReplacementsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
