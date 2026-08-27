@@ -14,6 +14,8 @@ export type PartSummary = {
   fitmentCount: number;
 };
 
+export type FitmentConfidence = 'official' | 'high' | 'medium' | 'low';
+
 export type PartFitment = {
   machineId: number;
   brand: string;
@@ -26,6 +28,7 @@ export type PartFitment = {
   serialFrom: string | null;
   serialTo: string | null;
   configurationNote: string | null;
+  fitmentConfidence: FitmentConfidence;
   machineVersionId: number | null;
   versionMarketName: string | null;
   versionModelYearStart: number | null;
@@ -93,6 +96,7 @@ type FitmentRow = RowDataPacket & {
   serial_from: string | null;
   serial_to: string | null;
   configuration_note: string | null;
+  fitment_confidence: FitmentConfidence;
   machine_version_id: number | null;
   version_market_name: string | null;
   version_model_year_start: number | null;
@@ -243,6 +247,7 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         mp.serial_from,
         mp.serial_to,
         mp.configuration_note,
+        mp.fitment_confidence,
         mp.machine_version_id,
         mv.market_name AS version_market_name,
         mv.model_year_start AS version_model_year_start,
@@ -259,6 +264,7 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
       LEFT JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.part_id = ?
       ORDER BY mf.name ASC, m.model_name ASC,
+               CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
                CASE WHEN mp.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
                mp.fitment_note ASC
     `, [base.id]);
@@ -321,6 +327,7 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         serialFrom: row.serial_from,
         serialTo: row.serial_to,
         configurationNote: row.configuration_note,
+        fitmentConfidence: row.fitment_confidence,
         machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
         versionMarketName: row.version_market_name,
         versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
