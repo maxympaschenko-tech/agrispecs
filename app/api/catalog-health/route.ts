@@ -56,6 +56,7 @@ export async function GET() {
       johnDeere5075MWearElectricalFitments,
       johnDeere5095M5105MWearElectricalFitments,
       johnDeere5MSteeringCrossReferences,
+      johnDeere5120MVerifiedFitments,
     ] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
@@ -120,9 +121,32 @@ export async function GET() {
         WHERE (p.normalized_part_number='RE217820' AND cp.normalized_part_number='RE217616' AND x.relation_type='replaces')
            OR (p.normalized_part_number='RE271437' AND cp.normalized_part_number='ARE271437' AND x.relation_type='alternative')
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN source_records sr ON sr.id=mp.source_record_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5120m'
+          AND sr.external_id='jd-rpg-5120m-na-2022-12'
+      `),
     ]);
 
-    const [maintenanceTasks, capacityRecords, machineImages, partComponentRecords, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
+    const [
+      maintenanceTasks,
+      capacityRecords,
+      machineImages,
+      partComponentRecords,
+      maintenance1Series,
+      maintenance3D,
+      maintenance3E,
+      maintenance3R,
+      maintenance4Series,
+      maintenance5M,
+      maintenance6R,
+      fitment6M,
+      maintenance5120M,
+      capacities5120M,
+    ] = await Promise.all([
       hasMaintenance ? count(`SELECT COUNT(*) AS count FROM maintenance_tasks`) : Promise.resolve(0),
       hasCapacities ? count(`SELECT COUNT(*) AS count FROM machine_capacities`) : Promise.resolve(0),
       hasImages ? count(`SELECT COUNT(*) AS count FROM machine_images`) : Promise.resolve(0),
@@ -155,7 +179,7 @@ export async function GET() {
       hasMaintenance ? count(`
         SELECT COUNT(*) AS count FROM maintenance_tasks mt
         JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
-        WHERE mf.slug='john-deere' AND m.slug IN ('5075m','5095m','5105m')
+        WHERE mf.slug='john-deere' AND m.slug IN ('5075m','5095m','5105m','5120m')
       `) : Promise.resolve(0),
       hasMaintenance ? count(`
         SELECT COUNT(*) AS count FROM maintenance_tasks mt
@@ -167,12 +191,26 @@ export async function GET() {
         JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('6m-95','6m-105','6m-115','6m-125','6m-130','6m-140','6m-150')
       `),
+      hasMaintenance ? count(`
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN source_records sr ON sr.id=mt.source_record_id
+        WHERE mf.slug='john-deere' AND m.slug='5120m' AND sr.external_id='jd-rpg-5120m-na-2022-12'
+      `) : Promise.resolve(0),
+      hasCapacities ? count(`
+        SELECT COUNT(*) AS count FROM machine_capacities mc
+        JOIN machines m ON m.id=mc.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN source_records sr ON sr.id=mc.source_record_id
+        WHERE mf.slug='john-deere' AND m.slug='5120m' AND sr.external_id='jd-rpg-5120m-na-2022-12'
+      `) : Promise.resolve(0),
     ]);
 
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_122_5m_steering_cross_references',
+      expectedLatestMigration: '20260827_123_5120m_verified_maintenance_parts',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -195,6 +233,8 @@ export async function GET() {
         expectedJohnDeere5095M5105MWearElectricalFitmentsAfter121: 22,
         johnDeere5MSteeringCrossReferences,
         expectedJohnDeere5MSteeringCrossReferencesAfter122: 2,
+        johnDeere5120MVerifiedFitments,
+        expectedJohnDeere5120MVerifiedFitmentsAfter123: 21,
       },
       maintenance: {
         total: maintenanceTasks,
@@ -204,9 +244,13 @@ export async function GET() {
         johnDeere3R: maintenance3R,
         johnDeere4Series: maintenance4Series,
         johnDeere5MVerified: maintenance5M,
+        johnDeere5120M: maintenance5120M,
+        expectedJohnDeere5120MAfter123: 6,
         johnDeere6RMY22: maintenance6R,
       },
       capacityRecords,
+      johnDeere5120MCapacityRecords: capacities5120M,
+      expectedJohnDeere5120MCapacityRecordsAfter123: 4,
       machineImages,
       tables: {
         schemaMigrations: hasMigrations,
