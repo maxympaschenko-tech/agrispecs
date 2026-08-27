@@ -18,7 +18,7 @@ export async function GET() {
   try {
     const db = await getDbReady();
     const [migrationRows] = await db.query<MigrationRow[]>(
-      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_129_6r_loader_mounting_frames'`,
+      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_130_6r_front_pto_hydraulic_kits'`,
     );
 
     const [
@@ -30,6 +30,8 @@ export async function GET() {
       loaderMountingParts,
       johnDeere6MMountingFrameFitments,
       johnDeere6RMountingFrameFitments,
+      johnDeere6RFrontAccessoryParts,
+      johnDeere6RFrontAccessoryFitments,
     ] = await Promise.all([
       count(`
         SELECT COUNT(*) AS count
@@ -105,11 +107,29 @@ export async function GET() {
           AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
           AND p.normalized_part_number IN ('AXX10595','AXX10596','AXX10321','AXX10322')
       `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND p.normalized_part_number IN ('BL16780','BL16781')
+          AND p.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
+          AND p.normalized_part_number IN ('BL16780','BL16781')
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestMigration: '20260827_129_6r_loader_mounting_frames',
+      expectedLatestMigration: '20260827_130_6r_front_pto_hydraulic_kits',
       migrationApplied: Number(migrationRows[0]?.count || 0) === 1,
       verifiedLoaders,
       expectedVerifiedLoaders: 8,
@@ -127,6 +147,10 @@ export async function GET() {
       expectedJohnDeere6MMountingFrameFitments: 14,
       johnDeere6RMountingFrameFitments,
       expectedJohnDeere6RMountingFrameFitments: 14,
+      johnDeere6RFrontAccessoryParts,
+      expectedJohnDeere6RFrontAccessoryParts: 2,
+      johnDeere6RFrontAccessoryFitments,
+      expectedJohnDeere6RFrontAccessoryFitments: 14,
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
