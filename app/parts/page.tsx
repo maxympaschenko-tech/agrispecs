@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPartCategories } from '@/lib/part-category-service';
 import { getPartCatalogItems, type PartCatalogItem } from '@/lib/parts-catalog-service';
 
 export const dynamic = 'force-dynamic';
@@ -30,11 +31,12 @@ function PartCard({ part }: { part: PartCatalogItem }) {
 }
 
 export default async function PartsPage() {
-  const parts = await getPartCatalogItems();
+  const [parts, categories] = await Promise.all([getPartCatalogItems(), getPartCategories()]);
   const johnDeereParts = parts.filter((part) => part.manufacturerSlug === 'john-deere');
   const aftermarketParts = parts.filter((part) => part.manufacturerSlug && part.manufacturerSlug !== 'john-deere');
   const replacementLinked = parts.filter((part) => part.relationCount > 0).length;
   const kitLinked = parts.filter((part) => part.componentCount > 0 || part.kitMembershipCount > 0).length;
+  const usefulCategories = categories.filter((category) => category.partCount >= 2);
 
   return (
     <main className="section">
@@ -58,6 +60,22 @@ export default async function PartsPage() {
           </div>
           <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
         </div>
+
+        {usefulCategories.length > 0 && (
+          <section className="catalog-group">
+            <h2>Browse parts by category</h2>
+            <p className="section-note">Only categories with multiple source-backed part pages are published here.</p>
+            <div className="grid">
+              {usefulCategories.map((category) => (
+                <Link className="card" href={`/parts/category/${category.slug}`} key={category.id}>
+                  <span className="eyebrow">Parts category</span>
+                  <h3>{category.name}</h3>
+                  <p>{category.partCount} source-backed part pages</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {johnDeereParts.length > 0 && (
           <section className="catalog-group">
