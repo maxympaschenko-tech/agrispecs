@@ -36,6 +36,7 @@ import { johnDeere3EFilterPakGenerationsMigration } from '@/lib/migrations/20260
 import { filterPakReplacementsMigration } from '@/lib/migrations/20260827_112_filter_pak_replacements';
 import { johnDeere4SeriesFilterPakReplacementMigration } from '@/lib/migrations/20260827_113_4_series_filter_pak_replacement';
 import { ta25767SourceUrlCorrectionMigration } from '@/lib/migrations/20260827_114_ta25767_source_url_correction';
+import { partComponentsMigration } from '@/lib/migrations/20260827_115_part_components';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -81,6 +82,7 @@ const migrations: DbMigration[] = [
   filterPakReplacementsMigration,
   johnDeere4SeriesFilterPakReplacementMigration,
   ta25767SourceUrlCorrectionMigration,
+  partComponentsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
