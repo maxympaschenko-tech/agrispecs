@@ -75,6 +75,7 @@ export const kubotaFilterSupersessionsMigration: DbMigration = {
       sourceId = Number(result.insertId);
     }
 
+    // First create every legacy node so multi-step replacement chains are order-independent.
     for (const item of replacements) {
       const categoryId = await selectId(
         connection,
@@ -100,7 +101,10 @@ export const kubotaFilterSupersessionsMigration: DbMigration = {
           `Legacy Kubota part number. Dealer catalog lists ${item.newNumber} as the replacement in the supersession chain.`,
         ],
       );
+    }
 
+    // Then connect the complete replacement graph.
+    for (const item of replacements) {
       const oldPartId = await selectId(
         connection,
         `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number=? LIMIT 1`,
