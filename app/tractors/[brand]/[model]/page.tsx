@@ -124,16 +124,18 @@ export default async function TractorModelPage({ params }: PageProps) {
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
-  const [versions, images, machineParts, maintenance, capacities] = await Promise.all([
-    getMachineVersions(machine.id),
+  const versions = await getMachineVersions(machine.id);
+  const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
+
+  const [images, machineParts, maintenance, capacities, specs] = await Promise.all([
     getMachineImages(machine.id),
-    getMachineParts(machine.id),
+    getMachineParts(machine.id, selectedVersion?.id),
     getMachineMaintenance(machine.id),
     getMachineCapacities(machine.id),
+    selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
   ]);
+
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
-  const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
-  const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
   const verifiedParts = machineParts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
 
   const specsBySection = new Map<string, MachineSpec[]>();
@@ -306,7 +308,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
                 <h2>Compatible maintenance parts</h2>
-                <p className="section-note">Part fitment is shown only where a technical source is attached. Serial-number restrictions may apply.</p>
+                <p className="section-note">The list is scoped to generic fitment plus the specification version shown at the top of this page. Serial-number restrictions may still apply.</p>
                 <div className="parts-list">
                   {verifiedParts.map((part) => (
                     <Link className="part-row" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
