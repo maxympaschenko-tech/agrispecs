@@ -2,14 +2,31 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+const siteName = 'Farm Machine Specs';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'),
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
   title: {
-    default: 'AgriSpecs - Farm Equipment Specifications and Parts Reference',
-    template: '%s | AgriSpecs',
+    default: 'Farm Machine Specs - Farm Equipment Specifications and Parts Reference',
+    template: `%s | ${siteName}`,
   },
   description:
-    'Farm equipment specifications, parts references, compatibility data, maintenance information, and model guides.',
+    'Farm equipment specifications, parts references, compatibility data, maintenance information, and model guides for tractors and agricultural machinery.',
+  openGraph: {
+    type: 'website',
+    url: siteUrl,
+    siteName,
+    title: 'Farm Machine Specs - Farm Equipment Specifications and Parts Reference',
+    description:
+      'Farm equipment specifications, parts references, compatibility data, maintenance information, and model guides for tractors and agricultural machinery.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Farm Machine Specs',
+    description: 'Farm equipment specifications, parts, compatibility and maintenance reference.',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -18,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <header className="site-header">
           <div className="container header-inner">
-            <Link className="logo" href="/">Agri<span>Specs</span></Link>
+            <Link className="logo" href="/">Farm Machine <span>Specs</span></Link>
             <nav className="nav" aria-label="Main navigation">
               <Link href="/tractors">Tractors</Link>
               <Link href="/parts">Parts</Link>
@@ -30,7 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <footer className="site-footer">
           <div className="container">
-            AgriSpecs is an independent farm equipment reference. Product names and trademarks belong to their respective owners.
+            Farm Machine Specs is an independent farm equipment reference. Product names and trademarks belong to their respective owners.
           </div>
         </footer>
       </body>
