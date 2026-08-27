@@ -36,8 +36,13 @@ export async function GET() {
       serviceFilterParts,
       highConfidenceServiceFilterFitments,
       filterSupersessionRows,
+      m5660ServiceFilterParts,
+      m5660HighConfidenceServiceFilterFitments,
+      currentFuelFilterFitments,
+      legacyFuelFilterActiveFitments,
+      currentFuelFilterSupersessionRows,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_145_kubota_filter_supersessions'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_147_kubota_current_fuel_filter_supersession'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060') AND m.data_status IN ('partial','verified')
@@ -136,7 +141,7 @@ export async function GET() {
         SELECT COUNT(*) AS count FROM parts p
         JOIN manufacturers mf ON mf.id=p.manufacturer_id
         WHERE mf.slug='kubota'
-          AND p.normalized_part_number IN ('1J80043170','5980026110','3A11119130','HHTA037710')
+          AND p.normalized_part_number IN ('HH1J143172','5980026110','3A11119130','HHTA037710')
           AND p.data_status IN ('partial','verified')
       `),
       count(`
@@ -146,7 +151,7 @@ export async function GET() {
         JOIN parts p ON p.id=mp.part_id
         WHERE mf.slug='kubota'
           AND m.slug IN ('m6060','m7060')
-          AND p.normalized_part_number IN ('1J80043170','5980026110','3A11119130','HHTA037710')
+          AND p.normalized_part_number IN ('HH1J143172','5980026110','3A11119130','HHTA037710')
           AND mp.fitment_confidence='high'
       `),
       count(`
@@ -160,11 +165,53 @@ export async function GET() {
           (oldp.normalized_part_number='T007037710' AND newp.normalized_part_number='HHTA037710')
         )
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='kubota'
+          AND p.normalized_part_number IN ('R140142270','R240142280','1G31143380','HH1J143172','HH16432430','HHTA037710')
+          AND p.data_status IN ('partial','verified')
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN parts p ON p.id=mp.part_id
+        WHERE mf.slug='kubota' AND m.slug='m5660su'
+          AND p.normalized_part_number IN ('R140142270','R240142280','1G31143380','HH1J143172','HH16432430','HHTA037710')
+          AND mp.fitment_confidence='high'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN parts p ON p.id=mp.part_id
+        WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060')
+          AND p.normalized_part_number='HH1J143172'
+          AND mp.fitment_confidence='high'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN parts p ON p.id=mp.part_id
+        WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060')
+          AND p.normalized_part_number='1J80043170'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM part_cross_references pcr
+        JOIN parts oldp ON oldp.id=pcr.part_id
+        JOIN parts newp ON newp.id=pcr.cross_part_id
+        JOIN manufacturers mf ON mf.id=oldp.manufacturer_id
+        WHERE mf.slug='kubota' AND pcr.relation_type='replaces'
+          AND oldp.normalized_part_number='1J80043170'
+          AND newp.normalized_part_number='HH1J143172'
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_145_kubota_filter_supersessions',
+      expectedLatestKubotaMigration: '20260827_147_kubota_current_fuel_filter_supersession',
       migrationApplied: migrationApplied === 1,
       publishableKubotaM60,
       expectedPublishableKubotaM60: 3,
@@ -204,6 +251,16 @@ export async function GET() {
       expectedHighConfidenceServiceFilterFitments: 8,
       filterSupersessionRows,
       expectedFilterSupersessionRows: 3,
+      m5660ServiceFilterParts,
+      expectedM5660ServiceFilterParts: 6,
+      m5660HighConfidenceServiceFilterFitments,
+      expectedM5660HighConfidenceServiceFilterFitments: 6,
+      currentFuelFilterFitments,
+      expectedCurrentFuelFilterFitments: 3,
+      legacyFuelFilterActiveFitments,
+      expectedLegacyFuelFilterActiveFitments: 0,
+      currentFuelFilterSupersessionRows,
+      expectedCurrentFuelFilterSupersessionRows: 1,
     }, {
       headers: { 'Cache-Control':'no-store, max-age=0', 'X-Robots-Tag':'noindex, nofollow' },
     });
