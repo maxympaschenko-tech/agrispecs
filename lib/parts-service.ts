@@ -74,26 +74,29 @@ function rowToPart(row: PartRow): PartSummary {
   };
 }
 
+const partSelect = `
+  SELECT
+    p.id,
+    p.part_number,
+    p.normalized_part_number,
+    p.name,
+    p.description,
+    p.data_status,
+    pc.name AS category_name,
+    pc.slug AS category_slug,
+    mf.name AS manufacturer_name,
+    mf.slug AS manufacturer_slug,
+    COUNT(DISTINCT mp.machine_id) AS fitment_count
+  FROM parts p
+  LEFT JOIN part_categories pc ON pc.id = p.category_id
+  LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
+  LEFT JOIN machine_parts mp ON mp.part_id = p.id
+`;
+
 export async function getParts(): Promise<PartSummary[]> {
   try {
     const db = await getDbReady();
-    const [rows] = await db.query<PartRow[]>(`
-      SELECT
-        p.id,
-        p.part_number,
-        p.normalized_part_number,
-        p.name,
-        p.description,
-        p.data_status,
-        pc.name AS category_name,
-        pc.slug AS category_slug,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        COUNT(DISTINCT mp.machine_id) AS fitment_count
-      FROM parts p
-      LEFT JOIN part_categories pc ON pc.id = p.category_id
-      LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
-      LEFT JOIN machine_parts mp ON mp.part_id = p.id
+    const [rows] = await db.query<PartRow[]>(`${partSelect}
       GROUP BY p.id
       ORDER BY mf.name ASC, pc.name ASC, p.part_number ASC
     `);
@@ -104,29 +107,41 @@ export async function getParts(): Promise<PartSummary[]> {
   }
 }
 
+export async function searchParts(term: string): Promise<PartSummary[]> {
+  const normalizedTerm = term.trim();
+  if (!normalizedTerm) return [];
+
+  const normalizedNumber = normalizedTerm.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const like = `%${normalizedTerm}%`;
+  const numberLike = `%${normalizedNumber}%`;
+
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<PartRow[]>(`${partSelect}
+      WHERE p.normalized_part_number LIKE ?
+         OR p.part_number LIKE ?
+         OR p.name LIKE ?
+         OR pc.name LIKE ?
+      GROUP BY p.id
+      ORDER BY
+        CASE WHEN p.normalized_part_number = ? THEN 0 ELSE 1 END,
+        p.part_number ASC
+      LIMIT 50
+    `, [numberLike, like, like, like, normalizedNumber]);
+    return rows.map(rowToPart);
+  } catch (error) {
+    console.error('Unable to search parts:', error);
+    return [];
+  }
+}
+
 export async function getPart(partNumberOrSlug: string): Promise<PartDetail | undefined> {
   const normalized = decodeURIComponent(partNumberOrSlug).trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   if (!normalized) return undefined;
 
   try {
     const db = await getDbReady();
-    const [rows] = await db.query<PartRow[]>(`
-      SELECT
-        p.id,
-        p.part_number,
-        p.normalized_part_number,
-        p.name,
-        p.description,
-        p.data_status,
-        pc.name AS category_name,
-        pc.slug AS category_slug,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        COUNT(DISTINCT mp.machine_id) AS fitment_count
-      FROM parts p
-      LEFT JOIN part_categories pc ON pc.id = p.category_id
-      LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
-      LEFT JOIN machine_parts mp ON mp.part_id = p.id
+    const [rows] = await db.query<PartRow[]>(`${partSelect}
       WHERE p.normalized_part_number = ?
       GROUP BY p.id
       LIMIT 1
