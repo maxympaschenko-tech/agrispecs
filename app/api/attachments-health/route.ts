@@ -18,7 +18,7 @@ export async function GET() {
   try {
     const db = await getDbReady();
     const [migrationRows] = await db.query<MigrationRow[]>(
-      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_130_6r_front_pto_hydraulic_kits'`,
+      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_131_6m_6r_pickup_hitch_valve_kit'`,
     );
 
     const [
@@ -32,6 +32,8 @@ export async function GET() {
       johnDeere6RMountingFrameFitments,
       johnDeere6RFrontAccessoryParts,
       johnDeere6RFrontAccessoryFitments,
+      pickupHitchValveKitParts,
+      pickupHitchValveKitFitments,
     ] = await Promise.all([
       count(`
         SELECT COUNT(*) AS count
@@ -125,11 +127,32 @@ export async function GET() {
           AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
           AND p.normalized_part_number IN ('BL16780','BL16781')
       `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND p.normalized_part_number='BL16683'
+          AND p.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND m.slug IN (
+            '6m-95','6m-105','6m-115','6m-125','6m-130','6m-140','6m-150',
+            '6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195'
+          )
+          AND p.normalized_part_number='BL16683'
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestMigration: '20260827_130_6r_front_pto_hydraulic_kits',
+      expectedLatestMigration: '20260827_131_6m_6r_pickup_hitch_valve_kit',
       migrationApplied: Number(migrationRows[0]?.count || 0) === 1,
       verifiedLoaders,
       expectedVerifiedLoaders: 8,
@@ -151,6 +174,10 @@ export async function GET() {
       expectedJohnDeere6RFrontAccessoryParts: 2,
       johnDeere6RFrontAccessoryFitments,
       expectedJohnDeere6RFrontAccessoryFitments: 14,
+      pickupHitchValveKitParts,
+      expectedPickupHitchValveKitParts: 1,
+      pickupHitchValveKitFitments,
+      expectedPickupHitchValveKitFitments: 14,
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
