@@ -30,13 +30,16 @@ export async function GET(){
       mowerRows,
       mowerFitments,
       gearMowerFitments,
+      snowBlowerRows,
+      snowBlowerFitments,
+      narrowSnowBlowerFitments,
       serviceParts,
       versionedServiceFitments,
       hstFilterFitments,
       gearHstFilterFitments,
       b2401DirectServiceFitments,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_178_kubota_b01_mowers'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_179_kubota_b01_snow_blowers'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
@@ -149,6 +152,28 @@ export async function GET(){
           AND a.slug IN ('rck54-32','rck60-32')
       `),
       count(`
+        SELECT COUNT(*) AS count FROM attachments a
+        JOIN manufacturers mf ON mf.id=a.manufacturer_id
+        WHERE mf.slug='kubota' AND a.attachment_type='front-snow-blower'
+          AND a.slug IN ('bx2816a','bx2830') AND a.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_attachments ma
+        JOIN machines m ON m.id=ma.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN attachments a ON a.id=ma.attachment_id
+        WHERE mf.slug='kubota' AND m.slug IN ('b2301','b2601','b2401dt')
+          AND a.slug IN ('bx2816a','bx2830') AND ma.confidence='official'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_attachments ma
+        JOIN machines m ON m.id=ma.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN attachments a ON a.id=ma.attachment_id
+        WHERE mf.slug='kubota' AND m.slug='b2401dtn'
+          AND a.slug IN ('bx2816a','bx2830')
+      `),
+      count(`
         SELECT COUNT(*) AS count FROM parts p
         JOIN manufacturers mf ON mf.id=p.manufacturer_id
         WHERE mf.slug='kubota'
@@ -210,6 +235,9 @@ export async function GET(){
       mowerRows:mowerRows===2,
       mowerFitments:mowerFitments===4,
       gearMowerFitments:gearMowerFitments===0,
+      snowBlowerRows:snowBlowerRows===2,
+      snowBlowerFitments:snowBlowerFitments===6,
+      narrowSnowBlowerFitments:narrowSnowBlowerFitments===0,
       serviceParts:serviceParts===6,
       versionedServiceFitments:versionedServiceFitments===18,
       hstFilterFitments:hstFilterFitments===2,
@@ -220,16 +248,18 @@ export async function GET(){
 
     return NextResponse.json({
       ok,
-      expectedLatestB01Migration:'20260827_178_kubota_b01_mowers',
+      expectedLatestB01Migration:'20260827_179_kubota_b01_snow_blowers',
       checks,
       values:{
         machineRows,currentVersions,specificationRows,currentGrossPowerRows,b2601CurrentRevisionRows,b2601LegacyRevisionRows,b2601HighConfidencePowerRows,
         attachmentRows,attachmentFitments,unsupportedNarrowAttachmentFitments,mowerRows,mowerFitments,gearMowerFitments,
+        snowBlowerRows,snowBlowerFitments,narrowSnowBlowerFitments,
         serviceParts,versionedServiceFitments,hstFilterFitments,gearHstFilterFitments,b2401DirectServiceFitments,
       },
       expected:{
         machineRows:4,currentVersions:4,specificationRows:120,currentGrossPowerRows:4,b2601CurrentRevisionRows:2,b2601LegacyRevisionRows:0,b2601HighConfidencePowerRows:2,
         attachmentRows:2,attachmentFitments:4,unsupportedNarrowAttachmentFitments:0,mowerRows:2,mowerFitments:4,gearMowerFitments:0,
+        snowBlowerRows:2,snowBlowerFitments:6,narrowSnowBlowerFitments:0,
         serviceParts:6,versionedServiceFitments:18,hstFilterFitments:2,gearHstFilterFitments:0,b2401DirectServiceFitments:6,
       },
     },{
