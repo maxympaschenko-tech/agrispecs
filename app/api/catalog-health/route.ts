@@ -57,6 +57,7 @@ export async function GET() {
       johnDeere5095M5105MWearElectricalFitments,
       johnDeere5MSteeringCrossReferences,
       johnDeere5120MVerifiedFitments,
+      johnDeere5130MAccessoryFitments,
     ] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
@@ -128,6 +129,16 @@ export async function GET() {
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug='5120m'
           AND sr.external_id='jd-rpg-5120m-na-2022-12'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN source_records sr ON sr.id=mp.source_record_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5130m'
+          AND sr.external_id='john-deere-5000m-pricebook-2025-11-05'
+          AND p.normalized_part_number IN ('BXX10535','BSJ10520','BSJ10563','BSJ10327')
       `),
     ]);
 
@@ -251,7 +262,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_124_5125m_ft4_versioned_maintenance',
+      expectedLatestMigration: '20260827_125_5130m_verified_accessory_kits',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -278,6 +289,8 @@ export async function GET() {
         expectedJohnDeere5120MVerifiedFitmentsAfter123: 21,
         johnDeere5125MFT4Fitments: fitments5125MFT4,
         expectedJohnDeere5125MFT4FitmentsAfter124: 12,
+        johnDeere5130MAccessoryFitments,
+        expectedJohnDeere5130MAccessoryFitmentsAfter125: 4,
       },
       maintenance: {
         total: maintenanceTasks,
