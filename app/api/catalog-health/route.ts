@@ -41,11 +41,12 @@ export async function GET() {
       };
     }
 
-    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments] = await Promise.all([
+    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM parts WHERE data_status='verified'`),
       count(`SELECT COUNT(*) AS count FROM machine_parts`),
+      count(`SELECT COUNT(*) AS count FROM part_cross_references`),
     ]);
 
     const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
@@ -97,7 +98,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_104_6m_verified_fitment',
+      expectedLatestMigration: '20260827_106_more_part_supersessions',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -105,6 +106,7 @@ export async function GET() {
       parts: {
         verified: verifiedParts,
         fitments,
+        crossReferences,
         johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
