@@ -37,12 +37,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const publishable = part.dataStatus === 'verified' || part.dataStatus === 'partial';
   const hasReplacement = part.relations.some((relation) => relation.direction === 'outgoing' && relation.relationType === 'replaces');
+  const hasComponents = part.components.length > 0;
   const title = hasReplacement
     ? `${part.manufacturerName || 'OEM'} ${part.partNumber} Replacement Part Number`
     : `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
   const description = hasReplacement
-    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number and official source.`
-    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, serial-number fitment notes and technical sources.`;
+    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number, verified fitment${hasComponents ? ', kit contents' : ''} and official source.`
+    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, serial-number fitment notes${hasComponents ? ', kit contents' : ''} and technical sources.`;
 
   return {
     title,
@@ -71,6 +72,20 @@ export default async function PartPage({ params }: PageProps) {
       .map((relation) => ({
         url: relation.sourceUrl as string,
         title: relation.sourceTitle || 'Official part substitution source',
+        publishedDate: null,
+      })),
+    ...part.components
+      .filter((component) => component.sourceUrl)
+      .map((component) => ({
+        url: component.sourceUrl as string,
+        title: component.sourceTitle || 'Official kit contents source',
+        publishedDate: null,
+      })),
+    ...part.includedInKits
+      .filter((kit) => kit.sourceUrl)
+      .map((kit) => ({
+        url: kit.sourceUrl as string,
+        title: kit.sourceTitle || 'Official kit contents source',
         publishedDate: null,
       })),
   ];
@@ -106,6 +121,8 @@ export default async function PartPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             <a href="#part-details">Part details</a>
+            {part.components.length > 0 && <a href="#kit-contents">Kit contents</a>}
+            {part.includedInKits.length > 0 && <a href="#included-in-kits">Included in Filter Paks</a>}
             {part.relations.length > 0 && <a href="#cross-references">Replacements & cross references</a>}
             <a href="#fitment">Compatible equipment</a>
             {sources.length > 0 && <a href="#sources">Sources</a>}
@@ -119,7 +136,41 @@ export default async function PartPage({ params }: PageProps) {
               {part.name && <div className="placeholder-row"><span>Description</span><span>{part.name}</span></div>}
               {part.categoryName && <div className="placeholder-row"><span>Category</span><span>{part.categoryName}</span></div>}
               <div className="placeholder-row"><span>Verified fitments</span><span>{part.fitmentCount}</span></div>
+              {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
             </section>
+
+            {part.components.length > 0 && (
+              <section className="data-section" id="kit-contents">
+                <h2>Kit contents</h2>
+                <p className="section-note">Components below are included only when the official source explicitly lists them for this kit.</p>
+                {part.components.map((component) => (
+                  <div className="placeholder-row" key={component.normalizedPartNumber}>
+                    <span>
+                      <Link href={`/parts/${component.normalizedPartNumber.toLowerCase()}`}>{component.partNumber}</Link>
+                    </span>
+                    <span>
+                      {component.name || 'OEM component'}
+                      {component.quantity !== null ? ` · Qty ${component.quantity}` : ''}
+                    </span>
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {part.includedInKits.length > 0 && (
+              <section className="data-section" id="included-in-kits">
+                <h2>Included in Filter Paks</h2>
+                <p className="section-note">Official kits currently recorded as containing this part.</p>
+                {part.includedInKits.map((kit) => (
+                  <div className="placeholder-row" key={kit.normalizedPartNumber}>
+                    <span>
+                      <Link href={`/parts/${kit.normalizedPartNumber.toLowerCase()}`}>{kit.partNumber}</Link>
+                    </span>
+                    <span>{kit.name || 'Filter Pak'}</span>
+                  </div>
+                ))}
+              </section>
+            )}
 
             {part.relations.length > 0 && (
               <section className="data-section" id="cross-references">
