@@ -14,6 +14,7 @@ import { moreMachineImagesMigration } from '@/lib/migrations/20260827_082_more_m
 import { maintenanceSchedulesMigration } from '@/lib/migrations/20260827_090_maintenance_schedules';
 import { johnDeere2025RMaintenanceMigration } from '@/lib/migrations/20260827_091_2025r_maintenance';
 import { johnDeere4066MMaintenanceMigration } from '@/lib/migrations/20260827_092_4066m_maintenance';
+import { johnDeere5ECapacityVariantsMigration } from '@/lib/migrations/20260827_093_5e_capacity_variants';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -37,6 +38,7 @@ const migrations: DbMigration[] = [
   maintenanceSchedulesMigration,
   johnDeere2025RMaintenanceMigration,
   johnDeere4066MMaintenanceMigration,
+  johnDeere5ECapacityVariantsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
