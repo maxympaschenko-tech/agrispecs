@@ -19,13 +19,15 @@ export async function GET() {
       migrationApplied,
       publishableM7060,
       currentVersions,
+      serviceReferenceVersions,
       specs,
+      serviceCapacities,
       verifiedLoaders,
       loaderCompatibilityRows,
       correctedPtoRows,
       hydraulicHitchBrakeRows,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_135_kubota_m7060_current_hydraulics_pto_correction'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_136_kubota_m7060_service_capacities'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug='m7060' AND m.data_status IN ('partial','verified')
@@ -37,11 +39,24 @@ export async function GET() {
           AND mv.slug IN ('us-current-8f8r','us-current-12f12r') AND mv.is_current=1
       `),
       count(`
+        SELECT COUNT(*) AS count FROM machine_versions mv
+        JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='kubota' AND m.slug='m7060'
+          AND mv.slug='us-service-reference-2017' AND mv.is_current=0
+      `),
+      count(`
         SELECT COUNT(*) AS count FROM machine_specs ms
         JOIN machines m ON m.id=ms.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         JOIN machine_versions mv ON mv.id=ms.machine_version_id
         WHERE mf.slug='kubota' AND m.slug='m7060'
           AND mv.slug IN ('us-current-8f8r','us-current-12f12r')
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_capacities mc
+        JOIN machines m ON m.id=mc.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN machine_versions mv ON mv.id=mc.machine_version_id
+        WHERE mf.slug='kubota' AND m.slug='m7060' AND mv.slug='us-service-reference-2017'
       `),
       count(`
         SELECT COUNT(*) AS count FROM attachments a
@@ -85,14 +100,18 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_135_kubota_m7060_current_hydraulics_pto_correction',
+      expectedLatestKubotaMigration: '20260827_136_kubota_m7060_service_capacities',
       migrationApplied: migrationApplied === 1,
       publishableM7060,
       expectedPublishableM7060: 1,
       currentConfigurationVersions: currentVersions,
       expectedCurrentConfigurationVersions: 2,
+      serviceReferenceVersions,
+      expectedServiceReferenceVersions: 1,
       specificationRecords: specs,
       expectedSpecificationRecords: 46,
+      serviceCapacities,
+      expectedServiceCapacities: 5,
       correctedPtoRows,
       expectedCorrectedPtoRows: 2,
       hydraulicHitchBrakeRows,
