@@ -2,21 +2,23 @@ import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
 import { getPartCategories } from '@/lib/part-category-service';
 import { getIndexablePartNumbers } from '@/lib/part-index-service';
+import { getAttachmentCatalog } from '@/lib/attachments-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
-  const staticPages: MetadataRoute.Sitemap = ['', '/tractors', '/brands', '/parts', '/fitment-checker', '/compare'].map((path) => ({
+  const staticPages: MetadataRoute.Sitemap = ['', '/tractors', '/brands', '/parts', '/attachments', '/fitment-checker', '/compare'].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
   }));
 
-  const [machines, partNumbers, categories] = await Promise.all([
+  const [machines, partNumbers, categories, attachments] = await Promise.all([
     getMachines(),
     getIndexablePartNumbers(),
     getPartCategories(),
+    getAttachmentCatalog(),
   ]);
 
   const publishableMachines = machines.filter(
@@ -47,5 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
-  return [...staticPages, ...brandPages, ...machinePages, ...categoryPages, ...partPages];
+  const attachmentPages: MetadataRoute.Sitemap = attachments
+    .filter((attachment) => attachment.compatibleMachineCount > 0)
+    .map((attachment) => ({
+      url: `${baseUrl}/attachments/${attachment.manufacturerSlug}/${attachment.slug}`,
+      lastModified: new Date(),
+    }));
+
+  return [...staticPages, ...brandPages, ...machinePages, ...categoryPages, ...partPages, ...attachmentPages];
 }
