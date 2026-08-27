@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { searchMachines } from '@/lib/catalog-service';
 import { searchParts } from '@/lib/parts-service';
+import { searchAttachments } from '@/lib/attachments-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -18,9 +19,10 @@ type SearchPageProps = {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = '' } = await searchParams;
   const term = q.trim();
-  const [machines, parts] = term
-    ? await Promise.all([searchMachines(term), searchParts(term)])
-    : [[], []];
+  const [machines, parts, attachments] = term
+    ? await Promise.all([searchMachines(term), searchParts(term), searchAttachments(term)])
+    : [[], [], []];
+  const publishableMachines = machines.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const verifiedParts = parts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
 
   return (
@@ -29,22 +31,39 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <span className="eyebrow">Catalog search</span>
         <h1>Search</h1>
         <form className="search-shell" action="/search">
-          <input name="q" defaultValue={q} aria-label="Search equipment or part number" placeholder="Try: John Deere 5075E or RE519626" />
+          <input name="q" defaultValue={q} aria-label="Search equipment, attachment or part number" placeholder="Try: John Deere 5075E, 540R loader or RE519626" />
           <button type="submit">Search</button>
         </form>
 
         <div style={{ marginTop: 28 }}>
-          {term && machines.length === 0 && verifiedParts.length === 0 && <p>No matching equipment or verified part records yet.</p>}
+          {term && publishableMachines.length === 0 && verifiedParts.length === 0 && attachments.length === 0 && (
+            <p>No matching source-backed equipment, attachment or part records yet.</p>
+          )}
 
-          {machines.length > 0 && (
+          {publishableMachines.length > 0 && (
             <section className="search-group">
               <h2>Equipment</h2>
               <div className="grid">
-                {machines.map((machine) => (
+                {publishableMachines.map((machine) => (
                   <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                     <span className="eyebrow">Tractor</span>
                     <h3>{machine.title}</h3>
                     <p>Specifications, maintenance and compatible parts</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {attachments.length > 0 && (
+            <section className="search-group">
+              <h2>Attachments</h2>
+              <div className="grid">
+                {attachments.map((attachment) => (
+                  <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
+                    <span className="eyebrow">{attachment.attachmentType === 'front-loader' ? 'Front loader' : 'Attachment'}</span>
+                    <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
+                    <p>{attachment.compatibleMachineCount} verified compatible tractor{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
                   </Link>
                 ))}
               </div>
