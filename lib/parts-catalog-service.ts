@@ -7,6 +7,7 @@ export type PartCatalogItem = {
   normalizedPartNumber: string;
   name: string | null;
   categoryName: string | null;
+  categorySlug: string | null;
   manufacturerName: string | null;
   manufacturerSlug: string | null;
   fitmentCount: number;
@@ -21,6 +22,7 @@ type CatalogRow = RowDataPacket & {
   normalized_part_number: string;
   name: string | null;
   category_name: string | null;
+  category_slug: string | null;
   manufacturer_name: string | null;
   manufacturer_slug: string | null;
   fitment_count: number;
@@ -29,9 +31,13 @@ type CatalogRow = RowDataPacket & {
   kit_membership_count: number;
 };
 
-export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
+export async function getPartCatalogItems(categorySlug?: string): Promise<PartCatalogItem[]> {
   try {
     const db = await getDbReady();
+    const params: unknown[] = [];
+    const categoryFilter = categorySlug ? 'AND pc.slug = ?' : '';
+    if (categorySlug) params.push(categorySlug);
+
     const [rows] = await db.query<CatalogRow[]>(`
       SELECT
         p.id,
@@ -39,6 +45,7 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
         p.normalized_part_number,
         p.name,
         pc.name AS category_name,
+        pc.slug AS category_slug,
         mf.name AS manufacturer_name,
         mf.slug AS manufacturer_slug,
         (SELECT COUNT(DISTINCT mp.machine_id) FROM machine_parts mp WHERE mp.part_id=p.id) AS fitment_count,
@@ -52,6 +59,7 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
       LEFT JOIN part_categories pc ON pc.id=p.category_id
       LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
       WHERE p.data_status IN ('partial','verified')
+        ${categoryFilter}
         AND (
           EXISTS (SELECT 1 FROM machine_parts mp WHERE mp.part_id=p.id)
           OR EXISTS (SELECT 1 FROM part_cross_references pcr WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id)
@@ -62,7 +70,7 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
         mf.name ASC,
         pc.name ASC,
         p.part_number ASC
-    `);
+    `, params);
 
     return rows.map((row) => ({
       id: Number(row.id),
@@ -70,6 +78,7 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
       normalizedPartNumber: row.normalized_part_number,
       name: row.name,
       categoryName: row.category_name,
+      categorySlug: row.category_slug,
       manufacturerName: row.manufacturer_name,
       manufacturerSlug: row.manufacturer_slug,
       fitmentCount: Number(row.fitment_count || 0),
