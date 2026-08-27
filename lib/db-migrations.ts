@@ -42,6 +42,7 @@ import { threeEFilterPakComponentsMigration } from '@/lib/migrations/20260827_11
 import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21128_components';
 import { catalogPerformanceIndexesMigration } from '@/lib/migrations/20260827_119_catalog_performance_indexes';
 import { johnDeere5075MWearElectricalPartsMigration } from '@/lib/migrations/20260827_120_5075m_wear_electrical_parts';
+import { johnDeere5095M5105MWearElectricalPartsMigration } from '@/lib/migrations/20260827_121_5095m_5105m_wear_electrical_parts';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -93,6 +94,7 @@ const migrations: DbMigration[] = [
   lva21128ComponentsMigration,
   catalogPerformanceIndexesMigration,
   johnDeere5075MWearElectricalPartsMigration,
+  johnDeere5095M5105MWearElectricalPartsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
