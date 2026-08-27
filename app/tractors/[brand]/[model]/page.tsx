@@ -11,10 +11,12 @@ type PageProps = {
 };
 
 const sectionOrder = [
+  'Machine Configuration',
   'Engine',
   'Transmission',
   'PTO',
   'Hydraulics',
+  'Dimensions & Weight',
   'Capacities',
   'Steering & Brakes',
   'Electrical',
