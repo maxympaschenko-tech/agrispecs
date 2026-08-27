@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { getBrands, machines } from '@/lib/catalog';
+import { getBrands, getMachines } from '@/lib/catalog-service';
 
-export default function HomePage() {
-  const brands = getBrands();
+export default async function HomePage() {
+  const [brands, machines] = await Promise.all([getBrands(), getMachines()]);
 
   return (
     <main>
@@ -25,7 +25,7 @@ export default function HomePage() {
           <h2>Browse tractors</h2>
           <p className="section-lead">The first catalog section is being built around major brands used in the United States.</p>
           <div className="grid">
-            {machines.map((machine) => (
+            {machines.slice(0, 12).map((machine) => (
               <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                 <span className="eyebrow">Tractor</span>
                 <h3>{machine.title}</h3>
