@@ -18,9 +18,9 @@ export async function GET(){
     const [
       migrationApplied,machineRows,currentVersions,specificationRows,grossPowerRows,
       attachmentRows,attachmentFitments,bh92RopsRestrictionRows,
-      serviceParts,versionedServiceFitments,hstFilterFitments,gearHstFilterFitments,hstFilterSupersessions,
+      serviceParts,versionedServiceFitments,hstFilterFitments,gearHstFilterFitments,hstFilterSupersessions,mx5400fProvenanceRows,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_167_kubota_mx_hst_filter_supersessions'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_168_kubota_mx5400f_filter_provenance'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
@@ -101,6 +101,15 @@ export async function GET(){
         WHERE mf.slug='kubota' AND pcr.relation_type='replaces' AND newp.normalized_part_number='HHTA059900'
           AND oldp.normalized_part_number IN ('TA24059900','TA24059901','V051165320')
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id
+        JOIN source_records sr ON sr.id=mp.source_record_id
+        WHERE mf.slug='kubota' AND m.slug='mx5400' AND mv.slug='us-current-gear-2wd'
+          AND p.normalized_part_number IN ('HH16432430','HH1J143172','R140142270','HHTA037710')
+          AND sr.external_id='messicks-kubota-mx5400f-service-filters'
+      `),
     ]);
 
     const checks={
@@ -117,15 +126,16 @@ export async function GET(){
       hstFilterFitments:hstFilterFitments===3,
       gearHstFilterFitments:gearHstFilterFitments===0,
       hstFilterSupersessions:hstFilterSupersessions===3,
+      mx5400fProvenanceRows:mx5400fProvenanceRows===4,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestMXMigration:'20260827_167_kubota_mx_hst_filter_supersessions',
+      expectedLatestMXMigration:'20260827_168_kubota_mx5400f_filter_provenance',
       checks,
-      values:{machineRows,currentVersions,specificationRows,grossPowerRows,attachmentRows,attachmentFitments,bh92RopsRestrictionRows,serviceParts,versionedServiceFitments,hstFilterFitments,gearHstFilterFitments,hstFilterSupersessions},
-      expected:{machineRows:3,currentVersions:6,specificationRows:168,grossPowerRows:6,attachmentRows:2,attachmentFitments:6,bh92RopsRestrictionRows:3,serviceParts:5,versionedServiceFitments:27,hstFilterFitments:3,gearHstFilterFitments:0,hstFilterSupersessions:3},
+      values:{machineRows,currentVersions,specificationRows,grossPowerRows,attachmentRows,attachmentFitments,bh92RopsRestrictionRows,serviceParts,versionedServiceFitments,hstFilterFitments,gearHstFilterFitments,hstFilterSupersessions,mx5400fProvenanceRows},
+      expected:{machineRows:3,currentVersions:6,specificationRows:168,grossPowerRows:6,attachmentRows:2,attachmentFitments:6,bh92RopsRestrictionRows:3,serviceParts:5,versionedServiceFitments:27,hstFilterFitments:3,gearHstFilterFitments:0,hstFilterSupersessions:3,mx5400fProvenanceRows:4},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
