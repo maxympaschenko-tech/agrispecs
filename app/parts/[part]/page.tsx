@@ -45,6 +45,13 @@ function fitmentVersionLabel(fitment: PartFitment) {
   ].filter(Boolean).join(' · ');
 }
 
+function fitmentConfidenceLabel(fitment: PartFitment) {
+  if (fitment.fitmentConfidence === 'official') return 'Official direct fitment';
+  if (fitment.fitmentConfidence === 'high') return 'High-confidence reference';
+  if (fitment.fitmentConfidence === 'medium') return 'Medium-confidence reference';
+  return 'Low-confidence reference';
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { part: slug } = await params;
   const part = await getPart(slug);
@@ -57,8 +64,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? `${part.manufacturerName || 'OEM'} ${part.partNumber} Replacement Part Number`
     : `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
   const description = hasReplacement
-    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number, verified fitment${hasComponents ? ', kit contents' : ''} and official source.`
-    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, serial-number fitment notes${hasComponents ? ', kit contents' : ''} and technical sources.`;
+    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number, source-backed fitment${hasComponents ? ', kit contents' : ''} and technical sources.`
+    : `${part.partNumber} ${part.name || 'OEM part'} reference with source-backed compatible farm equipment, fitment confidence, serial-number notes${hasComponents ? ', kit contents' : ''} and technical sources.`;
 
   return {
     title,
@@ -130,7 +137,7 @@ export default async function PartPage({ params }: PageProps) {
             </div>
           )}
           <div className="notice">
-            Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number, machine generation and configuration before ordering.
+            Fitment and replacement relationships are shown only where a source record is attached. Confidence labels distinguish direct model fitment from broader engine- or family-level references. Always confirm serial number, machine generation and configuration before ordering.
           </div>
           <Link className="tool-link" href={checkerHref}>Check this part by serial number →</Link>
         </section>
@@ -158,7 +165,7 @@ export default async function PartPage({ params }: PageProps) {
                   <span>{categoryHref ? <Link href={categoryHref}>{part.categoryName}</Link> : part.categoryName}</span>
                 </div>
               )}
-              <div className="placeholder-row"><span>Verified fitments</span><span>{part.fitmentCount}</span></div>
+              <div className="placeholder-row"><span>Source-backed fitments</span><span>{part.fitmentCount}</span></div>
               {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
             </section>
 
@@ -241,6 +248,7 @@ export default async function PartPage({ params }: PageProps) {
                       <Link className="part-fitment-machine" href={`/tractors/${fitment.brandSlug}/${fitment.modelSlug}`}>
                         {fitment.brand} {fitment.model}
                       </Link>
+                      <p><strong>Fitment confidence:</strong> {fitmentConfidenceLabel(fitment)}</p>
                       {versionLabel && <p><strong>Version:</strong> {versionLabel}</p>}
                       {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
                       {fitment.configurationNote && <p><strong>Configuration:</strong> {fitment.configurationNote}</p>}
@@ -251,7 +259,7 @@ export default async function PartPage({ params }: PageProps) {
                   </div>
                 );
               }) : (
-                <p>No direct equipment fitment has been published for this part number. Check the replacement relationship above when available.</p>
+                <p>No source-backed equipment fitment has been published for this part number. Check the replacement relationship above when available.</p>
               )}
             </section>
 
