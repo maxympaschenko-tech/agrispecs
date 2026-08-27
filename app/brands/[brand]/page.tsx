@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getBrands, machines } from '@/lib/catalog';
+import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
+import { getBrands as getSeedBrands } from '@/lib/catalog';
 
 type PageProps = { params: Promise<{ brand: string }> };
 
 export function generateStaticParams() {
-  return getBrands().map((brand) => ({ brand: brand.slug }));
+  return getSeedBrands().map((brand) => ({ brand: brand.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand } = await params;
-  const info = getBrands().find((item) => item.slug === brand);
+  const brands = await getBrands();
+  const info = brands.find((item) => item.slug === brand);
   if (!info) return {};
+
   return {
     title: `${info.name} Farm Equipment Models`,
     description: `Browse ${info.name} farm equipment model references, specifications, maintenance and parts data.`,
@@ -21,9 +24,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BrandPage({ params }: PageProps) {
   const { brand } = await params;
-  const info = getBrands().find((item) => item.slug === brand);
+  const [brands, brandMachines] = await Promise.all([
+    getBrands(),
+    getMachinesByBrand(brand),
+  ]);
+  const info = brands.find((item) => item.slug === brand);
   if (!info) notFound();
-  const brandMachines = machines.filter((machine) => machine.brandSlug === brand);
 
   return (
     <main className="section">
