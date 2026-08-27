@@ -13,10 +13,18 @@ type PartSeed={
 
 const parts:PartSeed[]=[
   {partNumber:'HH1J0-32430',normalized:'HH1J032430',name:'Engine Oil Filter Cartridge',categorySlug:'engine-oil-filters'},
+  {partNumber:'HH150-32094',normalized:'HH15032094',name:'Engine Oil Filter',categorySlug:'engine-oil-filters'},
   {partNumber:'12581-43012',normalized:'1258143012',name:'In-Line Fuel Filter',categorySlug:'fuel-filters'},
   {partNumber:'K1211-82320',normalized:'K121182320',name:'Engine Air Filter Element',categorySlug:'engine-air-filters'},
   {partNumber:'HHK20-36994',normalized:'HHK2036994',name:'Transmission Oil Filter Cartridge',categorySlug:'transmission-filters'},
 ];
+
+const modelPartNumbers:Record<ModelSlug,string[]>={
+  bx1880:['HH1J032430','1258143012','K121182320','HHK2036994'],
+  bx2380:['HH1J032430','1258143012','K121182320','HHK2036994'],
+  bx2680:['HH15032094','1258143012','K121182320','HHK2036994'],
+  bx23s:['HH1J032430','1258143012','K121182320','HHK2036994'],
+};
 
 const sources:Record<ModelSlug,{url:string;externalId:string;title:string}>={
   bx1880:{url:'https://www.messicks.com/catalogs/kubota/bx1880-1',externalId:'messicks-kubota-bx1880-1-service-filters',title:'Kubota BX1880-1 parts catalog - current service filter references'},
@@ -88,9 +96,10 @@ export const kubotaBXServiceFiltersMigration:DbMigration={
       const versionId=await selectId(connection,`SELECT id FROM machine_versions WHERE machine_id=? AND slug='us-current-hst-4wd' LIMIT 1`,[machineId]);
       const sourceRecordId=sourceRecordIds.get(modelSlug);
       if(!sourceRecordId) throw new Error(`Missing ${modelSlug} BX service-filter source.`);
-      for(const part of parts){
-        const partId=partIds.get(part.normalized);
-        if(!partId) throw new Error(`Missing BX part ${part.partNumber}`);
+      for(const normalized of modelPartNumbers[modelSlug]){
+        const part=parts.find((candidate)=>candidate.normalized===normalized);
+        const partId=partIds.get(normalized);
+        if(!part||!partId) throw new Error(`Missing BX part ${normalized}`);
         await upsertFitment(
           connection,machineId,versionId,partId,sourceRecordId,
           `${sources[modelSlug].title} supports ${part.partNumber} as a service-filter reference for this BX model family. Confirm exact tractor serial number before ordering.`,
