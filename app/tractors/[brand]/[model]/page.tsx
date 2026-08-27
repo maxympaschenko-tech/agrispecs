@@ -55,10 +55,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const machine = await getMachine(brand, model);
   if (!machine) return {};
 
+  const publishable = machine.dataStatus === 'partial' || machine.dataStatus === 'verified';
+
   return {
     title: `${machine.title} Specs, Parts and Maintenance`,
     description: `${machine.title} specifications, maintenance information, compatible parts, fluids, filters, attachments and reference data.`,
     alternates: { canonical: `/tractors/${machine.brandSlug}/${machine.modelSlug}` },
+    robots: publishable
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
   };
 }
 
