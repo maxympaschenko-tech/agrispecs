@@ -5,7 +5,7 @@ import { johnDeere3Series2026Migration } from '@/lib/migrations/20260827_010_joh
 import { johnDeere4Series2026Migration } from '@/lib/migrations/20260827_020_john_deere_4_series';
 import { johnDeere5ESeries2022Migration } from '@/lib/migrations/20260827_030_john_deere_5e_series';
 import { johnDeere5MSeries2025Migration } from '@/lib/migrations/20260827_040_john_deere_5m_series';
-import { johnDeere6MSeriesCurrentMigration } from '@/lib/migrations/20260827_050_6m_series';
+import { johnDeere6MSeriesCurrentMigration } from '@/lib/migrations/20260827_050_john_deere_6m_series';
 import { johnDeere6RSeriesCurrentMigration } from '@/lib/migrations/20260827_060_john_deere_6r_series';
 import { johnDeereFiltersPartsMigration } from '@/lib/migrations/20260827_070_john_deere_filters_parts';
 import { machineImagesMigration } from '@/lib/migrations/20260827_080_machine_images';
