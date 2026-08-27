@@ -25,6 +25,10 @@ import { kubotaL3302L3902CurrentSpecsMigration } from '@/lib/migrations/20260827
 import { kubotaL3302L3902LA526LoaderMigration } from '@/lib/migrations/20260827_156_kubota_l3302_l3902_la526_loader';
 import { kubotaL3302L3902ServiceFiltersMigration } from '@/lib/migrations/20260827_157_kubota_l3302_l3902_service_filters';
 import { kubotaFuelFilterFullSupersessionChainMigration } from '@/lib/migrations/20260827_158_kubota_fuel_filter_full_supersession_chain';
+import { kubotaL4802CurrentSpecsMigration } from '@/lib/migrations/20260827_159_kubota_l4802_current_specs';
+import { kubotaL4802LA766LoaderMigration } from '@/lib/migrations/20260827_160_kubota_l4802_la766_loader';
+import { kubotaL4802ServiceFiltersMigration } from '@/lib/migrations/20260827_161_kubota_l4802_service_filters';
+import { kubotaL4802HydraulicFilterSupersessionMigration } from '@/lib/migrations/20260827_162_kubota_l4802_hydraulic_filter_supersession';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -53,4 +57,8 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaL3302L3902LA526LoaderMigration,
   kubotaL3302L3902ServiceFiltersMigration,
   kubotaFuelFilterFullSupersessionChainMigration,
+  kubotaL4802CurrentSpecsMigration,
+  kubotaL4802LA766LoaderMigration,
+  kubotaL4802ServiceFiltersMigration,
+  kubotaL4802HydraulicFilterSupersessionMigration,
 ];
