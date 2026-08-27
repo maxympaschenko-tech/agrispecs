@@ -8,16 +8,9 @@
   --brand-dark: #154d2b;
   --accent: #d6a72c;
 }
-
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.55;
-}
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; line-height: 1.55; }
 a { color: inherit; text-decoration: none; }
 .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 .site-header { background: #102719; color: #fff; border-bottom: 4px solid var(--accent); }
@@ -40,6 +33,14 @@ a { color: inherit; text-decoration: none; }
 .checker-form button { border: 0; background: var(--brand); color: #fff; border-radius: 8px; padding: 13px 20px; font-weight: 800; cursor: pointer; }
 .checker-result { margin-top: 18px; }
 .tool-link { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; padding: 10px 14px; border-radius: 8px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 800; }
+.replacement-summary { margin-top: 16px; padding: 12px 14px; background: #edf6ee; border: 1px solid #c7ddca; border-radius: 8px; font-size: 14px; }
+.replacement-summary a { color: var(--brand-dark); font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+.replacement-chain { display: grid; gap: 9px; margin: 0 0 16px; padding: 14px; background: #f7faf7; border: 1px solid var(--line); border-radius: 9px; }
+.replacement-chain > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.replacement-chain > div > span { display: inline-flex; align-items: center; gap: 8px; }
+.replacement-chain a { color: var(--brand-dark); font-weight: 800; }
+.replacement-chain b { color: var(--muted); }
+.replacement-chain small { color: var(--muted); }
 .parts-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin: 0 0 18px; }
 .parts-stats > div { display: grid; gap: 3px; padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
 .parts-stats strong { font-size: 27px; line-height: 1; }
