@@ -27,6 +27,12 @@ const descriptions: Record<string,string> = {
   'engine-oils': 'Source-backed engine oil products referenced by official farm equipment maintenance guides and service schedules.',
   'transmission-hydraulic-fluids': 'Source-backed transmission and hydraulic fluids referenced by official maintenance guides, including system capacities where verified.',
   'fluids': 'Source-backed farm equipment fluids referenced by official maintenance and technical sources.',
+  'steering-parts': 'Source-backed tractor tie rods, steering ball joints and related steering parts with 2WD or MFWD configuration notes, replacement numbers and verified model fitment.',
+  'alternators': 'Source-backed tractor alternator part numbers with rated amperage, voltage and verified equipment fitment where published by the manufacturer.',
+  'batteries': 'Source-backed tractor battery part numbers and electrical-system fitment from official replacement-parts guides.',
+  'brake-parts': 'Source-backed tractor brake disk and brake-system replacement part numbers with verified compatible models.',
+  'drive-belts': 'Source-backed tractor fan and auxiliary drive belt part numbers with published length or configuration notes and verified model fitment.',
+  'clutch-parts': 'Source-backed PTO and transmission clutch part numbers with configuration notes and verified tractor fitment.',
 };
 
 function parsePage(value?: string) {
