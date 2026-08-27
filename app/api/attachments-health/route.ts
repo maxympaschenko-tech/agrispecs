@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 type CountRow = RowDataPacket & { count: number };
-
 type MigrationRow = RowDataPacket & { count: number };
 
 async function count(sql: string, params: unknown[] = []) {
@@ -19,10 +18,19 @@ export async function GET() {
   try {
     const db = await getDbReady();
     const [migrationRows] = await db.query<MigrationRow[]>(
-      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_128_6m_6r_loader_compatibility'`,
+      `SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_129_6r_loader_mounting_frames'`,
     );
 
-    const [verifiedLoaders, compatibilityRows, johnDeere5MRows, johnDeere6MRows, johnDeere6RRows] = await Promise.all([
+    const [
+      verifiedLoaders,
+      compatibilityRows,
+      johnDeere5MRows,
+      johnDeere6MRows,
+      johnDeere6RRows,
+      loaderMountingParts,
+      johnDeere6MMountingFrameFitments,
+      johnDeere6RMountingFrameFitments,
+    ] = await Promise.all([
       count(`
         SELECT COUNT(*) AS count
         FROM attachments a
@@ -69,11 +77,39 @@ export async function GET() {
           AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
           AND a.slug IN ('620r','640r','660r')
       `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND p.normalized_part_number IN ('AXX10595','AXX10596','AXX10321','AXX10322')
+          AND p.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND m.slug IN ('6m-95','6m-105','6m-115','6m-125','6m-130','6m-140','6m-150')
+          AND p.normalized_part_number IN ('AXX10595','AXX10596')
+      `),
+      count(`
+        SELECT COUNT(*) AS count
+        FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND m.slug IN ('6r-110','6r-120','6r-130','6r-140','6r-150','6r-175','6r-195')
+          AND p.normalized_part_number IN ('AXX10595','AXX10596','AXX10321','AXX10322')
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestMigration: '20260827_128_6m_6r_loader_compatibility',
+      expectedLatestMigration: '20260827_129_6r_loader_mounting_frames',
       migrationApplied: Number(migrationRows[0]?.count || 0) === 1,
       verifiedLoaders,
       expectedVerifiedLoaders: 8,
@@ -85,6 +121,12 @@ export async function GET() {
       expectedJohnDeere6MCompatibilityRows: 14,
       johnDeere6RCompatibilityRows: johnDeere6RRows,
       expectedJohnDeere6RCompatibilityRows: 12,
+      loaderMountingParts,
+      expectedLoaderMountingParts: 4,
+      johnDeere6MMountingFrameFitments,
+      expectedJohnDeere6MMountingFrameFitments: 14,
+      johnDeere6RMountingFrameFitments,
+      expectedJohnDeere6RMountingFrameFitments: 14,
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
