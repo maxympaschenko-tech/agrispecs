@@ -40,6 +40,7 @@ import { partComponentsMigration } from '@/lib/migrations/20260827_115_part_comp
 import { oneSeriesFilterPakComponentsMigration } from '@/lib/migrations/20260827_116_1_series_filter_pak_components';
 import { threeEFilterPakComponentsMigration } from '@/lib/migrations/20260827_117_3e_filter_pak_components';
 import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21128_components';
+import { catalogPerformanceIndexesMigration } from '@/lib/migrations/20260827_119_catalog_performance_indexes';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -89,6 +90,7 @@ const migrations: DbMigration[] = [
   oneSeriesFilterPakComponentsMigration,
   threeEFilterPakComponentsMigration,
   lva21128ComponentsMigration,
+  catalogPerformanceIndexesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
