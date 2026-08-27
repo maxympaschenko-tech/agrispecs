@@ -79,6 +79,18 @@ type CompatibleMachineRow = RowDataPacket & {
   source_url: string | null;
 };
 
+function rowToCatalogItem(row: AttachmentCatalogRow): AttachmentCatalogItem {
+  return {
+    id: Number(row.id),
+    manufacturerName: row.manufacturer_name,
+    manufacturerSlug: row.manufacturer_slug,
+    modelName: row.model_name,
+    slug: row.slug,
+    attachmentType: row.attachment_type,
+    compatibleMachineCount: Number(row.compatible_machine_count || 0),
+  };
+}
+
 export async function getMachineAttachments(machineId: string): Promise<MachineAttachment[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
@@ -142,17 +154,49 @@ export async function getAttachmentCatalog(): Promise<AttachmentCatalogItem[]> {
       ORDER BY mf.name,a.attachment_type,a.model_name
     `);
 
-    return rows.map((row) => ({
-      id: Number(row.id),
-      manufacturerName: row.manufacturer_name,
-      manufacturerSlug: row.manufacturer_slug,
-      modelName: row.model_name,
-      slug: row.slug,
-      attachmentType: row.attachment_type,
-      compatibleMachineCount: Number(row.compatible_machine_count || 0),
-    }));
+    return rows.map(rowToCatalogItem);
   } catch (error) {
     console.error('Unable to load attachment catalog:', error);
+    return [];
+  }
+}
+
+export async function searchAttachments(term: string): Promise<AttachmentCatalogItem[]> {
+  const normalized = term.trim();
+  if (!normalized) return [];
+
+  try {
+    const db = await getDbReady();
+    const like = `%${normalized}%`;
+    const [rows] = await db.query<AttachmentCatalogRow[]>(`
+      SELECT
+        a.id,
+        mf.name AS manufacturer_name,
+        mf.slug AS manufacturer_slug,
+        a.model_name,
+        a.slug,
+        a.attachment_type,
+        COUNT(DISTINCT ma.machine_id) AS compatible_machine_count
+      FROM attachments a
+      JOIN manufacturers mf ON mf.id=a.manufacturer_id
+      JOIN machine_attachments ma ON ma.attachment_id=a.id
+      WHERE a.data_status IN ('partial','verified')
+        AND (
+          a.model_name LIKE ?
+          OR mf.name LIKE ?
+          OR CONCAT(mf.name,' ',a.model_name) LIKE ?
+          OR a.attachment_type LIKE ?
+          OR CONCAT(a.model_name,' loader') LIKE ?
+        )
+      GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
+      HAVING COUNT(DISTINCT ma.machine_id) > 0
+      ORDER BY mf.name,a.attachment_type,a.model_name
+      LIMIT 30
+    `, [like,like,like,like,like]);
+
+    return rows.map(rowToCatalogItem);
+  } catch (error) {
+    console.error('Unable to search attachments:', error);
     return [];
   }
 }
