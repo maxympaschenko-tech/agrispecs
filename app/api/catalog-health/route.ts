@@ -42,7 +42,19 @@ export async function GET() {
       };
     }
 
-    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences, alternativeRelations, serialConstrainedFitments, compactSerialFitments, filterPak3ESerialFitments, filterPakReplacementRelations] = await Promise.all([
+    const [
+      johnDeereMachines,
+      publishableJohnDeere,
+      verifiedParts,
+      fitments,
+      crossReferences,
+      alternativeRelations,
+      serialConstrainedFitments,
+      compactSerialFitments,
+      filterPak3ESerialFitments,
+      filterPakReplacementRelations,
+      johnDeere5075MWearElectricalFitments,
+    ] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM parts WHERE data_status='verified'`),
@@ -76,6 +88,17 @@ export async function GET() {
             OR (p.normalized_part_number='LVA21038' AND cp.normalized_part_number='TA25768')
             OR (p.normalized_part_number='LVA21039' AND cp.normalized_part_number='TA25765')
             OR (p.normalized_part_number='TA15270' AND cp.normalized_part_number='TA25769'))
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5075m'
+          AND p.normalized_part_number IN (
+            'SJ20988','SJ27050','RE554568','DZ123153','AXE66451',
+            'RE217616','RE217817','RE217819','RE271437','RE271440','RE271441'
+          )
       `),
     ]);
 
@@ -129,7 +152,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_118_lva21128_components',
+      expectedLatestMigration: '20260827_120_5075m_wear_electrical_parts',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -146,6 +169,8 @@ export async function GET() {
         partComponents: partComponentRecords,
         expectedPartComponentsAfter118: 73,
         johnDeere6MVerifiedFitments: fitment6M,
+        johnDeere5075MWearElectricalFitments,
+        expectedJohnDeere5075MWearElectricalFitmentsAfter120: 11,
       },
       maintenance: {
         total: maintenanceTasks,
