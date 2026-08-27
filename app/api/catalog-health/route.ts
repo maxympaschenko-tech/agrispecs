@@ -207,10 +207,51 @@ export async function GET() {
       `) : Promise.resolve(0),
     ]);
 
+    const [version5125MFT4, fitments5125MFT4, maintenance5125MFT4, capacities5125MFT4] = await Promise.all([
+      count(`
+        SELECT COUNT(*) AS count FROM machine_versions mv
+        JOIN machines m ON m.id=mv.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5125m'
+          AND mv.slug='north-america-ft4-service-guide-2021-12'
+          AND mv.is_current=0
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN machine_versions mv ON mv.id=mp.machine_version_id
+        JOIN source_records sr ON sr.id=mp.source_record_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5125m'
+          AND mv.slug='north-america-ft4-service-guide-2021-12'
+          AND sr.external_id='jd-5m-ft4-filter-overview-2021-12'
+      `),
+      hasMaintenance ? count(`
+        SELECT COUNT(*) AS count FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id
+        JOIN machine_versions mv ON mv.id=mt.machine_version_id
+        JOIN source_records sr ON sr.id=mt.source_record_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5125m'
+          AND mv.slug='north-america-ft4-service-guide-2021-12'
+          AND sr.external_id='jd-5m-ft4-filter-overview-2021-12'
+      `) : Promise.resolve(0),
+      hasCapacities ? count(`
+        SELECT COUNT(*) AS count FROM machine_capacities mc
+        JOIN machines m ON m.id=mc.machine_id
+        JOIN machine_versions mv ON mv.id=mc.machine_version_id
+        JOIN source_records sr ON sr.id=mc.source_record_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug='5125m'
+          AND mv.slug='north-america-ft4-service-guide-2021-12'
+          AND sr.external_id='jd-5m-ft4-filter-overview-2021-12'
+      `) : Promise.resolve(0),
+    ]);
+
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_123_5120m_verified_maintenance_parts',
+      expectedLatestMigration: '20260827_124_5125m_ft4_versioned_maintenance',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -235,6 +276,8 @@ export async function GET() {
         expectedJohnDeere5MSteeringCrossReferencesAfter122: 2,
         johnDeere5120MVerifiedFitments,
         expectedJohnDeere5120MVerifiedFitmentsAfter123: 21,
+        johnDeere5125MFT4Fitments: fitments5125MFT4,
+        expectedJohnDeere5125MFT4FitmentsAfter124: 12,
       },
       maintenance: {
         total: maintenanceTasks,
@@ -246,11 +289,19 @@ export async function GET() {
         johnDeere5MVerified: maintenance5M,
         johnDeere5120M: maintenance5120M,
         expectedJohnDeere5120MAfter123: 6,
+        johnDeere5125MFT4: maintenance5125MFT4,
+        expectedJohnDeere5125MFT4After124: 14,
         johnDeere6RMY22: maintenance6R,
       },
       capacityRecords,
       johnDeere5120MCapacityRecords: capacities5120M,
       expectedJohnDeere5120MCapacityRecordsAfter123: 4,
+      johnDeere5125MFT4CapacityRecords: capacities5125MFT4,
+      expectedJohnDeere5125MFT4CapacityRecordsAfter124: 7,
+      versions: {
+        johnDeere5125MFT4Historical: version5125MFT4,
+        expectedJohnDeere5125MFT4HistoricalAfter124: 1,
+      },
       machineImages,
       tables: {
         schemaMigrations: hasMigrations,
