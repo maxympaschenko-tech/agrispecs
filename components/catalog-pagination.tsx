@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import styles from './catalog-pagination.module.css';
 
 type CatalogPaginationProps = {
   basePath: string;
@@ -14,7 +15,7 @@ export function CatalogPagination({ basePath, page, totalPages }: CatalogPaginat
   if (totalPages <= 1) return null;
 
   return (
-    <nav className="catalog-pagination" aria-label="Catalog pagination">
+    <nav className={styles.pagination} aria-label="Catalog pagination">
       <div>
         {page > 1 ? (
           <Link rel="prev" href={pageHref(basePath, page - 1)}>← Previous</Link>
