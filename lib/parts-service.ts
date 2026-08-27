@@ -27,9 +27,21 @@ export type PartFitment = {
   sourcePublishedDate: string | null;
 };
 
+export type PartRelation = {
+  direction: 'outgoing' | 'incoming';
+  relationType: 'cross_reference' | 'replaces' | 'supersedes' | 'alternative';
+  partNumber: string;
+  normalizedPartNumber: string;
+  name: string | null;
+  manufacturerName: string | null;
+  sourceTitle: string | null;
+  sourceUrl: string | null;
+};
+
 export type PartDetail = PartSummary & {
   description: string | null;
   fitments: PartFitment[];
+  relations: PartRelation[];
 };
 
 type PartRow = RowDataPacket & {
@@ -57,6 +69,17 @@ type FitmentRow = RowDataPacket & {
   source_title: string | null;
   source_url: string | null;
   source_published_date: string | null;
+};
+
+type RelationRow = RowDataPacket & {
+  direction: 'outgoing' | 'incoming';
+  relation_type: PartRelation['relationType'];
+  part_number: string;
+  normalized_part_number: string;
+  name: string | null;
+  manufacturer_name: string | null;
+  source_title: string | null;
+  source_url: string | null;
 };
 
 function rowToPart(row: PartRow): PartSummary {
@@ -170,6 +193,25 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
       ORDER BY mf.name ASC, m.model_name ASC, mp.fitment_note ASC
     `, [base.id]);
 
+    const [relationRows] = await db.query<RelationRow[]>(`
+      SELECT 'outgoing' AS direction, pcr.relation_type, p2.part_number, p2.normalized_part_number,
+             p2.name, mf2.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
+      FROM part_cross_references pcr
+      JOIN parts p2 ON p2.id=pcr.cross_part_id
+      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+      LEFT JOIN source_records sr ON sr.id=pcr.source_record_id
+      WHERE pcr.part_id=?
+      UNION ALL
+      SELECT 'incoming' AS direction, pcr.relation_type, p1.part_number, p1.normalized_part_number,
+             p1.name, mf1.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
+      FROM part_cross_references pcr
+      JOIN parts p1 ON p1.id=pcr.part_id
+      LEFT JOIN manufacturers mf1 ON mf1.id=p1.manufacturer_id
+      LEFT JOIN source_records sr ON sr.id=pcr.source_record_id
+      WHERE pcr.cross_part_id=?
+      ORDER BY part_number ASC
+    `, [base.id, base.id]);
+
     return {
       ...base,
       description: rows[0].description,
@@ -184,6 +226,16 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         sourceTitle: row.source_title,
         sourceUrl: row.source_url,
         sourcePublishedDate: row.source_published_date,
+      })),
+      relations: relationRows.map((row) => ({
+        direction: row.direction,
+        relationType: row.relation_type,
+        partNumber: row.part_number,
+        normalizedPartNumber: row.normalized_part_number,
+        name: row.name,
+        manufacturerName: row.manufacturer_name,
+        sourceTitle: row.source_title,
+        sourceUrl: row.source_url,
       })),
     };
   } catch (error) {
