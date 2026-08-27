@@ -48,6 +48,7 @@ import { johnDeere5120MVerifiedMaintenancePartsMigration } from '@/lib/migration
 import { johnDeere5125MFT4VersionedMaintenanceMigration } from '@/lib/migrations/20260827_124_5125m_ft4_versioned_maintenance';
 import { johnDeere5130MVerifiedAccessoryKitsMigration } from '@/lib/migrations/20260827_125_5130m_verified_accessory_kits';
 import { loaderCompatibilityMigration } from '@/lib/migrations/20260827_126_loader_compatibility';
+import { johnDeere6MLoaderMountingFramesMigration } from '@/lib/migrations/20260827_127_6m_loader_mounting_frames';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -105,6 +106,7 @@ const migrations: DbMigration[] = [
   johnDeere5125MFT4VersionedMaintenanceMigration,
   johnDeere5130MVerifiedAccessoryKitsMigration,
   loaderCompatibilityMigration,
+  johnDeere6MLoaderMountingFramesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
