@@ -73,6 +73,7 @@ export default async function PartPage({ params }: PageProps) {
       })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
+  const checkerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}`;
 
   return (
     <main>
@@ -89,6 +90,7 @@ export default async function PartPage({ params }: PageProps) {
           <div className="notice">
             Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number and machine configuration before ordering.
           </div>
+          <Link className="tool-link" href={checkerHref}>Check this part by serial number →</Link>
         </section>
 
         <div className="spec-layout">
@@ -131,6 +133,7 @@ export default async function PartPage({ params }: PageProps) {
               <h2>Compatible equipment</h2>
               {part.fitments.length > 0 ? part.fitments.map((fitment, index) => {
                 const serialRange = serialRangeLabel(fitment);
+                const modelCheckerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}&model=${encodeURIComponent(fitment.model)}`;
                 return (
                   <div className="part-fitment" key={`${fitment.machineId}-${index}`}>
                     <div>
@@ -140,6 +143,7 @@ export default async function PartPage({ params }: PageProps) {
                       {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
                       {fitment.configurationNote && <p><strong>Configuration:</strong> {fitment.configurationNote}</p>}
                       {fitment.fitmentNote && <p>{fitment.fitmentNote}</p>}
+                      <p><Link href={modelCheckerHref}>Check a serial number for this model →</Link></p>
                     </div>
                     {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
                   </div>
