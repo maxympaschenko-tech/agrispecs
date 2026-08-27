@@ -19,12 +19,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPartCategories(),
   ]);
 
-  const machinePages: MetadataRoute.Sitemap = machines
-    .filter((machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified')
-    .map((machine) => ({
-      url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
-      lastModified: new Date(),
-    }));
+  const publishableMachines = machines.filter(
+    (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
+  );
+
+  const brandPages: MetadataRoute.Sitemap = Array.from(
+    new Map(publishableMachines.map((machine) => [machine.brandSlug, machine.brandSlug])).values(),
+  ).map((brandSlug) => ({
+    url: `${baseUrl}/brands/${brandSlug}`,
+    lastModified: new Date(),
+  }));
+
+  const machinePages: MetadataRoute.Sitemap = publishableMachines.map((machine) => ({
+    url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+    lastModified: new Date(),
+  }));
 
   const categoryPages: MetadataRoute.Sitemap = categories
     .filter((category) => category.partCount >= 2)
@@ -38,5 +47,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
-  return [...staticPages, ...machinePages, ...categoryPages, ...partPages];
+  return [...staticPages, ...brandPages, ...machinePages, ...categoryPages, ...partPages];
 }
