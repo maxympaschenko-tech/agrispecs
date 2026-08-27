@@ -5,7 +5,7 @@ import { johnDeere3Series2026Migration } from '@/lib/migrations/20260827_010_joh
 import { johnDeere4Series2026Migration } from '@/lib/migrations/20260827_020_john_deere_4_series';
 import { johnDeere5ESeries2022Migration } from '@/lib/migrations/20260827_030_john_deere_5e_series';
 import { johnDeere5MSeries2025Migration } from '@/lib/migrations/20260827_040_john_deere_5m_series';
-import { johnDeere6MSeriesCurrentMigration } from '@/lib/migrations/20260827_050_john_deere_6m_series';
+import { johnDeere6MSeriesCurrentMigration } from '@/lib/migrations/20260827_050_6m_series';
 import { johnDeere6RSeriesCurrentMigration } from '@/lib/migrations/20260827_060_john_deere_6r_series';
 import { johnDeereFiltersPartsMigration } from '@/lib/migrations/20260827_070_john_deere_filters_parts';
 import { machineImagesMigration } from '@/lib/migrations/20260827_080_machine_images';
@@ -43,6 +43,7 @@ import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21
 import { catalogPerformanceIndexesMigration } from '@/lib/migrations/20260827_119_catalog_performance_indexes';
 import { johnDeere5075MWearElectricalPartsMigration } from '@/lib/migrations/20260827_120_5075m_wear_electrical_parts';
 import { johnDeere5095M5105MWearElectricalPartsMigration } from '@/lib/migrations/20260827_121_5095m_5105m_wear_electrical_parts';
+import { johnDeere5MSteeringCrossReferencesMigration } from '@/lib/migrations/20260827_122_5m_steering_cross_references';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -95,6 +96,7 @@ const migrations: DbMigration[] = [
   catalogPerformanceIndexesMigration,
   johnDeere5075MWearElectricalPartsMigration,
   johnDeere5095M5105MWearElectricalPartsMigration,
+  johnDeere5MSteeringCrossReferencesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
