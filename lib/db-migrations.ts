@@ -35,6 +35,7 @@ import { compactPinGenerationCorrectionMigration } from '@/lib/migrations/202608
 import { johnDeere3EFilterPakGenerationsMigration } from '@/lib/migrations/20260827_111_3e_filter_pak_generations';
 import { filterPakReplacementsMigration } from '@/lib/migrations/20260827_112_filter_pak_replacements';
 import { johnDeere4SeriesFilterPakReplacementMigration } from '@/lib/migrations/20260827_113_4_series_filter_pak_replacement';
+import { ta25767SourceUrlCorrectionMigration } from '@/lib/migrations/20260827_114_ta25767_source_url_correction';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -79,6 +80,7 @@ const migrations: DbMigration[] = [
   johnDeere3EFilterPakGenerationsMigration,
   filterPakReplacementsMigration,
   johnDeere4SeriesFilterPakReplacementMigration,
+  ta25767SourceUrlCorrectionMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
