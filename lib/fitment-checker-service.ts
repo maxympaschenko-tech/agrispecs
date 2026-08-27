@@ -75,6 +75,10 @@ function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' |
     const prefix = row.serial_prefix.toUpperCase();
     if (!serial.startsWith(prefix)) return 'outside';
     numeric = serial.slice(prefix.length);
+  } else if (!/^\d+$/.test(numeric)) {
+    const suffix = numeric.match(/(\d+)$/)?.[1];
+    if (!suffix) return 'unparseable';
+    numeric = suffix;
   }
 
   if (!/^\d+$/.test(numeric)) return 'unparseable';
@@ -94,7 +98,6 @@ export async function checkPartFitment(partInput: string, modelInput: string, se
   const db = await getDbReady();
   const [partRows] = await db.query<RowDataPacket[]>(`SELECT id FROM parts WHERE normalized_part_number=? ORDER BY id LIMIT 1`, [part]);
   if (!partRows[0]) return { status:'part-not-found', message:`Part ${partInput} is not in the verified catalog yet.` };
-  const partId = Number(partRows[0].id);
 
   const [machineRows] = await db.query<RowDataPacket[]>(`
     SELECT m.id
