@@ -54,6 +54,7 @@ export async function GET() {
       filterPak3ESerialFitments,
       filterPakReplacementRelations,
       johnDeere5075MWearElectricalFitments,
+      johnDeere5095M5105MWearElectricalFitments,
     ] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
@@ -98,6 +99,17 @@ export async function GET() {
           AND p.normalized_part_number IN (
             'SJ20988','SJ27050','RE554568','DZ123153','AXE66451',
             'RE217616','RE217817','RE217819','RE271437','RE271440','RE271441'
+          )
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN parts p ON p.id=mp.part_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug IN ('5095m','5105m')
+          AND p.normalized_part_number IN (
+            'AXE66451','DZ123153','RE554568','SJ27050','TR126196','SJ20988',
+            'RE271437','RE271440','RE271441','RE217616','RE217817'
           )
       `),
     ]);
@@ -152,7 +164,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_120_5075m_wear_electrical_parts',
+      expectedLatestMigration: '20260827_121_5095m_5105m_wear_electrical_parts',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -171,6 +183,8 @@ export async function GET() {
         johnDeere6MVerifiedFitments: fitment6M,
         johnDeere5075MWearElectricalFitments,
         expectedJohnDeere5075MWearElectricalFitmentsAfter120: 11,
+        johnDeere5095M5105MWearElectricalFitments,
+        expectedJohnDeere5095M5105MWearElectricalFitmentsAfter121: 22,
       },
       maintenance: {
         total: maintenanceTasks,
