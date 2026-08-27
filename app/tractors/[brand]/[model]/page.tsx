@@ -14,6 +14,16 @@ type PageProps = {
   params: Promise<{ brand: string; model: string }>;
 };
 
+type VersionScopedRecord = {
+  machineVersionId: number | null;
+  versionMarketName: string | null;
+  versionModelYearStart: number | null;
+  versionModelYearEnd: number | null;
+  versionConfiguration: string | null;
+  versionIsCurrent: boolean | null;
+  sourcePublishedDate: string | null;
+};
+
 const sectionOrder = [
   'Machine Configuration',
   'Engine',
@@ -60,6 +70,27 @@ function formatCapacity(value: number, unit: string) {
   if (unit !== 'L') return `${trimNumber(value, 1)} ${unit}`;
   if (value < 4) return `${trimNumber(value * 1.056688, 1)} US qt (${trimNumber(value, 1)} L)`;
   return `${trimNumber(value / 3.785411784, 1)} US gal (${trimNumber(value, 1)} L)`;
+}
+
+function versionContext(record: VersionScopedRecord) {
+  if (record.machineVersionId === null) return null;
+
+  const years = record.versionModelYearStart && record.versionModelYearEnd
+    ? `MY${record.versionModelYearStart}-${record.versionModelYearEnd}`
+    : record.versionModelYearStart
+      ? `MY${record.versionModelYearStart}+`
+      : null;
+
+  const published = record.sourcePublishedDate ? `source ${record.sourcePublishedDate}` : null;
+  const current = record.versionIsCurrent ? 'current version' : null;
+
+  return [
+    record.versionMarketName,
+    years,
+    record.versionConfiguration,
+    current,
+    published,
+  ].filter(Boolean).join(' · ');
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -219,21 +250,25 @@ export default async function TractorModelPage({ params }: PageProps) {
             {capacities.length > 0 && (
               <section className="data-section" id="capacities-fluids">
                 <h2>Capacities & fluids</h2>
-                <p className="section-note">Configuration-specific values are kept separate. Match the station, transmission and axle configuration before servicing the machine.</p>
+                <p className="section-note">Configuration- and generation-specific values are kept separate. Match the station, transmission, axle and version context before servicing the machine.</p>
                 <div className="capacity-list">
-                  {capacities.map((capacity) => (
-                    <div className="capacity-row" key={capacity.id}>
-                      <div>
-                        <strong>{capacity.label}</strong>
-                        {capacity.configuration && <span>{capacity.configuration}</span>}
-                        {capacity.fluidName && <small>{capacity.fluidName}</small>}
+                  {capacities.map((capacity) => {
+                    const context = versionContext(capacity);
+                    return (
+                      <div className="capacity-row" key={capacity.id}>
+                        <div>
+                          <strong>{capacity.label}</strong>
+                          {capacity.configuration && <span>{capacity.configuration}</span>}
+                          {capacity.fluidName && <small>{capacity.fluidName}</small>}
+                          {context && <small><strong>Applies to:</strong> {context}</small>}
+                        </div>
+                        <div>
+                          <strong>{formatCapacity(capacity.valueNumber, capacity.unit)}</strong>
+                          {capacity.notes && <small>{capacity.notes}</small>}
+                        </div>
                       </div>
-                      <div>
-                        <strong>{formatCapacity(capacity.valueNumber, capacity.unit)}</strong>
-                        {capacity.notes && <small>{capacity.notes}</small>}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             )}
@@ -241,25 +276,29 @@ export default async function TractorModelPage({ params }: PageProps) {
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
                 <h2>Maintenance schedule</h2>
-                <p className="section-note">Intervals are tied to the cited John Deere guide. Operating conditions and serial-number ranges can change the required service.</p>
+                <p className="section-note">Intervals are tied to the cited John Deere guide and, when available, to a specific machine version. Operating conditions and serial-number ranges can change the required service.</p>
                 <div className="maintenance-list">
-                  {maintenance.map((task) => (
-                    <div className="maintenance-row" key={task.id}>
-                      <div>
-                        <span className="maintenance-section">{task.section}</span>
-                        <strong>{task.action} {task.title.toLowerCase()}</strong>
-                        {task.partNumber && (
-                          <Link href={`/parts/${task.partNumber.toLowerCase()}`}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
-                        )}
-                        {task.notes && <small>{task.notes}</small>}
+                  {maintenance.map((task) => {
+                    const context = versionContext(task);
+                    return (
+                      <div className="maintenance-row" key={task.id}>
+                        <div>
+                          <span className="maintenance-section">{task.section}</span>
+                          <strong>{task.action} {task.title.toLowerCase()}</strong>
+                          {task.partNumber && (
+                            <Link href={`/parts/${task.partNumber.toLowerCase()}`}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
+                          )}
+                          {context && <small><strong>Applies to:</strong> {context}</small>}
+                          {task.notes && <small>{task.notes}</small>}
+                        </div>
+                        <div>
+                          <strong>{task.intervalText}</strong>
+                          {task.initialIntervalHours !== null && <span>Initial service: {task.initialIntervalHours} hours</span>}
+                          {task.capacityValue !== null && <span>Capacity: {trimNumber(task.capacityValue, 1)} {task.capacityUnit || ''}</span>}
+                        </div>
                       </div>
-                      <div>
-                        <strong>{task.intervalText}</strong>
-                        {task.initialIntervalHours !== null && <span>Initial service: {task.initialIntervalHours} hours</span>}
-                        {task.capacityValue !== null && <span>Capacity: {trimNumber(task.capacityValue, 1)} {task.capacityUnit || ''}</span>}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             )}
