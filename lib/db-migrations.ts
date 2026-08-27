@@ -58,6 +58,7 @@ import { kubotaM7060CurrentSpecsMigration } from '@/lib/migrations/20260827_133_
 import { kubotaM7060LA1154LoaderMigration } from '@/lib/migrations/20260827_134_kubota_m7060_la1154_loader';
 import { kubotaM7060CurrentHydraulicsPtoCorrectionMigration } from '@/lib/migrations/20260827_135_kubota_m7060_current_hydraulics_pto_correction';
 import { kubotaM7060ServiceCapacitiesMigration } from '@/lib/migrations/20260827_136_kubota_m7060_service_capacities';
+import { kubotaM7060CapacityProvenanceCorrectionMigration } from '@/lib/migrations/20260827_137_kubota_m7060_capacity_provenance_correction';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -125,6 +126,7 @@ const migrations: DbMigration[] = [
   kubotaM7060LA1154LoaderMigration,
   kubotaM7060CurrentHydraulicsPtoCorrectionMigration,
   kubotaM7060ServiceCapacitiesMigration,
+  kubotaM7060CapacityProvenanceCorrectionMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
@@ -150,9 +152,7 @@ async function applyMigrations() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    const [appliedRows] = await connection.query<AppliedMigrationRow[]>(
-      'SELECT id FROM schema_migrations',
-    );
+    const [appliedRows] = await connection.query<AppliedMigrationRow[]>('SELECT id FROM schema_migrations');
     const applied = new Set(appliedRows.map((row) => row.id));
 
     for (const migration of migrations) {
@@ -161,10 +161,7 @@ async function applyMigrations() {
       await connection.beginTransaction();
       try {
         await migration.apply(connection);
-        await connection.query(
-          'INSERT INTO schema_migrations (id, description) VALUES (?, ?)',
-          [migration.id, migration.description],
-        );
+        await connection.query('INSERT INTO schema_migrations (id, description) VALUES (?, ?)', [migration.id, migration.description]);
         await connection.commit();
         applied.add(migration.id);
       } catch (error) {
