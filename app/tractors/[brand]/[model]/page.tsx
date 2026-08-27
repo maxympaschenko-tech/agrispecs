@@ -6,6 +6,7 @@ import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachineParts } from '@/lib/parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
 import { getMachineCapacities } from '@/lib/capacities-service';
+import { getMachineAttachments } from '@/lib/attachments-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -127,11 +128,12 @@ export default async function TractorModelPage({ params }: PageProps) {
   const versions = await getMachineVersions(machine.id);
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
 
-  const [images, machineParts, maintenance, capacities, specs] = await Promise.all([
+  const [images, machineParts, maintenance, capacities, attachments, specs] = await Promise.all([
     getMachineImages(machine.id),
     getMachineParts(machine.id, selectedVersion?.id),
     getMachineMaintenance(machine.id),
     getMachineCapacities(machine.id),
+    getMachineAttachments(machine.id),
     selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
   ]);
 
@@ -161,6 +163,11 @@ export default async function TractorModelPage({ params }: PageProps) {
       url: capacity.sourceUrl as string,
       title: capacity.sourceTitle || 'Capacity source',
       publishedDate: capacity.sourcePublishedDate,
+    })),
+    ...attachments.filter((attachment) => attachment.sourceUrl).map((attachment) => ({
+      url: attachment.sourceUrl as string,
+      title: attachment.sourceTitle || 'Attachment compatibility source',
+      publishedDate: null,
     })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
@@ -233,6 +240,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts</a>}
+            {attachments.length > 0 && <a href="#attachments">Compatible loaders</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
 
@@ -318,6 +326,29 @@ export default async function TractorModelPage({ params }: PageProps) {
                       </span>
                       <span>{part.categoryName || 'Part'} →</span>
                     </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {attachments.length > 0 && (
+              <section className="data-section" id="attachments">
+                <h2>Compatible loaders</h2>
+                <p className="section-note">Loader compatibility is stored separately from parts. Configuration requirements below come from the cited John Deere compatibility table.</p>
+                <div className="maintenance-list">
+                  {attachments.map((attachment) => (
+                    <div className="maintenance-row" key={attachment.id}>
+                      <div>
+                        <span className="maintenance-section">Front loader</span>
+                        <strong>John Deere {attachment.modelName}</strong>
+                        {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
+                        {attachment.configurationText && <small><strong>Loader configuration:</strong> {attachment.configurationText}</small>}
+                      </div>
+                      <div>
+                        {attachment.liftCapacityText && <strong>{attachment.liftCapacityText}</strong>}
+                        {attachment.liftHeightText && <span>Lift height: {attachment.liftHeightText}</span>}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </section>
