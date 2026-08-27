@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
 import { getReplacementChain } from '@/lib/replacement-chain-service';
+import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -52,6 +53,17 @@ function fitmentConfidenceLabel(fitment: PartFitment) {
   return 'Low-confidence reference';
 }
 
+function sourceProvenanceLabel(source: SourceProvenance | undefined) {
+  if (!source) return 'Source record';
+  if (source.authorityLevel === 'official') {
+    return source.sourceType === 'government'
+      ? `${source.sourceName} · official government source`
+      : `${source.sourceName} · official source`;
+  }
+  if (source.authorityLevel === 'primary') return `${source.sourceName} · primary ${source.sourceType} source`;
+  return `${source.sourceName} · ${source.sourceType} reference`;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { part: slug } = await params;
   const part = await getPart(slug);
@@ -93,25 +105,27 @@ export default async function PartPage({ params }: PageProps) {
       .filter((relation) => relation.sourceUrl)
       .map((relation) => ({
         url: relation.sourceUrl as string,
-        title: relation.sourceTitle || 'Official part substitution source',
+        title: relation.sourceTitle || 'Part substitution source',
         publishedDate: null,
       })),
     ...part.components
       .filter((component) => component.sourceUrl)
       .map((component) => ({
         url: component.sourceUrl as string,
-        title: component.sourceTitle || 'Official kit contents source',
+        title: component.sourceTitle || 'Kit contents source',
         publishedDate: null,
       })),
     ...part.includedInKits
       .filter((kit) => kit.sourceUrl)
       .map((kit) => ({
         url: kit.sourceUrl as string,
-        title: kit.sourceTitle || 'Official kit contents source',
+        title: kit.sourceTitle || 'Kit contents source',
         publishedDate: null,
       })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
+  const provenance = await getSourceProvenanceByUrls(sources.map((source) => source.url));
+  const provenanceByUrl = new Map(provenance.map((source) => [source.url, source]));
   const checkerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}`;
   const finalReplacement = replacementChain.nodes.at(-1);
   const categoryHref = part.categorySlug ? `/parts/category/${part.categorySlug}` : null;
@@ -266,12 +280,18 @@ export default async function PartPage({ params }: PageProps) {
             {sources.length > 0 && (
               <section className="data-section" id="sources">
                 <h2>Sources</h2>
-                {sources.map((source) => (
-                  <div className="placeholder-row" key={source.url}>
-                    <span>{source.publishedDate || 'Official source'}</span>
-                    <span><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></span>
-                  </div>
-                ))}
+                {sources.map((source) => {
+                  const sourceProvenance = provenanceByUrl.get(source.url);
+                  return (
+                    <div className="placeholder-row" key={source.url}>
+                      <span>
+                        {sourceProvenanceLabel(sourceProvenance)}
+                        {source.publishedDate ? ` · ${source.publishedDate}` : ''}
+                      </span>
+                      <span><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></span>
+                    </div>
+                  );
+                })}
               </section>
             )}
           </div>
