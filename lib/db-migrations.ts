@@ -10,6 +10,7 @@ import { johnDeere6RSeriesCurrentMigration } from '@/lib/migrations/20260827_060
 import { johnDeereFiltersPartsMigration } from '@/lib/migrations/20260827_070_john_deere_filters_parts';
 import { machineImagesMigration } from '@/lib/migrations/20260827_080_machine_images';
 import { localMachineMediaMigration } from '@/lib/migrations/20260827_081_local_machine_media';
+import { moreMachineImagesMigration } from '@/lib/migrations/20260827_082_more_machine_images';
 import { maintenanceSchedulesMigration } from '@/lib/migrations/20260827_090_maintenance_schedules';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
@@ -30,6 +31,7 @@ const migrations: DbMigration[] = [
   johnDeereFiltersPartsMigration,
   machineImagesMigration,
   localMachineMediaMigration,
+  moreMachineImagesMigration,
   maintenanceSchedulesMigration,
 ];
 
