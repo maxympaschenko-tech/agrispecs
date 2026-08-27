@@ -74,7 +74,9 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
           WHEN 'Engine' THEN 10
           WHEN 'Fuel & Air' THEN 20
           WHEN 'Transmission' THEN 30
+          WHEN 'PTO' THEN 35
           WHEN 'Hydraulics' THEN 40
+          WHEN 'Axle' THEN 45
           WHEN 'Cab' THEN 50
           ELSE 90
         END,
