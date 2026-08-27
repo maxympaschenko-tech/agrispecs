@@ -73,14 +73,16 @@ function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' |
   let numeric = serial;
 
   if (row.serial_prefix) {
-    const prefix = row.serial_prefix.toUpperCase();
-    const prefixIndex = serial.lastIndexOf(prefix);
-    if (prefixIndex < 0) return 'outside';
+    if (!/^\d+$/.test(serial)) {
+      const prefix = row.serial_prefix.toUpperCase();
+      const prefixIndex = serial.lastIndexOf(prefix);
+      if (prefixIndex < 0) return 'outside';
 
-    const tail = serial.slice(prefixIndex + prefix.length);
-    const suffix = tail.match(/(\d+)$/)?.[1];
-    if (!suffix) return 'unparseable';
-    numeric = suffix;
+      const tail = serial.slice(prefixIndex + prefix.length);
+      const suffix = tail.match(/(\d+)$/)?.[1];
+      if (!suffix) return 'unparseable';
+      numeric = suffix;
+    }
   } else if (!/^\d+$/.test(numeric)) {
     const suffix = numeric.match(/(\d+)$/)?.[1];
     if (!suffix) return 'unparseable';
@@ -148,6 +150,15 @@ export async function checkPartFitment(partInput: string, modelInput: string, se
 
   const serial = normalizeSerial(serialInput);
   if (!serial) return { status:'invalid-serial', message:'Enter a serial number in the documented format.', ...resultBase(representative) };
+
+  const prefixes = new Set(constrainedRows.map((row) => row.serial_prefix).filter((value): value is string => Boolean(value)));
+  if (/^\d+$/.test(serial) && prefixes.size > 1) {
+    return {
+      status:'invalid-serial',
+      message:`This part/model has multiple documented PIN generations (${Array.from(prefixes).join(', ')}). Enter the full machine PIN or include its prefix so the generation can be identified safely.`,
+      ...resultBase(representative),
+    };
+  }
 
   let hadParseableRule = false;
   for (const row of constrainedRows) {
