@@ -84,9 +84,7 @@ function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' |
       numeric = suffix;
     }
   } else if (!/^\d+$/.test(numeric)) {
-    const suffix = numeric.match(/(\d+)$/)?.[1];
-    if (!suffix) return 'unparseable';
-    numeric = suffix;
+    return 'unparseable';
   }
 
   if (!/^\d+$/.test(numeric)) return 'unparseable';
@@ -182,7 +180,14 @@ export async function checkPartFitment(partInput: string, modelInput: string, se
   }
 
   if (constrainedRows.length > 0) {
-    return { status:'invalid-serial', message:'The entered serial could not be compared with the documented serial format for this fitment.', ...resultBase(constrainedRows[0]) };
+    const hasPrefixlessRule = constrainedRows.some((row) => !row.serial_prefix);
+    return {
+      status:'invalid-serial',
+      message: hasPrefixlessRule
+        ? 'The source provides a numeric-only serial rule for at least one fitment. Enter the numeric serial portion, or enter the full PIN when a documented prefix is available.'
+        : 'The entered serial could not be compared with the documented PIN format for this fitment.',
+      ...resultBase(constrainedRows[0]),
+    };
   }
 
   return { status:'serial-unverified', message:'Verified model fitment found, but the available source does not provide a structured serial-number rule.', ...resultBase(rows[0]) };
