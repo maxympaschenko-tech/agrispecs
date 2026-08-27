@@ -22,6 +22,7 @@ import { johnDeere3DNorthAmericaMaintenanceMigration } from '@/lib/migrations/20
 import { johnDeere4SeriesMY24MaintenanceMigration } from '@/lib/migrations/20260827_098_4_series_my24_maintenance';
 import { johnDeere4075RMaintenanceMigration } from '@/lib/migrations/20260827_099_4075r_maintenance';
 import { johnDeere4044MFuelWaterCorrectionMigration } from '@/lib/migrations/20260827_100_4044m_fuel_water_correction';
+import { johnDeere1023EMY22MaintenanceMigration } from '@/lib/migrations/20260827_101_1023e_my22_maintenance';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -53,6 +54,7 @@ const migrations: DbMigration[] = [
   johnDeere4SeriesMY24MaintenanceMigration,
   johnDeere4075RMaintenanceMigration,
   johnDeere4044MFuelWaterCorrectionMigration,
+  johnDeere1023EMY22MaintenanceMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
