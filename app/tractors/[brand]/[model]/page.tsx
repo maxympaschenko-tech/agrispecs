@@ -7,6 +7,7 @@ import { getMachineParts } from '@/lib/parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
 import { getMachineCapacities } from '@/lib/capacities-service';
 import { getMachineAttachments } from '@/lib/attachments-service';
+import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -49,6 +50,17 @@ function attachmentTypeLabel(type: string) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ') || 'Attachment';
+}
+
+function sourceProvenanceLabel(source: SourceProvenance | undefined) {
+  if (!source) return 'Source record';
+  if (source.authorityLevel === 'official') {
+    return source.sourceType === 'government'
+      ? `${source.sourceName} · official government source`
+      : `${source.sourceName} · official source`;
+  }
+  if (source.authorityLevel === 'primary') return `${source.sourceName} · primary ${source.sourceType} source`;
+  return `${source.sourceName} · ${source.sourceType} reference`;
 }
 
 function trimNumber(value: number, digits = 1) {
@@ -181,6 +193,8 @@ export default async function TractorModelPage({ params }: PageProps) {
     })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
+  const provenance = await getSourceProvenanceByUrls(sources.map((source) => source.url));
+  const provenanceByUrl = new Map(provenance.map((source) => [source.url, source]));
 
   const versionYears = selectedVersion
     ? selectedVersion.modelYearStart && selectedVersion.modelYearEnd
@@ -373,7 +387,7 @@ export default async function TractorModelPage({ params }: PageProps) {
                 <h2>Sources</h2>
                 {sources.map((source) => (
                   <div className="placeholder-row" key={source.url}>
-                    <span>{source.publishedDate || 'Official source'}</span>
+                    <span>{source.publishedDate || sourceProvenanceLabel(provenanceByUrl.get(source.url))}</span>
                     <span>
                       <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a>
                     </span>
