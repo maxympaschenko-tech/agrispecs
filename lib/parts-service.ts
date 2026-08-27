@@ -26,6 +26,12 @@ export type PartFitment = {
   serialFrom: string | null;
   serialTo: string | null;
   configurationNote: string | null;
+  machineVersionId: number | null;
+  versionMarketName: string | null;
+  versionModelYearStart: number | null;
+  versionModelYearEnd: number | null;
+  versionConfiguration: string | null;
+  versionIsCurrent: boolean | null;
   sourceTitle: string | null;
   sourceUrl: string | null;
   sourcePublishedDate: string | null;
@@ -87,6 +93,12 @@ type FitmentRow = RowDataPacket & {
   serial_from: string | null;
   serial_to: string | null;
   configuration_note: string | null;
+  machine_version_id: number | null;
+  version_market_name: string | null;
+  version_model_year_start: number | null;
+  version_model_year_end: number | null;
+  version_configuration: string | null;
+  version_is_current: number | null;
   source_title: string | null;
   source_url: string | null;
   source_published_date: string | null;
@@ -231,15 +243,24 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         mp.serial_from,
         mp.serial_to,
         mp.configuration_note,
+        mp.machine_version_id,
+        mv.market_name AS version_market_name,
+        mv.model_year_start AS version_model_year_start,
+        mv.model_year_end AS version_model_year_end,
+        mv.configuration AS version_configuration,
+        mv.is_current AS version_is_current,
         sr.title AS source_title,
         sr.url AS source_url,
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM machine_parts mp
       INNER JOIN machines m ON m.id = mp.machine_id
       INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+      LEFT JOIN machine_versions mv ON mv.id = mp.machine_version_id
       LEFT JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.part_id = ?
-      ORDER BY mf.name ASC, m.model_name ASC, mp.fitment_note ASC
+      ORDER BY mf.name ASC, m.model_name ASC,
+               CASE WHEN mp.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
+               mp.fitment_note ASC
     `, [base.id]);
 
     const [relationRows] = await db.query<RelationRow[]>(`
@@ -300,6 +321,12 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         serialFrom: row.serial_from,
         serialTo: row.serial_to,
         configurationNote: row.configuration_note,
+        machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
+        versionMarketName: row.version_market_name,
+        versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
+        versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
+        versionConfiguration: row.version_configuration,
+        versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
         sourceTitle: row.source_title,
         sourceUrl: row.source_url,
         sourcePublishedDate: row.source_published_date,
@@ -323,11 +350,15 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
   }
 }
 
-export async function getMachineParts(machineId: string): Promise<PartSummary[]> {
+export async function getMachineParts(machineId: string, machineVersionId?: number): Promise<PartSummary[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
     const db = await getDbReady();
+    const versionFilter = machineVersionId ? 'AND (mp.machine_version_id IS NULL OR mp.machine_version_id = ?)' : '';
+    const params: Array<number> = [Number(machineId)];
+    if (machineVersionId) params.push(machineVersionId);
+
     const [rows] = await db.query<PartRow[]>(`
       SELECT
         p.id,
@@ -350,10 +381,11 @@ export async function getMachineParts(machineId: string): Promise<PartSummary[]>
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
       WHERE mp.machine_id = ?
+        ${versionFilter}
       GROUP BY p.id, p.part_number, p.normalized_part_number, p.name, p.description, p.data_status,
                pc.name, pc.slug, mf.name, mf.slug
       ORDER BY pc.name ASC, p.part_number ASC
-    `, [Number(machineId)]);
+    `, params);
     return rows.map(rowToPart);
   } catch (error) {
     console.error('Unable to load machine parts:', error);
