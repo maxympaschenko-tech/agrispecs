@@ -11,6 +11,8 @@ export type PartCatalogItem = {
   manufacturerSlug: string | null;
   fitmentCount: number;
   relationCount: number;
+  componentCount: number;
+  kitMembershipCount: number;
 };
 
 type CatalogRow = RowDataPacket & {
@@ -23,6 +25,8 @@ type CatalogRow = RowDataPacket & {
   manufacturer_slug: string | null;
   fitment_count: number;
   relation_count: number;
+  component_count: number;
+  kit_membership_count: number;
 };
 
 export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
@@ -41,7 +45,9 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
         (
           (SELECT COUNT(*) FROM part_cross_references pcr1 WHERE pcr1.part_id=p.id) +
           (SELECT COUNT(*) FROM part_cross_references pcr2 WHERE pcr2.cross_part_id=p.id)
-        ) AS relation_count
+        ) AS relation_count,
+        (SELECT COUNT(*) FROM part_components pco WHERE pco.parent_part_id=p.id) AS component_count,
+        (SELECT COUNT(*) FROM part_components pci WHERE pci.component_part_id=p.id) AS kit_membership_count
       FROM parts p
       LEFT JOIN part_categories pc ON pc.id=p.category_id
       LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
@@ -49,6 +55,7 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
         AND (
           EXISTS (SELECT 1 FROM machine_parts mp WHERE mp.part_id=p.id)
           OR EXISTS (SELECT 1 FROM part_cross_references pcr WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id)
+          OR EXISTS (SELECT 1 FROM part_components pcomp WHERE pcomp.parent_part_id=p.id OR pcomp.component_part_id=p.id)
         )
       ORDER BY
         CASE WHEN mf.slug='john-deere' THEN 0 ELSE 1 END,
@@ -67,6 +74,8 @@ export async function getPartCatalogItems(): Promise<PartCatalogItem[]> {
       manufacturerSlug: row.manufacturer_slug,
       fitmentCount: Number(row.fitment_count || 0),
       relationCount: Number(row.relation_count || 0),
+      componentCount: Number(row.component_count || 0),
+      kitMembershipCount: Number(row.kit_membership_count || 0),
     }));
   } catch (error) {
     console.error('Unable to load parts catalog items:', error);
