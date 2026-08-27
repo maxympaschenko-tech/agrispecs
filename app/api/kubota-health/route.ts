@@ -15,8 +15,15 @@ async function count(sql: string, params: unknown[] = []) {
 
 export async function GET() {
   try {
-    const [migrationApplied,publishableM7060,currentVersions,specs] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_133_kubota_m7060_current_specs'`),
+    const [
+      migrationApplied,
+      publishableM7060,
+      currentVersions,
+      specs,
+      verifiedLoaders,
+      loaderCompatibilityRows,
+    ] = await Promise.all([
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_134_kubota_m7060_la1154_loader'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug='m7060' AND m.data_status IN ('partial','verified')
@@ -34,11 +41,24 @@ export async function GET() {
         WHERE mf.slug='kubota' AND m.slug='m7060'
           AND mv.slug IN ('us-current-8f8r','us-current-12f12r')
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM attachments a
+        JOIN manufacturers mf ON mf.id=a.manufacturer_id
+        WHERE mf.slug='kubota' AND a.attachment_type='front-loader'
+          AND a.slug='la1154' AND a.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_attachments ma
+        JOIN machines m ON m.id=ma.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN attachments a ON a.id=ma.attachment_id
+        WHERE mf.slug='kubota' AND m.slug='m7060' AND a.slug='la1154'
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_133_kubota_m7060_current_specs',
+      expectedLatestKubotaMigration: '20260827_134_kubota_m7060_la1154_loader',
       migrationApplied: migrationApplied === 1,
       publishableM7060,
       expectedPublishableM7060: 1,
@@ -46,6 +66,10 @@ export async function GET() {
       expectedCurrentConfigurationVersions: 2,
       specificationRecords: specs,
       expectedSpecificationRecords: 32,
+      verifiedLoaders,
+      expectedVerifiedLoaders: 1,
+      loaderCompatibilityRows,
+      expectedLoaderCompatibilityRows: 1,
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
