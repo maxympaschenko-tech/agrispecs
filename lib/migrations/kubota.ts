@@ -12,6 +12,8 @@ import { machinePartFitmentConfidenceMigration } from '@/lib/migrations/20260827
 import { kubotaM60EngineOilFilterReferencesMigration } from '@/lib/migrations/20260827_143_kubota_m60_engine_oil_filter_references';
 import { kubotaM6060M7060ServiceFiltersMigration } from '@/lib/migrations/20260827_144_kubota_m6060_m7060_service_filters';
 import { kubotaFilterSupersessionsMigration } from '@/lib/migrations/20260827_145_kubota_filter_supersessions';
+import { kubotaM5660SUServiceFiltersMigration } from '@/lib/migrations/20260827_146_kubota_m5660su_service_filters';
+import { kubotaCurrentFuelFilterSupersessionMigration } from '@/lib/migrations/20260827_147_kubota_current_fuel_filter_supersession';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -27,4 +29,6 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM60EngineOilFilterReferencesMigration,
   kubotaM6060M7060ServiceFiltersMigration,
   kubotaFilterSupersessionsMigration,
+  kubotaM5660SUServiceFiltersMigration,
+  kubotaCurrentFuelFilterSupersessionMigration,
 ];
