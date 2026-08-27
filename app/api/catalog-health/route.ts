@@ -48,7 +48,7 @@ export async function GET() {
       count(`SELECT COUNT(*) AS count FROM machine_parts`),
     ]);
 
-    const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series] = await Promise.all([
+    const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M] = await Promise.all([
       hasMaintenance ? count(`SELECT COUNT(*) AS count FROM maintenance_tasks`) : Promise.resolve(0),
       hasCapacities ? count(`SELECT COUNT(*) AS count FROM machine_capacities`) : Promise.resolve(0),
       hasImages ? count(`SELECT COUNT(*) AS count FROM machine_images`) : Promise.resolve(0),
@@ -87,12 +87,19 @@ export async function GET() {
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='john-deere' AND m.slug IN ('4044m','4052m','4066m','4044r','4052r','4066r','4075r')
       `) : Promise.resolve(0),
+      hasMaintenance ? count(`
+        SELECT COUNT(*) AS count
+        FROM maintenance_tasks mt
+        JOIN machines m ON m.id=mt.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere' AND m.slug IN ('5075m','5095m','5105m')
+      `) : Promise.resolve(0),
     ]);
 
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_101_1023e_my22_maintenance',
+      expectedLatestMigration: '20260827_102_5m_verified_maintenance',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -108,6 +115,7 @@ export async function GET() {
         johnDeere3E: maintenance3E,
         johnDeere3R: maintenance3R,
         johnDeere4Series: maintenance4Series,
+        johnDeere5MVerified: maintenance5M,
       },
       capacityRecords,
       machineImages,
