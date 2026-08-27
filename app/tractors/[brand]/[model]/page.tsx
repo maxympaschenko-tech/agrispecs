@@ -5,6 +5,7 @@ import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } fro
 import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachineParts } from '@/lib/parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
+import { getMachineCapacities } from '@/lib/capacities-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -55,6 +56,12 @@ function formatSpecValue(spec: MachineSpec) {
   return `${trimNumber(value, Number.isInteger(value) ? 0 : 1)}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
+function formatCapacity(value: number, unit: string) {
+  if (unit !== 'L') return `${trimNumber(value, 1)} ${unit}`;
+  if (value < 4) return `${trimNumber(value * 1.056688, 1)} US qt (${trimNumber(value, 1)} L)`;
+  return `${trimNumber(value / 3.785411784, 1)} US gal (${trimNumber(value, 1)} L)`;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand, model } = await params;
   const machine = await getMachine(brand, model);
@@ -86,11 +93,12 @@ export default async function TractorModelPage({ params }: PageProps) {
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
-  const [versions, images, machineParts, maintenance] = await Promise.all([
+  const [versions, images, machineParts, maintenance, capacities] = await Promise.all([
     getMachineVersions(machine.id),
     getMachineImages(machine.id),
     getMachineParts(machine.id),
     getMachineMaintenance(machine.id),
+    getMachineCapacities(machine.id),
   ]);
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
@@ -115,6 +123,11 @@ export default async function TractorModelPage({ params }: PageProps) {
       url: task.sourceUrl as string,
       title: task.sourceTitle || 'Maintenance source',
       publishedDate: task.sourcePublishedDate,
+    })),
+    ...capacities.filter((capacity) => capacity.sourceUrl).map((capacity) => ({
+      url: capacity.sourceUrl as string,
+      title: capacity.sourceTitle || 'Capacity source',
+      publishedDate: capacity.sourcePublishedDate,
     })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
@@ -184,6 +197,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {availableSections.map((section) => (
               <a key={section} href={`#${sectionId(section)}`}>{section}</a>
             ))}
+            {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
@@ -201,6 +215,28 @@ export default async function TractorModelPage({ params }: PageProps) {
                 ))}
               </section>
             ))}
+
+            {capacities.length > 0 && (
+              <section className="data-section" id="capacities-fluids">
+                <h2>Capacities & fluids</h2>
+                <p className="section-note">Configuration-specific values are kept separate. Match the station, transmission and axle configuration before servicing the machine.</p>
+                <div className="capacity-list">
+                  {capacities.map((capacity) => (
+                    <div className="capacity-row" key={capacity.id}>
+                      <div>
+                        <strong>{capacity.label}</strong>
+                        {capacity.configuration && <span>{capacity.configuration}</span>}
+                        {capacity.fluidName && <small>{capacity.fluidName}</small>}
+                      </div>
+                      <div>
+                        <strong>{formatCapacity(capacity.valueNumber, capacity.unit)}</strong>
+                        {capacity.notes && <small>{capacity.notes}</small>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
