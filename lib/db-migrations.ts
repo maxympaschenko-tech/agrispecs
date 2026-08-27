@@ -41,6 +41,7 @@ import { oneSeriesFilterPakComponentsMigration } from '@/lib/migrations/20260827
 import { threeEFilterPakComponentsMigration } from '@/lib/migrations/20260827_117_3e_filter_pak_components';
 import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21128_components';
 import { catalogPerformanceIndexesMigration } from '@/lib/migrations/20260827_119_catalog_performance_indexes';
+import { johnDeere5075MWearElectricalPartsMigration } from '@/lib/migrations/20260827_120_5075m_wear_electrical_parts';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -91,6 +92,7 @@ const migrations: DbMigration[] = [
   threeEFilterPakComponentsMigration,
   lva21128ComponentsMigration,
   catalogPerformanceIndexesMigration,
+  johnDeere5075MWearElectricalPartsMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
