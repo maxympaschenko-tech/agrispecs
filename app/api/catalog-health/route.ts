@@ -41,7 +41,7 @@ export async function GET() {
       };
     }
 
-    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences, alternativeRelations, serialConstrainedFitments] = await Promise.all([
+    const [johnDeereMachines, publishableJohnDeere, verifiedParts, fitments, crossReferences, alternativeRelations, serialConstrainedFitments, compactSerialFitments] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM parts WHERE data_status='verified'`),
@@ -49,6 +49,14 @@ export async function GET() {
       count(`SELECT COUNT(*) AS count FROM part_cross_references`),
       count(`SELECT COUNT(*) AS count FROM part_cross_references WHERE relation_type='alternative'`),
       count(`SELECT COUNT(*) AS count FROM machine_parts WHERE serial_prefix IS NOT NULL OR serial_from IS NOT NULL OR serial_to IS NOT NULL`),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='john-deere'
+          AND m.slug IN ('1023e','1025r','2025r','3032e')
+          AND (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL)
+      `),
     ]);
 
     const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
@@ -100,7 +108,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_108_official_aftermarket_alternatives',
+      expectedLatestMigration: '20260827_109_compact_serial_cutovers',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -111,6 +119,7 @@ export async function GET() {
         crossReferences,
         alternatives: alternativeRelations,
         serialConstrainedFitments,
+        compactSerialFitments,
         johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
