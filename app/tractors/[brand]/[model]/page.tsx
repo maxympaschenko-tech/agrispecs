@@ -239,7 +239,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             ))}
             {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
-            {verifiedParts.length > 0 && <a href="#parts">Parts</a>}
+            {verifiedParts.length > 0 && <a href="#parts">Parts & kits</a>}
             {attachments.length > 0 && <a href="#attachments">Compatible loaders</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
@@ -315,8 +315,8 @@ export default async function TractorModelPage({ params }: PageProps) {
 
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
-                <h2>Compatible maintenance parts</h2>
-                <p className="section-note">The list is scoped to generic fitment plus the specification version shown at the top of this page. Serial-number restrictions may still apply.</p>
+                <h2>Compatible parts & kits</h2>
+                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Serial-number and machine-configuration restrictions may still apply, so review each part page before ordering or installing.</p>
                 <div className="parts-list">
                   {verifiedParts.map((part) => (
                     <Link className="part-row" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
@@ -340,7 +340,7 @@ export default async function TractorModelPage({ params }: PageProps) {
                     <div className="maintenance-row" key={attachment.id}>
                       <div>
                         <span className="maintenance-section">Front loader</span>
-                        <strong>John Deere {attachment.modelName}</strong>
+                        <strong><Link href={`/attachments/${machine.brandSlug}/${attachment.slug}`}>John Deere {attachment.modelName}</Link></strong>
                         {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
                         {attachment.configurationText && <small><strong>Loader configuration:</strong> {attachment.configurationText}</small>}
                       </div>
