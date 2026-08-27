@@ -2,6 +2,7 @@ import type { RowDataPacket } from 'mysql2';
 import { getDb } from '@/lib/db';
 import type { DbMigration } from '@/lib/db-migration-types';
 import { johnDeere3Series2026Migration } from '@/lib/migrations/20260827_010_john_deere_3_series';
+import { johnDeere4Series2026Migration } from '@/lib/migrations/20260827_020_john_deere_4_series';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -13,6 +14,7 @@ const migrations: DbMigration[] = [
     apply: async () => {},
   },
   johnDeere3Series2026Migration,
+  johnDeere4Series2026Migration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
