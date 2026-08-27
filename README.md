@@ -1,6 +1,8 @@
-# AgriSpecs
+# Farm Machine Specs
 
-AgriSpecs is an English-language farm equipment specifications, maintenance and parts reference built for US search traffic.
+Farm Machine Specs is an English-language farm equipment specifications, maintenance and parts reference built for US search traffic.
+
+Production domain: https://farmmachinespecs.com
 
 ## Stack
 
@@ -32,7 +34,7 @@ npm start
 Set these in Hostinger hPanel for the Node.js app:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://farmmachinespecs.com
 DB_HOST=...
 DB_PORT=3306
 DB_USER=...
@@ -78,7 +80,7 @@ Search result pages are `noindex`; canonical model pages are indexable.
 
 ## Hostinger deployment
 
-Create a Node.js Web App in hPanel and connect this GitHub repository. Hostinger should detect Next.js automatically. Use Node.js 22 and the standard build command `npm run build`. Set the environment variables before connecting the production database.
+Create a Node.js Web App in hPanel and connect this GitHub repository. Hostinger should detect Next.js automatically. Use Node.js 22 and the standard build command `npm run build`. Set `NEXT_PUBLIC_SITE_URL=https://farmmachinespecs.com` before launch. The MariaDB variables can be added after the first frontend deployment.
 
 ## Data quality rule
 
