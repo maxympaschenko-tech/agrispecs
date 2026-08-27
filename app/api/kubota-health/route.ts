@@ -31,8 +31,10 @@ export async function GET() {
       loaderCompatibilityRows,
       correctedPtoRows,
       hydraulicHitchBrakeRows,
+      engineOilFilterParts,
+      highConfidenceOilFilterFitments,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_141_kubota_m5660su_la1154su_loader'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_143_kubota_m60_engine_oil_filter_references'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060') AND m.data_status IN ('partial','verified')
@@ -110,11 +112,28 @@ export async function GET() {
         WHERE mf.slug='kubota' AND m.slug='m7060' AND mv.slug IN ('us-current-8f8r','us-current-12f12r')
           AND sd.spec_key IN ('hydraulics.three_point_pump_capacity','hydraulics.control_system','hydraulics.remote_valves','hitch.category','hitch.lift_capacity_24in','brakes.type','drivetrain.4wd_clutch')
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='kubota'
+          AND p.normalized_part_number IN ('HH1C032430','HH16432430')
+          AND p.data_status IN ('partial','verified')
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN parts p ON p.id=mp.part_id
+        WHERE mf.slug='kubota'
+          AND m.slug IN ('m5660su','m6060','m7060')
+          AND p.normalized_part_number IN ('HH1C032430','HH16432430')
+          AND mp.fitment_confidence='high'
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_141_kubota_m5660su_la1154su_loader',
+      expectedLatestKubotaMigration: '20260827_143_kubota_m60_engine_oil_filter_references',
       migrationApplied: migrationApplied === 1,
       publishableKubotaM60,
       expectedPublishableKubotaM60: 3,
@@ -144,6 +163,10 @@ export async function GET() {
       expectedVerifiedLoaders: 2,
       loaderCompatibilityRows,
       expectedLoaderCompatibilityRows: 3,
+      engineOilFilterParts,
+      expectedEngineOilFilterParts: 2,
+      highConfidenceOilFilterFitments,
+      expectedHighConfidenceOilFilterFitments: 3,
     }, {
       headers: { 'Cache-Control':'no-store, max-age=0', 'X-Robots-Tag':'noindex, nofollow' },
     });
