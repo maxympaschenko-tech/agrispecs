@@ -21,6 +21,7 @@ export async function GET() {
       currentVersions,
       specificationRows,
       currentGrossPowerRows,
+      correctedGearTransmissionRows,
       loaderRows,
       loaderFitments,
       serviceParts,
@@ -28,7 +29,7 @@ export async function GET() {
       hstFilterFitments,
       filterSupersessions,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_153_kubota_l2502_filter_supersessions'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_154_kubota_l2502_gear_transmission_correction'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
@@ -59,6 +60,18 @@ export async function GET() {
         WHERE mf.slug='kubota' AND m.slug='l2502'
           AND mv.slug IN ('us-current-gear-2wd','us-current-gear-4wd','us-current-hst-4wd')
           AND sd.spec_key='engine.gross_power' AND ms.value_number=23.3
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_specs ms
+        JOIN machines m ON m.id=ms.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN machine_versions mv ON mv.id=ms.machine_version_id
+        JOIN spec_definitions sd ON sd.id=ms.spec_definition_id
+        WHERE mf.slug='kubota' AND m.slug='l2502'
+          AND mv.slug IN ('us-current-gear-2wd','us-current-gear-4wd')
+          AND sd.spec_key='transmission.standard'
+          AND ms.value_text LIKE '%8 forward / 4 reverse%'
+          AND ms.confidence='high'
       `),
       count(`
         SELECT COUNT(*) AS count FROM attachments a
@@ -122,6 +135,7 @@ export async function GET() {
       currentVersions: currentVersions === 3,
       specificationRows: specificationRows === 54,
       currentGrossPowerRows: currentGrossPowerRows === 3,
+      correctedGearTransmissionRows: correctedGearTransmissionRows === 2,
       loaderRows: loaderRows === 1,
       loaderFitments: loaderFitments === 1,
       serviceParts: serviceParts === 5,
@@ -133,13 +147,14 @@ export async function GET() {
 
     return NextResponse.json({
       ok,
-      expectedLatestL2502Migration: '20260827_153_kubota_l2502_filter_supersessions',
+      expectedLatestL2502Migration: '20260827_154_kubota_l2502_gear_transmission_correction',
       checks,
       values: {
         machineRows,
         currentVersions,
         specificationRows,
         currentGrossPowerRows,
+        correctedGearTransmissionRows,
         loaderRows,
         loaderFitments,
         serviceParts,
@@ -152,6 +167,7 @@ export async function GET() {
         currentVersions: 3,
         specificationRows: 54,
         currentGrossPowerRows: 3,
+        correctedGearTransmissionRows: 2,
         loaderRows: 1,
         loaderFitments: 1,
         serviceParts: 5,
