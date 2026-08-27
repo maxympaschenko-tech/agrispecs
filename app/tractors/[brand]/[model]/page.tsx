@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
+import { getMachineParts } from '@/lib/parts-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -84,13 +85,15 @@ export default async function TractorModelPage({ params }: PageProps) {
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
-  const [versions, images] = await Promise.all([
+  const [versions, images, machineParts] = await Promise.all([
     getMachineVersions(machine.id),
     getMachineImages(machine.id),
+    getMachineParts(machine.id),
   ]);
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
+  const verifiedParts = machineParts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
 
   const specsBySection = new Map<string, MachineSpec[]>();
   for (const spec of specs) {
@@ -177,6 +180,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {availableSections.map((section) => (
               <a key={section} href={`#${sectionId(section)}`}>{section}</a>
             ))}
+            {verifiedParts.length > 0 && <a href="#parts">Parts</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
 
@@ -192,6 +196,24 @@ export default async function TractorModelPage({ params }: PageProps) {
                 ))}
               </section>
             ))}
+
+            {verifiedParts.length > 0 && (
+              <section className="data-section" id="parts">
+                <h2>Compatible maintenance parts</h2>
+                <p className="section-note">Part fitment is shown only where a technical source is attached. Serial-number restrictions may apply.</p>
+                <div className="parts-list">
+                  {verifiedParts.map((part) => (
+                    <Link className="part-row" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+                      <span>
+                        <strong>{part.partNumber}</strong>
+                        <small>{part.name || part.categoryName || 'OEM part'}</small>
+                      </span>
+                      <span>{part.categoryName || 'Part'} →</span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {sources.length > 0 && (
               <section className="data-section" id="sources">
