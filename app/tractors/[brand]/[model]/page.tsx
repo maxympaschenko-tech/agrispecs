@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getMachine, machines } from '@/lib/catalog';
+import { getMachine } from '@/lib/catalog-service';
+import { machines as seedMachines } from '@/lib/catalog';
 
 type PageProps = {
   params: Promise<{ brand: string; model: string }>;
@@ -23,7 +24,7 @@ const sections = [
 ] as const;
 
 export function generateStaticParams() {
-  return machines.map((machine) => ({
+  return seedMachines.map((machine) => ({
     brand: machine.brandSlug,
     model: machine.modelSlug,
   }));
@@ -31,7 +32,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand, model } = await params;
-  const machine = getMachine(brand, model);
+  const machine = await getMachine(brand, model);
   if (!machine) return {};
 
   return {
@@ -43,8 +44,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function TractorModelPage({ params }: PageProps) {
   const { brand, model } = await params;
-  const machine = getMachine(brand, model);
+  const machine = await getMachine(brand, model);
   if (!machine) notFound();
+
+  const statusLabel = machine.dataStatus === 'verified'
+    ? 'Verified'
+    : machine.dataStatus === 'partial'
+      ? 'Partially verified'
+      : machine.dataStatus === 'review'
+        ? 'Under review'
+        : 'Verification queued';
 
   return (
     <main>
@@ -56,9 +65,11 @@ export default async function TractorModelPage({ params }: PageProps) {
           <span className="eyebrow">Tractor reference</span>
           <h1>{machine.title}</h1>
           <p>Specifications, maintenance, parts and compatibility reference.</p>
-          <div className="notice">
-            This model page is part of the initial catalog build. Numerical specifications will be published only after source verification.
-          </div>
+          {machine.dataStatus !== 'verified' && (
+            <div className="notice">
+              Numerical specifications are published only after source verification.
+            </div>
+          )}
         </section>
 
         <div className="spec-layout">
@@ -71,7 +82,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {sections.map(([id, label]) => (
               <section className="data-section" id={id} key={id}>
                 <h2>{label}</h2>
-                <div className="placeholder-row"><span>Data status</span><span>Verification queued</span></div>
+                <div className="placeholder-row"><span>Data status</span><span>{statusLabel}</span></div>
                 <div className="placeholder-row"><span>Sources</span><span>Official and technical references planned</span></div>
               </section>
             ))}
