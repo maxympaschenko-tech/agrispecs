@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPart, type PartRelation } from '@/lib/parts-service';
+import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -21,6 +21,14 @@ function relationLabel(relation: PartRelation) {
   return 'Cross reference';
 }
 
+function serialRangeLabel(fitment: PartFitment) {
+  const prefix = fitment.serialPrefix || '';
+  if (fitment.serialFrom && fitment.serialTo) return `${prefix}${fitment.serialFrom} to ${prefix}${fitment.serialTo}`;
+  if (fitment.serialFrom) return `${prefix}${fitment.serialFrom} and later`;
+  if (fitment.serialTo) return `through ${prefix}${fitment.serialTo}`;
+  return null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { part: slug } = await params;
   const part = await getPart(slug);
@@ -33,7 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
   const description = hasReplacement
     ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number and official source.`
-    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, fitment notes and technical sources.`;
+    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, serial-number fitment notes and technical sources.`;
 
   return {
     title,
@@ -121,17 +129,22 @@ export default async function PartPage({ params }: PageProps) {
 
             <section className="data-section" id="fitment">
               <h2>Compatible equipment</h2>
-              {part.fitments.length > 0 ? part.fitments.map((fitment, index) => (
-                <div className="part-fitment" key={`${fitment.machineId}-${index}`}>
-                  <div>
-                    <Link className="part-fitment-machine" href={`/tractors/${fitment.brandSlug}/${fitment.modelSlug}`}>
-                      {fitment.brand} {fitment.model}
-                    </Link>
-                    {fitment.fitmentNote && <p>{fitment.fitmentNote}</p>}
+              {part.fitments.length > 0 ? part.fitments.map((fitment, index) => {
+                const serialRange = serialRangeLabel(fitment);
+                return (
+                  <div className="part-fitment" key={`${fitment.machineId}-${index}`}>
+                    <div>
+                      <Link className="part-fitment-machine" href={`/tractors/${fitment.brandSlug}/${fitment.modelSlug}`}>
+                        {fitment.brand} {fitment.model}
+                      </Link>
+                      {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
+                      {fitment.configurationNote && <p><strong>Configuration:</strong> {fitment.configurationNote}</p>}
+                      {fitment.fitmentNote && <p>{fitment.fitmentNote}</p>}
+                    </div>
+                    {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
                   </div>
-                  {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
-                </div>
-              )) : (
+                );
+              }) : (
                 <p>No direct equipment fitment has been published for this part number. Check the replacement relationship above when available.</p>
               )}
             </section>
