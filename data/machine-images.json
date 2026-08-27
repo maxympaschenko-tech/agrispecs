@@ -26,5 +26,19 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "caption": "John Deere 1025R in Petrolia, Ontario, 2026.",
     "altText": "John Deere 1025R tractor"
+  },
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "6r-150",
+    "sourceKey": "commons-jd-6r-150-gotland-2024",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_150.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/6r-150/main.jpg",
+    "publicUrl": "/media/machines/john-deere/6r-150/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_6R_150.jpg",
+    "author": "Bene Riobó",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 6R 150 at Gotlands Skördefestival, Sweden, 2024.",
+    "altText": "John Deere 6R 150 tractor"
   }
 ]
