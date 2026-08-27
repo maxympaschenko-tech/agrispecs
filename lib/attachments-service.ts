@@ -185,14 +185,15 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
           a.model_name LIKE ?
           OR mf.name LIKE ?
           OR CONCAT(mf.name,' ',a.model_name) LIKE ?
-          OR a.attachment_type LIKE ?
-          OR CONCAT(a.model_name,' loader') LIKE ?
+          OR REPLACE(a.attachment_type,'-',' ') LIKE ?
+          OR CONCAT(a.model_name,' ',REPLACE(a.attachment_type,'-',' ')) LIKE ?
+          OR CONCAT(mf.name,' ',a.model_name,' ',REPLACE(a.attachment_type,'-',' ')) LIKE ?
         )
       GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
       HAVING COUNT(DISTINCT ma.machine_id) > 0
       ORDER BY mf.name,a.attachment_type,a.model_name
       LIMIT 30
-    `, [like,like,like,like,like]);
+    `, [like,like,like,like,like,like]);
 
     return rows.map(rowToCatalogItem);
   } catch (error) {
