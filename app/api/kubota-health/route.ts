@@ -35,8 +35,9 @@ export async function GET() {
       highConfidenceOilFilterFitments,
       serviceFilterParts,
       highConfidenceServiceFilterFitments,
+      filterSupersessionRows,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_144_kubota_m6060_m7060_service_filters'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_145_kubota_filter_supersessions'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060') AND m.data_status IN ('partial','verified')
@@ -148,11 +149,22 @@ export async function GET() {
           AND p.normalized_part_number IN ('1J80043170','5980026110','3A11119130','HHTA037710')
           AND mp.fitment_confidence='high'
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM part_cross_references pcr
+        JOIN parts oldp ON oldp.id=pcr.part_id
+        JOIN parts newp ON newp.id=pcr.cross_part_id
+        JOIN manufacturers mf ON mf.id=oldp.manufacturer_id
+        WHERE mf.slug='kubota' AND pcr.relation_type='replaces' AND (
+          (oldp.normalized_part_number='3F75011220' AND newp.normalized_part_number='5980026110') OR
+          (oldp.normalized_part_number='TA04037710' AND newp.normalized_part_number='T007037710') OR
+          (oldp.normalized_part_number='T007037710' AND newp.normalized_part_number='HHTA037710')
+        )
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_144_kubota_m6060_m7060_service_filters',
+      expectedLatestKubotaMigration: '20260827_145_kubota_filter_supersessions',
       migrationApplied: migrationApplied === 1,
       publishableKubotaM60,
       expectedPublishableKubotaM60: 3,
@@ -190,6 +202,8 @@ export async function GET() {
       expectedServiceFilterParts: 4,
       highConfidenceServiceFilterFitments,
       expectedHighConfidenceServiceFilterFitments: 8,
+      filterSupersessionRows,
+      expectedFilterSupersessionRows: 3,
     }, {
       headers: { 'Cache-Control':'no-store, max-age=0', 'X-Robots-Tag':'noindex, nofollow' },
     });
