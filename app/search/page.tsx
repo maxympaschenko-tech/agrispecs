@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { machines } from '@/lib/catalog';
+import { searchMachines } from '@/lib/catalog-service';
 
 export const metadata: Metadata = {
   title: 'Search',
@@ -13,10 +13,8 @@ type SearchPageProps = {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = '' } = await searchParams;
-  const term = q.trim().toLowerCase();
-  const results = term
-    ? machines.filter((machine) => `${machine.brand} ${machine.model}`.toLowerCase().includes(term))
-    : [];
+  const term = q.trim();
+  const results = term ? await searchMachines(term) : [];
 
   return (
     <main className="section">
@@ -28,7 +26,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <button type="submit">Search</button>
         </form>
         <div style={{ marginTop: 28 }}>
-          {term && results.length === 0 && <p>No matching seed records yet. The production search will also cover OEM part numbers and aliases.</p>}
+          {term && results.length === 0 && <p>No matching equipment records yet. Part-number search will be added as the parts catalog is populated.</p>}
           <div className="grid">
             {results.map((machine) => (
               <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
