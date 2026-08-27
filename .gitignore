@@ -6,3 +6,5 @@ out/
 .env.production
 npm-debug.log*
 .DS_Store
+public/media/machines/
+public/media/media-build-manifest.json
