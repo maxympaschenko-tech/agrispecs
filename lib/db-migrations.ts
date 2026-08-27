@@ -50,6 +50,7 @@ import { johnDeere5130MVerifiedAccessoryKitsMigration } from '@/lib/migrations/2
 import { loaderCompatibilityMigration } from '@/lib/migrations/20260827_126_loader_compatibility';
 import { johnDeere6MLoaderMountingFramesMigration } from '@/lib/migrations/20260827_127_6m_loader_mounting_frames';
 import { johnDeere6M6RLoaderCompatibilityMigration } from '@/lib/migrations/20260827_128_6m_6r_loader_compatibility';
+import { johnDeere6RLoaderMountingFramesMigration } from '@/lib/migrations/20260827_129_6r_loader_mounting_frames';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -109,6 +110,7 @@ const migrations: DbMigration[] = [
   loaderCompatibilityMigration,
   johnDeere6MLoaderMountingFramesMigration,
   johnDeere6M6RLoaderCompatibilityMigration,
+  johnDeere6RLoaderMountingFramesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
