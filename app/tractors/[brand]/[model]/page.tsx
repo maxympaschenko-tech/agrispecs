@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachineParts } from '@/lib/parts-service';
+import { getMachineMaintenance } from '@/lib/maintenance-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -85,10 +86,11 @@ export default async function TractorModelPage({ params }: PageProps) {
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
-  const [versions, images, machineParts] = await Promise.all([
+  const [versions, images, machineParts, maintenance] = await Promise.all([
     getMachineVersions(machine.id),
     getMachineImages(machine.id),
     getMachineParts(machine.id),
+    getMachineMaintenance(machine.id),
   ]);
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
@@ -103,17 +105,19 @@ export default async function TractorModelPage({ params }: PageProps) {
   }
 
   const availableSections = sectionOrder.filter((section) => specsBySection.has(section));
-  const sources = Array.from(
-    new Map(
-      specs
-        .filter((spec) => spec.sourceUrl)
-        .map((spec) => [spec.sourceUrl, {
-          title: spec.sourceTitle || 'Source',
-          url: spec.sourceUrl as string,
-          publishedDate: spec.sourcePublishedDate,
-        }]),
-    ).values(),
-  );
+  const sourceEntries = [
+    ...specs.filter((spec) => spec.sourceUrl).map((spec) => ({
+      url: spec.sourceUrl as string,
+      title: spec.sourceTitle || 'Technical source',
+      publishedDate: spec.sourcePublishedDate,
+    })),
+    ...maintenance.filter((task) => task.sourceUrl).map((task) => ({
+      url: task.sourceUrl as string,
+      title: task.sourceTitle || 'Maintenance source',
+      publishedDate: task.sourcePublishedDate,
+    })),
+  ];
+  const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
 
   const versionYears = selectedVersion
     ? selectedVersion.modelYearStart && selectedVersion.modelYearEnd
@@ -180,6 +184,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {availableSections.map((section) => (
               <a key={section} href={`#${sectionId(section)}`}>{section}</a>
             ))}
+            {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
@@ -196,6 +201,32 @@ export default async function TractorModelPage({ params }: PageProps) {
                 ))}
               </section>
             ))}
+
+            {maintenance.length > 0 && (
+              <section className="data-section" id="maintenance">
+                <h2>Maintenance schedule</h2>
+                <p className="section-note">Intervals are tied to the cited John Deere guide. Operating conditions and serial-number ranges can change the required service.</p>
+                <div className="maintenance-list">
+                  {maintenance.map((task) => (
+                    <div className="maintenance-row" key={task.id}>
+                      <div>
+                        <span className="maintenance-section">{task.section}</span>
+                        <strong>{task.action} {task.title.toLowerCase()}</strong>
+                        {task.partNumber && (
+                          <Link href={`/parts/${task.partNumber.toLowerCase()}`}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
+                        )}
+                        {task.notes && <small>{task.notes}</small>}
+                      </div>
+                      <div>
+                        <strong>{task.intervalText}</strong>
+                        {task.initialIntervalHours !== null && <span>Initial service: {task.initialIntervalHours} hours</span>}
+                        {task.capacityValue !== null && <span>Capacity: {trimNumber(task.capacityValue, 1)} {task.capacityUnit || ''}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
