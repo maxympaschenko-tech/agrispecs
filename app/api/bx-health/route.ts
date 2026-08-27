@@ -26,6 +26,9 @@ export async function GET(){
       attachmentRows,
       attachmentFitments,
       bt603Fitments,
+      mowerRows,
+      mowerFitments,
+      easyOverBarTireRestrictionRows,
       serviceParts,
       versionedServiceFitments,
       bx2680CorrectOilFitments,
@@ -33,7 +36,7 @@ export async function GET(){
       otherBxCurrentOilFitments,
       supersessionRows,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_173_kubota_bx_filter_supersessions'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_174_kubota_bx_mowers'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
@@ -112,6 +115,32 @@ export async function GET(){
           AND a.attachment_type='backhoe' AND ma.confidence='official'
       `),
       count(`
+        SELECT COUNT(*) AS count FROM attachments a
+        JOIN manufacturers mf ON mf.id=a.manufacturer_id
+        WHERE mf.slug='kubota'
+          AND a.slug IN ('rck48-18bx','rck54-23bx','rck60b-23bx','rck54d-26bx-1','rck60d-26bx-1')
+          AND a.attachment_type IN ('mid-mount-mower','easy-over-mower')
+          AND a.data_status='verified'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_attachments ma
+        JOIN machines m ON m.id=ma.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN attachments a ON a.id=ma.attachment_id
+        WHERE mf.slug='kubota' AND m.slug IN ('bx1880','bx2380','bx2680','bx23s')
+          AND a.slug IN ('rck48-18bx','rck54-23bx','rck60b-23bx','rck54d-26bx-1','rck60d-26bx-1')
+          AND ma.confidence='official'
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_attachments ma
+        JOIN machines m ON m.id=ma.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN attachments a ON a.id=ma.attachment_id
+        WHERE mf.slug='kubota' AND m.slug IN ('bx2380','bx2680','bx23s')
+          AND a.slug IN ('rck54d-26bx-1','rck60d-26bx-1')
+          AND ma.compatibility_note LIKE '%not compatible with bar tires%'
+      `),
+      count(`
         SELECT COUNT(*) AS count FROM parts p
         JOIN manufacturers mf ON mf.id=p.manufacturer_id
         WHERE mf.slug='kubota'
@@ -183,6 +212,9 @@ export async function GET(){
       attachmentRows:attachmentRows===5,
       attachmentFitments:attachmentFitments===9,
       bt603Fitments:bt603Fitments===1,
+      mowerRows:mowerRows===5,
+      mowerFitments:mowerFitments===14,
+      easyOverBarTireRestrictionRows:easyOverBarTireRestrictionRows===6,
       serviceParts:serviceParts===5,
       versionedServiceFitments:versionedServiceFitments===16,
       bx2680CorrectOilFitments:bx2680CorrectOilFitments===1,
@@ -194,17 +226,17 @@ export async function GET(){
 
     return NextResponse.json({
       ok,
-      expectedLatestBXMigration:'20260827_173_kubota_bx_filter_supersessions',
+      expectedLatestBXMigration:'20260827_174_kubota_bx_mowers',
       checks,
       values:{
         machineRows,currentVersions,specificationRows,currentGrossPowerRows,bx2680CurrentPowerRows,bx2680LegacyPowerRows,
-        attachmentRows,attachmentFitments,bt603Fitments,serviceParts,versionedServiceFitments,
-        bx2680CorrectOilFitments,bx2680IncorrectOilFitments,otherBxCurrentOilFitments,supersessionRows,
+        attachmentRows,attachmentFitments,bt603Fitments,mowerRows,mowerFitments,easyOverBarTireRestrictionRows,
+        serviceParts,versionedServiceFitments,bx2680CorrectOilFitments,bx2680IncorrectOilFitments,otherBxCurrentOilFitments,supersessionRows,
       },
       expected:{
         machineRows:4,currentVersions:4,specificationRows:108,currentGrossPowerRows:4,bx2680CurrentPowerRows:2,bx2680LegacyPowerRows:0,
-        attachmentRows:5,attachmentFitments:9,bt603Fitments:1,serviceParts:5,versionedServiceFitments:16,
-        bx2680CorrectOilFitments:1,bx2680IncorrectOilFitments:0,otherBxCurrentOilFitments:3,supersessionRows:5,
+        attachmentRows:5,attachmentFitments:9,bt603Fitments:1,mowerRows:5,mowerFitments:14,easyOverBarTireRestrictionRows:6,
+        serviceParts:5,versionedServiceFitments:16,bx2680CorrectOilFitments:1,bx2680IncorrectOilFitments:0,otherBxCurrentOilFitments:3,supersessionRows:5,
       },
     },{
       status:ok?200:503,
