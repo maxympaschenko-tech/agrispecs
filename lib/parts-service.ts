@@ -42,10 +42,23 @@ export type PartRelation = {
   sourceUrl: string | null;
 };
 
+export type PartComponent = {
+  partNumber: string;
+  normalizedPartNumber: string;
+  name: string | null;
+  manufacturerName: string | null;
+  quantity: number | null;
+  notes: string | null;
+  sourceTitle: string | null;
+  sourceUrl: string | null;
+};
+
 export type PartDetail = PartSummary & {
   description: string | null;
   fitments: PartFitment[];
   relations: PartRelation[];
+  components: PartComponent[];
+  includedInKits: PartComponent[];
 };
 
 type PartRow = RowDataPacket & {
@@ -90,6 +103,17 @@ type RelationRow = RowDataPacket & {
   source_url: string | null;
 };
 
+type ComponentRow = RowDataPacket & {
+  part_number: string;
+  normalized_part_number: string;
+  name: string | null;
+  manufacturer_name: string | null;
+  quantity: string | number | null;
+  notes: string | null;
+  source_title: string | null;
+  source_url: string | null;
+};
+
 function rowToPart(row: PartRow): PartSummary {
   return {
     id: Number(row.id),
@@ -102,6 +126,19 @@ function rowToPart(row: PartRow): PartSummary {
     manufacturerSlug: row.manufacturer_slug,
     dataStatus: row.data_status,
     fitmentCount: Number(row.fitment_count || 0),
+  };
+}
+
+function rowToComponent(row: ComponentRow): PartComponent {
+  return {
+    partNumber: row.part_number,
+    normalizedPartNumber: row.normalized_part_number,
+    name: row.name,
+    manufacturerName: row.manufacturer_name,
+    quantity: row.quantity === null ? null : Number(row.quantity),
+    notes: row.notes,
+    sourceTitle: row.source_title,
+    sourceUrl: row.source_url,
   };
 }
 
@@ -224,6 +261,30 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
       ORDER BY part_number ASC
     `, [base.id, base.id]);
 
+    const [componentRows] = await db.query<ComponentRow[]>(`
+      SELECT p2.part_number, p2.normalized_part_number, p2.name,
+             mf2.name AS manufacturer_name, pc.quantity, pc.notes,
+             sr.title AS source_title, sr.url AS source_url
+      FROM part_components pc
+      JOIN parts p2 ON p2.id=pc.component_part_id
+      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+      LEFT JOIN source_records sr ON sr.id=pc.source_record_id
+      WHERE pc.parent_part_id=?
+      ORDER BY p2.part_number ASC
+    `, [base.id]);
+
+    const [kitRows] = await db.query<ComponentRow[]>(`
+      SELECT p2.part_number, p2.normalized_part_number, p2.name,
+             mf2.name AS manufacturer_name, pc.quantity, pc.notes,
+             sr.title AS source_title, sr.url AS source_url
+      FROM part_components pc
+      JOIN parts p2 ON p2.id=pc.parent_part_id
+      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+      LEFT JOIN source_records sr ON sr.id=pc.source_record_id
+      WHERE pc.component_part_id=?
+      ORDER BY p2.part_number ASC
+    `, [base.id]);
+
     return {
       ...base,
       description: rows[0].description,
@@ -253,6 +314,8 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         sourceTitle: row.source_title,
         sourceUrl: row.source_url,
       })),
+      components: componentRows.map(rowToComponent),
+      includedInKits: kitRows.map(rowToComponent),
     };
   } catch (error) {
     console.error('Unable to load part:', error);
