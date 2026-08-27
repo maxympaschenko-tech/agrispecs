@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { machines } from '@/lib/catalog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
   const staticPages = ['', '/tractors', '/brands', '/parts', '/compare'].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
