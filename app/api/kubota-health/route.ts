@@ -33,8 +33,10 @@ export async function GET() {
       hydraulicHitchBrakeRows,
       engineOilFilterParts,
       highConfidenceOilFilterFitments,
+      serviceFilterParts,
+      highConfidenceServiceFilterFitments,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_143_kubota_m60_engine_oil_filter_references'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_144_kubota_m6060_m7060_service_filters'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug IN ('m5660su','m6060','m7060') AND m.data_status IN ('partial','verified')
@@ -129,11 +131,28 @@ export async function GET() {
           AND p.normalized_part_number IN ('HH1C032430','HH16432430')
           AND mp.fitment_confidence='high'
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM parts p
+        JOIN manufacturers mf ON mf.id=p.manufacturer_id
+        WHERE mf.slug='kubota'
+          AND p.normalized_part_number IN ('1J80043170','5980026110','3A11119130','HHTA037710')
+          AND p.data_status IN ('partial','verified')
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_parts mp
+        JOIN machines m ON m.id=mp.machine_id
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN parts p ON p.id=mp.part_id
+        WHERE mf.slug='kubota'
+          AND m.slug IN ('m6060','m7060')
+          AND p.normalized_part_number IN ('1J80043170','5980026110','3A11119130','HHTA037710')
+          AND mp.fitment_confidence='high'
+      `),
     ]);
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_143_kubota_m60_engine_oil_filter_references',
+      expectedLatestKubotaMigration: '20260827_144_kubota_m6060_m7060_service_filters',
       migrationApplied: migrationApplied === 1,
       publishableKubotaM60,
       expectedPublishableKubotaM60: 3,
@@ -167,6 +186,10 @@ export async function GET() {
       expectedEngineOilFilterParts: 2,
       highConfidenceOilFilterFitments,
       expectedHighConfidenceOilFilterFitments: 3,
+      serviceFilterParts,
+      expectedServiceFilterParts: 4,
+      highConfidenceServiceFilterFitments,
+      expectedHighConfidenceServiceFilterFitments: 8,
     }, {
       headers: { 'Cache-Control':'no-store, max-age=0', 'X-Robots-Tag':'noindex, nofollow' },
     });
