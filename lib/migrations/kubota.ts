@@ -30,6 +30,8 @@ import { kubotaL4802LA766LoaderMigration } from '@/lib/migrations/20260827_160_k
 import { kubotaL4802ServiceFiltersMigration } from '@/lib/migrations/20260827_161_kubota_l4802_service_filters';
 import { kubotaL4802HydraulicFilterSupersessionMigration } from '@/lib/migrations/20260827_162_kubota_l4802_hydraulic_filter_supersession';
 import { kubotaL4802BH92BackhoeMigration } from '@/lib/migrations/20260827_163_kubota_l4802_bh92_backhoe';
+import { kubotaMXCurrentSpecsMigration } from '@/lib/migrations/20260827_164_kubota_mx_current_specs';
+import { kubotaMXAttachmentsMigration } from '@/lib/migrations/20260827_165_kubota_mx_attachments';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -63,4 +65,6 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaL4802ServiceFiltersMigration,
   kubotaL4802HydraulicFilterSupersessionMigration,
   kubotaL4802BH92BackhoeMigration,
+  kubotaMXCurrentSpecsMigration,
+  kubotaMXAttachmentsMigration,
 ];
