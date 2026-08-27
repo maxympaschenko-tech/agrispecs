@@ -37,6 +37,9 @@ import { kubotaMXHSTFilterSupersessionsMigration } from '@/lib/migrations/202608
 import { kubotaMX5400FFilterProvenanceMigration } from '@/lib/migrations/20260827_168_kubota_mx5400f_filter_provenance';
 import { kubotaMXOilSeparatorFilterMigration } from '@/lib/migrations/20260827_169_kubota_mx_oil_separator_filter';
 import { kubotaBXCurrentSpecsMigration } from '@/lib/migrations/20260827_170_kubota_bx_current_specs';
+import { kubotaBXAttachmentsMigration } from '@/lib/migrations/20260827_171_kubota_bx_attachments';
+import { kubotaBXServiceFiltersMigration } from '@/lib/migrations/20260827_172_kubota_bx_service_filters';
+import { kubotaBXFilterSupersessionsMigration } from '@/lib/migrations/20260827_173_kubota_bx_filter_supersessions';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -77,4 +80,7 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaMX5400FFilterProvenanceMigration,
   kubotaMXOilSeparatorFilterMigration,
   kubotaBXCurrentSpecsMigration,
+  kubotaBXAttachmentsMigration,
+  kubotaBXServiceFiltersMigration,
+  kubotaBXFilterSupersessionsMigration,
 ];
