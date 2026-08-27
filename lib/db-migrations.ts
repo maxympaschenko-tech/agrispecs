@@ -45,6 +45,7 @@ import { johnDeere5075MWearElectricalPartsMigration } from '@/lib/migrations/202
 import { johnDeere5095M5105MWearElectricalPartsMigration } from '@/lib/migrations/20260827_121_5095m_5105m_wear_electrical_parts';
 import { johnDeere5MSteeringCrossReferencesMigration } from '@/lib/migrations/20260827_122_5m_steering_cross_references';
 import { johnDeere5120MVerifiedMaintenancePartsMigration } from '@/lib/migrations/20260827_123_5120m_verified_maintenance_parts';
+import { johnDeere5125MFT4VersionedMaintenanceMigration } from '@/lib/migrations/20260827_124_5125m_ft4_versioned_maintenance';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -99,6 +100,7 @@ const migrations: DbMigration[] = [
   johnDeere5095M5105MWearElectricalPartsMigration,
   johnDeere5MSteeringCrossReferencesMigration,
   johnDeere5120MVerifiedMaintenancePartsMigration,
+  johnDeere5125MFT4VersionedMaintenanceMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
