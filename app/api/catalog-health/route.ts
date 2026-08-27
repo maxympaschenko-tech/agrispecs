@@ -55,6 +55,7 @@ export async function GET() {
       filterPakReplacementRelations,
       johnDeere5075MWearElectricalFitments,
       johnDeere5095M5105MWearElectricalFitments,
+      johnDeere5MSteeringCrossReferences,
     ] = await Promise.all([
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='john-deere' AND m.data_status IN ('partial','verified')`),
@@ -112,6 +113,13 @@ export async function GET() {
             'RE271437','RE271440','RE271441','RE217616','RE217817'
           )
       `),
+      count(`
+        SELECT COUNT(*) AS count FROM part_cross_references x
+        JOIN parts p ON p.id=x.part_id
+        JOIN parts cp ON cp.id=x.cross_part_id
+        WHERE (p.normalized_part_number='RE217820' AND cp.normalized_part_number='RE217616' AND x.relation_type='replaces')
+           OR (p.normalized_part_number='RE271437' AND cp.normalized_part_number='ARE271437' AND x.relation_type='alternative')
+      `),
     ]);
 
     const [maintenanceTasks, capacityRecords, machineImages, partComponentRecords, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
@@ -164,7 +172,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_121_5095m_5105m_wear_electrical_parts',
+      expectedLatestMigration: '20260827_122_5m_steering_cross_references',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -185,6 +193,8 @@ export async function GET() {
         expectedJohnDeere5075MWearElectricalFitmentsAfter120: 11,
         johnDeere5095M5105MWearElectricalFitments,
         expectedJohnDeere5095M5105MWearElectricalFitmentsAfter121: 22,
+        johnDeere5MSteeringCrossReferences,
+        expectedJohnDeere5MSteeringCrossReferencesAfter122: 2,
       },
       maintenance: {
         total: maintenanceTasks,
