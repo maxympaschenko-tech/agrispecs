@@ -56,6 +56,7 @@ import { johnDeere6M6RPickupHitchValveKitMigration } from '@/lib/migrations/2026
 import { johnDeere6M6RHydraulicStabilizerPartsMigration } from '@/lib/migrations/20260827_132_6m_6r_hydraulic_stabilizer_parts';
 import { kubotaM7060CurrentSpecsMigration } from '@/lib/migrations/20260827_133_kubota_m7060_current_specs';
 import { kubotaM7060LA1154LoaderMigration } from '@/lib/migrations/20260827_134_kubota_m7060_la1154_loader';
+import { kubotaM7060CurrentHydraulicsPtoCorrectionMigration } from '@/lib/migrations/20260827_135_kubota_m7060_current_hydraulics_pto_correction';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -121,6 +122,7 @@ const migrations: DbMigration[] = [
   johnDeere6M6RHydraulicStabilizerPartsMigration,
   kubotaM7060CurrentSpecsMigration,
   kubotaM7060LA1154LoaderMigration,
+  kubotaM7060CurrentHydraulicsPtoCorrectionMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
