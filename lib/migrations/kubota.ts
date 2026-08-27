@@ -10,6 +10,7 @@ import { kubotaM5660SUCurrentSpecsMigration } from '@/lib/migrations/20260827_14
 import { kubotaM5660SULA1154SULoaderMigration } from '@/lib/migrations/20260827_141_kubota_m5660su_la1154su_loader';
 import { machinePartFitmentConfidenceMigration } from '@/lib/migrations/20260827_142_machine_part_fitment_confidence';
 import { kubotaM60EngineOilFilterReferencesMigration } from '@/lib/migrations/20260827_143_kubota_m60_engine_oil_filter_references';
+import { kubotaM6060M7060ServiceFiltersMigration } from '@/lib/migrations/20260827_144_kubota_m6060_m7060_service_filters';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -23,4 +24,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM5660SULA1154SULoaderMigration,
   machinePartFitmentConfidenceMigration,
   kubotaM60EngineOilFilterReferencesMigration,
+  kubotaM6060M7060ServiceFiltersMigration,
 ];
