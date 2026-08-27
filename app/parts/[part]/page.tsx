@@ -30,6 +30,21 @@ function serialRangeLabel(fitment: PartFitment) {
   return null;
 }
 
+function fitmentVersionLabel(fitment: PartFitment) {
+  if (fitment.machineVersionId === null) return null;
+  const years = fitment.versionModelYearStart && fitment.versionModelYearEnd
+    ? `MY${fitment.versionModelYearStart}-${fitment.versionModelYearEnd}`
+    : fitment.versionModelYearStart
+      ? `MY${fitment.versionModelYearStart}+`
+      : null;
+  return [
+    fitment.versionMarketName,
+    years,
+    fitment.versionConfiguration,
+    fitment.versionIsCurrent ? 'current version' : null,
+  ].filter(Boolean).join(' · ');
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { part: slug } = await params;
   const part = await getPart(slug);
@@ -115,7 +130,7 @@ export default async function PartPage({ params }: PageProps) {
             </div>
           )}
           <div className="notice">
-            Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number and machine configuration before ordering.
+            Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number, machine generation and configuration before ordering.
           </div>
           <Link className="tool-link" href={checkerHref}>Check this part by serial number →</Link>
         </section>
@@ -218,13 +233,15 @@ export default async function PartPage({ params }: PageProps) {
               <h2>Compatible equipment</h2>
               {part.fitments.length > 0 ? part.fitments.map((fitment, index) => {
                 const serialRange = serialRangeLabel(fitment);
+                const versionLabel = fitmentVersionLabel(fitment);
                 const modelCheckerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}&model=${encodeURIComponent(fitment.model)}`;
                 return (
-                  <div className="part-fitment" key={`${fitment.machineId}-${index}`}>
+                  <div className="part-fitment" key={`${fitment.machineId}-${fitment.machineVersionId ?? 'generic'}-${index}`}>
                     <div>
                       <Link className="part-fitment-machine" href={`/tractors/${fitment.brandSlug}/${fitment.modelSlug}`}>
                         {fitment.brand} {fitment.model}
                       </Link>
+                      {versionLabel && <p><strong>Version:</strong> {versionLabel}</p>}
                       {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
                       {fitment.configurationNote && <p><strong>Configuration:</strong> {fitment.configurationNote}</p>}
                       {fitment.fitmentNote && <p>{fitment.fitmentNote}</p>}
