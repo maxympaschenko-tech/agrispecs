@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { machines } from '@/lib/catalog';
+import { getMachines } from '@/lib/catalog-service';
 
 export const metadata: Metadata = {
   title: 'Tractor Specifications and Parts Reference',
   description: 'Browse tractor models by manufacturer and open specifications, maintenance, parts and compatibility reference pages.',
 };
 
-export default function TractorsPage() {
+export default async function TractorsPage() {
+  const machines = await getMachines();
+
   return (
     <main className="section">
       <div className="container">
