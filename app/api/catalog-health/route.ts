@@ -29,6 +29,7 @@ export async function GET() {
     const hasMaintenance = await tableExists('maintenance_tasks');
     const hasCapacities = await tableExists('machine_capacities');
     const hasImages = await tableExists('machine_images');
+    const hasPartComponents = await tableExists('part_components');
 
     let migrationStatus = { applied: 0, latest: null as string | null };
     if (hasMigrations) {
@@ -77,10 +78,11 @@ export async function GET() {
       `),
     ]);
 
-    const [maintenanceTasks, capacityRecords, machineImages, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
+    const [maintenanceTasks, capacityRecords, machineImages, partComponentRecords, maintenance1Series, maintenance3D, maintenance3E, maintenance3R, maintenance4Series, maintenance5M, maintenance6R, fitment6M] = await Promise.all([
       hasMaintenance ? count(`SELECT COUNT(*) AS count FROM maintenance_tasks`) : Promise.resolve(0),
       hasCapacities ? count(`SELECT COUNT(*) AS count FROM machine_capacities`) : Promise.resolve(0),
       hasImages ? count(`SELECT COUNT(*) AS count FROM machine_images`) : Promise.resolve(0),
+      hasPartComponents ? count(`SELECT COUNT(*) AS count FROM part_components`) : Promise.resolve(0),
       hasMaintenance ? count(`
         SELECT COUNT(*) AS count FROM maintenance_tasks mt
         JOIN machines m ON m.id=mt.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
@@ -126,7 +128,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_113_4_series_filter_pak_replacement',
+      expectedLatestMigration: '20260827_115_part_components',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
@@ -140,6 +142,7 @@ export async function GET() {
         compactSerialFitments,
         johnDeere3EFilterPakSerialFitments: filterPak3ESerialFitments,
         filterPakReplacementRelations,
+        partComponents: partComponentRecords,
         johnDeere6MVerifiedFitments: fitment6M,
       },
       maintenance: {
@@ -159,6 +162,7 @@ export async function GET() {
         maintenanceTasks: hasMaintenance,
         machineCapacities: hasCapacities,
         machineImages: hasImages,
+        partComponents: hasPartComponents,
       },
     }, {
       headers: {
