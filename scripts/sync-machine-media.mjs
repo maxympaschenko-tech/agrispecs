@@ -2,6 +2,11 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+if (process.env.SKIP_MEDIA_SYNC === '1') {
+  console.log('[media] Skipping external media sync for CI build.');
+  process.exit(0);
+}
+
 const root = process.cwd();
 const manifestPath = path.join(root, 'data', 'machine-images.json');
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
