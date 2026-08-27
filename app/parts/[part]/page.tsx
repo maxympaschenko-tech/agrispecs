@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPart } from '@/lib/parts-service';
+import { getPart, type PartRelation } from '@/lib/parts-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,14 +10,30 @@ type PageProps = {
   params: Promise<{ part: string }>;
 };
 
+function relationLabel(relation: PartRelation) {
+  if (relation.relationType === 'replaces') {
+    return relation.direction === 'outgoing' ? 'Replaced by' : 'Replaces';
+  }
+  if (relation.relationType === 'supersedes') {
+    return relation.direction === 'outgoing' ? 'Superseded by' : 'Supersedes';
+  }
+  if (relation.relationType === 'alternative') return 'Alternative';
+  return 'Cross reference';
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { part: slug } = await params;
   const part = await getPart(slug);
   if (!part) return {};
 
   const publishable = part.dataStatus === 'verified' || part.dataStatus === 'partial';
-  const title = `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
-  const description = `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, fitment notes and technical sources.`;
+  const hasReplacement = part.relations.some((relation) => relation.direction === 'outgoing' && relation.relationType === 'replaces');
+  const title = hasReplacement
+    ? `${part.manufacturerName || 'OEM'} ${part.partNumber} Replacement Part Number`
+    : `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
+  const description = hasReplacement
+    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number and official source.`
+    : `${part.partNumber} ${part.name || 'OEM part'} reference with verified compatible farm equipment, fitment notes and technical sources.`;
 
   return {
     title,
@@ -32,17 +48,23 @@ export default async function PartPage({ params }: PageProps) {
   const part = await getPart(slug);
   if (!part) notFound();
 
-  const sources = Array.from(
-    new Map(
-      part.fitments
-        .filter((fitment) => fitment.sourceUrl)
-        .map((fitment) => [fitment.sourceUrl, {
-          url: fitment.sourceUrl as string,
-          title: fitment.sourceTitle || 'Technical source',
-          publishedDate: fitment.sourcePublishedDate,
-        }]),
-    ).values(),
-  );
+  const sourceEntries = [
+    ...part.fitments
+      .filter((fitment) => fitment.sourceUrl)
+      .map((fitment) => ({
+        url: fitment.sourceUrl as string,
+        title: fitment.sourceTitle || 'Technical source',
+        publishedDate: fitment.sourcePublishedDate,
+      })),
+    ...part.relations
+      .filter((relation) => relation.sourceUrl)
+      .map((relation) => ({
+        url: relation.sourceUrl as string,
+        title: relation.sourceTitle || 'Official part substitution source',
+        publishedDate: null,
+      })),
+  ];
+  const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
 
   return (
     <main>
@@ -55,8 +77,9 @@ export default async function PartPage({ params }: PageProps) {
           <span className="eyebrow">{part.categoryName || 'OEM part'}</span>
           <h1>{part.partNumber}</h1>
           <p>{part.manufacturerName ? `${part.manufacturerName} ` : ''}{part.name || 'Farm equipment part'}</p>
+          {part.description && <p style={{ marginTop: 10 }}>{part.description}</p>}
           <div className="notice">
-            Fitment below is shown only where a source record is attached. Always confirm serial number and machine configuration before ordering.
+            Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number and machine configuration before ordering.
           </div>
         </section>
 
@@ -64,6 +87,7 @@ export default async function PartPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             <a href="#part-details">Part details</a>
+            {part.relations.length > 0 && <a href="#cross-references">Replacements & cross references</a>}
             <a href="#fitment">Compatible equipment</a>
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
@@ -78,6 +102,23 @@ export default async function PartPage({ params }: PageProps) {
               <div className="placeholder-row"><span>Verified fitments</span><span>{part.fitmentCount}</span></div>
             </section>
 
+            {part.relations.length > 0 && (
+              <section className="data-section" id="cross-references">
+                <h2>Replacements & cross references</h2>
+                <p className="section-note">Direction matters: “Replaced by” points from a legacy number to the current substitute; “Replaces” identifies older numbers superseded by this part.</p>
+                {part.relations.map((relation, index) => (
+                  <div className="placeholder-row" key={`${relation.direction}-${relation.relationType}-${relation.normalizedPartNumber}-${index}`}>
+                    <span>{relationLabel(relation)}</span>
+                    <span>
+                      <Link href={`/parts/${relation.normalizedPartNumber.toLowerCase()}`}>
+                        {relation.partNumber}{relation.name ? ` · ${relation.name}` : ''}
+                      </Link>
+                    </span>
+                  </div>
+                ))}
+              </section>
+            )}
+
             <section className="data-section" id="fitment">
               <h2>Compatible equipment</h2>
               {part.fitments.length > 0 ? part.fitments.map((fitment, index) => (
@@ -91,7 +132,7 @@ export default async function PartPage({ params }: PageProps) {
                   {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
                 </div>
               )) : (
-                <p>No verified equipment fitment has been published yet.</p>
+                <p>No direct equipment fitment has been published for this part number. Check the replacement relationship above when available.</p>
               )}
             </section>
 
