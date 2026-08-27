@@ -72,7 +72,8 @@ export async function GET() {
         JOIN parts cp ON cp.id=x.cross_part_id
         WHERE x.relation_type='replaces'
           AND ((p.normalized_part_number='LVA23615' AND cp.normalized_part_number='TA25767')
-            OR (p.normalized_part_number='LVA21038' AND cp.normalized_part_number='TA25768'))
+            OR (p.normalized_part_number='LVA21038' AND cp.normalized_part_number='TA25768')
+            OR (p.normalized_part_number='LVA21039' AND cp.normalized_part_number='TA25765'))
       `),
     ]);
 
@@ -125,7 +126,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_112_filter_pak_replacements',
+      expectedLatestMigration: '20260827_113_4_series_filter_pak_replacement',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
