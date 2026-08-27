@@ -86,18 +86,20 @@ const partSelect = `
     pc.slug AS category_slug,
     mf.name AS manufacturer_name,
     mf.slug AS manufacturer_slug,
-    COUNT(DISTINCT mp.machine_id) AS fitment_count
+    (
+      SELECT COUNT(DISTINCT mp_count.machine_id)
+      FROM machine_parts mp_count
+      WHERE mp_count.part_id = p.id
+    ) AS fitment_count
   FROM parts p
   LEFT JOIN part_categories pc ON pc.id = p.category_id
   LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
-  LEFT JOIN machine_parts mp ON mp.part_id = p.id
 `;
 
 export async function getParts(): Promise<PartSummary[]> {
   try {
     const db = await getDbReady();
     const [rows] = await db.query<PartRow[]>(`${partSelect}
-      GROUP BY p.id
       ORDER BY mf.name ASC, pc.name ASC, p.part_number ASC
     `);
     return rows.map(rowToPart);
@@ -122,7 +124,6 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
          OR p.part_number LIKE ?
          OR p.name LIKE ?
          OR pc.name LIKE ?
-      GROUP BY p.id
       ORDER BY
         CASE WHEN p.normalized_part_number = ? THEN 0 ELSE 1 END,
         p.part_number ASC
@@ -143,7 +144,6 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
     const db = await getDbReady();
     const [rows] = await db.query<PartRow[]>(`${partSelect}
       WHERE p.normalized_part_number = ?
-      GROUP BY p.id
       LIMIT 1
     `, [normalized]);
 
@@ -209,14 +209,18 @@ export async function getMachineParts(machineId: string): Promise<PartSummary[]>
         pc.slug AS category_slug,
         mf.name AS manufacturer_name,
         mf.slug AS manufacturer_slug,
-        COUNT(DISTINCT mp2.machine_id) AS fitment_count
+        (
+          SELECT COUNT(DISTINCT mp_count.machine_id)
+          FROM machine_parts mp_count
+          WHERE mp_count.part_id = p.id
+        ) AS fitment_count
       FROM machine_parts mp
       INNER JOIN parts p ON p.id = mp.part_id
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
-      LEFT JOIN machine_parts mp2 ON mp2.part_id = p.id
       WHERE mp.machine_id = ?
-      GROUP BY p.id
+      GROUP BY p.id, p.part_number, p.normalized_part_number, p.name, p.description, p.data_status,
+               pc.name, pc.slug, mf.name, mf.slug
       ORDER BY pc.name ASC, p.part_number ASC
     `, [Number(machineId)]);
     return rows.map(rowToPart);
