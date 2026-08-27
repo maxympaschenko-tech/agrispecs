@@ -6,7 +6,7 @@ export type Machine = {
   model: string;
   modelSlug: string;
   title: string;
-  dataStatus: 'seed' | 'verified';
+  dataStatus: 'seed' | 'partial' | 'verified' | 'review';
 };
 
 export const machines: Machine[] = [
