@@ -71,10 +71,16 @@ function resultBase(row: FitmentRow) {
 
 function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' | 'unparseable' {
   let numeric = serial;
+
   if (row.serial_prefix) {
     const prefix = row.serial_prefix.toUpperCase();
-    if (!serial.startsWith(prefix)) return 'outside';
-    numeric = serial.slice(prefix.length);
+    const prefixIndex = serial.lastIndexOf(prefix);
+    if (prefixIndex < 0) return 'outside';
+
+    const tail = serial.slice(prefixIndex + prefix.length);
+    const suffix = tail.match(/(\d+)$/)?.[1];
+    if (!suffix) return 'unparseable';
+    numeric = suffix;
   } else if (!/^\d+$/.test(numeric)) {
     const suffix = numeric.match(/(\d+)$/)?.[1];
     if (!suffix) return 'unparseable';
