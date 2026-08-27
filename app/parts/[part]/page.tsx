@@ -92,11 +92,14 @@ export default async function PartPage({ params }: PageProps) {
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
   const checkerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}`;
   const finalReplacement = replacementChain.nodes.at(-1);
+  const categoryHref = part.categorySlug ? `/parts/category/${part.categorySlug}` : null;
 
   return (
     <main>
       <div className="container breadcrumbs">
-        <Link href="/">Home</Link> / <Link href="/parts">Parts</Link> / {part.partNumber}
+        <Link href="/">Home</Link> / <Link href="/parts">Parts</Link>
+        {categoryHref && part.categoryName ? <> / <Link href={categoryHref}>{part.categoryName}</Link></> : null}
+        {' / '}{part.partNumber}
       </div>
 
       <div className="container">
@@ -134,7 +137,12 @@ export default async function PartPage({ params }: PageProps) {
               <div className="placeholder-row"><span>Part number</span><span>{part.partNumber}</span></div>
               {part.manufacturerName && <div className="placeholder-row"><span>Manufacturer</span><span>{part.manufacturerName}</span></div>}
               {part.name && <div className="placeholder-row"><span>Description</span><span>{part.name}</span></div>}
-              {part.categoryName && <div className="placeholder-row"><span>Category</span><span>{part.categoryName}</span></div>}
+              {part.categoryName && (
+                <div className="placeholder-row">
+                  <span>Category</span>
+                  <span>{categoryHref ? <Link href={categoryHref}>{part.categoryName}</Link> : part.categoryName}</span>
+                </div>
+              )}
               <div className="placeholder-row"><span>Verified fitments</span><span>{part.fitmentCount}</span></div>
               {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
             </section>
