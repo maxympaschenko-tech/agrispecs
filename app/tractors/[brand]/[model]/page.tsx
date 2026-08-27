@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
+import { getMachineImages } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -58,6 +59,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!machine) return {};
 
   const publishable = machine.dataStatus === 'partial' || machine.dataStatus === 'verified';
+  const images = await getMachineImages(machine.id);
+  const primaryImage = images.find((image) => image.isPrimary) || images[0];
 
   return {
     title: `${machine.title} Specs, Parts and Maintenance`,
@@ -66,6 +69,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     robots: publishable
       ? { index: true, follow: true }
       : { index: false, follow: true },
+    openGraph: primaryImage
+      ? {
+          title: `${machine.title} Specs, Parts and Maintenance`,
+          description: `${machine.title} specifications, parts and maintenance reference.`,
+          images: [{ url: primaryImage.imageUrl, alt: primaryImage.altText || machine.title }],
+        }
+      : undefined,
   };
 }
 
@@ -74,7 +84,11 @@ export default async function TractorModelPage({ params }: PageProps) {
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
-  const versions = await getMachineVersions(machine.id);
+  const [versions, images] = await Promise.all([
+    getMachineVersions(machine.id),
+    getMachineImages(machine.id),
+  ]);
+  const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
 
@@ -113,23 +127,48 @@ export default async function TractorModelPage({ params }: PageProps) {
       </div>
       <div className="container">
         <section className="machine-header">
-          <span className="eyebrow">Tractor reference</span>
-          <h1>{machine.title}</h1>
-          <p>Specifications, maintenance, parts and compatibility reference.</p>
+          <div className={primaryImage ? 'machine-header-grid' : undefined}>
+            <div>
+              <span className="eyebrow">Tractor reference</span>
+              <h1>{machine.title}</h1>
+              <p>Specifications, maintenance, parts and compatibility reference.</p>
 
-          {selectedVersion && (
-            <div className="notice">
-              <strong>Specification set:</strong>{' '}
-              {[selectedVersion.marketName, versionYears, selectedVersion.configuration].filter(Boolean).join(' - ')}
-              {selectedVersion.notes ? ` ${selectedVersion.notes}` : ''}
-            </div>
-          )}
+              {selectedVersion && (
+                <div className="notice">
+                  <strong>Specification set:</strong>{' '}
+                  {[selectedVersion.marketName, versionYears, selectedVersion.configuration].filter(Boolean).join(' - ')}
+                  {selectedVersion.notes ? ` ${selectedVersion.notes}` : ''}
+                </div>
+              )}
 
-          {specs.length === 0 && (
-            <div className="notice">
-              Numerical specifications are published only after source verification.
+              {specs.length === 0 && (
+                <div className="notice">
+                  Numerical specifications are published only after source verification.
+                </div>
+              )}
             </div>
-          )}
+
+            {primaryImage && (
+              <figure className="machine-photo">
+                <img src={primaryImage.imageUrl} alt={primaryImage.altText || machine.title} loading="eager" />
+                <figcaption>
+                  {primaryImage.caption && <span>{primaryImage.caption} </span>}
+                  Photo:{' '}
+                  <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
+                    {primaryImage.author || 'source'}
+                  </a>
+                  {primaryImage.licenseName && (
+                    <>
+                      {' '}·{' '}
+                      {primaryImage.licenseUrl ? (
+                        <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
+                      ) : primaryImage.licenseName}
+                    </>
+                  )}
+                </figcaption>
+              </figure>
+            )}
+          </div>
         </section>
 
         <div className="spec-layout">
