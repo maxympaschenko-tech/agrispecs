@@ -29,6 +29,7 @@ import { johnDeere6MVerifiedFitmentMigration } from '@/lib/migrations/20260827_1
 import { partSupersessionsMigration } from '@/lib/migrations/20260827_105_part_supersessions';
 import { morePartSupersessionsMigration } from '@/lib/migrations/20260827_106_more_part_supersessions';
 import { structuredSerialFitmentMigration } from '@/lib/migrations/20260827_107_structured_serial_fitment';
+import { officialAftermarketAlternativesMigration } from '@/lib/migrations/20260827_108_official_aftermarket_alternatives';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -67,6 +68,7 @@ const migrations: DbMigration[] = [
   partSupersessionsMigration,
   morePartSupersessionsMigration,
   structuredSerialFitmentMigration,
+  officialAftermarketAlternativesMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
