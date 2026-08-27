@@ -1,5 +1,5 @@
 import type { RowDataPacket } from 'mysql2';
-import { getDb } from '@/lib/db';
+import { getDbReady } from '@/lib/db-migrations';
 import {
   machines as seedMachines,
   getBrands as getSeedBrands,
@@ -87,7 +87,8 @@ function rowToMachine(row: MachineRow): Machine {
 
 export async function getMachines(): Promise<Machine[]> {
   try {
-    const [rows] = await getDb().query<MachineRow[]>(`
+    const db = await getDbReady();
+    const [rows] = await db.query<MachineRow[]>(`
       SELECT
         m.id,
         m.model_name,
@@ -112,7 +113,8 @@ export async function getMachines(): Promise<Machine[]> {
 
 export async function getMachine(brandSlug: string, modelSlug: string): Promise<Machine | undefined> {
   try {
-    const [rows] = await getDb().query<MachineRow[]>(`
+    const db = await getDbReady();
+    const [rows] = await db.query<MachineRow[]>(`
       SELECT
         m.id,
         m.model_name,
@@ -141,7 +143,8 @@ export async function getMachine(brandSlug: string, modelSlug: string): Promise<
 
 export async function getBrands(): Promise<Array<{ slug: string; name: string }>> {
   try {
-    const [rows] = await getDb().query<BrandRow[]>(`
+    const db = await getDbReady();
+    const [rows] = await db.query<BrandRow[]>(`
       SELECT DISTINCT mf.name, mf.slug
       FROM manufacturers mf
       INNER JOIN machines m ON m.manufacturer_id = mf.id
@@ -168,8 +171,9 @@ export async function searchMachines(term: string): Promise<Machine[]> {
   if (!normalized) return [];
 
   try {
+    const db = await getDbReady();
     const like = `%${normalized}%`;
-    const [rows] = await getDb().query<MachineRow[]>(`
+    const [rows] = await db.query<MachineRow[]>(`
       SELECT
         m.id,
         m.model_name,
@@ -201,7 +205,8 @@ export async function getMachineVersions(machineId: string): Promise<MachineVers
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
-    const [rows] = await getDb().query<VersionRow[]>(`
+    const db = await getDbReady();
+    const [rows] = await db.query<VersionRow[]>(`
       SELECT
         mv.id,
         mv.slug,
@@ -242,7 +247,8 @@ export async function getMachineSpecs(machineId: string, machineVersionId?: numb
   if (!/^\d+$/.test(machineId) || !machineVersionId) return [];
 
   try {
-    const [rows] = await getDb().query<SpecRow[]>(`
+    const db = await getDbReady();
+    const [rows] = await db.query<SpecRow[]>(`
       SELECT
         sd.spec_key,
         sd.section,
