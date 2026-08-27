@@ -16,6 +16,7 @@ import { kubotaM5660SUServiceFiltersMigration } from '@/lib/migrations/20260827_
 import { kubotaCurrentFuelFilterSupersessionMigration } from '@/lib/migrations/20260827_147_kubota_current_fuel_filter_supersession';
 import { kubotaM5660SUAirFilterSupersessionsMigration } from '@/lib/migrations/20260827_148_kubota_m5660su_air_filter_supersessions';
 import { kubotaL2502CurrentSpecsMigration } from '@/lib/migrations/20260827_149_kubota_l2502_current_specs';
+import { kubotaL2502LA526LoaderMigration } from '@/lib/migrations/20260827_150_kubota_l2502_la526_loader';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -35,4 +36,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaCurrentFuelFilterSupersessionMigration,
   kubotaM5660SUAirFilterSupersessionsMigration,
   kubotaL2502CurrentSpecsMigration,
+  kubotaL2502LA526LoaderMigration,
 ];
