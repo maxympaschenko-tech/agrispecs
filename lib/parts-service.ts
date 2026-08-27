@@ -22,6 +22,10 @@ export type PartFitment = {
   modelSlug: string;
   fitmentNote: string | null;
   quantity: number | null;
+  serialPrefix: string | null;
+  serialFrom: string | null;
+  serialTo: string | null;
+  configurationNote: string | null;
   sourceTitle: string | null;
   sourceUrl: string | null;
   sourcePublishedDate: string | null;
@@ -66,6 +70,10 @@ type FitmentRow = RowDataPacket & {
   model_slug: string;
   fitment_note: string | null;
   quantity: string | number | null;
+  serial_prefix: string | null;
+  serial_from: string | null;
+  serial_to: string | null;
+  configuration_note: string | null;
   source_title: string | null;
   source_url: string | null;
   source_published_date: string | null;
@@ -182,6 +190,10 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         m.slug AS model_slug,
         mp.fitment_note,
         mp.quantity,
+        mp.serial_prefix,
+        mp.serial_from,
+        mp.serial_to,
+        mp.configuration_note,
         sr.title AS source_title,
         sr.url AS source_url,
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
@@ -223,6 +235,10 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         modelSlug: row.model_slug,
         fitmentNote: row.fitment_note,
         quantity: row.quantity === null ? null : Number(row.quantity),
+        serialPrefix: row.serial_prefix,
+        serialFrom: row.serial_from,
+        serialTo: row.serial_to,
+        configurationNote: row.configuration_note,
         sourceTitle: row.source_title,
         sourceUrl: row.source_url,
         sourcePublishedDate: row.source_published_date,
