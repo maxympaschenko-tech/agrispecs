@@ -17,10 +17,12 @@ export async function GET() {
   try {
     const [
       migrationApplied,
-      publishableM7060,
-      currentVersions,
+      publishableKubotaM60,
+      m7060CurrentVersions,
+      m6060CurrentVersions,
       serviceReferenceVersions,
-      specs,
+      m7060Specs,
+      m6060Specs,
       serviceCapacities,
       correctedCapacityProvenanceRows,
       verifiedLoaders,
@@ -28,16 +30,21 @@ export async function GET() {
       correctedPtoRows,
       hydraulicHitchBrakeRows,
     ] = await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_137_kubota_m7060_capacity_provenance_correction'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260827_139_kubota_m6060_la1154_loader'`),
       count(`
         SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id
-        WHERE mf.slug='kubota' AND m.slug='m7060' AND m.data_status IN ('partial','verified')
+        WHERE mf.slug='kubota' AND m.slug IN ('m6060','m7060') AND m.data_status IN ('partial','verified')
       `),
       count(`
         SELECT COUNT(*) AS count FROM machine_versions mv
         JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
         WHERE mf.slug='kubota' AND m.slug='m7060'
           AND mv.slug IN ('us-current-8f8r','us-current-12f12r') AND mv.is_current=1
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_versions mv
+        JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        WHERE mf.slug='kubota' AND m.slug='m6060' AND mv.slug='us-current-8f8r' AND mv.is_current=1
       `),
       count(`
         SELECT COUNT(*) AS count FROM machine_versions mv
@@ -51,6 +58,12 @@ export async function GET() {
         JOIN machine_versions mv ON mv.id=ms.machine_version_id
         WHERE mf.slug='kubota' AND m.slug='m7060'
           AND mv.slug IN ('us-current-8f8r','us-current-12f12r')
+      `),
+      count(`
+        SELECT COUNT(*) AS count FROM machine_specs ms
+        JOIN machines m ON m.id=ms.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN machine_versions mv ON mv.id=ms.machine_version_id
+        WHERE mf.slug='kubota' AND m.slug='m6060' AND mv.slug='us-current-8f8r'
       `),
       count(`
         SELECT COUNT(*) AS count FROM machine_capacities mc
@@ -79,7 +92,7 @@ export async function GET() {
         JOIN machines m ON m.id=ma.machine_id
         JOIN manufacturers mf ON mf.id=m.manufacturer_id
         JOIN attachments a ON a.id=ma.attachment_id
-        WHERE mf.slug='kubota' AND m.slug='m7060' AND a.slug='la1154'
+        WHERE mf.slug='kubota' AND m.slug IN ('m6060','m7060') AND a.slug='la1154'
       `),
       count(`
         SELECT COUNT(*) AS count
@@ -110,16 +123,20 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      expectedLatestKubotaMigration: '20260827_137_kubota_m7060_capacity_provenance_correction',
+      expectedLatestKubotaMigration: '20260827_139_kubota_m6060_la1154_loader',
       migrationApplied: migrationApplied === 1,
-      publishableM7060,
-      expectedPublishableM7060: 1,
-      currentConfigurationVersions: currentVersions,
-      expectedCurrentConfigurationVersions: 2,
+      publishableKubotaM60,
+      expectedPublishableKubotaM60: 2,
+      m7060CurrentConfigurationVersions: m7060CurrentVersions,
+      expectedM7060CurrentConfigurationVersions: 2,
+      m6060CurrentConfigurationVersions: m6060CurrentVersions,
+      expectedM6060CurrentConfigurationVersions: 1,
       serviceReferenceVersions,
       expectedServiceReferenceVersions: 1,
-      specificationRecords: specs,
-      expectedSpecificationRecords: 46,
+      m7060SpecificationRecords: m7060Specs,
+      expectedM7060SpecificationRecords: 46,
+      m6060SpecificationRecords: m6060Specs,
+      expectedM6060SpecificationRecords: 29,
       serviceCapacities,
       expectedServiceCapacities: 5,
       correctedCapacityProvenanceRows,
@@ -131,7 +148,7 @@ export async function GET() {
       verifiedLoaders,
       expectedVerifiedLoaders: 1,
       loaderCompatibilityRows,
-      expectedLoaderCompatibilityRows: 1,
+      expectedLoaderCompatibilityRows: 2,
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
