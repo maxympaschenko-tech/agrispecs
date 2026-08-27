@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
+import { getReplacementChain } from '@/lib/replacement-chain-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -56,6 +57,7 @@ export default async function PartPage({ params }: PageProps) {
   const part = await getPart(slug);
   if (!part) notFound();
 
+  const replacementChain = await getReplacementChain(part.id);
   const sourceEntries = [
     ...part.fitments
       .filter((fitment) => fitment.sourceUrl)
@@ -74,6 +76,7 @@ export default async function PartPage({ params }: PageProps) {
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
   const checkerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}`;
+  const finalReplacement = replacementChain.nodes.at(-1);
 
   return (
     <main>
@@ -87,6 +90,12 @@ export default async function PartPage({ params }: PageProps) {
           <h1>{part.partNumber}</h1>
           <p>{part.manufacturerName ? `${part.manufacturerName} ` : ''}{part.name || 'Farm equipment part'}</p>
           {part.description && <p style={{ marginTop: 10 }}>{part.description}</p>}
+          {finalReplacement && (
+            <div className="replacement-summary">
+              <strong>Current replacement chain ends at:</strong>{' '}
+              <Link href={`/parts/${finalReplacement.normalizedPartNumber.toLowerCase()}`}>{finalReplacement.partNumber}</Link>
+            </div>
+          )}
           <div className="notice">
             Fitment and replacement relationships are shown only where a source record is attached. Always confirm serial number and machine configuration before ordering.
           </div>
@@ -116,6 +125,23 @@ export default async function PartPage({ params }: PageProps) {
               <section className="data-section" id="cross-references">
                 <h2>Replacements & cross references</h2>
                 <p className="section-note">Direction matters: “Replaced by” points from a legacy number to the current substitute; “Replaces” identifies older numbers superseded by this part.</p>
+                {replacementChain.nodes.length > 0 && (
+                  <div className="replacement-chain" aria-label="Verified replacement chain">
+                    <strong>Verified replacement chain</strong>
+                    <div>
+                      <Link href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>{part.partNumber}</Link>
+                      {replacementChain.nodes.map((node) => (
+                        <span key={node.id}>
+                          <b>→</b>
+                          <Link href={`/parts/${node.normalizedPartNumber.toLowerCase()}`}>{node.partNumber}</Link>
+                        </span>
+                      ))}
+                    </div>
+                    {!replacementChain.complete && (
+                      <small>{replacementChain.ambiguous ? 'The chain branches or loops after this point, so no single final replacement is asserted.' : 'The verified chain continues beyond the current depth limit.'}</small>
+                    )}
+                  </div>
+                )}
                 {part.relations.map((relation, index) => (
                   <div className="placeholder-row" key={`${relation.direction}-${relation.relationType}-${relation.normalizedPartNumber}-${index}`}>
                     <span>{relationLabel(relation)}</span>
