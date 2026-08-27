@@ -41,6 +41,16 @@ function sectionId(section: string) {
   return section.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function attachmentTypeLabel(type: string) {
+  if (type === 'front-loader') return 'Front loader';
+  if (type === 'backhoe') return 'Backhoe';
+  return type
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || 'Attachment';
+}
+
 function trimNumber(value: number, digits = 1) {
   const rounded = Number(value.toFixed(digits));
   return String(rounded);
@@ -240,7 +250,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts & kits</a>}
-            {attachments.length > 0 && <a href="#attachments">Compatible loaders</a>}
+            {attachments.length > 0 && <a href="#attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
 
@@ -286,7 +296,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
                 <h2>Maintenance schedule</h2>
-                <p className="section-note">Intervals are tied to the cited John Deere guide and, when available, to a specific machine version. Operating conditions and serial-number ranges can change the required service.</p>
+                <p className="section-note">Intervals are tied to the cited maintenance source and, when available, to a specific machine version. Operating conditions and serial-number ranges can change the required service.</p>
                 <div className="maintenance-list">
                   {maintenance.map((task) => {
                     const context = versionContext(task);
@@ -333,23 +343,27 @@ export default async function TractorModelPage({ params }: PageProps) {
 
             {attachments.length > 0 && (
               <section className="data-section" id="attachments">
-                <h2>Compatible loaders</h2>
-                <p className="section-note">Loader compatibility is stored separately from parts. Configuration requirements below come from the cited John Deere compatibility table.</p>
+                <h2>Compatible attachments</h2>
+                <p className="section-note">Attachment compatibility is stored separately from service parts. Configuration requirements below come from the cited compatibility source and can vary by driveline or tractor version.</p>
                 <div className="maintenance-list">
-                  {attachments.map((attachment) => (
-                    <div className="maintenance-row" key={attachment.id}>
-                      <div>
-                        <span className="maintenance-section">Front loader</span>
-                        <strong><Link href={`/attachments/${machine.brandSlug}/${attachment.slug}`}>John Deere {attachment.modelName}</Link></strong>
-                        {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
-                        {attachment.configurationText && <small><strong>Loader configuration:</strong> {attachment.configurationText}</small>}
+                  {attachments.map((attachment) => {
+                    const typeLabel = attachmentTypeLabel(attachment.attachmentType);
+                    const isLoader = attachment.attachmentType === 'front-loader';
+                    return (
+                      <div className="maintenance-row" key={attachment.id}>
+                        <div>
+                          <span className="maintenance-section">{typeLabel}</span>
+                          <strong><Link href={`/attachments/${machine.brandSlug}/${attachment.slug}`}>{machine.brand} {attachment.modelName}</Link></strong>
+                          {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
+                          {attachment.configurationText && <small><strong>{typeLabel} details:</strong> {attachment.configurationText}</small>}
+                        </div>
+                        <div>
+                          {attachment.liftCapacityText && <strong>{attachment.liftCapacityText}</strong>}
+                          {attachment.liftHeightText && <span>{isLoader ? 'Lift height' : 'Working height'}: {attachment.liftHeightText}</span>}
+                        </div>
                       </div>
-                      <div>
-                        {attachment.liftCapacityText && <strong>{attachment.liftCapacityText}</strong>}
-                        {attachment.liftHeightText && <span>Lift height: {attachment.liftHeightText}</span>}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             )}
