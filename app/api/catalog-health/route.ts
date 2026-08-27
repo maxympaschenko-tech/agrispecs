@@ -108,7 +108,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       migrations: migrationStatus,
-      expectedLatestMigration: '20260827_109_compact_serial_cutovers',
+      expectedLatestMigration: '20260827_110_compact_pin_generation_correction',
       johnDeere: {
         machines: johnDeereMachines,
         publishable: publishableJohnDeere,
