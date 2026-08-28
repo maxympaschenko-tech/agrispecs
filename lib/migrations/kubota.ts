@@ -56,6 +56,7 @@ import { kubotaLX20MowersMigration } from '@/lib/migrations/20260828_186_kubota_
 import { machineAttachmentPerformanceOverridesMigration } from '@/lib/migrations/20260828_187_machine_attachment_performance_overrides';
 import { kubotaM4CurrentSpecsMigration } from '@/lib/migrations/20260828_188_kubota_m4_current_specs';
 import { kubotaM4LA1154LoaderMigration } from '@/lib/migrations/20260828_189_kubota_m4_la1154_loader';
+import { kubotaM4ServiceFiltersMigration } from '@/lib/migrations/20260828_190_kubota_m4_service_filters';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -115,4 +116,5 @@ export const kubotaMigrations: DbMigration[] = [
   machineAttachmentPerformanceOverridesMigration,
   kubotaM4CurrentSpecsMigration,
   kubotaM4LA1154LoaderMigration,
+  kubotaM4ServiceFiltersMigration,
 ];
