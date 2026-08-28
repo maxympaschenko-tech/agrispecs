@@ -77,7 +77,7 @@ export const johnDeere6R215250CurrentSpecsMigration: DbMigration = {
       await c.query(
         `INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes)
          VALUES(?,?,'US','United States','Current 6R cab tractor',TRUE,?,'Current-model support is confirmed by Deere US 6R references; engine power values use Deere North America official price-book/specification data.')
-         ON DUPLICATE KEY UPDATE is_current=TRUE,series_id=series_id,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,
+         ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,
         [machineId,VERSION,pricebookSourceId],
       );
       const versionId = await id(c, `SELECT id FROM machine_versions WHERE machine_id=? AND slug=? LIMIT 1`, [machineId,VERSION]);
