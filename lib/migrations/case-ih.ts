@@ -33,6 +33,7 @@ import { caseIHPuma150175CurrentMigration } from '@/lib/migrations/20260828_257_
 import { caseIHFarmallMediumUtilityACorrectionsMigration } from '@/lib/migrations/20260828_258_case_ih_farmall_medium_utility_a_corrections';
 import { caseIHFarmallMediumUtilityCCorrectionsMigration } from '@/lib/migrations/20260828_259_case_ih_farmall_medium_utility_c_corrections';
 import { caseIHFarmallMediumUtilityALoaderCorrectionsMigration } from '@/lib/migrations/20260828_260_case_ih_farmall_medium_utility_a_loader_corrections';
+import { caseIHPuma155NewCurrentMigration } from '@/lib/migrations/20260828_261_case_ih_puma_155_new_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -50,5 +51,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHFarmallLargeUtilityMCurrentMigration, caseIHFarmallNCurrentSpecsMigration,
   caseIHFarmallVCurrentRegistryMigration, caseIHFarmallCLCurrentSpecsMigration, caseIHPuma150175CurrentMigration,
   caseIHFarmallMediumUtilityACorrectionsMigration, caseIHFarmallMediumUtilityCCorrectionsMigration,
-  caseIHFarmallMediumUtilityALoaderCorrectionsMigration,
+  caseIHFarmallMediumUtilityALoaderCorrectionsMigration, caseIHPuma155NewCurrentMigration,
 ];
