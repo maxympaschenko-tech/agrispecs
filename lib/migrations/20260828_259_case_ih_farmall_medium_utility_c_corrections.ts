@@ -1,0 +1,5 @@
+import type { RowDataPacket } from 'mysql2';
+import type { DbMigration } from '@/lib/db-migration-types';
+type IdRow=RowDataPacket&{id:number};
+async function id(c:Parameters<DbMigration['apply']>[0],sql:string,p:unknown[]=[]){const[r]=await c.query<IdRow[]>(sql,p);if(!r[0])throw Error('Farmall Medium Utility C correction dependency missing');return Number(r[0].id)}
+export const caseIHFarmallMediumUtilityCCorrectionsMigration:DbMigration={id:'20260828_259_case_ih_farmall_medium_utility_c_corrections',description:'Remove unpublished zero PTO value from current US Farmall 90C',async apply(c){const mf=await id(c,`SELECT id FROM manufacturers WHERE slug='case-ih' LIMIT 1`);const mi=await id(c,`SELECT id FROM machines WHERE manufacturer_id=? AND slug='farmall-90c' LIMIT 1`,[mf]);const vi=await id(c,`SELECT id FROM machine_versions WHERE machine_id=? AND slug='united-states-current-2026-08' LIMIT 1`,[mi]);const di=await id(c,`SELECT id FROM spec_definitions WHERE spec_key='pto.rated_power' LIMIT 1`);await c.query(`DELETE FROM machine_specs WHERE machine_id=? AND machine_version_id=? AND spec_definition_id=?`,[mi,vi,di])}};
