@@ -4,11 +4,11 @@ type IdRow=RowDataPacket&{id:number};
 const VERSION='united-states-current-2026-08';
 const family={url:'https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series',externalId:'case-ih-farmall-medium-utility-a-current-us-90-120-2026-08'};
 const models=[
- ['farmall-90a','Farmall Utility 90A',90,72,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-90a'],
+ ['farmall-90a','Farmall Utility 90A',90,75,'Cab','4WD','electronic power shuttle','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-90a'],
  ['farmall-95a','Farmall Utility 95A',97,78,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-utility-series/farmall-medium-utility-a-series/farmall-medium-utility-95a'],
- ['farmall-100a','Farmall Utility 100A',100,81,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-100a'],
+ ['farmall-100a','Farmall Utility 100A',101,85,'Cab','4WD','electronic power shuttle','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-100a'],
  ['farmall-105a','Farmall Utility 105A',112,92,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-utility-series/farmall-medium-utility-a-series/farmall-medium-utility-105a'],
- ['farmall-110a','Farmall Utility 110A',110,90,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-110a'],
+ ['farmall-110a','Farmall Utility 110A',110,93,'Cab','4WD','electronic power shuttle','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-110a'],
  ['farmall-115a','Farmall Utility 115A',120,100,'Cab or Non-cab','2WD or MFD','12x12 power shuttle and creeper ready','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-utility-series/farmall-medium-utility-a-series/farmall-medium-utility-115a'],
  ['farmall-120a','Farmall Utility 120A',117,99,'Cab','4WD','electronic power shuttle','https://www.caseih.com/en-us/unitedstates/products/tractors/farmall-medium-utility-a-series/farmall-medium-utility-120a']
 ] as const;
