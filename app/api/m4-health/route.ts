@@ -18,8 +18,9 @@ export async function GET(){
     const [
       migrationApplied,overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,
       remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values,
+      cabinAirCategoryRows,serviceParts,serviceFitments,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_189_kubota_m4_la1154_loader'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_190_kubota_m4_service_filters'`),
       count(`SELECT COUNT(*) AS count FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='machine_attachments' AND COLUMN_NAME IN ('performance_capacity_text','performance_height_text','performance_configuration_text')`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND mv.slug='us-current-hdc12-cab-4wd' AND mv.is_current=1`),
@@ -32,20 +33,24 @@ export async function GET(){
       count(`SELECT COUNT(*) AS count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN attachments a ON a.id=ma.attachment_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND a.slug='la1154' AND ma.confidence='official'`),
       count(`SELECT COUNT(*) AS count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN attachments a ON a.id=ma.attachment_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND a.slug='la1154' AND ma.performance_capacity_text LIKE '%2,674 lb%' AND ma.performance_capacity_text LIKE '%2,928 lb%' AND ma.performance_height_text LIKE '%133.0 in%' AND ma.performance_configuration_text IS NOT NULL`),
       count(`SELECT COUNT(*) AS count FROM attachments a JOIN manufacturers mf ON mf.id=a.manufacturer_id WHERE mf.slug='kubota' AND a.slug='la1154' AND a.lift_capacity_text LIKE '%2,469 lb%' AND a.lift_height_text LIKE '%132.7 in%'`),
+      count(`SELECT COUNT(*) AS count FROM part_categories WHERE slug='cabin-air-filters'`),
+      count(`SELECT COUNT(*) AS count FROM parts p JOIN manufacturers mf ON mf.id=p.manufacturer_id WHERE mf.slug='kubota' AND p.normalized_part_number IN ('HH1C032430','HH1J143172','5980026110','3A11119130','1J77005810','6A67175090') AND p.data_status IN ('partial','verified')`),
+      count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND mv.slug='us-current-hdc12-cab-4wd' AND p.normalized_part_number IN ('HH1C032430','HH1J143172','5980026110','3A11119130','1J77005810','6A67175090') AND mp.fitment_confidence='high'`),
     ]);
 
     const checks={
       migrationApplied:migrationApplied===1,overrideColumns:overrideColumns===3,machineRows:machineRows===3,currentVersions:currentVersions===3,
       specificationRows:specificationRows===90,currentGrossPowerRows:currentGrossPowerRows===3,legacyGrossPowerRows:legacyGrossPowerRows===0,ptoPowerRows:ptoPowerRows===3,remoteValveRows:remoteValveRows===3,
       loaderRows:loaderRows===1,loaderFitments:loaderFitments===3,performanceOverrideRows:performanceOverrideRows===3,globalLA1154M60Values:globalLA1154M60Values===1,
+      cabinAirCategoryRows:cabinAirCategoryRows===1,serviceParts:serviceParts===6,serviceFitments:serviceFitments===18,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestM4Migration:'20260828_189_kubota_m4_la1154_loader',
+      expectedLatestM4Migration:'20260828_190_kubota_m4_service_filters',
       checks,
-      values:{overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values},
+      values:{overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values,cabinAirCategoryRows,serviceParts,serviceFitments},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
