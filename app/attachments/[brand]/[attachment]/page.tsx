@@ -73,6 +73,9 @@ export default async function AttachmentPage({ params }: PageProps) {
                 <span>{item.configurationText}</span>
               </div>
             )}
+            {item.compatibleMachines.some((machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText) && (
+              <p className="section-note">Published performance can vary by tractor, tire, hydraulic or mounting configuration. Tractor-specific values are shown below when the cited source provides them.</p>
+            )}
           </section>
 
           <section className="data-section">
@@ -84,6 +87,9 @@ export default async function AttachmentPage({ params }: PageProps) {
                   <Link className="part-fitment-machine" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                     {machine.brand} {machine.model}
                   </Link>
+                  {machine.performanceCapacityText && <p><strong>Performance:</strong> {machine.performanceCapacityText}</p>}
+                  {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
+                  {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
                   {machine.compatibilityNote && <p>{machine.compatibilityNote}</p>}
                 </div>
               </div>
