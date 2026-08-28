@@ -1,0 +1,33 @@
+import { NextResponse } from 'next/server';
+import type { RowDataPacket } from 'mysql2';
+import { getDbReady } from '@/lib/db-migrations';
+
+export const dynamic='force-dynamic';
+export const revalidate=0;
+
+type CountRow=RowDataPacket&{count:number};
+async function count(sql:string){const db=await getDbReady();const [rows]=await db.query<CountRow[]>(sql);return Number(rows[0]?.count||0);}
+const slugs="'maxxum-115','maxxum-125','maxxum-135','maxxum-145','maxxum-150'";
+
+export async function GET(){try{
+  const [migrationApplied,machines,currentVersions,specRows,fourFiveRows,sixSevenRows,ratedRows,maxRows,ptoRows,hydraulicRows,hitchRows,loaderRows,l113Fitments,l115Fitments,sourceRows]=await Promise.all([
+    count(`SELECT COUNT(*) count FROM schema_migrations WHERE id='20260828_234_case_ih_maxxum_loaders'`),
+    count(`SELECT COUNT(*) count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug IN (${slugs})`),
+    count(`SELECT COUNT(*) count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug IN (${slugs}) AND mv.slug='united-states-current-2026-08' AND mv.is_current=1`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug IN (${slugs}) AND mv.slug='united-states-current-2026-08'`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE m.slug IN ('maxxum-115','maxxum-125','maxxum-135','maxxum-145') AND mv.slug='united-states-current-2026-08' AND sd.spec_key='engine.displacement' AND ms.value_number=4.5`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE m.slug='maxxum-150' AND mv.slug='united-states-current-2026-08' AND sd.spec_key='engine.displacement' AND ms.value_number=6.7`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE mv.slug='united-states-current-2026-08' AND sd.spec_key='engine.rated_power' AND ((m.slug='maxxum-115' AND ms.value_number=116) OR (m.slug='maxxum-125' AND ms.value_number=125) OR (m.slug='maxxum-135' AND ms.value_number=135) OR (m.slug='maxxum-145' AND ms.value_number=145) OR (m.slug='maxxum-150' AND ms.value_number=150))`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE mv.slug='united-states-current-2026-08' AND sd.spec_key='engine.maximum_power' AND ((m.slug='maxxum-115' AND ms.value_number=145) OR (m.slug='maxxum-125' AND ms.value_number=155) OR (m.slug='maxxum-135' AND ms.value_number=169) OR (m.slug='maxxum-145' AND ms.value_number=175) OR (m.slug='maxxum-150' AND ms.value_number=175))`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE mv.slug='united-states-current-2026-08' AND sd.spec_key='pto.rated_power' AND ((m.slug='maxxum-115' AND ms.value_number=95) OR (m.slug='maxxum-125' AND ms.value_number=105) OR (m.slug='maxxum-135' AND ms.value_number=110) OR (m.slug='maxxum-145' AND ms.value_number=120) OR (m.slug='maxxum-150' AND ms.value_number=125))`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND mv.slug='united-states-current-2026-08' AND sd.spec_key='hydraulics.main_pump_max_flow' AND ms.value_number=39.6`),
+    count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND mv.slug='united-states-current-2026-08' AND sd.spec_key='hitch.rear_max_lift_capacity' AND ms.value_number=8945`),
+    count(`SELECT COUNT(*) count FROM attachments a JOIN manufacturers mf ON mf.id=a.manufacturer_id WHERE mf.slug='case-ih' AND a.slug IN ('l113-maxxum','l115-maxxum') AND a.attachment_type='front-loader' AND a.data_status='verified'`),
+    count(`SELECT COUNT(*) count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN attachments a ON a.id=ma.attachment_id WHERE m.slug IN (${slugs}) AND a.slug='l113-maxxum' AND ma.confidence='official'`),
+    count(`SELECT COUNT(*) count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN attachments a ON a.id=ma.attachment_id WHERE m.slug IN (${slugs}) AND a.slug='l115-maxxum' AND ma.confidence='official'`),
+    count(`SELECT COUNT(*) count FROM source_records WHERE external_id IN ('case-ih-maxxum-current-us-115-150-2026-08','case-ih-maxxum-115-current-us','case-ih-maxxum-125-current-us','case-ih-maxxum-135-current-us','case-ih-maxxum-145-current-us','case-ih-maxxum-150-current-us','case-ih-maxxum-l113-loader-current','case-ih-maxxum-l115-loader-current')`),
+  ]);
+  const checks={migrationApplied:migrationApplied===1,machines:machines===5,currentVersions:currentVersions===5,specRows:specRows===50,fourFiveRows:fourFiveRows===4,sixSevenRows:sixSevenRows===1,ratedRows:ratedRows===5,maxRows:maxRows===5,ptoRows:ptoRows===5,hydraulicRows:hydraulicRows===5,hitchRows:hitchRows===5,loaderRows:loaderRows===2,l113Fitments:l113Fitments===5,l115Fitments:l115Fitments===5,sourceRows:sourceRows===8};
+  const ok=Object.values(checks).every(Boolean);
+  return NextResponse.json({ok,expectedLatestCaseIHMaxxumMigration:'20260828_234_case_ih_maxxum_loaders',checks,values:{migrationApplied,machines,currentVersions,specRows,fourFiveRows,sixSevenRows,ratedRows,maxRows,ptoRows,hydraulicRows,hitchRows,loaderRows,l113Fitments,l115Fitments,sourceRows}},{status:ok?200:503,headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'}});
+}catch(error){console.error('Case IH Maxxum health check failed:',error);return NextResponse.json({ok:false,error:'Case IH Maxxum health check failed'},{status:500,headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'}});}}
