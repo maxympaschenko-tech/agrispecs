@@ -31,6 +31,9 @@ export type AttachmentCompatibleMachine = {
   model: string;
   modelSlug: string;
   compatibilityNote: string | null;
+  performanceCapacityText: string | null;
+  performanceHeightText: string | null;
+  performanceConfigurationText: string | null;
 };
 
 export type AttachmentDetail = AttachmentCatalogItem & {
@@ -75,6 +78,9 @@ type CompatibleMachineRow = RowDataPacket & {
   model: string;
   model_slug: string;
   compatibility_note: string | null;
+  performance_capacity_text: string | null;
+  performance_height_text: string | null;
+  performance_configuration_text: string | null;
   source_title: string | null;
   source_url: string | null;
 };
@@ -102,9 +108,9 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
         a.model_name,
         a.slug,
         a.attachment_type,
-        a.lift_capacity_text,
-        a.lift_height_text,
-        a.configuration_text,
+        COALESCE(ma.performance_capacity_text,a.lift_capacity_text) AS lift_capacity_text,
+        COALESCE(ma.performance_height_text,a.lift_height_text) AS lift_height_text,
+        COALESCE(ma.performance_configuration_text,a.configuration_text) AS configuration_text,
         ma.compatibility_note,
         sr.title AS source_title,
         sr.url AS source_url
@@ -234,6 +240,9 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         m.model_name AS model,
         m.slug AS model_slug,
         ma.compatibility_note,
+        ma.performance_capacity_text,
+        ma.performance_height_text,
+        ma.performance_configuration_text,
         sr.title AS source_title,
         sr.url AS source_url
       FROM machine_attachments ma
@@ -264,6 +273,9 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         model: row.model,
         modelSlug: row.model_slug,
         compatibilityNote: row.compatibility_note,
+        performanceCapacityText: row.performance_capacity_text,
+        performanceHeightText: row.performance_height_text,
+        performanceConfigurationText: row.performance_configuration_text,
       })),
       sourceTitle: firstSource?.source_title ?? null,
       sourceUrl: firstSource?.source_url ?? null,
