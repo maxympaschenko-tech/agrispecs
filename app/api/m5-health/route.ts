@@ -18,9 +18,9 @@ export async function GET(){
       migrationApplied,machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,
       eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,
       loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources,
-      fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources,
+      fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources,oilSeparatorSupersessionRows,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_195_kubota_m5_hdc_service_pack'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_196_kubota_m5_oil_separator_supersession'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.is_current=1`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug='m5-091' AND mv.is_current=1`),
@@ -47,6 +47,7 @@ export async function GET(){
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.slug='us-current-hdc-4wd-cab' AND p.normalized_part_number IN ('1G41052300','V052151940','5523126150','1J50805812') AND mp.fitment_confidence='high'`),
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.slug<>'us-current-hdc-4wd-cab' AND p.normalized_part_number IN ('1G41052300','V052151940','5523126150','1J50805812')`),
       count(`SELECT COUNT(*) AS count FROM source_records WHERE external_id IN ('messicks-m5-091hdc-expanded-service-pack-2026-08','messicks-m5-111hdc-expanded-service-pack-2026-08')`),
+      count(`SELECT COUNT(*) AS count FROM part_cross_references pcr JOIN parts p ON p.id=pcr.part_id JOIN parts cp ON cp.id=pcr.cross_part_id JOIN manufacturers mf ON mf.id=p.manufacturer_id WHERE mf.slug='kubota' AND p.normalized_part_number='1J50805810' AND cp.normalized_part_number='1J50805812' AND pcr.relation_type='replaces'`),
     ]);
 
     const checks={
@@ -57,15 +58,15 @@ export async function GET(){
       serviceParts:serviceParts===5,coreServiceFitments:coreServiceFitments===39,cabServiceFitments:cabServiceFitments===14,
       openStationCabFilterFitments:openStationCabFilterFitments===0,variantServiceSources:variantServiceSources===13,
       fuelWaterCategoryRows:fuelWaterCategoryRows===1,expandedServiceParts:expandedServiceParts===4,hdcExpandedFitments:hdcExpandedFitments===8,
-      nonHdcExpandedFitments:nonHdcExpandedFitments===0,expandedServiceSources:expandedServiceSources===2,
+      nonHdcExpandedFitments:nonHdcExpandedFitments===0,expandedServiceSources:expandedServiceSources===2,oilSeparatorSupersessionRows:oilSeparatorSupersessionRows===1,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestM5Migration:'20260828_195_kubota_m5_hdc_service_pack',
+      expectedLatestM5Migration:'20260828_196_kubota_m5_oil_separator_supersession',
       checks,
-      values:{machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources,fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources},
+      values:{machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources,fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources,oilSeparatorSupersessionRows},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
