@@ -23,6 +23,8 @@ import { caseIHFarmallCompactCLoadersMigration } from '@/lib/migrations/20260828
 import { caseIHFarmall25SCCurrentMigration } from '@/lib/migrations/20260828_248_case_ih_farmall_25sc_current';
 import { caseIHFarmallCompactACurrentSpecsMigration } from '@/lib/migrations/20260828_249_case_ih_farmall_compact_a_current_specs';
 import { caseIHFarmallCompactAL340ALoaderMigration } from '@/lib/migrations/20260828_250_case_ih_farmall_compact_a_l340a_loader';
+import { caseIHFarmallSmallUtilityCCurrentSpecsMigration } from '@/lib/migrations/20260828_251_case_ih_farmall_small_utility_c_current_specs';
+import { caseIHFarmallSmallUtilityCL565LoaderMigration } from '@/lib/migrations/20260828_252_case_ih_farmall_small_utility_c_l565_loader';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration,
@@ -49,4 +51,6 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHFarmall25SCCurrentMigration,
   caseIHFarmallCompactACurrentSpecsMigration,
   caseIHFarmallCompactAL340ALoaderMigration,
+  caseIHFarmallSmallUtilityCCurrentSpecsMigration,
+  caseIHFarmallSmallUtilityCL565LoaderMigration,
 ];
