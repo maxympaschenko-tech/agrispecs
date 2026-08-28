@@ -17,6 +17,7 @@ import { johnDeere9RX490640CurrentSpecsMigration } from '@/lib/migrations/202608
 import { johnDeere9RX490640ServiceFiltersMigration } from '@/lib/migrations/20260828_226_john_deere_9rx_490_640_service_filters';
 import { johnDeere6M165250CurrentSpecsMigration } from '@/lib/migrations/20260828_263_john_deere_6m_165_250_current_specs';
 import { johnDeere6M180240CurrentSpecsMigration } from '@/lib/migrations/20260828_264_john_deere_6m_180_240_current_specs';
+import { johnDeere6MOOSCurrentSpecsMigration } from '@/lib/migrations/20260828_265_john_deere_6m_oos_current_specs';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -37,4 +38,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere9RX490640ServiceFiltersMigration,
   johnDeere6M165250CurrentSpecsMigration,
   johnDeere6M180240CurrentSpecsMigration,
+  johnDeere6MOOSCurrentSpecsMigration,
 ];
