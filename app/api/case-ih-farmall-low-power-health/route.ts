@@ -1,0 +1,18 @@
+import { NextResponse } from 'next/server';
+import type { RowDataPacket } from 'mysql2';
+import { getDbReady } from '@/lib/db-migrations';
+export const dynamic='force-dynamic';export const revalidate=0;
+type CountRow=RowDataPacket&{count:number};async function count(sql:string){const db=await getDbReady();const[rows]=await db.query<CountRow[]>(sql);return Number(rows[0]?.count||0)}
+const compactA="'farmall-compact-25a','farmall-compact-35a','farmall-compact-40a'";
+export async function GET(){try{const [migrations,subcompact,subSpecs,subLoader,compactMachines,compactVersions,compactSpecs,compactLoader,compactFitments,sources]=await Promise.all([
+ count(`SELECT COUNT(*) count FROM schema_migrations WHERE id IN ('20260828_248_case_ih_farmall_25sc_current','20260828_249_case_ih_farmall_compact_a_current_specs','20260828_250_case_ih_farmall_compact_a_l340a_loader')`),
+ count(`SELECT COUNT(*) count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug='farmall-25sc'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id WHERE m.slug='farmall-25sc' AND mv.slug='united-states-current-2026-08'`),
+ count(`SELECT COUNT(*) count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN attachments a ON a.id=ma.attachment_id WHERE m.slug='farmall-25sc' AND a.slug='l320s-farmall-25sc' AND ma.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug IN (${compactA})`),
+ count(`SELECT COUNT(*) count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id WHERE m.slug IN (${compactA}) AND mv.slug='united-states-current-2026-08' AND mv.is_current=1`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN machine_versions mv ON mv.id=ms.machine_version_id WHERE m.slug IN (${compactA}) AND mv.slug='united-states-current-2026-08'`),
+ count(`SELECT COUNT(*) count FROM attachments a JOIN manufacturers mf ON mf.id=a.manufacturer_id WHERE mf.slug='case-ih' AND a.slug='l340a-farmall-compact-a' AND a.data_status='verified'`),
+ count(`SELECT COUNT(*) count FROM machine_attachments ma JOIN machines m ON m.id=ma.machine_id JOIN attachments a ON a.id=ma.attachment_id WHERE m.slug IN ('farmall-compact-35a','farmall-compact-40a') AND a.slug='l340a-farmall-compact-a' AND ma.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM source_records WHERE external_id IN ('case-ih-farmall-25sc-current-us','case-ih-farmall-25sc-l320s-current','case-ih-farmall-compact-25a-current-us','case-ih-farmall-compact-35a-current-us','case-ih-farmall-compact-40a-current-us','case-ih-farmall-compact-a-l340a-current')`)
+]);const checks={migrations:migrations===3,subcompact:subcompact===1,subSpecs:subSpecs===6,subLoader:subLoader===1,compactMachines:compactMachines===3,compactVersions:compactVersions===3,compactSpecs:compactSpecs===24,compactLoader:compactLoader===1,compactFitments:compactFitments===2,sources:sources===6};const ok=Object.values(checks).every(Boolean);return NextResponse.json({ok,checks,values:{migrations,subcompact,subSpecs,subLoader,compactMachines,compactVersions,compactSpecs,compactLoader,compactFitments,sources}},{status:ok?200:503,headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'}})}catch(error){console.error('Farmall low-power health check failed:',error);return NextResponse.json({ok:false,error:'Farmall low-power health check failed'},{status:500,headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'}})}}
