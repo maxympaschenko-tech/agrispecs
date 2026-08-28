@@ -51,6 +51,8 @@ import { kubotaLX20CurrentSpecsMigration } from '@/lib/migrations/20260828_181_k
 import { kubotaLX20AttachmentsMigration } from '@/lib/migrations/20260828_182_kubota_lx20_attachments';
 import { kubotaLX20ServiceFiltersMigration } from '@/lib/migrations/20260828_183_kubota_lx20_service_filters';
 import { kubotaLX20FilterSupersessionsMigration } from '@/lib/migrations/20260828_184_kubota_lx20_filter_supersessions';
+import { kubotaLX20SnowBlowersMigration } from '@/lib/migrations/20260828_185_kubota_lx20_snow_blowers';
+import { kubotaLX20MowersMigration } from '@/lib/migrations/20260828_186_kubota_lx20_mowers';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -105,4 +107,6 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaLX20AttachmentsMigration,
   kubotaLX20ServiceFiltersMigration,
   kubotaLX20FilterSupersessionsMigration,
+  kubotaLX20SnowBlowersMigration,
+  kubotaLX20MowersMigration,
 ];
