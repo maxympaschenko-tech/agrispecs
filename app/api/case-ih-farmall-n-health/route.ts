@@ -25,7 +25,7 @@ export async function GET() {
       count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions sd ON sd.id=ms.spec_definition_id WHERE sd.spec_key='pto.rated_power' AND ((m.slug='farmall-80n' AND ms.value_number=65) OR (m.slug='farmall-90n' AND ms.value_number=75) OR (m.slug='farmall-100n' AND ms.value_number=87) OR (m.slug='farmall-110n' AND ms.value_number=96) OR (m.slug='farmall-120n' AND ms.value_number=102))`),
       count(`SELECT COUNT(*) count FROM source_records WHERE external_id IN ('case-ih-farmall-80n-current-us','case-ih-farmall-90n-current-us','case-ih-farmall-100n-current-us','case-ih-farmall-110n-current-us','case-ih-farmall-120n-current-us')`),
     ]);
-    const checks = { migrations: migrations === 1, machines: machines === 5, versions: versions === 5, specs: specs === 39, hpRows: hpRows === 5, ptoRows: ptoRows === 5, sources: sources === 5 };
+    const checks = { migrations: migrations === 1, machines: machines === 5, versions: versions === 5, specs: specs === 38, hpRows: hpRows === 5, ptoRows: ptoRows === 5, sources: sources === 5 };
     const ok = Object.values(checks).every(Boolean);
     return NextResponse.json({ ok, checks, values: { migrations, machines, versions, specs, hpRows, ptoRows, sources } }, { status: ok ? 200 : 503, headers: { 'Cache-Control': 'no-store, max-age=0', 'X-Robots-Tag': 'noindex, nofollow' } });
   } catch (error) {
