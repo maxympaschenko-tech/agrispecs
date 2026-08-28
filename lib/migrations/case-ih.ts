@@ -9,6 +9,8 @@ import { caseIHMaxxumCurrentSpecsMigration } from '@/lib/migrations/20260828_233
 import { caseIHMaxxumLoadersMigration } from '@/lib/migrations/20260828_234_case_ih_maxxum_loaders';
 import { caseIHVestrumCurrentSpecsMigration } from '@/lib/migrations/20260828_235_case_ih_vestrum_current_specs';
 import { caseIHVestrumL113LoaderMigration } from '@/lib/migrations/20260828_236_case_ih_vestrum_l113_loader';
+import { caseIHFarmall100AProCurrentSpecsMigration } from '@/lib/migrations/20260828_237_case_ih_farmall_100a_pro_current_specs';
+import { caseIHFarmall100AProLoadersMigration } from '@/lib/migrations/20260828_238_case_ih_farmall_100a_pro_loaders';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration,
@@ -21,4 +23,6 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHMaxxumLoadersMigration,
   caseIHVestrumCurrentSpecsMigration,
   caseIHVestrumL113LoaderMigration,
+  caseIHFarmall100AProCurrentSpecsMigration,
+  caseIHFarmall100AProLoadersMigration,
 ];
