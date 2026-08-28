@@ -66,6 +66,7 @@ import { kubotaM5OilSeparatorSupersessionMigration } from '@/lib/migrations/2026
 import { kubotaM6CurrentSpecsMigration } from '@/lib/migrations/20260828_197_kubota_m6_current_specs';
 import { kubotaM6LoadersMigration } from '@/lib/migrations/20260828_198_kubota_m6_loaders';
 import { kubotaM6ServiceFiltersMigration } from '@/lib/migrations/20260828_199_kubota_m6_service_filters';
+import { kubotaM6ServiceSupersessionsMigration } from '@/lib/migrations/20260828_200_kubota_m6_service_supersessions';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -135,4 +136,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM6CurrentSpecsMigration,
   kubotaM6LoadersMigration,
   kubotaM6ServiceFiltersMigration,
+  kubotaM6ServiceSupersessionsMigration,
 ];
