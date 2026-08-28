@@ -55,6 +55,7 @@ import { johnDeere6RFrontPTOHydraulicKitsMigration } from '@/lib/migrations/2026
 import { johnDeere6M6RPickupHitchValveKitMigration } from '@/lib/migrations/20260827_131_6m_6r_pickup_hitch_valve_kit';
 import { johnDeere6M6RHydraulicStabilizerPartsMigration } from '@/lib/migrations/20260827_132_6m_6r_hydraulic_stabilizer_parts';
 import { kubotaMigrations } from '@/lib/migrations/kubota';
+import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expansion';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -119,6 +120,7 @@ const migrations: DbMigration[] = [
   johnDeere6M6RPickupHitchValveKitMigration,
   johnDeere6M6RHydraulicStabilizerPartsMigration,
   ...kubotaMigrations,
+  ...johnDeereExpansionMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
