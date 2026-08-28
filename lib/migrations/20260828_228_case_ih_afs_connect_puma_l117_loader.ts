@@ -1,0 +1,20 @@
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { DbMigration } from '@/lib/db-migration-types';
+
+type IdRow=RowDataPacket&{id:number};
+const SOURCE_URL='https://www.caseih.com/en-us/unitedstates/products/tractors/puma-super-series/afs-connect-puma-series';
+const SOURCE_EXTERNAL_ID='case-ih-afs-connect-puma-l117-loader-current';
+const modelSlugs=['afs-connect-puma-185','afs-connect-puma-200','afs-connect-puma-220','afs-connect-puma-240','afs-connect-puma-260'] as const;
+async function selectId(connection:Parameters<DbMigration['apply']>[0],sql:string,params:unknown[]=[]){const [rows]=await connection.query<IdRow[]>(sql,params);if(!rows[0])throw new Error('Missing Case IH AFS Connect Puma L117 dependency.');return Number(rows[0].id);}
+
+export const caseIHAfsConnectPumaL117LoaderMigration:DbMigration={
+  id:'20260828_228_case_ih_afs_connect_puma_l117_loader',
+  description:'Add official Case IH L117 loader compatibility for current AFS Connect Puma 185-260 tractors',
+  async apply(connection){
+    const manufacturerId=await selectId(connection,`SELECT id FROM manufacturers WHERE slug='case-ih' LIMIT 1`);
+    let [sourceRows]=await connection.query<IdRow[]>(`SELECT id FROM sources WHERE name='Case IH' AND domain='caseih.com' ORDER BY id LIMIT 1`);let sourceId=sourceRows[0]?.id?Number(sourceRows[0].id):0;if(!sourceId){const [result]=await connection.query<ResultSetHeader>(`INSERT INTO sources (name,domain,source_type,authority_level) VALUES ('Case IH','caseih.com','manufacturer','official')`);sourceId=Number(result.insertId);}
+    const [existing]=await connection.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? LIMIT 1`,[SOURCE_EXTERNAL_ID]);let sourceRecordId=existing[0]?.id?Number(existing[0].id):0;if(!sourceRecordId){const [result]=await connection.query<ResultSetHeader>(`INSERT INTO source_records (source_id,url,external_id,title,raw_reference) VALUES (?,?,?,?,?)`,[sourceId,SOURCE_URL,SOURCE_EXTERNAL_ID,'Case IH US AFS Connect Puma Series - L117 loader compatibility',JSON.stringify({loader:'L117',models:['AFS Connect Puma 185','AFS Connect Puma 200','AFS Connect Puma 220','AFS Connect Puma 240','AFS Connect Puma 260'],maxLiftCapacityLb:5622,maxHeightIn:168,boomBreakoutForceLb:6768})]);sourceRecordId=Number(result.insertId);}
+    await connection.query(`INSERT INTO attachments (manufacturer_id,attachment_type,model_name,slug,lift_capacity_text,lift_height_text,configuration_text,data_status) VALUES (?,'front-loader','L117','l117',?,?,?,'verified') ON DUPLICATE KEY UPDATE model_name='L117',lift_capacity_text=VALUES(lift_capacity_text),lift_height_text=VALUES(lift_height_text),configuration_text=VALUES(configuration_text),data_status='verified'`,[manufacturerId,'Up to 5,622 lb max lift capacity; boom breakout force up to 6,768 lb','Up to 168 in max height','Case IH performance-matched loader for Puma 185-260 tractors. Exact capacity depends on tractor/loader configuration.']);const attachmentId=await selectId(connection,`SELECT id FROM attachments WHERE manufacturer_id=? AND attachment_type='front-loader' AND slug='l117' LIMIT 1`,[manufacturerId]);
+    for(const slug of modelSlugs){const machineId=await selectId(connection,`SELECT m.id FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='case-ih' AND m.slug=? LIMIT 1`,[slug]);await connection.query(`INSERT INTO machine_attachments (machine_id,attachment_id,compatibility_note,source_record_id,confidence) VALUES (?,?,?,?,'official') ON DUPLICATE KEY UPDATE compatibility_note=VALUES(compatibility_note),source_record_id=VALUES(source_record_id),confidence='official'`,[machineId,attachmentId,`Case IH US AFS Connect Puma family page lists L117 for Puma 185-260; this current AFS Connect ${slug.replace('afs-connect-puma-','Puma ')} is inside that compatibility range.`,sourceRecordId]);}
+  }
+};
