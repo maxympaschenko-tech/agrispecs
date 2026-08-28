@@ -18,8 +18,9 @@ export async function GET(){
       migrationApplied,machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,
       eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,
       loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources,
+      fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_194_kubota_m5_service_filters'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_195_kubota_m5_hdc_service_pack'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.is_current=1`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug='m5-091' AND mv.is_current=1`),
@@ -41,6 +42,11 @@ export async function GET(){
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.is_current=1 AND p.normalized_part_number IN ('6A67175090','T185571600') AND mv.configuration LIKE '%cab%' AND mp.fitment_confidence='high'`),
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.is_current=1 AND p.normalized_part_number IN ('6A67175090','T185571600') AND mv.configuration LIKE '%open%'`),
       count(`SELECT COUNT(*) AS count FROM source_records WHERE external_id IN ('messicks-m5-091hf-service-filters-2026-08','messicks-m5-091hfc-service-filters-2026-08','messicks-m5-091hd-service-filters-2026-08','messicks-m5-091hd12-service-filters-2026-08','messicks-m5-091hdc-service-filters-2026-08','messicks-m5-091hdc12-service-filters-2026-08','messicks-m5-111hf-service-filters-2026-08','messicks-m5-111hfc-service-filters-2026-08','messicks-m5-111hd-service-filters-2026-08','messicks-m5-111hd12-service-filters-2026-08','messicks-m5-111hdc-service-filters-2026-08','messicks-m5-111hdc12-service-filters-2026-08','messicks-m5-111hdc24-service-filters-2026-08')`),
+      count(`SELECT COUNT(*) AS count FROM part_categories WHERE slug='fuel-water-separators'`),
+      count(`SELECT COUNT(*) AS count FROM parts p JOIN manufacturers mf ON mf.id=p.manufacturer_id WHERE mf.slug='kubota' AND p.normalized_part_number IN ('1G41052300','V052151940','5523126150','1J50805812') AND p.data_status IN ('partial','verified')`),
+      count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.slug='us-current-hdc-4wd-cab' AND p.normalized_part_number IN ('1G41052300','V052151940','5523126150','1J50805812') AND mp.fitment_confidence='high'`),
+      count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m5-091','m5-111') AND mv.slug<>'us-current-hdc-4wd-cab' AND p.normalized_part_number IN ('1G41052300','V052151940','5523126150','1J50805812')`),
+      count(`SELECT COUNT(*) AS count FROM source_records WHERE external_id IN ('messicks-m5-091hdc-expanded-service-pack-2026-08','messicks-m5-111hdc-expanded-service-pack-2026-08')`),
     ]);
 
     const checks={
@@ -50,14 +56,16 @@ export async function GET(){
       lowLiftRows:lowLiftRows===8,highLiftRows:highLiftRows===5,loaderRows:loaderRows===1,loaderFitments:loaderFitments===2,
       serviceParts:serviceParts===5,coreServiceFitments:coreServiceFitments===39,cabServiceFitments:cabServiceFitments===14,
       openStationCabFilterFitments:openStationCabFilterFitments===0,variantServiceSources:variantServiceSources===13,
+      fuelWaterCategoryRows:fuelWaterCategoryRows===1,expandedServiceParts:expandedServiceParts===4,hdcExpandedFitments:hdcExpandedFitments===8,
+      nonHdcExpandedFitments:nonHdcExpandedFitments===0,expandedServiceSources:expandedServiceSources===2,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestM5Migration:'20260828_194_kubota_m5_service_filters',
+      expectedLatestM5Migration:'20260828_195_kubota_m5_hdc_service_pack',
       checks,
-      values:{machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources},
+      values:{machineRows,currentVersions,m5091Versions,m5111Versions,specificationRows,grossPowerRows,ptoPowerRows,eightSpeedRows,twelveSpeedRows,twentyFourSpeedRows,twoWdRows,fourWdRows,lowLiftRows,highLiftRows,loaderRows,loaderFitments,serviceParts,coreServiceFitments,cabServiceFitments,openStationCabFilterFitments,variantServiceSources,fuelWaterCategoryRows,expandedServiceParts,hdcExpandedFitments,nonHdcExpandedFitments,expandedServiceSources},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
