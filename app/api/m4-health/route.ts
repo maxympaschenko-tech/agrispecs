@@ -18,9 +18,9 @@ export async function GET(){
     const [
       migrationApplied,overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,
       remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values,
-      cabinAirCategoryRows,serviceParts,serviceFitments,
+      cabinAirCategoryRows,serviceParts,serviceFitments,oilFilterSupersessions,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_190_kubota_m4_service_filters'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_191_kubota_m4_oil_filter_supersessions'`),
       count(`SELECT COUNT(*) AS count FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='machine_attachments' AND COLUMN_NAME IN ('performance_capacity_text','performance_height_text','performance_configuration_text')`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND mv.slug='us-current-hdc12-cab-4wd' AND mv.is_current=1`),
@@ -36,21 +36,22 @@ export async function GET(){
       count(`SELECT COUNT(*) AS count FROM part_categories WHERE slug='cabin-air-filters'`),
       count(`SELECT COUNT(*) AS count FROM parts p JOIN manufacturers mf ON mf.id=p.manufacturer_id WHERE mf.slug='kubota' AND p.normalized_part_number IN ('HH1C032430','HH1J143172','5980026110','3A11119130','1J77005810','6A67175090') AND p.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m4d-061','m4-071','m4d-071') AND mv.slug='us-current-hdc12-cab-4wd' AND p.normalized_part_number IN ('HH1C032430','HH1J143172','5980026110','3A11119130','1J77005810','6A67175090') AND mp.fitment_confidence='high'`),
+      count(`SELECT COUNT(*) AS count FROM part_cross_references pcr JOIN parts oldp ON oldp.id=pcr.part_id JOIN parts newp ON newp.id=pcr.cross_part_id JOIN manufacturers mf ON mf.id=oldp.manufacturer_id WHERE mf.slug='kubota' AND pcr.relation_type='replaces' AND newp.normalized_part_number='HH1C032430' AND oldp.normalized_part_number IN ('1C01032430','1C02032430','1C02032434')`),
     ]);
 
     const checks={
       migrationApplied:migrationApplied===1,overrideColumns:overrideColumns===3,machineRows:machineRows===3,currentVersions:currentVersions===3,
       specificationRows:specificationRows===90,currentGrossPowerRows:currentGrossPowerRows===3,legacyGrossPowerRows:legacyGrossPowerRows===0,ptoPowerRows:ptoPowerRows===3,remoteValveRows:remoteValveRows===3,
       loaderRows:loaderRows===1,loaderFitments:loaderFitments===3,performanceOverrideRows:performanceOverrideRows===3,globalLA1154M60Values:globalLA1154M60Values===1,
-      cabinAirCategoryRows:cabinAirCategoryRows===1,serviceParts:serviceParts===6,serviceFitments:serviceFitments===18,
+      cabinAirCategoryRows:cabinAirCategoryRows===1,serviceParts:serviceParts===6,serviceFitments:serviceFitments===18,oilFilterSupersessions:oilFilterSupersessions===3,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestM4Migration:'20260828_190_kubota_m4_service_filters',
+      expectedLatestM4Migration:'20260828_191_kubota_m4_oil_filter_supersessions',
       checks,
-      values:{overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values,cabinAirCategoryRows,serviceParts,serviceFitments},
+      values:{overrideColumns,machineRows,currentVersions,specificationRows,currentGrossPowerRows,legacyGrossPowerRows,ptoPowerRows,remoteValveRows,loaderRows,loaderFitments,performanceOverrideRows,globalLA1154M60Values,cabinAirCategoryRows,serviceParts,serviceFitments,oilFilterSupersessions},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
