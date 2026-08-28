@@ -5,6 +5,8 @@ import { caseIHMagnumCurrentSpecsMigration } from '@/lib/migrations/20260828_229
 import { caseIHMagnumL118LoaderMigration } from '@/lib/migrations/20260828_230_case_ih_magnum_l118_loader';
 import { caseIHSteigerCurrentSpecsMigration } from '@/lib/migrations/20260828_231_case_ih_steiger_current_specs';
 import { caseIHOptumCurrentSpecsMigration } from '@/lib/migrations/20260828_232_case_ih_optum_current_specs';
+import { caseIHMaxxumCurrentSpecsMigration } from '@/lib/migrations/20260828_233_case_ih_maxxum_current_specs';
+import { caseIHMaxxumLoadersMigration } from '@/lib/migrations/20260828_234_case_ih_maxxum_loaders';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration,
@@ -13,4 +15,6 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHMagnumL118LoaderMigration,
   caseIHSteigerCurrentSpecsMigration,
   caseIHOptumCurrentSpecsMigration,
+  caseIHMaxxumCurrentSpecsMigration,
+  caseIHMaxxumLoadersMigration,
 ];
