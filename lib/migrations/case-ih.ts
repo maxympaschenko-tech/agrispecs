@@ -13,20 +13,8 @@ import { caseIHFarmall100AProCurrentSpecsMigration } from '@/lib/migrations/2026
 import { caseIHFarmall100AProLoadersMigration } from '@/lib/migrations/20260828_238_case_ih_farmall_100a_pro_loaders';
 import { caseIHFarmallSmallUtilityACurrentSpecsMigration } from '@/lib/migrations/20260828_239_case_ih_farmall_small_utility_a_current_specs';
 import { caseIHFarmallSmallUtilityALoadersMigration } from '@/lib/migrations/20260828_240_case_ih_farmall_small_utility_a_loaders';
-
+import { caseIHFarmallMediumUtilityACurrentSpecsMigration } from '@/lib/migrations/20260828_241_case_ih_farmall_medium_utility_a_current_specs';
+import { caseIHFarmallMediumUtilityALoadersMigration } from '@/lib/migrations/20260828_242_case_ih_farmall_medium_utility_a_loaders';
 export const caseIHMigrations: DbMigration[] = [
-  caseIHAfsConnectPumaCurrentSpecsMigration,
-  caseIHAfsConnectPumaL117LoaderMigration,
-  caseIHMagnumCurrentSpecsMigration,
-  caseIHMagnumL118LoaderMigration,
-  caseIHSteigerCurrentSpecsMigration,
-  caseIHOptumCurrentSpecsMigration,
-  caseIHMaxxumCurrentSpecsMigration,
-  caseIHMaxxumLoadersMigration,
-  caseIHVestrumCurrentSpecsMigration,
-  caseIHVestrumL113LoaderMigration,
-  caseIHFarmall100AProCurrentSpecsMigration,
-  caseIHFarmall100AProLoadersMigration,
-  caseIHFarmallSmallUtilityACurrentSpecsMigration,
-  caseIHFarmallSmallUtilityALoadersMigration,
+  caseIHAfsConnectPumaCurrentSpecsMigration,caseIHAfsConnectPumaL117LoaderMigration,caseIHMagnumCurrentSpecsMigration,caseIHMagnumL118LoaderMigration,caseIHSteigerCurrentSpecsMigration,caseIHOptumCurrentSpecsMigration,caseIHMaxxumCurrentSpecsMigration,caseIHMaxxumLoadersMigration,caseIHVestrumCurrentSpecsMigration,caseIHVestrumL113LoaderMigration,caseIHFarmall100AProCurrentSpecsMigration,caseIHFarmall100AProLoadersMigration,caseIHFarmallSmallUtilityACurrentSpecsMigration,caseIHFarmallSmallUtilityALoadersMigration,caseIHFarmallMediumUtilityACurrentSpecsMigration,caseIHFarmallMediumUtilityALoadersMigration,
 ];
