@@ -73,6 +73,10 @@ import { kubotaM6SServiceFiltersMigration } from '@/lib/migrations/20260828_203_
 import { kubotaM7Gen4CurrentSpecsMigration } from '@/lib/migrations/20260828_204_kubota_m7_gen4_current_specs';
 import { kubotaM7Gen4LM2606LoaderMigration } from '@/lib/migrations/20260828_205_kubota_m7_gen4_lm2606_loader';
 import { kubotaM7Gen4ServiceFiltersMigration } from '@/lib/migrations/20260828_206_kubota_m7_gen4_service_filters';
+import { kubotaM8CurrentSpecsMigration } from '@/lib/migrations/20260828_207_kubota_m8_current_specs';
+import { kubotaM8M77LoaderMigration } from '@/lib/migrations/20260828_208_kubota_m8_m77_loader';
+import { kubotaM8ServiceFiltersMigration } from '@/lib/migrations/20260828_209_kubota_m8_service_filters';
+import { kubotaM8AirFilterSupersessionMigration } from '@/lib/migrations/20260828_210_kubota_m8_air_filter_supersession';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -149,4 +153,8 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM7Gen4CurrentSpecsMigration,
   kubotaM7Gen4LM2606LoaderMigration,
   kubotaM7Gen4ServiceFiltersMigration,
+  kubotaM8CurrentSpecsMigration,
+  kubotaM8M77LoaderMigration,
+  kubotaM8ServiceFiltersMigration,
+  kubotaM8AirFilterSupersessionMigration,
 ];
