@@ -62,6 +62,7 @@ import { kubotaM5CurrentSpecsMigration } from '@/lib/migrations/20260828_192_kub
 import { kubotaM5LA1854LoaderMigration } from '@/lib/migrations/20260828_193_kubota_m5_la1854_loader';
 import { kubotaM5ServiceFiltersMigration } from '@/lib/migrations/20260828_194_kubota_m5_service_filters';
 import { kubotaM5HDCServicePackMigration } from '@/lib/migrations/20260828_195_kubota_m5_hdc_service_pack';
+import { kubotaM5OilSeparatorSupersessionMigration } from '@/lib/migrations/20260828_196_kubota_m5_oil_separator_supersession';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -127,4 +128,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM5LA1854LoaderMigration,
   kubotaM5ServiceFiltersMigration,
   kubotaM5HDCServicePackMigration,
+  kubotaM5OilSeparatorSupersessionMigration,
 ];
