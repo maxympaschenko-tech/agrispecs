@@ -69,6 +69,7 @@ import { kubotaM6ServiceFiltersMigration } from '@/lib/migrations/20260828_199_k
 import { kubotaM6ServiceSupersessionsMigration } from '@/lib/migrations/20260828_200_kubota_m6_service_supersessions';
 import { kubotaM6SCurrentSpecsMigration } from '@/lib/migrations/20260828_201_kubota_m6s_current_specs';
 import { kubotaM6SLA1941LoaderMigration } from '@/lib/migrations/20260828_202_kubota_m6s_la1941_loader';
+import { kubotaM6SServiceFiltersMigration } from '@/lib/migrations/20260828_203_kubota_m6s_service_filters';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -141,4 +142,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM6ServiceSupersessionsMigration,
   kubotaM6SCurrentSpecsMigration,
   kubotaM6SLA1941LoaderMigration,
+  kubotaM6SServiceFiltersMigration,
 ];
