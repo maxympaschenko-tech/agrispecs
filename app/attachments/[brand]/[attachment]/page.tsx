@@ -26,6 +26,11 @@ function specificationHeading(type: string) {
   return 'Attachment specifications';
 }
 
+function hasConfigurationCondition(note: string | null) {
+  if (!note) return false;
+  return /\b(requires?|required|restricted|only|depending|must|except|2wd|mfwd|specific (?:axle|configuration|transmission))\b/i.test(note);
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand, attachment: slug } = await params;
   const item = await getAttachment(brand, slug);
@@ -33,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const title = `${item.manufacturerName} ${item.modelName} ${typeLabel} Compatibility`;
-  const description = `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatible tractors, published specifications and source-backed configuration requirements.`;
+  const description = `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} tractor fitment, published specifications and source-backed configuration requirements.`;
   return {
     title,
     description,
@@ -61,7 +66,7 @@ export default async function AttachmentPage({ params }: PageProps) {
         <div className="container">
           <span className="eyebrow">{typeLabel} compatibility</span>
           <h1>{item.manufacturerName} {item.modelName}</h1>
-          <p className="section-lead">Verified tractor compatibility and published {typeLabel.toLowerCase()} information from the cited source.</p>
+          <p className="section-lead">Verified tractor fitment and published {typeLabel.toLowerCase()} information from the cited source. Some fitments apply only to specific tractor configurations.</p>
 
           <section className="data-section">
             <h2>{specificationHeading(item.attachmentType)}</h2>
@@ -79,21 +84,25 @@ export default async function AttachmentPage({ params }: PageProps) {
           </section>
 
           <section className="data-section">
-            <h2>Compatible tractors</h2>
-            <p className="section-note">Configuration notes matter. Compatibility for one driveline, transmission or equipment configuration should not be assumed for every version of the same tractor model.</p>
-            {item.compatibleMachines.map((machine) => (
-              <div className="part-fitment" key={machine.machineId}>
-                <div>
-                  <Link className="part-fitment-machine" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {machine.brand} {machine.model}
-                  </Link>
-                  {machine.performanceCapacityText && <p><strong>Performance:</strong> {machine.performanceCapacityText}</p>}
-                  {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
-                  {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
-                  {machine.compatibilityNote && <p>{machine.compatibilityNote}</p>}
+            <h2>Verified tractor fitment</h2>
+            <p className="section-note">A listed tractor is not automatically compatible in every configuration. Check each fitment note for axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
+            {item.compatibleMachines.map((machine) => {
+              const conditional = hasConfigurationCondition(machine.compatibilityNote);
+              return (
+                <div className="part-fitment" key={machine.machineId}>
+                  <div>
+                    <Link className="part-fitment-machine" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                      {machine.brand} {machine.model}
+                    </Link>
+                    {conditional && <p><strong>Conditional fitment:</strong> configuration requirements apply.</p>}
+                    {machine.performanceCapacityText && <p><strong>Performance:</strong> {machine.performanceCapacityText}</p>}
+                    {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
+                    {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
+                    {machine.compatibilityNote && <p><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {machine.compatibilityNote}</p>}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </section>
 
           {item.sourceUrl && (

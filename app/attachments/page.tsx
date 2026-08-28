@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Farm Equipment Attachments and Compatibility',
-  description: 'Source-backed farm equipment attachment compatibility, including front loaders, backhoes and compatible tractor models.',
+  description: 'Source-backed farm equipment attachment fitment, including front loaders, backhoes and tractor-specific configuration requirements.',
   alternates: { canonical: '/attachments' },
 };
 
@@ -29,17 +29,17 @@ export default async function AttachmentsPage() {
       <div className="container">
         <span className="eyebrow">Attachment compatibility</span>
         <h1>Farm equipment attachments</h1>
-        <p className="section-lead">Browse source-backed loader, backhoe and other attachment compatibility by model.</p>
+        <p className="section-lead">Browse source-backed loader, backhoe and other attachment fitment by tractor model, including configuration requirements when the manufacturer publishes them.</p>
         <div className="grid">
           {attachments.map((attachment) => (
             <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
               <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
               <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
-              <p>{attachment.compatibleMachineCount} verified compatible tractor{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
+              <p>{attachment.compatibleMachineCount} verified tractor fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
             </Link>
           ))}
         </div>
-        {attachments.length === 0 && <div className="notice">Verified attachment compatibility records are being added.</div>}
+        {attachments.length === 0 && <div className="notice">Verified attachment fitment records are being added.</div>}
       </div>
     </main>
   );

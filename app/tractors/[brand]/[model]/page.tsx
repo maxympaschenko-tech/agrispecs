@@ -52,6 +52,11 @@ function attachmentTypeLabel(type: string) {
     .join(' ') || 'Attachment';
 }
 
+function hasConfigurationCondition(note: string | null) {
+  if (!note) return false;
+  return /\b(requires?|required|restricted|only|depending|must|except|2wd|mfwd|specific (?:axle|configuration|transmission))\b/i.test(note);
+}
+
 function sourceProvenanceLabel(source: SourceProvenance | undefined) {
   if (!source) return 'Source record';
   if (source.authorityLevel === 'official') {
@@ -264,7 +269,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts & kits</a>}
-            {attachments.length > 0 && <a href="#attachments">Compatible attachments</a>}
+            {attachments.length > 0 && <a href="#attachments">Attachment fitment</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
 
@@ -357,18 +362,19 @@ export default async function TractorModelPage({ params }: PageProps) {
 
             {attachments.length > 0 && (
               <section className="data-section" id="attachments">
-                <h2>Compatible attachments</h2>
-                <p className="section-note">Attachment compatibility is stored separately from service parts. Configuration requirements below come from the cited compatibility source and can vary by driveline or tractor version.</p>
+                <h2>Verified attachment fitment</h2>
+                <p className="section-note">Attachment fitment is stored separately from service parts. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration; verify the requirement below before ordering or installing.</p>
                 <div className="maintenance-list">
                   {attachments.map((attachment) => {
                     const typeLabel = attachmentTypeLabel(attachment.attachmentType);
                     const isLoader = attachment.attachmentType === 'front-loader';
+                    const conditional = hasConfigurationCondition(attachment.compatibilityNote);
                     return (
                       <div className="maintenance-row" key={attachment.id}>
                         <div>
-                          <span className="maintenance-section">{typeLabel}</span>
+                          <span className="maintenance-section">{typeLabel}{conditional ? ' · Conditional fitment' : ''}</span>
                           <strong><Link href={`/attachments/${machine.brandSlug}/${attachment.slug}`}>{machine.brand} {attachment.modelName}</Link></strong>
-                          {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
+                          {attachment.compatibilityNote && <small><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {attachment.compatibilityNote}</small>}
                           {attachment.configurationText && <small><strong>{typeLabel} details:</strong> {attachment.configurationText}</small>}
                         </div>
                         <div>
