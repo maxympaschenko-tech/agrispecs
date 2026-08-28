@@ -18,9 +18,9 @@ export async function GET(){
       migrationApplied,machineRows,currentVersions,specificationRows,grossPowerRows,ptoPowerRows,
       standardM6141Rows,suspendedM6141Rows,standardM6141WeightRows,suspendedM6141WeightRows,
       loaderRows,loaderFitments,serviceParts,commonServiceFitments,smallEngineFitments,incorrectSmallEngineOnLarge,
-      largeEngineFitments,incorrectLargeEngineOnSmall,serviceSourceRows,
+      largeEngineFitments,incorrectLargeEngineOnSmall,serviceSourceRows,serviceSupersessionRows,
     ]=await Promise.all([
-      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_199_kubota_m6_service_filters'`),
+      count(`SELECT COUNT(*) AS count FROM schema_migrations WHERE id='20260828_200_kubota_m6_service_supersessions'`),
       count(`SELECT COUNT(*) AS count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m6-101','m6-111','m6-131','m6-141') AND m.data_status IN ('partial','verified')`),
       count(`SELECT COUNT(*) AS count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='kubota' AND m.slug IN ('m6-101','m6-111','m6-131','m6-141') AND mv.is_current=1`),
       count(`SELECT COUNT(*) AS count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=ms.machine_version_id WHERE mf.slug='kubota' AND m.slug IN ('m6-101','m6-111','m6-131','m6-141') AND mv.is_current=1`),
@@ -39,6 +39,7 @@ export async function GET(){
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m6-131','m6-141') AND mv.is_current=1 AND p.normalized_part_number IN ('1G31143380','HH1J043172') AND mp.fitment_confidence='high'`),
       count(`SELECT COUNT(*) AS count FROM machine_parts mp JOIN machines m ON m.id=mp.machine_id JOIN manufacturers mf ON mf.id=m.manufacturer_id JOIN machine_versions mv ON mv.id=mp.machine_version_id JOIN parts p ON p.id=mp.part_id WHERE mf.slug='kubota' AND m.slug IN ('m6-101','m6-111') AND mv.is_current=1 AND p.normalized_part_number IN ('1G31143380','HH1J043172')`),
       count(`SELECT COUNT(*) AS count FROM source_records WHERE external_id IN ('messicks-m6-101dtc-1-service-filters-2026-08','messicks-m6-111dtc-1-service-filters-2026-08','messicks-m6-131dtc-1-service-filters-2026-08','messicks-m6-141dtc-1-dtsc-1-service-filters-2026-08','messicks-hh3s0-82590-m6-current-fitment','messicks-hh1j0-43172-m6-current-fitment')`),
+      count(`SELECT COUNT(*) AS count FROM part_cross_references pcr JOIN parts p ON p.id=pcr.part_id JOIN parts cp ON cp.id=pcr.cross_part_id JOIN manufacturers mf ON mf.id=p.manufacturer_id WHERE mf.slug='kubota' AND pcr.relation_type='replaces' AND ((p.normalized_part_number IN ('3Y20582590','HH3Y082590') AND cp.normalized_part_number='HH3S082590') OR (p.normalized_part_number IN ('1J52143170','1J52143172','HH1J043170') AND cp.normalized_part_number='HH1J043172') OR (p.normalized_part_number IN ('1583143380','1583143382') AND cp.normalized_part_number='1G31143380'))`),
     ]);
 
     const checks={
@@ -48,14 +49,15 @@ export async function GET(){
       loaderRows:loaderRows===2,loaderFitments:loaderFitments===4,serviceParts:serviceParts===7,commonServiceFitments:commonServiceFitments===15,
       smallEngineFitments:smallEngineFitments===4,incorrectSmallEngineOnLarge:incorrectSmallEngineOnLarge===0,
       largeEngineFitments:largeEngineFitments===6,incorrectLargeEngineOnSmall:incorrectLargeEngineOnSmall===0,serviceSourceRows:serviceSourceRows===6,
+      serviceSupersessionRows:serviceSupersessionRows===7,
     };
     const ok=Object.values(checks).every(Boolean);
 
     return NextResponse.json({
       ok,
-      expectedLatestM6Migration:'20260828_199_kubota_m6_service_filters',
+      expectedLatestM6Migration:'20260828_200_kubota_m6_service_supersessions',
       checks,
-      values:{machineRows,currentVersions,specificationRows,grossPowerRows,ptoPowerRows,standardM6141Rows,suspendedM6141Rows,standardM6141WeightRows,suspendedM6141WeightRows,loaderRows,loaderFitments,serviceParts,commonServiceFitments,smallEngineFitments,incorrectSmallEngineOnLarge,largeEngineFitments,incorrectLargeEngineOnSmall,serviceSourceRows},
+      values:{machineRows,currentVersions,specificationRows,grossPowerRows,ptoPowerRows,standardM6141Rows,suspendedM6141Rows,standardM6141WeightRows,suspendedM6141WeightRows,loaderRows,loaderFitments,serviceParts,commonServiceFitments,smallEngineFitments,incorrectSmallEngineOnLarge,largeEngineFitments,incorrectLargeEngineOnSmall,serviceSourceRows,serviceSupersessionRows},
     },{
       status:ok?200:503,
       headers:{'Cache-Control':'no-store, max-age=0','X-Robots-Tag':'noindex, nofollow'},
