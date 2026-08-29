@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Farm Machine Specs favicon">
-  <circle cx="32" cy="32" r="30" fill="#102719"/>
-  <text x="32" y="38" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="900" letter-spacing="-1" fill="#ffffff">FM</text>
-  <rect x="18" y="44" width="28" height="4" rx="2" fill="#e1b63f"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Farm Machine Specs tractor favicon">
+  <rect width="64" height="64" rx="14" fill="#102719"/>
+  <path d="M5 52c11-7 21-9 30-8 9 0 17 3 24 8v7H5z" fill="#2f7a46"/>
+  <path d="M8 57c12-7 25-9 42-4" fill="none" stroke="#e1b63f" stroke-width="4" stroke-linecap="round"/>
+  <path d="M15 36h8l4-12h13l5 12h5c3 0 5 2 5 5v2h-7.2a9 9 0 0 0-17.6 0H27a6.5 6.5 0 0 0-12.4 0H10v-2c0-2.8 2.2-5 5-5Z" fill="#f5f7f3"/>
+  <path d="M29 20h10l3 11H26z" fill="#f5f7f3"/>
+  <path d="M31 23h6l1.5 6H29.5z" fill="#102719"/>
+  <rect x="39" y="17" width="3" height="10" rx="1.5" fill="#f5f7f3"/>
+  <circle cx="21" cy="44" r="6" fill="#102719" stroke="#e1b63f" stroke-width="3"/>
+  <circle cx="39" cy="43" r="9" fill="#102719" stroke="#e1b63f" stroke-width="3"/>
 </svg>
