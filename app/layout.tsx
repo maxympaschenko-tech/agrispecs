@@ -82,11 +82,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <p style={{ margin: 0 }}>
               Farm Machine Specs is an independent farm equipment reference. Product names and trademarks belong to their respective owners.
             </p>
-            <p style={{ margin: '10px 0 0' }}>
-              <Link href="/methodology" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>
-                Data Sources &amp; Methodology
-              </Link>
-            </p>
+            <nav aria-label="Footer navigation" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 18px', marginTop: 12 }}>
+              <Link href="/about" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>About</Link>
+              <Link href="/methodology" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>Data Sources &amp; Methodology</Link>
+              <Link href="/editorial-policy" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>Editorial &amp; Corrections Policy</Link>
+              <Link href="/contact" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>Contact &amp; Corrections</Link>
+              <Link href="/privacy" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>Privacy</Link>
+              <Link href="/terms" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>Terms</Link>
+            </nav>
           </div>
         </footer>
       </body>
