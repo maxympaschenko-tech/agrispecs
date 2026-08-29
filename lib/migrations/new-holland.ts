@@ -13,6 +13,7 @@ import { newHollandT6180MethaneCurrentSpecsMigration } from '@/lib/migrations/20
 import { newHollandT7CurrentVisibleModelsMigration } from '@/lib/migrations/20260829_283_new_holland_t7_current_visible_models';
 import { newHollandGenesisT8CurrentSpecsMigration } from '@/lib/migrations/20260829_285_new_holland_genesis_t8_current_specs';
 import { newHollandT9CurrentSpecsMigration } from '@/lib/migrations/20260829_286_new_holland_t9_current_specs';
+import { newHollandTS6SeriesIICurrentSpecsMigration } from '@/lib/migrations/20260829_287_new_holland_ts6_series_ii_current_specs';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -29,4 +30,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandT7CurrentVisibleModelsMigration,
   newHollandGenesisT8CurrentSpecsMigration,
   newHollandT9CurrentSpecsMigration,
+  newHollandTS6SeriesIICurrentSpecsMigration,
 ];
