@@ -58,6 +58,7 @@ import { kubotaMigrations } from '@/lib/migrations/kubota';
 import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expansion';
 import { newHollandMigrations } from '@/lib/migrations/new-holland';
 import { caseIHMigrations } from '@/lib/migrations/case-ih';
+import { masseyFergusonMigrations } from '@/lib/migrations/massey-ferguson';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -125,6 +126,7 @@ const migrations: DbMigration[] = [
   ...johnDeereExpansionMigrations,
   ...newHollandMigrations,
   ...caseIHMigrations,
+  ...masseyFergusonMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
