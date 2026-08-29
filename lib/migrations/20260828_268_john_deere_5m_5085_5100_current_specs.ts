@@ -40,7 +40,7 @@ export const johnDeere5M50855100CurrentSpecsMigration: DbMigration = {
       ['Hydraulics','hydraulics.total_flow','Maximum total flow','decimal','L/min',10],
       ['Hydraulics','hydraulics.steering_pump_flow','Steering pump flow','decimal','L/min',20],
       ['Hydraulics','hydraulics.implement_pump_flow','Implement pump flow','decimal','L/min',30],
-      ['Capacities','capacities.def_tank','DEF tank','decimal','US gal',20],
+      ['Capacities','capacities.def_tank','DEF tank','decimal','L',20],
       ['Electrical','electrical.system_voltage','Electrical system','integer','V',10],
       ['Electrical','electrical.battery_cca','Battery','integer','CCA',30],
     ];
@@ -64,7 +64,7 @@ export const johnDeere5M50855100CurrentSpecsMigration: DbMigration = {
         ['hydraulics.total_flow',94,'L/min'],
         ['hydraulics.steering_pump_flow',24,'L/min'],
         ['hydraulics.implement_pump_flow',70,'L/min'],
-        ['capacities.def_tank',3.2,'US gal'],
+        ['capacities.def_tank',12.1133177088,'L'],
         ['electrical.system_voltage',12,'V'],
         ['electrical.battery_cca',925,'CCA'],
       ];
