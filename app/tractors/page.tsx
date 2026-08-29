@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Tractor Specifications and Parts Reference',
-  description: 'Browse source-backed tractor specifications, maintenance schedules, OEM parts, replacement numbers and compatibility references.',
+  title: 'Tractor Specs by Brand, Parts and Comparisons',
+  description: 'Browse source-backed tractor specifications by manufacturer, including maintenance, OEM parts, attachment fitment and side-by-side tractor comparisons.',
   alternates: { canonical: '/tractors' },
 };
 
@@ -19,31 +19,88 @@ export default async function TractorsPage() {
   const researchMachines = machines.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
+  const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
+  const brandGroups = Array.from(
+    publishedMachines.reduce<Map<string, typeof publishedMachines>>((groups, machine) => {
+      const existing = groups.get(machine.brand) ?? [];
+      existing.push(machine);
+      groups.set(machine.brand, existing);
+      return groups;
+    }, new Map()),
+  );
 
   return (
     <main className="section">
       <div className="container">
         <span className="eyebrow">Equipment catalog</span>
-        <h1>Tractors</h1>
-        <p className="section-lead">Browse tractor models with source-backed specifications, maintenance, parts and compatibility data.</p>
+        <h1>Tractor specs by brand and model</h1>
+        <p className="section-lead">Browse source-backed tractor specifications, maintenance, OEM parts, attachment fitment and comparison tools for models published in the catalog.</p>
 
-        {publishedMachines.length > 0 && (
+        <div className="parts-stats">
+          <div>
+            <strong>{publishedMachines.length.toLocaleString('en-US')}</strong>
+            <span>Published tractor models</span>
+          </div>
+          <div>
+            <strong>{brandGroups.length.toLocaleString('en-US')}</strong>
+            <span>Manufacturers represented</span>
+          </div>
+          <div>
+            <strong>{verifiedCount.toLocaleString('en-US')}</strong>
+            <span>Models marked verified</span>
+          </div>
+        </div>
+
+        <div className="parts-tool-callout">
+          <div>
+            <strong>Need to compare models?</strong>
+            <span>Open the side-by-side tractor comparison tool or browse a manufacturer hub.</span>
+          </div>
+          <Link className="tool-link" href="/compare">Compare tractors</Link>
+        </div>
+
+        {brandGroups.length > 0 && (
           <section className="catalog-group">
-            <h2>Models with published data</h2>
-            <p className="section-note">These pages contain verified or partially verified technical data with attached sources.</p>
+            <h2>Browse by manufacturer</h2>
+            <p className="section-note">Jump directly to a manufacturer section or open its dedicated brand hub.</p>
             <div className="grid">
-              {publishedMachines.map((machine) => (
-                <div className="card" key={machine.id}>
-                  <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
-                  <h3>{machine.title}</h3>
-                  <p>Specs, maintenance, parts, fitment and related equipment.</p>
-                  <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
-                  <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
-                </div>
-              ))}
+              {brandGroups.map(([brand, brandMachines]) => {
+                const brandSlug = brandMachines[0]?.brandSlug;
+                return (
+                  <div className="card" key={brand}>
+                    <span className="eyebrow">Manufacturer</span>
+                    <h3>{brand}</h3>
+                    <p>{brandMachines.length} published model{brandMachines.length === 1 ? '' : 's'} in the catalog.</p>
+                    <a className="tool-link" href={`#brand-${brandSlug}`}>View models</a>{' '}
+                    <Link className="tool-link" href={`/brands/${brandSlug}`}>Brand hub</Link>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
+
+        {brandGroups.map(([brand, brandMachines]) => {
+          const brandSlug = brandMachines[0]?.brandSlug;
+          return (
+            <section className="catalog-group" id={`brand-${brandSlug}`} key={brand}>
+              <h2>{brand} tractor models</h2>
+              <p className="section-note">Published {brand} model pages with source-backed specifications and related reference data.</p>
+              <div className="grid">
+                {brandMachines.map((machine) => (
+                  <div className="card" key={machine.id}>
+                    <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
+                    <h3>{machine.model}</h3>
+                    <p>Specs, maintenance, parts, fitment and related equipment.</p>
+                    <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
+                    <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
+                  </div>
+                ))}
+              </div>
+              <Link className="tool-link" href={`/brands/${brandSlug}`}>View all {brand} references</Link>
+            </section>
+          );
+        })}
 
         {researchMachines.length > 0 && (
           <section className="catalog-group">
