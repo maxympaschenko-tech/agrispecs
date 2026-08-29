@@ -4,6 +4,7 @@ import { masseyFergusonUsExpansionMigration } from '@/lib/migrations/20260829_30
 import { masseyFergusonUtilityLoadersMigration } from '@/lib/migrations/20260829_302_massey_ferguson_utility_loaders';
 import { masseyFergusonProfessionalLoadersMigration } from '@/lib/migrations/20260829_303_massey_ferguson_professional_loaders';
 import { masseyFergusonServiceIntervalsMigration } from '@/lib/migrations/20260829_304_massey_ferguson_service_intervals';
+import { masseyFergusonGlobalEmissionsMigration } from '@/lib/migrations/20260829_305_massey_ferguson_global_emissions';
 
 export const masseyFergusonMigrations: DbMigration[] = [
   masseyFergusonCurrentUsCoreMigration,
@@ -11,4 +12,5 @@ export const masseyFergusonMigrations: DbMigration[] = [
   masseyFergusonUtilityLoadersMigration,
   masseyFergusonProfessionalLoadersMigration,
   masseyFergusonServiceIntervalsMigration,
+  masseyFergusonGlobalEmissionsMigration,
 ];
