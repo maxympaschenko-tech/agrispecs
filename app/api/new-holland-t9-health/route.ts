@@ -1,0 +1,18 @@
+import { NextResponse } from 'next/server';
+import type { RowDataPacket } from 'mysql2';
+import { getDbReady } from '@/lib/db-migrations';
+export const dynamic='force-dynamic';export const revalidate=0;type R=RowDataPacket&{count:number};
+const slugs="'t9-470','t9-520','t9-520-smarttrax','t9-580','t9-580-smarttrax','t9-615','t9-615-smarttrax','t9-655','t9-700'";
+async function count(sql:string){const db=await getDbReady();const[r]=await db.query<R[]>(sql);return Number(r[0]?.count||0)}
+export async function GET(){try{const[migration,machines,versions,rated,peak,engine,service,hydraulics,smarttrax,t9700,source]=await Promise.all([
+ count(`SELECT COUNT(*) count FROM schema_migrations WHERE id='20260829_286_new_holland_t9_current_specs'`),
+ count(`SELECT COUNT(*) count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='new-holland' AND m.slug IN (${slugs})`),
+ count(`SELECT COUNT(*) count FROM machine_versions mv JOIN machines m ON m.id=mv.machine_id WHERE m.slug IN (${slugs}) AND mv.slug='united-states-current-2026-08' AND mv.is_current=1`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND d.spec_key='engine.rated_power' AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND d.spec_key='engine.peak_power' AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND d.spec_key='engine.displacement' AND ms.value_number=13 AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND d.spec_key='maintenance.engine_service_interval' AND ms.value_number=1800 AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN (${slugs}) AND d.spec_key='hydraulics.max_total_flow' AND ms.value_number=427 AND ms.unit='L/min' AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machine_specs ms JOIN machines m ON m.id=ms.machine_id JOIN spec_definitions d ON d.id=ms.spec_definition_id WHERE m.slug IN ('t9-520-smarttrax','t9-580-smarttrax','t9-615-smarttrax') AND d.spec_key='configuration.running_gear' AND ms.value_text='SmartTrax' AND ms.confidence='official'`),
+ count(`SELECT COUNT(*) count FROM machines m JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='new-holland' AND m.slug='t9-700'`),
+ count(`SELECT COUNT(*) count FROM source_records WHERE external_id='new-holland-t9-current-us-2026-08'`)]);const checks={migration:migration===1,machines:machines===9,currentVersions:versions===9,ratedRows:rated===8,peakRows:peak===8,engineRows:engine===9,serviceRows:service===9,hydraulicRows:hydraulics===9,smartTraxRows:smarttrax===3,t9700Current:t9700===1,sourceRecord:source===1};const ok=Object.values(checks).every(Boolean);return NextResponse.json({ok,checks,values:{migration,machines,versions,rated,peak,engine,service,hydraulics,smarttrax,t9700,source}},{status:ok?200:503,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'}})}catch(error){console.error(error);return NextResponse.json({ok:false,error:'New Holland T9 health check failed'},{status:500})}}
