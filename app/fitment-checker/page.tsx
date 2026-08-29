@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Farm Equipment Part Serial Number Fitment Checker',
-  description: 'Check verified farm equipment part fitment by model and serial number using source-backed compatibility data.',
+  title: 'Farm Equipment Part Fitment and Serial Number Checker',
+  description: 'Check source-backed farm equipment part fitment by part number, machine model and documented serial-number range.',
   alternates: { canonical: '/fitment-checker' },
 };
 
@@ -24,6 +24,15 @@ function resultHeading(status: string) {
   return 'Unable to verify';
 }
 
+function resultGuidance(status: string) {
+  if (status === 'fits') return 'The stored source-backed rule covers this model and the serial number entered.';
+  if (status === 'outside-range') return 'The entered serial number falls outside the documented range stored for this part/model relationship. Check for a replacement part, another machine generation or a configuration-specific rule before ordering.';
+  if (status === 'serial-unverified') return 'The model relationship is documented, but the stored source does not provide a structured serial-number rule that can be tested automatically.';
+  if (status === 'fitment-known') return 'The model relationship is documented. Add a serial number when available; some applications depend on serial break, market or configuration.';
+  if (status === 'no-fitment') return 'No direct source-backed relationship is stored for this exact part/model query. That is not proof of incompatibility.';
+  return 'The current catalog does not contain enough source-backed information to make a fitment assertion.';
+}
+
 export default async function FitmentCheckerPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const part = (params.part || '').trim();
@@ -36,8 +45,8 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
     <main className="section">
       <div className="container">
         <span className="eyebrow">Compatibility tool</span>
-        <h1>Part serial number fitment checker</h1>
-        <p className="section-lead">Check a part number against a machine model and, when Deere publishes a structured serial range, test the serial number against that range.</p>
+        <h1>Part fitment and serial number checker</h1>
+        <p className="section-lead">Check a part number against a machine model and, when the cited manufacturer or technical source publishes a structured serial range, test the entered serial number against that documented rule.</p>
 
         <form className="checker-form" action="/fitment-checker">
           <label>
@@ -55,10 +64,16 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
           <button type="submit">Check fitment</button>
         </form>
 
+        <div className="parts-stats">
+          <div><strong>Part + model</strong><span>required to test a stored fitment relationship</span></div>
+          <div><strong>Serial</strong><span>optional unless the application has a documented serial break</span></div>
+          <div><strong>Source-backed</strong><span>results only; missing data is never converted into a fitment claim</span></div>
+        </div>
+
         {submitted && !result && (
           <section className="data-section checker-result">
             <h2>Enter both a part number and machine model</h2>
-            <p>The serial number is optional.</p>
+            <p>The serial number is optional. Start with the exact part number printed on the part, packaging or manufacturer documentation and the machine model designation.</p>
           </section>
         )}
 
@@ -66,6 +81,7 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
           <section className="data-section checker-result">
             <h2>{resultHeading(result.status)}</h2>
             <p>{result.message}</p>
+            <p className="section-note">{resultGuidance(result.status)}</p>
             {result.partNumber && <div className="placeholder-row"><span>Part</span><span><Link href={`/parts/${result.partNumber.toLowerCase()}`}>{result.partNumber}{result.partName ? ` · ${result.partName}` : ''}</Link></span></div>}
             {result.model && result.brandSlug && result.modelSlug && <div className="placeholder-row"><span>Machine</span><span><Link href={`/tractors/${result.brandSlug}/${result.modelSlug}`}>{result.brand} {result.model}</Link></span></div>}
             {result.serialPrefix && <div className="placeholder-row"><span>Serial prefix</span><span>{result.serialPrefix}</span></div>}
@@ -74,11 +90,33 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
             {result.configurationNote && <div className="placeholder-row"><span>Configuration</span><span>{result.configurationNote}</span></div>}
             {result.fitmentNote && <div className="placeholder-row"><span>Fitment note</span><span>{result.fitmentNote}</span></div>}
             {result.sourceUrl && <div className="placeholder-row"><span>Source</span><span><a href={result.sourceUrl} target="_blank" rel="noopener noreferrer">{result.sourceTitle || 'Official technical source'}</a></span></div>}
+            {result.partNumber && <Link className="tool-link" href={`/parts/${result.partNumber.toLowerCase()}`}>Open full part reference →</Link>}
           </section>
         )}
 
+        <section className="catalog-group">
+          <h2>How to interpret a fitment result</h2>
+          <div className="grid">
+            <div className="card">
+              <span className="eyebrow">Verified range</span>
+              <h3>Fits verified serial range</h3>
+              <p>The stored source explicitly supports the model and the entered serial falls inside its documented range.</p>
+            </div>
+            <div className="card">
+              <span className="eyebrow">Model-level evidence</span>
+              <h3>Serial unverified</h3>
+              <p>The model fitment is documented, but a machine-specific serial rule is unavailable or cannot be tested from the current source.</p>
+            </div>
+            <div className="card">
+              <span className="eyebrow">No assertion</span>
+              <h3>No verified direct fitment</h3>
+              <p>This means the catalog lacks a direct cited relationship for the query. It does not mean the part is definitely incompatible.</p>
+            </div>
+          </div>
+        </section>
+
         <div className="notice">
-          This tool only confirms rules already stored from cited sources. A missing fitment or missing serial rule is not proof that a part is incompatible. Always verify the complete machine PIN and configuration before ordering.
+          This tool only confirms rules already stored from cited sources. A missing fitment or missing serial rule is not proof that a part is incompatible. Always verify the complete machine PIN, model year, market and configuration before ordering. See <Link href="/methodology">Data Sources &amp; Methodology</Link> for the publication rules used by this site.
         </div>
       </div>
     </main>
