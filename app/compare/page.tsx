@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/compare' },
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 type ComparePageProps = {
   searchParams: Promise<{ m1?: string; m2?: string; m3?: string; rows?: string }>;
 };
@@ -182,8 +186,55 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
       return map;
     }, new Map());
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const canonicalUrl = `${baseUrl}/compare`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: 'Compare Tractor Specifications',
+        description: 'Compare source-backed tractor specifications side by side across manufacturers.',
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#comparisons` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Compare', item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#comparisons`,
+        name: 'Source-backed tractor comparisons',
+        numberOfItems: comparisonPresets.length,
+        itemListElement: comparisonPresets.map((preset, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: preset.title,
+          url: `${baseUrl}/compare/${preset.slug}`,
+        })),
+      },
+    ],
+  };
+
   return (
     <main className="section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
+      />
       <div className="container">
         <span className="eyebrow">Comparison tool</span>
         <h1>Compare tractors side by side</h1>
