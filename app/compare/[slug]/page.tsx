@@ -154,7 +154,15 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
                           {row.rows.map((spec, index) => (
                             <td key={`${row.key}-${compared[index].id}`}>
                               <strong>{formatSpec(spec)}</strong>
-                              {spec && <small>{spec.confidence === 'official' ? 'Official source' : 'High confidence'}</small>}
+                              {spec?.sourceUrl ? (
+                                <small>
+                                  <a href={spec.sourceUrl} target="_blank" rel="noreferrer" title={spec.sourceTitle || undefined} style={{ textDecoration: 'underline', textUnderlineOffset: 2 }}>
+                                    {spec.confidence === 'official' ? 'Official source' : 'Source'}
+                                  </a>
+                                </small>
+                              ) : spec ? (
+                                <small>{spec.confidence === 'official' ? 'Official source recorded' : 'High confidence'}</small>
+                              ) : null}
                             </td>
                           ))}
                         </tr>
