@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 48" role="img" aria-labelledby="title desc">
+  <title id="title">Farm Machine Specs</title>
+  <desc id="desc">Farm Machine Specs logo with a simplified tractor icon.</desc>
+  <g transform="translate(0 2)">
+    <rect width="44" height="44" rx="10" fill="#d6a72c"/>
+    <path d="M10 28h5l3-9h10l4 9h3.5c2.5 0 4.5 2 4.5 4.5V34h-5.2a7 7 0 0 0-13.6 0H18a5 5 0 0 0-9.6 0H6v-2c0-2.2 1.8-4 4-4Z" fill="#102719"/>
+    <path d="M20 16h7.5l2.2 7H17.6L20 16Z" fill="#102719"/>
+    <circle cx="13" cy="34" r="4" fill="#102719" stroke="#f7e8b8" stroke-width="1.5"/>
+    <circle cx="28" cy="34" r="6" fill="#102719" stroke="#f7e8b8" stroke-width="1.5"/>
+  </g>
+  <text x="58" y="31" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="800" letter-spacing="-0.5" fill="#ffffff">Farm Machine</text>
+  <text x="223" y="31" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="800" letter-spacing="-0.5" fill="#e1b63f">Specs</text>
+</svg>
