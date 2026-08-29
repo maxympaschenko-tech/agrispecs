@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { getMachine } from '@/lib/catalog-service';
+import { comparisonPresets } from '@/lib/comparison-presets';
 
 type LayoutProps = {
   children: ReactNode;
@@ -10,11 +11,35 @@ type LayoutProps = {
 export default async function TractorModelLayout({ children, params }: LayoutProps) {
   const { brand, model } = await params;
   const machine = await getMachine(brand, model);
+  const isPublished = machine && (machine.dataStatus === 'partial' || machine.dataStatus === 'verified');
+  const relatedComparisons = isPublished
+    ? comparisonPresets.filter((preset) =>
+        preset.machines.some((target) => target.brand === machine.brand && target.model === machine.model),
+      )
+    : [];
 
   return (
     <>
       {children}
-      {machine && (machine.dataStatus === 'partial' || machine.dataStatus === 'verified') && (
+      {isPublished && relatedComparisons.length > 0 && (
+        <section className="section">
+          <div className="container">
+            <span className="eyebrow">Related comparisons</span>
+            <h2>Compare {machine.model} with similar tractors</h2>
+            <p className="section-lead">Open source-backed side-by-side comparisons that include this tractor.</p>
+            <div className="grid">
+              {relatedComparisons.slice(0, 4).map((preset) => (
+                <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
+                  <span className="eyebrow">Tractor comparison</span>
+                  <h3>{preset.title}</h3>
+                  <p>{preset.description}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+      {isPublished && (
         <Link
           href={`/compare?m1=${encodeURIComponent(machine.id)}`}
           aria-label={`Compare ${machine.title} with another tractor`}
