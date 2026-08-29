@@ -1,9 +1,21 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getBrands, getMachines } from '@/lib/catalog-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: 'Farm Machine Specs - Tractor Specs, Parts and Fitment Reference',
+  description:
+    'Source-backed tractor specifications, OEM parts, attachment fitment, maintenance references and side-by-side comparisons for farm equipment used in the United States.',
+  alternates: { canonical: '/' },
+};
+
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
 
 export default async function HomePage() {
   const [brands, machines] = await Promise.all([getBrands(), getMachines()]);
@@ -25,9 +37,35 @@ export default async function HomePage() {
     .slice(0, 12);
 
   const featuredComparisons = comparisonPresets.slice(0, 6);
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${baseUrl}/#homepage`,
+    url: baseUrl,
+    name: 'Farm Machine Specs - Tractor Specs, Parts and Fitment Reference',
+    description:
+      'Source-backed tractor specifications, OEM parts, attachment fitment, maintenance references and side-by-side comparisons for farm equipment used in the United States.',
+    isPartOf: {
+      '@id': `${baseUrl}/#website`,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'Farm equipment reference sections',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Tractors', url: `${baseUrl}/tractors` },
+        { '@type': 'ListItem', position: 2, name: 'Parts', url: `${baseUrl}/parts` },
+        { '@type': 'ListItem', position: 3, name: 'Attachments', url: `${baseUrl}/attachments` },
+        { '@type': 'ListItem', position: 4, name: 'Fitment Checker', url: `${baseUrl}/fitment-checker` },
+        { '@type': 'ListItem', position: 5, name: 'Brands', url: `${baseUrl}/brands` },
+        { '@type': 'ListItem', position: 6, name: 'Compare Tractors', url: `${baseUrl}/compare` },
+      ],
+    },
+  };
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <section className="hero">
         <div className="container">
           <span className="eyebrow">Farm equipment reference</span>
