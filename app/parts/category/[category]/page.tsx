@@ -35,6 +35,10 @@ const descriptions: Record<string,string> = {
   'clutch-parts': 'Source-backed PTO and transmission clutch part numbers with configuration notes and verified tractor fitment.',
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 function parsePage(value?: string) {
   if (!value) return 1;
   if (!/^\d+$/.test(value)) return null;
@@ -109,9 +113,53 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
 
   const basePath = `/parts/category/${category.slug}`;
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalPath = canonicalForPage(category.slug, page);
+  const canonicalUrl = `${baseUrl}${canonicalPath}`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: page === 1 ? `${category.name} - Farm Equipment Parts & Compatibility` : `${category.name} - Page ${page}`,
+        description: descriptionFor(category.slug, category.name),
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#items` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Parts', item: `${baseUrl}/parts` },
+          { '@type': 'ListItem', position: 3, name: category.name, item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        numberOfItems: catalog.items.length,
+        itemListElement: catalog.items.map((part, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${baseUrl}/parts/${part.normalizedPartNumber.toLowerCase()}`,
+          name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
+        })),
+      },
+    ],
+  };
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/parts">Parts</Link> / {category.name}
       </div>
