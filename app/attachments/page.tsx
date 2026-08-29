@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/attachments' },
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 function attachmentTypeLabel(type: string) {
   if (type === 'front-loader') return 'Front loader';
   if (type === 'backhoe') return 'Backhoe';
@@ -32,8 +36,51 @@ export default async function AttachmentsPage() {
     return map;
   }, new Map());
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/attachments`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: 'Farm Equipment Attachments and Compatibility',
+        description: 'Source-backed farm equipment attachment fitment, including front loaders, backhoes and tractor-specific configuration requirements.',
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#items` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Attachments', item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        numberOfItems: attachments.length,
+        itemListElement: attachments.map((attachment, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${baseUrl}/attachments/${attachment.manufacturerSlug}/${attachment.slug}`,
+          name: `${attachment.manufacturerName} ${attachment.modelName} ${attachmentTypeLabel(attachment.attachmentType)}`,
+        })),
+      },
+    ],
+  };
+
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <span className="eyebrow">Attachment compatibility</span>
         <h1>Farm equipment attachments</h1>
