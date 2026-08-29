@@ -98,6 +98,42 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'New Holland', model: 'All-New T7.225' },
     ],
   },
+  {
+    slug: 'john-deere-7r-250-vs-new-holland-t8-320',
+    title: 'John Deere 7R 250 vs New Holland T8.320',
+    description: 'Compare current source-backed specifications for two tractors with 250 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '7R 250' },
+      { brand: 'New Holland', model: 'T8.320' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-270-vs-case-ih-optum-270',
+    title: 'John Deere 7R 270 vs Case IH Optum 270',
+    description: 'Compare current source-backed specifications for high-horsepower tractors with 270 and 271 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '7R 270' },
+      { brand: 'Case IH', model: 'Optum 270' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-290-vs-case-ih-magnum-295',
+    title: 'John Deere 7R 290 vs Case IH Magnum 295',
+    description: 'Compare current source-backed specifications for high-horsepower tractors with 290 and 295 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '7R 290' },
+      { brand: 'Case IH', model: 'Magnum 295' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-350-vs-case-ih-magnum-355',
+    title: 'John Deere 7R 350 vs Case IH Magnum 355',
+    description: 'Compare current source-backed specifications for high-horsepower tractors with 350 and 355 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '7R 350' },
+      { brand: 'Case IH', model: 'Magnum 355' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
