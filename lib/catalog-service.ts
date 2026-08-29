@@ -222,7 +222,7 @@ export async function getMachineVersions(machineId: string): Promise<MachineVers
       LEFT JOIN machine_specs ms ON ms.machine_version_id = mv.id
       WHERE mv.machine_id = ?
       GROUP BY mv.id
-      ORDER BY spec_count DESC, mv.is_current DESC, mv.model_year_end DESC, mv.model_year_start DESC
+      ORDER BY mv.is_current DESC, spec_count DESC, mv.model_year_end DESC, mv.model_year_start DESC
     `, [Number(machineId)]);
 
     return rows.map((row) => ({
