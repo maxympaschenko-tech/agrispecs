@@ -4,13 +4,23 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const release = {
-  marker: '2026-08-29-homepage-portal-v1',
+  marker: '2026-08-29-structured-data-v2',
   expectedFeatures: [
     'tractor-field-favicon',
-    'homepage-coverage-counters',
-    'homepage-cross-brand-featured-tractors',
+    'homepage-portal-layout',
     'homepage-popular-comparisons',
     'interactive-tractor-compare',
+    'source-backed-parts-catalog',
+    'source-backed-attachment-catalog',
+    'fitment-checker-guidance',
+    'methodology-page',
+    'global-website-jsonld',
+    'tractor-detail-jsonld',
+    'part-detail-jsonld',
+    'attachment-detail-jsonld',
+    'brand-hub-jsonld',
+    'catalog-hub-jsonld',
+    'comparison-hub-jsonld',
   ],
 };
 
