@@ -8,9 +8,44 @@ export const metadata: Metadata = {
   alternates: { canonical: '/methodology' },
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export default function MethodologyPage() {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const canonicalUrl = `${baseUrl}/methodology`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: 'Data Sources and Methodology',
+        description:
+          'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed tractor, parts and attachment data.',
+        isPartOf: { '@id': `${baseUrl}/#website` },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        about: {
+          '@type': 'Thing',
+          name: 'Farm equipment data sourcing and normalization methodology',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Data Sources & Methodology', item: canonicalUrl },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <span className="eyebrow">Editorial standards</span>
         <h1>Data sources and methodology</h1>
