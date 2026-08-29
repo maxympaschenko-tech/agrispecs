@@ -55,6 +55,11 @@ export default async function AttachmentPage({ params }: PageProps) {
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const isLoader = item.attachmentType === 'front-loader';
   const isBackhoe = item.attachmentType === 'backhoe';
+  const conditionalFitmentCount = item.compatibleMachines.filter((machine) => hasConfigurationCondition(machine.compatibilityNote)).length;
+  const performanceFitmentCount = item.compatibleMachines.filter(
+    (machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText,
+  ).length;
+  const firstCompatibleMachine = item.compatibleMachines[0];
 
   return (
     <main>
@@ -68,6 +73,28 @@ export default async function AttachmentPage({ params }: PageProps) {
           <h1>{item.manufacturerName} {item.modelName}</h1>
           <p className="section-lead">Verified tractor fitment and published {typeLabel.toLowerCase()} information from the cited source. Some fitments apply only to specific tractor configurations.</p>
 
+          <div className="parts-stats">
+            <div><strong>{item.compatibleMachineCount}</strong><span>verified compatible tractor{item.compatibleMachineCount === 1 ? '' : 's'}</span></div>
+            <div><strong>{conditionalFitmentCount}</strong><span>fitment{conditionalFitmentCount === 1 ? '' : 's'} with configuration requirements</span></div>
+            <div><strong>{performanceFitmentCount}</strong><span>tractor-specific performance record{performanceFitmentCount === 1 ? '' : 's'}</span></div>
+          </div>
+
+          <div className="parts-tool-callout">
+            <div>
+              <strong>Planning this attachment for a tractor?</strong>
+              <span>Open the tractor record to review specifications, parts and other compatible equipment before relying on the fitment note.</span>
+            </div>
+            <div>
+              <Link className="tool-link" href="/attachments">Browse attachments →</Link>
+              {firstCompatibleMachine && (
+                <>
+                  {' '}
+                  <Link className="tool-link" href={`/compare?m1=${firstCompatibleMachine.machineId}`}>Compare compatible tractors →</Link>
+                </>
+              )}
+            </div>
+          </div>
+
           <section className="data-section">
             <h2>{specificationHeading(item.attachmentType)}</h2>
             {item.liftCapacityText && <div className="placeholder-row"><span>{isLoader ? 'Lift capacity' : 'Capacity'}</span><span>{item.liftCapacityText}</span></div>}
@@ -78,7 +105,7 @@ export default async function AttachmentPage({ params }: PageProps) {
                 <span>{item.configurationText}</span>
               </div>
             )}
-            {item.compatibleMachines.some((machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText) && (
+            {performanceFitmentCount > 0 && (
               <p className="section-note">Published performance can vary by tractor, tire, hydraulic or mounting configuration. Tractor-specific values are shown below when the cited source provides them.</p>
             )}
           </section>
@@ -99,6 +126,10 @@ export default async function AttachmentPage({ params }: PageProps) {
                     {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
                     {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
                     {machine.compatibilityNote && <p><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {machine.compatibilityNote}</p>}
+                    <p>
+                      <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View tractor specs →</Link>{' '}
+                      <Link href={`/compare?m1=${machine.machineId}`}>Compare this tractor →</Link>
+                    </p>
                   </div>
                 </div>
               );
@@ -114,6 +145,10 @@ export default async function AttachmentPage({ params }: PageProps) {
               </div>
             </section>
           )}
+
+          <div className="notice">
+            Attachment fitment is published only when a cited source supports the relationship. Missing models are not automatically incompatible, and listed models may still require a specific axle, transmission, hydraulic or mounting configuration. See our <Link href="/methodology">data methodology</Link> for publication rules.
+          </div>
         </div>
       </section>
     </main>
