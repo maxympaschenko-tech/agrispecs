@@ -3,10 +3,12 @@ import { masseyFergusonCurrentUsCoreMigration } from '@/lib/migrations/20260829_
 import { masseyFergusonUsExpansionMigration } from '@/lib/migrations/20260829_301_massey_ferguson_us_expansion';
 import { masseyFergusonUtilityLoadersMigration } from '@/lib/migrations/20260829_302_massey_ferguson_utility_loaders';
 import { masseyFergusonProfessionalLoadersMigration } from '@/lib/migrations/20260829_303_massey_ferguson_professional_loaders';
+import { masseyFergusonServiceIntervalsMigration } from '@/lib/migrations/20260829_304_massey_ferguson_service_intervals';
 
 export const masseyFergusonMigrations: DbMigration[] = [
   masseyFergusonCurrentUsCoreMigration,
   masseyFergusonUsExpansionMigration,
   masseyFergusonUtilityLoadersMigration,
   masseyFergusonProfessionalLoadersMigration,
+  masseyFergusonServiceIntervalsMigration,
 ];
