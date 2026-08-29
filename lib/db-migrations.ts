@@ -59,6 +59,7 @@ import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expans
 import { newHollandMigrations } from '@/lib/migrations/new-holland';
 import { caseIHMigrations } from '@/lib/migrations/case-ih';
 import { masseyFergusonMigrations } from '@/lib/migrations/massey-ferguson';
+import { fendtMigrations } from '@/lib/migrations/fendt';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -127,6 +128,7 @@ const migrations: DbMigration[] = [
   ...newHollandMigrations,
   ...caseIHMigrations,
   ...masseyFergusonMigrations,
+  ...fendtMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
