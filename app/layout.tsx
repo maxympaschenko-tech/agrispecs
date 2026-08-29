@@ -8,6 +8,10 @@ const siteName = 'Farm Machine Specs';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: siteName,
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+  },
   title: {
     default: 'Farm Machine Specs - Farm Equipment Specifications and Parts Reference',
     template: `%s | ${siteName}`,
@@ -35,7 +39,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <header className="site-header">
           <div className="container header-inner">
-            <Link className="logo" href="/">Farm Machine <span>Specs</span></Link>
+            <Link className="logo" href="/" aria-label="Farm Machine Specs home">
+              <img
+                src="/farm-machine-specs-logo.svg"
+                alt="Farm Machine Specs"
+                width="336"
+                height="48"
+                style={{ display: 'block', width: 'auto', height: 42, maxWidth: '100%' }}
+              />
+            </Link>
             <nav className="nav" aria-label="Main navigation">
               <Link href="/tractors">Tractors</Link>
               <Link href="/parts">Parts</Link>
