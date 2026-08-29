@@ -3,6 +3,7 @@ import { getMachines } from '@/lib/catalog-service';
 import { getPartCategories } from '@/lib/part-category-service';
 import { getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
+import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -37,6 +38,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
+  const comparisonPages: MetadataRoute.Sitemap = comparisonPresets.map((preset) => ({
+    url: `${baseUrl}/compare/${preset.slug}`,
+    lastModified: new Date(),
+  }));
+
   const categoryPages: MetadataRoute.Sitemap = categories
     .filter((category) => category.partCount >= 2)
     .map((category) => ({
@@ -56,5 +62,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     }));
 
-  return [...staticPages, ...brandPages, ...machinePages, ...categoryPages, ...partPages, ...attachmentPages];
+  return [...staticPages, ...brandPages, ...machinePages, ...comparisonPages, ...categoryPages, ...partPages, ...attachmentPages];
 }
