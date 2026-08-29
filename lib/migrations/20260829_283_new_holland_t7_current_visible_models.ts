@@ -1,0 +1,27 @@
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { DbMigration } from '@/lib/db-migration-types';
+
+type IdRow=RowDataPacket&{id:number};
+type Model={slug:string;model:string;variant:string;frame:string;ratedHp:number};
+const SOURCE_URL='https://agriculture.newholland.com/en-us/nar/products/tractors-telehandlers/t7-series';
+const EXTERNAL_ID='new-holland-t7-current-us-visible-models-2026-08';
+const VERSION='united-states-current-2026-08';
+const models:Model[]=[
+ {slug:'t7-190-all-new',model:'All-New T7.190',variant:'All-New',frame:'Standard Wheelbase',ratedHp:155},
+ {slug:'t7-190-classic',model:'T7.190 Classic',variant:'Classic',frame:'Standard Wheelbase',ratedHp:150},
+ {slug:'t7-190-sidewinder-ii',model:'T7.190 SideWinder II',variant:'SideWinder II',frame:'Standard Wheelbase',ratedHp:150},
+ {slug:'t7-210-all-new',model:'All-New T7.210',variant:'All-New',frame:'Standard Wheelbase',ratedHp:165},
+ {slug:'t7-210-classic',model:'T7.210 Classic',variant:'Classic',frame:'Standard Wheelbase',ratedHp:165},
+ {slug:'t7-210-sidewinder-ii',model:'T7.210 SideWinder II',variant:'SideWinder II',frame:'Standard Wheelbase',ratedHp:165},
+ {slug:'t7-225-all-new',model:'All-New T7.225',variant:'All-New',frame:'Standard Wheelbase',ratedHp:185},
+ {slug:'t7-225-sidewinder-ii',model:'T7.225 SideWinder II',variant:'SideWinder II',frame:'Standard Wheelbase',ratedHp:180},
+ {slug:'t7-230-classic',model:'T7.230 Classic',variant:'Classic',frame:'Long Wheelbase',ratedHp:180},
+];
+async function id(c:Parameters<DbMigration['apply']>[0],sql:string,p:unknown[]=[]){const[r]=await c.query<IdRow[]>(sql,p);if(!r[0])throw new Error('New Holland T7 dependency missing');return Number(r[0].id)}
+export const newHollandT7CurrentVisibleModelsMigration:DbMigration={id:'20260829_283_new_holland_t7_current_visible_models',description:'Add current official US New Holland T7 models explicitly visible on the current product page',async apply(c){
+ const mf=await id(c,`SELECT id FROM manufacturers WHERE slug='new-holland' LIMIT 1`),et=await id(c,`SELECT id FROM equipment_types WHERE slug='tractor' LIMIT 1`),sid=await id(c,`SELECT id FROM sources WHERE name='New Holland' AND domain='agriculture.newholland.com' LIMIT 1`);
+ const[r]=await c.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? LIMIT 1`,[EXTERNAL_ID]);let sr=r[0]?.id?Number(r[0].id):0;if(!sr){const[x]=await c.query<ResultSetHeader>(`INSERT INTO source_records(source_id,url,external_id,title) VALUES(?,?,?,'New Holland US T7 current visible model lineup')`,[sid,SOURCE_URL,EXTERNAL_ID]);sr=Number(x.insertId)}
+ await c.query(`INSERT INTO machine_series(manufacturer_id,equipment_type_id,name,slug) VALUES(?,?,'T7 Series','t7-series') ON DUPLICATE KEY UPDATE name=VALUES(name)`,[mf,et]);const series=await id(c,`SELECT id FROM machine_series WHERE manufacturer_id=? AND equipment_type_id=? AND slug='t7-series' LIMIT 1`,[mf,et]);
+ const defs:Array<[string,string,string,string,string|null,number]>=[['Machine Configuration','configuration.variant','Variant','text',null,1],['Machine Configuration','configuration.frame_size','Frame size','text',null,2],['Engine','engine.rated_power','Rated engine power','decimal','hp',10]];for(const d of defs)await c.query(`INSERT INTO spec_definitions(section,spec_key,label,value_type,canonical_unit,display_order) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE section=VALUES(section),label=VALUES(label),value_type=VALUES(value_type),canonical_unit=VALUES(canonical_unit),display_order=VALUES(display_order)`,d);
+ for(const m of models){await c.query(`INSERT INTO machines(manufacturer_id,equipment_type_id,series_id,model_name,slug,market_notes,data_status) VALUES(?,?,?,?,?,'Current US New Holland T7 tractor variant explicitly listed on official T7 page','partial') ON DUPLICATE KEY UPDATE series_id=VALUES(series_id),model_name=VALUES(model_name),market_notes=VALUES(market_notes)`,[mf,et,series,m.model,m.slug]);const mi=await id(c,`SELECT id FROM machines WHERE manufacturer_id=? AND slug=? LIMIT 1`,[mf,m.slug]);await c.query(`UPDATE machine_versions SET is_current=FALSE WHERE machine_id=? AND slug<>?`,[mi,VERSION]);await c.query(`INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes) VALUES(?,?,'US','United States','T7 current US variant',TRUE,?,'Official New Holland North America current T7 lineup captured August 2026; only page-visible values stored.') ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,[mi,VERSION,sr]);const vi=await id(c,`SELECT id FROM machine_versions WHERE machine_id=? AND slug=? LIMIT 1`,[mi,VERSION]);const vals:Array<[string,string|number,string|null]>=[['configuration.variant',m.variant,null],['configuration.frame_size',m.frame,null],['engine.rated_power',m.ratedHp,'hp']];for(const[k,v,u]of vals){const di=await id(c,`SELECT id FROM spec_definitions WHERE spec_key=? LIMIT 1`,[k]);await c.query(`INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence) VALUES(?,?,?,?,?,?,?,'official') ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`,[mi,vi,di,typeof v==='string'?v:null,typeof v==='number'?v:null,u,sr])}}
+}};
