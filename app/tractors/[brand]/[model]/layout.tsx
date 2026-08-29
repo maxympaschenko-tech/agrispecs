@@ -8,6 +8,10 @@ type LayoutProps = {
   params: Promise<{ brand: string; model: string }>;
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export default async function TractorModelLayout({ children, params }: LayoutProps) {
   const { brand, model } = await params;
   const machine = await getMachine(brand, model);
@@ -18,8 +22,77 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
       )
     : [];
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const canonicalUrl = machine
+    ? `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`
+    : null;
+  const structuredData = machine && canonicalUrl
+    ? {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            '@id': `${canonicalUrl}#webpage`,
+            url: canonicalUrl,
+            name: `${machine.title} specs, parts and maintenance`,
+            description: `${machine.title} source-backed specifications, maintenance, compatible parts, attachments and reference data.`,
+            isPartOf: {
+              '@type': 'WebSite',
+              '@id': `${baseUrl}/#website`,
+              url: baseUrl,
+              name: 'Farm Machine Specs',
+            },
+            breadcrumb: {
+              '@id': `${canonicalUrl}#breadcrumb`,
+            },
+            about: {
+              '@type': 'Thing',
+              name: machine.title,
+              additionalType: 'Tractor',
+            },
+          },
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${canonicalUrl}#breadcrumb`,
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: baseUrl,
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Tractors',
+                item: `${baseUrl}/tractors`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: machine.brand,
+                item: `${baseUrl}/brands/${machine.brandSlug}`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 4,
+                name: machine.model,
+                item: canonicalUrl,
+              },
+            ],
+          },
+        ],
+      }
+    : null;
+
   return (
     <>
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
+        />
+      )}
       {children}
 
       {isPublished && (
