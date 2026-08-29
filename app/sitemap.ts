@@ -10,10 +10,16 @@ export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
-  const staticPages: MetadataRoute.Sitemap = ['', '/tractors', '/brands', '/parts', '/attachments', '/fitment-checker', '/compare', '/methodology'].map((path) => ({
-    url: `${baseUrl}${path}`,
-    lastModified: new Date(),
-  }));
+  const staticPages: MetadataRoute.Sitemap = [
+    '',
+    '/tractors',
+    '/brands',
+    '/parts',
+    '/attachments',
+    '/fitment-checker',
+    '/compare',
+    '/methodology',
+  ].map((path) => ({ url: `${baseUrl}${path}` }));
 
   const [machines, partNumbers, categories, attachments] = await Promise.all([
     getMachines(),
@@ -26,41 +32,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
 
+  const publishableMachineKeys = new Set(
+    publishableMachines.map((machine) => `${machine.brand}\u0000${machine.model}`),
+  );
+
   const brandPages: MetadataRoute.Sitemap = Array.from(
     new Map(publishableMachines.map((machine) => [machine.brandSlug, machine.brandSlug])).values(),
   ).map((brandSlug) => ({
     url: `${baseUrl}/brands/${brandSlug}`,
-    lastModified: new Date(),
   }));
 
   const machinePages: MetadataRoute.Sitemap = publishableMachines.map((machine) => ({
     url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
-    lastModified: new Date(),
   }));
 
-  const comparisonPages: MetadataRoute.Sitemap = comparisonPresets.map((preset) => ({
-    url: `${baseUrl}/compare/${preset.slug}`,
-    lastModified: new Date(),
-  }));
+  const comparisonPages: MetadataRoute.Sitemap = comparisonPresets
+    .filter((preset) =>
+      preset.machines.every((machine) => publishableMachineKeys.has(`${machine.brand}\u0000${machine.model}`)),
+    )
+    .map((preset) => ({
+      url: `${baseUrl}/compare/${preset.slug}`,
+    }));
 
   const categoryPages: MetadataRoute.Sitemap = categories
     .filter((category) => category.partCount >= 2)
     .map((category) => ({
       url: `${baseUrl}/parts/category/${category.slug}`,
-      lastModified: new Date(),
     }));
 
   const partPages: MetadataRoute.Sitemap = partNumbers.map((partNumber) => ({
     url: `${baseUrl}/parts/${partNumber.toLowerCase()}`,
-    lastModified: new Date(),
   }));
 
   const attachmentPages: MetadataRoute.Sitemap = attachments
     .filter((attachment) => attachment.compatibleMachineCount > 0)
     .map((attachment) => ({
       url: `${baseUrl}/attachments/${attachment.manufacturerSlug}/${attachment.slug}`,
-      lastModified: new Date(),
     }));
 
-  return [...staticPages, ...brandPages, ...machinePages, ...comparisonPages, ...categoryPages, ...partPages, ...attachmentPages];
+  return [
+    ...staticPages,
+    ...brandPages,
+    ...machinePages,
+    ...comparisonPages,
+    ...categoryPages,
+    ...partPages,
+    ...attachmentPages,
+  ];
 }
