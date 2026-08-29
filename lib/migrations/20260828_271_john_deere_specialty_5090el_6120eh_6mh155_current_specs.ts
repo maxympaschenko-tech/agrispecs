@@ -17,7 +17,6 @@ type Model = {
   displacementL?: number;
   transmission?: string;
   hydraulicFlow?: number;
-  hydraulicUnit?: string;
   drive?: string;
 };
 
@@ -29,21 +28,21 @@ const models: Model[] = [
   {
     slug: '5090el', model: '5090EL', seriesSlug: '5el-series', seriesName: '5EL Series',
     application: 'Low-profile specialty', station: 'Open Operator Station', ratedHp: 90, ptoHp: 75,
-    hydraulicFlow: 22.5, hydraulicUnit: 'gpm', drive: 'Manual Four Wheel Drive',
+    hydraulicFlow: 85.17176514, drive: 'Manual Four Wheel Drive',
   },
   {
     slug: '6120eh', model: '6120EH', seriesSlug: '6eh-series', seriesName: '6EH Series',
     application: 'High-crop specialty', station: 'Open Operator Station; cab option', ratedHp: 120, ptoHp: 102,
     engineModel: 'John Deere PowerTech PWL', displacementL: 4.5,
     transmission: '12F/12R PowrReverser with creeper-capable specialty configuration',
-    hydraulicFlow: 20, hydraulicUnit: 'gpm', drive: 'MFWD',
+    hydraulicFlow: 75.7, drive: 'MFWD',
   },
   {
     slug: '6mh-155', model: '6MH 155', seriesSlug: '6mh-series', seriesName: '6MH Series',
     application: 'High-clearance specialty', station: 'Cab', ratedHp: 155, maxHp: 171, ipmHp: 20,
     engineModel: 'John Deere PowerTech PVS', displacementL: 6.8,
     transmission: 'AutoQuad, PowrQuad, or AutoPowr/IVT depending on configuration',
-    hydraulicFlow: 114, hydraulicUnit: 'L/min', drive: 'Wheel',
+    hydraulicFlow: 114, drive: 'Wheel',
   },
 ];
 
@@ -84,7 +83,7 @@ export const johnDeereSpecialty5090EL6120EH6MH155CurrentSpecsMigration: DbMigrat
       ['Engine','engine.ipm_additional_power','Additional IPM power','decimal','hp',18],
       ['Transmission','transmission.options','Transmission options','text',null,20],
       ['PTO','pto.rated_power','PTO power','decimal','hp',10],
-      ['Hydraulics','hydraulics.pump_rated_output','Hydraulic pump output','decimal',null,10],
+      ['Hydraulics','hydraulics.pump_rated_output','Hydraulic pump output','decimal','L/min',10],
     ];
     for (const d of defs) {
       await c.query(`INSERT INTO spec_definitions(section,spec_key,label,value_type,canonical_unit,display_order) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE section=VALUES(section),label=VALUES(label),value_type=VALUES(value_type),canonical_unit=VALUES(canonical_unit),display_order=VALUES(display_order)`, d);
@@ -110,7 +109,7 @@ export const johnDeereSpecialty5090EL6120EH6MH155CurrentSpecsMigration: DbMigrat
       if (m.engineModel) values.push(['engine.model',m.engineModel,null,m.slug==='6mh-155'?familySourceId:pricebookSourceId]);
       if (m.displacementL !== undefined) values.push(['engine.displacement',m.displacementL,'L',pricebookSourceId]);
       if (m.transmission) values.push(['transmission.options',m.transmission,null,m.slug==='6mh-155'?familySourceId:pricebookSourceId]);
-      if (m.hydraulicFlow !== undefined) values.push(['hydraulics.pump_rated_output',m.hydraulicFlow,m.hydraulicUnit ?? null,m.slug==='5090el'?familySourceId:(m.slug==='6120eh'?pricebookSourceId:pricebookSourceId)]);
+      if (m.hydraulicFlow !== undefined) values.push(['hydraulics.pump_rated_output',m.hydraulicFlow,'L/min',m.slug==='5090el'?familySourceId:pricebookSourceId]);
       for (const [key,value,unit,recordId] of values) {
         const defId = await id(c, `SELECT id FROM spec_definitions WHERE spec_key=? LIMIT 1`, [key]);
         await c.query(`INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence) VALUES(?,?,?,?,?,?,?,'official') ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`, [machineId,versionId,defId,typeof value==='string'?value:null,typeof value==='number'?value:null,unit,recordId]);
