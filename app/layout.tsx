@@ -61,7 +61,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <footer className="site-footer">
           <div className="container">
-            Farm Machine Specs is an independent farm equipment reference. Product names and trademarks belong to their respective owners.
+            <p style={{ margin: 0 }}>
+              Farm Machine Specs is an independent farm equipment reference. Product names and trademarks belong to their respective owners.
+            </p>
+            <p style={{ margin: '10px 0 0' }}>
+              <Link href="/methodology" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                Data Sources &amp; Methodology
+              </Link>
+            </p>
           </div>
         </footer>
       </body>
