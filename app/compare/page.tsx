@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 type ComparePageProps = {
-  searchParams: Promise<{ m1?: string; m2?: string; m3?: string }>;
+  searchParams: Promise<{ m1?: string; m2?: string; m3?: string; rows?: string }>;
 };
 
 type ComparedMachine = {
@@ -24,6 +24,13 @@ type ComparedMachine = {
   specs: MachineSpec[];
 };
 
+type CompareRow = {
+  key: string;
+  label: string;
+  rows: Array<MachineSpec | undefined>;
+  different: boolean;
+};
+
 function formatSpec(spec: MachineSpec | undefined) {
   if (!spec) return '—';
   if (spec.valueText) return spec.valueText;
@@ -31,8 +38,14 @@ function formatSpec(spec: MachineSpec | undefined) {
   return `${spec.valueNumber.toLocaleString('en-US')}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
+function rowIsDifferent(rows: Array<MachineSpec | undefined>) {
+  const values = rows.map(formatSpec);
+  return new Set(values).size > 1;
+}
+
 export default async function ComparePage({ searchParams }: ComparePageProps) {
   const params = await searchParams;
+  const differencesOnly = params.rows === 'differences';
   const machines = (await getMachines()).filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
@@ -76,9 +89,11 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   const sections = Array.from(specMap.entries())
     .filter(([, item]) => item.rows.filter(Boolean).length >= Math.min(2, compared.length))
-    .reduce<Map<string, Array<{ key: string; label: string; rows: Array<MachineSpec | undefined> }>>>((map, [key, item]) => {
+    .map(([key, item]) => ({ key, ...item, different: rowIsDifferent(item.rows) }))
+    .filter((item) => !differencesOnly || item.different)
+    .reduce<Map<string, CompareRow[]>>((map, item) => {
       const list = map.get(item.section) ?? [];
-      list.push({ key, label: item.label, rows: item.rows });
+      list.push({ key: item.key, label: item.label, rows: item.rows, different: item.different });
       map.set(item.section, list);
       return map;
     }, new Map());
@@ -105,6 +120,13 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               </label>
             );
           })}
+          <label>
+            <span>Rows</span>
+            <select name="rows" defaultValue={differencesOnly ? 'differences' : 'all'}>
+              <option value="all">All shared specs</option>
+              <option value="differences">Differences only</option>
+            </select>
+          </label>
           <button type="submit">Compare</button>
         </form>
 
@@ -127,7 +149,11 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
             </div>
 
             {sections.size === 0 ? (
-              <div className="notice">These selected records do not yet share enough normalized specification fields for a useful comparison.</div>
+              <div className="notice">
+                {differencesOnly
+                  ? 'No differing shared specification rows were found for these selected records. Switch Rows to All shared specs to see their common values.'
+                  : 'These selected records do not yet share enough normalized specification fields for a useful comparison.'}
+              </div>
             ) : (
               <div className="compare-sections">
                 {Array.from(sections.entries()).map(([section, rows]) => (
@@ -144,7 +170,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                         <tbody>
                           {rows.map((row) => (
                             <tr key={row.key}>
-                              <th scope="row">{row.label}</th>
+                              <th scope="row">{row.label}{row.different ? ' *' : ''}</th>
                               {row.rows.map((spec, index) => (
                                 <td key={`${row.key}-${compared[index].id}`}>
                                   <strong>{formatSpec(spec)}</strong>
