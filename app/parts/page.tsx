@@ -41,9 +41,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
   return {
     title: page === 1
-      ? 'Farm Equipment Parts, Replacements and Cross References'
+      ? 'Farm Equipment Parts, OEM Numbers and Cross References'
       : `Farm Equipment Parts - Page ${page}`,
-    description: 'Verified OEM part numbers, maintenance kits and kit contents, replacement numbers, aftermarket alternatives and farm equipment compatibility data.',
+    description: 'Source-backed OEM part numbers, maintenance kits, replacement numbers, cross references and farm equipment compatibility data by manufacturer.',
     alternates: { canonical: canonicalForPage(page) },
     robots: { index: true, follow: true },
   };
@@ -81,29 +81,47 @@ export default async function PartsPage({ searchParams }: PageProps) {
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
 
   const parts = catalog.items;
-  const johnDeereParts = parts.filter((part) => part.manufacturerSlug === 'john-deere');
-  const aftermarketParts = parts.filter((part) => part.manufacturerSlug && part.manufacturerSlug !== 'john-deere');
   const usefulCategories = categories.filter((category) => category.partCount >= 2);
+  const manufacturerGroups = Array.from(
+    parts.reduce<Map<string, { name: string; slug: string | null; items: PartCatalogItem[] }>>((groups, part) => {
+      const key = part.manufacturerSlug || 'other-documented-parts';
+      const current = groups.get(key) || {
+        name: part.manufacturerName || 'Other documented parts',
+        slug: part.manufacturerSlug,
+        items: [],
+      };
+      current.items.push(part);
+      groups.set(key, current);
+      return groups;
+    }, new Map()),
+  ).map(([, group]) => group);
 
   return (
     <main className="section">
       <div className="container">
         <span className="eyebrow">Parts catalog</span>
-        <h1>Farm equipment parts, replacements and cross references{page > 1 ? ` - Page ${page}` : ''}</h1>
+        <h1>Farm equipment parts, OEM numbers and cross references{page > 1 ? ` - Page ${page}` : ''}</h1>
         <p className="section-lead">
-          Source-backed OEM part numbers, legacy replacements, maintenance kit contents, aftermarket alternatives and compatible equipment. Serial-number restrictions are shown when the technical source provides them.
+          Search source-backed OEM part numbers, legacy replacements, maintenance kit contents, documented alternatives and compatible equipment. Serial-number restrictions are shown when the technical source provides them.
         </p>
+
+        {page === 1 && (
+          <form className="search-shell" action="/search" style={{ marginBottom: 24 }}>
+            <input name="q" aria-label="Search farm equipment part number" placeholder="Search a part number, for example RE519626" />
+            <button type="submit">Search parts</button>
+          </form>
+        )}
 
         <div className="parts-stats">
           <div><strong>{stats.total}</strong><span>source-backed part pages</span></div>
           <div><strong>{stats.replacementLinked}</strong><span>with replacement or cross-reference data</span></div>
-          <div><strong>{stats.kitLinked}</strong><span>with verified Filter Pak component data</span></div>
+          <div><strong>{stats.kitLinked}</strong><span>with verified kit component data</span></div>
         </div>
 
         <div className="parts-tool-callout">
           <div>
-            <strong>Have a model and serial number?</strong>
-            <span>Use the fitment checker to test a documented serial-number range.</span>
+            <strong>Have a tractor model and serial number?</strong>
+            <span>Use the fitment checker to test documented fitment and serial-number ranges.</span>
           </div>
           <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
         </div>
@@ -111,7 +129,7 @@ export default async function PartsPage({ searchParams }: PageProps) {
         {page === 1 && usefulCategories.length > 0 && (
           <section className="catalog-group">
             <h2>Browse parts by category</h2>
-            <p className="section-note">Only categories with multiple source-backed part pages are published here.</p>
+            <p className="section-note">Categories are published when enough source-backed part records exist to make the page useful.</p>
             <div className="grid">
               {usefulCategories.map((category) => (
                 <Link className="card" href={`/parts/category/${category.slug}`} key={category.id}>
@@ -124,25 +142,17 @@ export default async function PartsPage({ searchParams }: PageProps) {
           </section>
         )}
 
-        {johnDeereParts.length > 0 && (
-          <section className="catalog-group">
-            <h2>John Deere OEM & legacy part numbers</h2>
-            <p className="section-note">Includes current OEM numbers, source-backed Filter Pak contents, and legacy numbers where Deere publishes a substitute replacement.</p>
+        {manufacturerGroups.map((group) => (
+          <section className="catalog-group" key={group.slug || group.name}>
+            <h2>{group.name} parts</h2>
+            <p className="section-note">
+              Source-backed part numbers and documented replacement, kit or fitment relationships for {group.name}.
+            </p>
             <div className="grid">
-              {johnDeereParts.map((part) => <PartCard key={part.id} part={part} />)}
+              {group.items.map((part) => <PartCard key={part.id} part={part} />)}
             </div>
           </section>
-        )}
-
-        {aftermarketParts.length > 0 && (
-          <section className="catalog-group">
-            <h2>Aftermarket alternatives</h2>
-            <p className="section-note">Shown only where the cited source lists the part as an alternative buying option or cross-reference.</p>
-            <div className="grid">
-              {aftermarketParts.map((part) => <PartCard key={part.id} part={part} />)}
-            </div>
-          </section>
-        )}
+        ))}
 
         {parts.length === 0 && page === 1 && <div className="notice">Verified part records are being added.</div>}
 
