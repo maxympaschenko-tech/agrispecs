@@ -1,0 +1,75 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Data Sources and Methodology',
+  description:
+    'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed tractor, parts and attachment data.',
+  alternates: { canonical: '/methodology' },
+};
+
+export default function MethodologyPage() {
+  return (
+    <main className="section">
+      <div className="container">
+        <span className="eyebrow">Editorial standards</span>
+        <h1>Data sources and methodology</h1>
+        <p className="section-lead">
+          Farm Machine Specs is built as a structured equipment reference. We prioritize official manufacturer records, preserve source provenance and avoid filling gaps with guessed specifications.
+        </p>
+
+        <section className="data-section">
+          <h2>Manufacturer-first sourcing</h2>
+          <p>
+            Current machine specifications are collected from official manufacturer product pages, specification sheets, price books, parts catalogs and other first-party technical material whenever available. Each stored specification can be linked back to the source record used to support it.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Current and historical versions</h2>
+          <p>
+            A model name can exist across multiple years or configurations. We keep version records separate and mark the current market version when the manufacturer provides enough evidence to do so. Older records are not silently merged into a current model.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Normalized specifications</h2>
+          <p>
+            Published values are mapped to normalized specification keys so tractors from different brands can be compared consistently. Units are normalized only when a reliable conversion is possible. Text values remain text when converting them would change their meaning.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Missing values stay missing</h2>
+          <p>
+            If a current official source does not publish a value, we prefer to leave that specification blank rather than infer it from a related model, family page or older generation. A missing value is not treated as zero and is not treated as a difference in comparisons unless at least two published values are available.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Confidence and publication status</h2>
+          <p>
+            Source-backed values can carry an official or otherwise explicit confidence level. Models may be published as partial when useful verified data exists but the record is not yet complete. This lets the site expand without presenting incomplete records as exhaustive specifications.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Parts and fitment</h2>
+          <p>
+            Parts, replacements and attachment compatibility are published only when a source record supports the relationship. Fitment notes and serial-number context are retained when the manufacturer provides them because a part number can vary by machine configuration or production range.
+          </p>
+        </section>
+
+        <section className="data-section">
+          <h2>Independent reference</h2>
+          <p>
+            Farm Machine Specs is an independent reference and is not affiliated with John Deere, Case IH, New Holland or other equipment manufacturers. Product names and trademarks belong to their respective owners.
+          </p>
+          <p>
+            <Link className="tool-link" href="/tractors">Browse tractor specifications</Link>
+          </p>
+        </section>
+      </div>
+    </main>
+  );
+}
