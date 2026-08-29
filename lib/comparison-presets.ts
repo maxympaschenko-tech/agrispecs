@@ -68,6 +68,36 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'New Holland', model: 'All-New T7.225' },
     ],
   },
+  {
+    slug: 'john-deere-6r-155-vs-case-ih-puma-155-new-vs-new-holland-all-new-t7-190',
+    title: 'John Deere 6R 155 vs Case IH Puma 155 New vs New Holland All-New T7.190',
+    description: 'Compare current source-backed specifications for three tractors with 155 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '6R 155' },
+      { brand: 'Case IH', model: 'Puma 155 New' },
+      { brand: 'New Holland', model: 'All-New T7.190' },
+    ],
+  },
+  {
+    slug: 'john-deere-6r-165-vs-case-ih-puma-165-new-vs-new-holland-all-new-t7-210',
+    title: 'John Deere 6R 165 vs Case IH Puma 165 New vs New Holland All-New T7.210',
+    description: 'Compare current source-backed specifications for three tractors with 165 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '6R 165' },
+      { brand: 'Case IH', model: 'Puma 165 New' },
+      { brand: 'New Holland', model: 'All-New T7.210' },
+    ],
+  },
+  {
+    slug: 'john-deere-6r-185-vs-case-ih-puma-185-new-vs-new-holland-all-new-t7-225',
+    title: 'John Deere 6R 185 vs Case IH Puma 185 New vs New Holland All-New T7.225',
+    description: 'Compare current source-backed specifications for three tractors with 185 rated horsepower.',
+    machines: [
+      { brand: 'John Deere', model: '6R 185' },
+      { brand: 'Case IH', model: 'Puma 185 New' },
+      { brand: 'New Holland', model: 'All-New T7.225' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
