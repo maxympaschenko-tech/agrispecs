@@ -43,6 +43,22 @@ function rowIsDifferent(rows: Array<MachineSpec | undefined>) {
   return new Set(values).size > 1;
 }
 
+function numericRange(rows: Array<MachineSpec | undefined>) {
+  const numeric = rows.filter(
+    (spec): spec is MachineSpec => Boolean(spec && !spec.valueText && spec.valueNumber !== null),
+  );
+  if (numeric.length < 2) return null;
+
+  const units = new Set(numeric.map((spec) => spec.unit || ''));
+  if (units.size !== 1) return null;
+
+  const values = numeric.map((spec) => spec.valueNumber as number);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) return null;
+  return { min, max };
+}
+
 export default async function ComparePage({ searchParams }: ComparePageProps) {
   const params = await searchParams;
   const differencesOnly = params.rows === 'differences';
@@ -168,17 +184,30 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                           </tr>
                         </thead>
                         <tbody>
-                          {rows.map((row) => (
-                            <tr key={row.key}>
-                              <th scope="row">{row.label}{row.different ? ' *' : ''}</th>
-                              {row.rows.map((spec, index) => (
-                                <td key={`${row.key}-${compared[index].id}`}>
-                                  <strong>{formatSpec(spec)}</strong>
-                                  {spec && <small>{spec.confidence === 'official' ? 'Official source' : 'High confidence'}</small>}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
+                          {rows.map((row) => {
+                            const range = numericRange(row.rows);
+                            return (
+                              <tr key={row.key}>
+                                <th scope="row">{row.label}{row.different ? ' *' : ''}</th>
+                                {row.rows.map((spec, index) => {
+                                  const isHigh = Boolean(range && spec?.valueNumber === range.max);
+                                  const isLow = Boolean(range && spec?.valueNumber === range.min);
+                                  return (
+                                    <td
+                                      key={`${row.key}-${compared[index].id}`}
+                                      style={isHigh ? { background: '#edf6ee' } : isLow ? { background: '#fff8df' } : undefined}
+                                    >
+                                      <strong>{formatSpec(spec)}</strong>
+                                      {range && spec?.valueNumber !== null && spec?.valueNumber !== undefined && (
+                                        <small>{isHigh ? 'Highest numeric value' : isLow ? 'Lowest numeric value' : 'Between selected values'}</small>
+                                      )}
+                                      {spec && <small>{spec.confidence === 'official' ? 'Official source' : 'High confidence'}</small>}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
