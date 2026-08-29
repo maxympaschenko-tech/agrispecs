@@ -164,6 +164,60 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'New Holland', model: 'T4.100V' },
     ],
   },
+  {
+    slug: 'john-deere-5100m-vs-massey-ferguson-mf-4710-vs-case-ih-farmall-100a-vs-new-holland-powerstar-100',
+    title: 'John Deere 5100M vs Massey Ferguson MF 4710 vs Case IH Farmall 100A vs New Holland PowerStar 100',
+    description: 'Compare current source-backed specifications for four major-brand utility tractors around the 100 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '5100M' },
+      { brand: 'Massey Ferguson', model: 'MF 4710' },
+      { brand: 'Case IH', model: 'Farmall 100A' },
+      { brand: 'New Holland', model: 'PowerStar 100' },
+    ],
+  },
+  {
+    slug: 'john-deere-5120m-vs-massey-ferguson-mf-6712-vs-case-ih-farmall-115a-vs-new-holland-powerstar-120',
+    title: 'John Deere 5120M vs Massey Ferguson MF 6712 vs Case IH Farmall 115A vs New Holland PowerStar 120',
+    description: 'Compare current source-backed specifications for four utility and mid-range tractors around the 115 to 120 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '5120M' },
+      { brand: 'Massey Ferguson', model: 'MF 6712' },
+      { brand: 'Case IH', model: 'Farmall 115A' },
+      { brand: 'New Holland', model: 'PowerStar 120' },
+    ],
+  },
+  {
+    slug: 'john-deere-6r-155-vs-massey-ferguson-mf-7s-155-vs-case-ih-puma-155-new-vs-new-holland-all-new-t7-190',
+    title: 'John Deere 6R 155 vs Massey Ferguson MF 7S.155 vs Case IH Puma 155 New vs New Holland All-New T7.190',
+    description: 'Compare current source-backed specifications for four major-brand tractors in the 155 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '6R 155' },
+      { brand: 'Massey Ferguson', model: 'MF 7S.155' },
+      { brand: 'Case IH', model: 'Puma 155 New' },
+      { brand: 'New Holland', model: 'All-New T7.190' },
+    ],
+  },
+  {
+    slug: 'john-deere-6r-165-vs-massey-ferguson-mf-7s-165-vs-case-ih-puma-165-new-vs-new-holland-all-new-t7-210',
+    title: 'John Deere 6R 165 vs Massey Ferguson MF 7S.165 vs Case IH Puma 165 New vs New Holland All-New T7.210',
+    description: 'Compare current source-backed specifications for four major-brand tractors in the 165 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '6R 165' },
+      { brand: 'Massey Ferguson', model: 'MF 7S.165' },
+      { brand: 'Case IH', model: 'Puma 165 New' },
+      { brand: 'New Holland', model: 'All-New T7.210' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-290-vs-massey-ferguson-mf-8s-285-vs-case-ih-magnum-295',
+    title: 'John Deere 7R 290 vs Massey Ferguson MF 8S.285 vs Case IH Magnum 295',
+    description: 'Compare current source-backed specifications for three high-horsepower tractors around the 285 to 295 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '7R 290' },
+      { brand: 'Massey Ferguson', model: 'MF 8S.285' },
+      { brand: 'Case IH', model: 'Magnum 295' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
