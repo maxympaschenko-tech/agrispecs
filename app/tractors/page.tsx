@@ -33,11 +33,13 @@ export default async function TractorsPage() {
             <p className="section-note">These pages contain verified or partially verified technical data with attached sources.</p>
             <div className="grid">
               {publishedMachines.map((machine) => (
-                <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                <div className="card" key={machine.id}>
                   <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                   <h3>{machine.title}</h3>
                   <p>Specs, maintenance, parts, fitment and related equipment.</p>
-                </Link>
+                  <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
+                  <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
+                </div>
               ))}
             </div>
           </section>
