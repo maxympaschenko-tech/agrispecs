@@ -56,6 +56,7 @@ import { johnDeere6M6RPickupHitchValveKitMigration } from '@/lib/migrations/2026
 import { johnDeere6M6RHydraulicStabilizerPartsMigration } from '@/lib/migrations/20260827_132_6m_6r_hydraulic_stabilizer_parts';
 import { kubotaMigrations } from '@/lib/migrations/kubota';
 import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expansion';
+import { newHollandMigrations } from '@/lib/migrations/new-holland';
 import { caseIHMigrations } from '@/lib/migrations/case-ih';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
@@ -122,6 +123,7 @@ const migrations: DbMigration[] = [
   johnDeere6M6RHydraulicStabilizerPartsMigration,
   ...kubotaMigrations,
   ...johnDeereExpansionMigrations,
+  ...newHollandMigrations,
   ...caseIHMigrations,
 ];
 
