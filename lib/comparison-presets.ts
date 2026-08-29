@@ -41,6 +41,33 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'New Holland', model: 'PowerStar 120' },
     ],
   },
+  {
+    slug: 'case-ih-puma-155-new-vs-new-holland-all-new-t7-190',
+    title: 'Case IH Puma 155 New vs New Holland All-New T7.190',
+    description: 'Compare current source-backed specifications for two 155 rated horsepower row-crop tractors.',
+    machines: [
+      { brand: 'Case IH', model: 'Puma 155 New' },
+      { brand: 'New Holland', model: 'All-New T7.190' },
+    ],
+  },
+  {
+    slug: 'case-ih-puma-165-new-vs-new-holland-all-new-t7-210',
+    title: 'Case IH Puma 165 New vs New Holland All-New T7.210',
+    description: 'Compare current source-backed specifications for two 165 rated horsepower row-crop tractors.',
+    machines: [
+      { brand: 'Case IH', model: 'Puma 165 New' },
+      { brand: 'New Holland', model: 'All-New T7.210' },
+    ],
+  },
+  {
+    slug: 'case-ih-puma-185-new-vs-new-holland-all-new-t7-225',
+    title: 'Case IH Puma 185 New vs New Holland All-New T7.225',
+    description: 'Compare current source-backed specifications for two 185 rated horsepower row-crop tractors.',
+    machines: [
+      { brand: 'Case IH', model: 'Puma 185 New' },
+      { brand: 'New Holland', model: 'All-New T7.225' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
