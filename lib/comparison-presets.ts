@@ -134,6 +134,36 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'Case IH', model: 'Magnum 355' },
     ],
   },
+  {
+    slug: 'john-deere-5075en-vs-case-ih-farmall-80n-vs-new-holland-t4-80v',
+    title: 'John Deere 5075EN vs Case IH Farmall 80N vs New Holland T4.80V',
+    description: 'Compare current source-backed specifications for three narrow orchard and vineyard tractors around the 75 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '5075EN' },
+      { brand: 'Case IH', model: 'Farmall 80N' },
+      { brand: 'New Holland', model: 'T4.80V' },
+    ],
+  },
+  {
+    slug: 'john-deere-5090en-vs-case-ih-farmall-90n-vs-new-holland-t4-90v',
+    title: 'John Deere 5090EN vs Case IH Farmall 90N vs New Holland T4.90V',
+    description: 'Compare current source-backed specifications for three narrow orchard and vineyard tractors in the 84 to 90 horsepower range.',
+    machines: [
+      { brand: 'John Deere', model: '5090EN' },
+      { brand: 'Case IH', model: 'Farmall 90N' },
+      { brand: 'New Holland', model: 'T4.90V' },
+    ],
+  },
+  {
+    slug: 'john-deere-5105en-vs-case-ih-farmall-100n-vs-new-holland-t4-100v',
+    title: 'John Deere 5105EN vs Case IH Farmall 100N vs New Holland T4.100V',
+    description: 'Compare current source-backed specifications for three narrow orchard and vineyard tractors around the 100 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '5105EN' },
+      { brand: 'Case IH', model: 'Farmall 100N' },
+      { brand: 'New Holland', model: 'T4.100V' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
