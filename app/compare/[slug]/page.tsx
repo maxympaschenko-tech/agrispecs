@@ -26,11 +26,59 @@ type CompareRow = {
   rows: Array<MachineSpec | undefined>;
 };
 
+type KeyDifference = {
+  key: string;
+  label: string;
+  unit: string;
+  minValue: number;
+  minMachine: string;
+  maxValue: number;
+  maxMachine: string;
+  spreadScore: number;
+};
+
 function formatSpec(spec: MachineSpec | undefined) {
   if (!spec) return '—';
   if (spec.valueText) return spec.valueText;
   if (spec.valueNumber === null) return '—';
   return `${spec.valueNumber.toLocaleString('en-US')}${spec.unit ? ` ${spec.unit}` : ''}`;
+}
+
+function buildKeyDifference(
+  key: string,
+  item: { label: string; rows: Array<MachineSpec | undefined> },
+  compared: ComparedMachine[],
+): KeyDifference | null {
+  const numeric = item.rows
+    .map((spec, index) => ({ spec, machine: compared[index] }))
+    .filter(
+      (entry): entry is { spec: MachineSpec; machine: ComparedMachine } =>
+        Boolean(entry.spec && !entry.spec.valueText && entry.spec.valueNumber !== null && entry.machine),
+    );
+
+  if (numeric.length < 2) return null;
+
+  const units = new Set(numeric.map(({ spec }) => spec.unit || ''));
+  if (units.size !== 1) return null;
+
+  const sorted = [...numeric].sort((a, b) => (a.spec.valueNumber as number) - (b.spec.valueNumber as number));
+  const low = sorted[0];
+  const high = sorted[sorted.length - 1];
+  const minValue = low.spec.valueNumber as number;
+  const maxValue = high.spec.valueNumber as number;
+  if (minValue === maxValue) return null;
+
+  const baseline = Math.max(Math.abs(minValue), 1);
+  return {
+    key,
+    label: item.label,
+    unit: low.spec.unit || '',
+    minValue,
+    minMachine: low.machine.title,
+    maxValue,
+    maxMachine: high.machine.title,
+    spreadScore: Math.abs(maxValue - minValue) / baseline,
+  };
 }
 
 export function generateStaticParams() {
@@ -63,7 +111,7 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
     .map((target) => machines.find((machine) => machine.brand === target.brand && machine.model === target.model))
     .filter((machine): machine is NonNullable<typeof machine> => Boolean(machine));
 
-  if (selected.length < 2) notFound();
+  if (selected.length !== preset.machines.length) notFound();
 
   const compared: ComparedMachine[] = await Promise.all(
     selected.map(async (machine) => {
@@ -94,6 +142,12 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
     });
   });
 
+  const keyDifferences = Array.from(specMap.entries())
+    .map(([key, item]) => buildKeyDifference(key, item, compared))
+    .filter((item): item is KeyDifference => Boolean(item))
+    .sort((a, b) => b.spreadScore - a.spreadScore)
+    .slice(0, 5);
+
   const sections = Array.from(specMap.entries())
     .filter(([, item]) => item.rows.filter(Boolean).length >= Math.min(2, compared.length))
     .reduce<Map<string, CompareRow[]>>((map, [key, item]) => {
@@ -123,6 +177,24 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
             </div>
           ))}
         </div>
+
+        {keyDifferences.length > 0 && (
+          <section className="card">
+            <span className="eyebrow">Quick scan</span>
+            <h2>Key differences</h2>
+            <p>Largest numeric spreads among shared normalized specifications. These are descriptive comparisons, not best-or-worst ratings.</p>
+            <ul>
+              {keyDifferences.map((difference) => (
+                <li key={difference.key}>
+                  <strong>{difference.label}:</strong>{' '}
+                  {difference.minMachine} {difference.minValue.toLocaleString('en-US')}{difference.unit ? ` ${difference.unit}` : ''}
+                  {' vs '}
+                  {difference.maxMachine} {difference.maxValue.toLocaleString('en-US')}{difference.unit ? ` ${difference.unit}` : ''}.
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <div className="parts-tool-callout">
           <div>
