@@ -17,7 +17,7 @@ function jsonLd(value: unknown) {
 }
 
 type ComparePageProps = {
-  searchParams: Promise<{ m1?: string; m2?: string; m3?: string; rows?: string }>;
+  searchParams: Promise<{ m1?: string; m2?: string; m3?: string; m4?: string; rows?: string }>;
 };
 
 type ComparedMachine = {
@@ -134,10 +134,10 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     }, new Map()),
   );
 
-  const requestedIds = [params.m1, params.m2, params.m3]
+  const requestedIds = [params.m1, params.m2, params.m3, params.m4]
     .filter((value): value is string => Boolean(value))
     .filter((value, index, values) => values.indexOf(value) === index)
-    .slice(0, 3);
+    .slice(0, 4);
 
   const selectedMachines = machines.filter((machine) => requestedIds.includes(machine.id));
   selectedMachines.sort((a, b) => requestedIds.indexOf(a.id) - requestedIds.indexOf(b.id));
@@ -238,7 +238,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
       <div className="container">
         <span className="eyebrow">Comparison tool</span>
         <h1>Compare tractors side by side</h1>
-        <p className="section-lead">Select up to three tractors. The table uses current source-backed records and normalized specification keys so equivalent fields line up across brands.</p>
+        <p className="section-lead">Select up to four tractors. The table uses current source-backed records and normalized specification keys so equivalent fields line up across brands.</p>
 
         <section className="catalog-group">
           <h2>Popular source-backed comparisons</h2>
@@ -255,11 +255,11 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         </section>
 
         <form className="compare-form" action="/compare" method="get">
-          {[1, 2, 3].map((slot) => {
-            const name = `m${slot}` as 'm1' | 'm2' | 'm3';
+          {[1, 2, 3, 4].map((slot) => {
+            const name = `m${slot}` as 'm1' | 'm2' | 'm3' | 'm4';
             return (
               <label key={name}>
-                <span>{slot === 3 ? 'Optional third tractor' : `Tractor ${slot}`}</span>
+                <span>{slot > 2 ? `Optional tractor ${slot}` : `Tractor ${slot}`}</span>
                 <select name={name} defaultValue={params[name] || ''}>
                   <option value="">Choose a tractor</option>
                   {machinesByBrand.map(([brand, brandMachines]) => (
@@ -286,7 +286,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         {compared.length < 2 ? (
           <div className="card compare-empty">
             <h3>Select at least two tractors</h3>
-            <p>Choose two or three published models above to compare their verified specifications.</p>
+            <p>Choose two to four published models above to compare their verified specifications.</p>
           </div>
         ) : (
           <>
