@@ -21,6 +21,46 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
   return (
     <>
       {children}
+
+      {isPublished && (
+        <section className="section">
+          <div className="container">
+            <span className="eyebrow">Tractor tools</span>
+            <h2>More {machine.title} reference tools</h2>
+            <p className="section-lead">
+              Continue into manufacturer coverage, documented parts, attachment fitment, serial-number checking or our data methodology.
+            </p>
+            <div className="grid">
+              <Link className="card" href={`/brands/${machine.brandSlug}`}>
+                <span className="eyebrow">Manufacturer hub</span>
+                <h3>Browse {machine.brand} models</h3>
+                <p>See other published {machine.brand} tractor records and coverage status.</p>
+              </Link>
+              <Link className="card" href="/parts">
+                <span className="eyebrow">Parts catalog</span>
+                <h3>Search part numbers</h3>
+                <p>Browse source-backed OEM numbers, replacements, kits and compatibility records.</p>
+              </Link>
+              <Link className="card" href="/attachments">
+                <span className="eyebrow">Attachment fitment</span>
+                <h3>Browse compatible attachments</h3>
+                <p>Open published loader, backhoe and other attachment fitment references.</p>
+              </Link>
+              <Link className="card" href="/fitment-checker">
+                <span className="eyebrow">Compatibility checker</span>
+                <h3>Check a part and serial number</h3>
+                <p>Test documented model fitment and serial-number ranges when they are available.</p>
+              </Link>
+              <Link className="card" href="/methodology">
+                <span className="eyebrow">Editorial standards</span>
+                <h3>How this data is verified</h3>
+                <p>Read the manufacturer-first sourcing, normalization and missing-data policy.</p>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {isPublished && relatedComparisons.length > 0 && (
         <section className="section">
           <div className="container">
