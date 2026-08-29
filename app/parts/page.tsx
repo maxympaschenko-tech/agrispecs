@@ -16,6 +16,10 @@ type PageProps = {
   searchParams: Promise<{ page?: string }>;
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 function parsePage(value?: string) {
   if (!value) return 1;
   if (!/^\d+$/.test(value)) return null;
@@ -96,8 +100,52 @@ export default async function PartsPage({ searchParams }: PageProps) {
     }, new Map()),
   ).map(([, group]) => group);
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalPath = canonicalForPage(page);
+  const canonicalUrl = `${baseUrl}${canonicalPath}`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: page === 1 ? 'Farm Equipment Parts, OEM Numbers and Cross References' : `Farm Equipment Parts - Page ${page}`,
+        description: 'Source-backed OEM part numbers, maintenance kits, replacement numbers, cross references and farm equipment compatibility data by manufacturer.',
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#items` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Parts', item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        numberOfItems: parts.length,
+        itemListElement: parts.map((part, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${baseUrl}/parts/${part.normalizedPartNumber.toLowerCase()}`,
+          name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
+        })),
+      },
+    ],
+  };
+
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <span className="eyebrow">Parts catalog</span>
         <h1>Farm equipment parts, OEM numbers and cross references{page > 1 ? ` - Page ${page}` : ''}</h1>
