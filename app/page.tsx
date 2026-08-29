@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getBrands, getMachines } from '@/lib/catalog-service';
+import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -22,6 +23,8 @@ export default async function HomePage() {
   )
     .flatMap(([, brandMachines]) => brandMachines)
     .slice(0, 12);
+
+  const featuredComparisons = comparisonPresets.slice(0, 6);
 
   return (
     <main>
@@ -82,6 +85,23 @@ export default async function HomePage() {
               <span className="tool-link">Compare models</span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <h2>Popular tractor comparisons</h2>
+          <p className="section-lead">Permanent comparison pages built from the same normalized source-backed records as the interactive comparison tool.</p>
+          <div className="grid">
+            {featuredComparisons.map((preset) => (
+              <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
+                <span className="eyebrow">Source-backed comparison</span>
+                <h3>{preset.title}</h3>
+                <p>{preset.description}</p>
+              </Link>
+            ))}
+          </div>
+          <Link className="tool-link" href="/compare">See all comparisons</Link>
         </div>
       </section>
 
