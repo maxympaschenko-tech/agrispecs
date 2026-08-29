@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   ).length;
 
   return {
-    title: `${info.name} Farm Equipment Models`,
-    description: `Browse ${info.name} farm equipment model references, specifications, maintenance, parts and compatibility data.`,
+    title: `${info.name} Tractor Specs and Farm Equipment Models`,
+    description: `Browse ${info.name} tractor specifications, model references, maintenance, OEM parts, attachments and compatibility data.`,
     alternates: { canonical: `/brands/${info.slug}` },
     robots: publishableCount > 0 ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -38,6 +38,8 @@ export default async function BrandPage({ params }: PageProps) {
   const publishedMachines = brandMachines.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
+  const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
+  const partialCount = publishedMachines.length - verifiedCount;
   const researchMachines = brandMachines.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
@@ -51,21 +53,57 @@ export default async function BrandPage({ params }: PageProps) {
       <section className="section" style={{ paddingTop: 18 }}>
         <div className="container">
           <span className="eyebrow">Manufacturer</span>
-          <h1>{info.name}</h1>
+          <h1>{info.name} tractor specs and model reference</h1>
           <p className="section-lead">
-            Farm equipment specifications, maintenance schedules, OEM parts, replacement numbers and compatibility references for {info.name} models.
+            Source-backed tractor specifications, maintenance schedules, OEM parts, replacement numbers, attachments and compatibility references for {info.name} equipment.
           </p>
+
+          <div className="parts-stats">
+            <div>
+              <strong>{publishedMachines.length.toLocaleString('en-US')}</strong>
+              <span>Models with published data</span>
+            </div>
+            <div>
+              <strong>{verifiedCount.toLocaleString('en-US')}</strong>
+              <span>Verified model records</span>
+            </div>
+            <div>
+              <strong>{partialCount.toLocaleString('en-US')}</strong>
+              <span>Source-backed partial records</span>
+            </div>
+          </div>
+
+          <div className="grid">
+            <Link className="card" href="/compare">
+              <span className="eyebrow">Comparison</span>
+              <h3>Compare {info.name} tractors</h3>
+              <p>Put published normalized specifications side by side with models from other brands.</p>
+              <span className="tool-link">Open Compare</span>
+            </Link>
+            <Link className="card" href="/parts">
+              <span className="eyebrow">Parts reference</span>
+              <h3>Search OEM parts</h3>
+              <p>Search part numbers, replacement references and verified machine fitment records.</p>
+              <span className="tool-link">Browse parts</span>
+            </Link>
+            <Link className="card" href="/attachments">
+              <span className="eyebrow">Attachments</span>
+              <h3>Browse compatible attachments</h3>
+              <p>Find source-backed loader, backhoe and attachment fitment where available.</p>
+              <span className="tool-link">View attachments</span>
+            </Link>
+          </div>
 
           {publishedMachines.length > 0 && (
             <section className="catalog-group">
-              <h2>Models with published data</h2>
-              <p className="section-note">These model pages contain source-backed technical, maintenance or parts data.</p>
+              <h2>{info.name} models with published data</h2>
+              <p className="section-note">These pages contain source-backed technical, maintenance, parts or compatibility data.</p>
               <div className="grid">
                 {publishedMachines.map((machine) => (
                   <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
-                    <p>Specifications, maintenance and parts reference</p>
+                    <p>Specifications, maintenance, parts and compatibility reference.</p>
                   </Link>
                 ))}
               </div>
@@ -87,6 +125,14 @@ export default async function BrandPage({ params }: PageProps) {
               </div>
             </section>
           )}
+
+          <section className="catalog-group">
+            <h2>How {info.name} data is verified</h2>
+            <p className="section-note">
+              Published values are tied to manufacturer-first source records whenever possible. Missing specifications remain unpublished rather than being inferred from neighboring models.
+            </p>
+            <Link className="tool-link" href="/methodology">Read our data methodology</Link>
+          </section>
 
           {brandMachines.length === 0 && <div className="notice">No model records are available for this manufacturer yet.</div>}
         </div>
