@@ -95,6 +95,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: preset.description,
     alternates: { canonical: `/compare/${preset.slug}` },
     robots: { index: true, follow: true },
+    openGraph: {
+      type: 'article',
+      title: `${preset.title} - Tractor Specs Comparison`,
+      description: preset.description,
+      url: `/compare/${preset.slug}`,
+    },
   };
 }
 
@@ -158,9 +164,46 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
     }, new Map());
 
   const interactiveHref = `/compare?${compared.map((machine, index) => `m${index + 1}=${encodeURIComponent(machine.id)}`).join('&')}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const pageUrl = `${siteUrl}/compare/${preset.slug}`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: preset.title,
+        description: preset.description,
+        isPartOf: { '@type': 'WebSite', name: 'Farm Machine Specs', url: siteUrl },
+        mainEntity: { '@id': `${pageUrl}#comparison-list` },
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${pageUrl}#comparison-list`,
+        name: preset.title,
+        numberOfItems: compared.length,
+        itemListElement: compared.map((machine, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: machine.title,
+          url: `${siteUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+          { '@type': 'ListItem', position: 2, name: 'Compare', item: `${siteUrl}/compare` },
+          { '@type': 'ListItem', position: 3, name: preset.title, item: pageUrl },
+        ],
+      },
+    ],
+  };
 
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <div className="container">
         <div className="breadcrumbs"><Link href="/">Home</Link> / <Link href="/compare">Compare</Link> / {preset.title}</div>
         <span className="eyebrow">Source-backed tractor comparison</span>
@@ -179,7 +222,7 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
         </div>
 
         {keyDifferences.length > 0 && (
-          <section className="card">
+          <section className="card compare-key-differences">
             <span className="eyebrow">Quick scan</span>
             <h2>Key differences</h2>
             <p>Largest numeric spreads among shared normalized specifications. These are descriptive comparisons, not best-or-worst ratings.</p>
