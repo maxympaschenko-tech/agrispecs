@@ -10,7 +10,7 @@ export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
-  const staticPages: MetadataRoute.Sitemap = ['', '/tractors', '/brands', '/parts', '/attachments', '/fitment-checker', '/compare'].map((path) => ({
+  const staticPages: MetadataRoute.Sitemap = ['', '/tractors', '/brands', '/parts', '/attachments', '/fitment-checker', '/compare', '/methodology'].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
   }));
