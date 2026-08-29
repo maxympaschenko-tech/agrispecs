@@ -66,6 +66,14 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
   const machines = (await getMachines()).filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
+  const machinesByBrand = Array.from(
+    machines.reduce<Map<string, typeof machines>>((map, machine) => {
+      const list = map.get(machine.brand) ?? [];
+      list.push(machine);
+      map.set(machine.brand, list);
+      return map;
+    }, new Map()),
+  );
 
   const requestedIds = [params.m1, params.m2, params.m3]
     .filter((value): value is string => Boolean(value))
@@ -128,7 +136,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
           <div className="grid">
             {comparisonPresets.map((preset) => (
               <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
-                <span className="eyebrow">Utility tractor comparison</span>
+                <span className="eyebrow">Source-backed comparison</span>
                 <h3>{preset.title}</h3>
                 <p>{preset.description}</p>
               </Link>
@@ -144,8 +152,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                 <span>{slot === 3 ? 'Optional third tractor' : `Tractor ${slot}`}</span>
                 <select name={name} defaultValue={params[name] || ''}>
                   <option value="">Choose a tractor</option>
-                  {machines.map((machine) => (
-                    <option key={machine.id} value={machine.id}>{machine.title}</option>
+                  {machinesByBrand.map(([brand, brandMachines]) => (
+                    <optgroup key={brand} label={brand}>
+                      {brandMachines.map((machine) => (
+                        <option key={machine.id} value={machine.id}>{machine.model}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </label>
@@ -216,7 +228,15 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                                       {range && spec?.valueNumber !== null && spec?.valueNumber !== undefined && (
                                         <small>{isHigh ? 'Highest numeric value' : isLow ? 'Lowest numeric value' : 'Between selected values'}</small>
                                       )}
-                                      {spec && <small>{spec.confidence === 'official' ? 'Official source' : 'High confidence'}</small>}
+                                      {spec?.sourceUrl ? (
+                                        <small>
+                                          <a href={spec.sourceUrl} target="_blank" rel="noreferrer" title={spec.sourceTitle || undefined} style={{ textDecoration: 'underline', textUnderlineOffset: 2 }}>
+                                            {spec.confidence === 'official' ? 'Official source' : 'Source'}
+                                          </a>
+                                        </small>
+                                      ) : spec ? (
+                                        <small>{spec.confidence === 'official' ? 'Official source recorded' : 'High confidence'}</small>
+                                      ) : null}
                                     </td>
                                   );
                                 })}
