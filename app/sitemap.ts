@@ -19,6 +19,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/fitment-checker',
     '/compare',
     '/methodology',
+    '/about',
+    '/editorial-policy',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
   const [machines, partNumbers, categories, attachments] = await Promise.all([
