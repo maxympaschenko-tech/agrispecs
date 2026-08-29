@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMachines, getMachineVersions, getMachineSpecs, type MachineSpec } from '@/lib/catalog-service';
+import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -120,6 +121,20 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         <span className="eyebrow">Comparison tool</span>
         <h1>Compare tractors side by side</h1>
         <p className="section-lead">Select up to three tractors. The table uses current source-backed records and normalized specification keys so equivalent fields line up across brands.</p>
+
+        <section className="catalog-group">
+          <h2>Popular source-backed comparisons</h2>
+          <p className="section-note">Permanent comparison pages use the same current database records as the interactive tool.</p>
+          <div className="grid">
+            {comparisonPresets.map((preset) => (
+              <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
+                <span className="eyebrow">Utility tractor comparison</span>
+                <h3>{preset.title}</h3>
+                <p>{preset.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <form className="compare-form" action="/compare" method="get">
           {[1, 2, 3].map((slot) => {
