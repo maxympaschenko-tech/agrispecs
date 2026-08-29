@@ -32,11 +32,26 @@ type CompareRow = {
   different: boolean;
 };
 
+type KeyDifference = {
+  key: string;
+  label: string;
+  unit: string | null;
+  minValue: number;
+  maxValue: number;
+  minTitles: string[];
+  maxTitles: string[];
+  spread: number;
+};
+
 function formatSpec(spec: MachineSpec | undefined) {
   if (!spec) return '—';
   if (spec.valueText) return spec.valueText;
   if (spec.valueNumber === null) return '—';
   return `${spec.valueNumber.toLocaleString('en-US')}${spec.unit ? ` ${spec.unit}` : ''}`;
+}
+
+function formatNumber(value: number, unit: string | null) {
+  return `${value.toLocaleString('en-US')}${unit ? ` ${unit}` : ''}`;
 }
 
 function rowIsDifferent(rows: Array<MachineSpec | undefined>) {
@@ -60,6 +75,44 @@ function numericRange(rows: Array<MachineSpec | undefined>) {
   const max = Math.max(...values);
   if (min === max) return null;
   return { min, max };
+}
+
+function getKeyDifferences(
+  entries: Array<[string, { label: string; rows: Array<MachineSpec | undefined> }]>,
+  compared: ComparedMachine[],
+) {
+  return entries
+    .map(([key, item]): KeyDifference | null => {
+      const numeric = item.rows
+        .map((spec, index) => ({ spec, title: compared[index]?.title }))
+        .filter(
+          (item): item is { spec: MachineSpec; title: string } =>
+            Boolean(item.spec && item.title && !item.spec.valueText && item.spec.valueNumber !== null),
+        );
+      if (numeric.length < 2) return null;
+
+      const units = new Set(numeric.map(({ spec }) => spec.unit || ''));
+      if (units.size !== 1) return null;
+
+      const values = numeric.map(({ spec }) => spec.valueNumber as number);
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      if (minValue === maxValue) return null;
+
+      return {
+        key,
+        label: item.label,
+        unit: numeric[0].spec.unit,
+        minValue,
+        maxValue,
+        minTitles: numeric.filter(({ spec }) => spec.valueNumber === minValue).map(({ title }) => title),
+        maxTitles: numeric.filter(({ spec }) => spec.valueNumber === maxValue).map(({ title }) => title),
+        spread: Math.abs(maxValue - minValue),
+      };
+    })
+    .filter((item): item is KeyDifference => Boolean(item))
+    .sort((a, b) => b.spread - a.spread)
+    .slice(0, 5);
 }
 
 export default async function ComparePage({ searchParams }: ComparePageProps) {
@@ -114,8 +167,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     });
   });
 
-  const sections = Array.from(specMap.entries())
-    .filter(([, item]) => item.rows.filter(Boolean).length >= Math.min(2, compared.length))
+  const sharedEntries = Array.from(specMap.entries()).filter(
+    ([, item]) => item.rows.filter(Boolean).length >= Math.min(2, compared.length),
+  );
+  const keyDifferences = getKeyDifferences(sharedEntries, compared);
+
+  const sections = sharedEntries
     .map(([key, item]) => ({ key, ...item, different: rowIsDifferent(item.rows) }))
     .filter((item) => !differencesOnly || item.different)
     .reduce<Map<string, CompareRow[]>>((map, item) => {
@@ -192,6 +249,22 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                 </div>
               ))}
             </div>
+
+            {keyDifferences.length > 0 && (
+              <section className="data-section compare-key-differences">
+                <h2>Key numeric differences</h2>
+                <p className="section-note">Largest numeric spreads among shared source-backed specifications. Higher or lower does not imply better.</p>
+                <ul>
+                  {keyDifferences.map((difference) => (
+                    <li key={difference.key}>
+                      <strong>{difference.label}:</strong>{' '}
+                      {difference.minTitles.join(' / ')} {formatNumber(difference.minValue, difference.unit)} vs{' '}
+                      {difference.maxTitles.join(' / ')} {formatNumber(difference.maxValue, difference.unit)}.
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {sections.size === 0 ? (
               <div className="notice">
