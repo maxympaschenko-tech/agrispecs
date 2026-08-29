@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/brands' },
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export default async function BrandsPage() {
   const [brands, machines] = await Promise.all([getBrands(), getMachines()]);
   const publishableCounts = new Map<string,number>();
@@ -21,9 +25,51 @@ export default async function BrandsPage() {
   }
 
   const publishableBrands = brands.filter((brand) => (publishableCounts.get(brand.slug) || 0) > 0);
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/brands`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: 'Farm Equipment Brands',
+        description: 'Browse agricultural equipment manufacturers with source-backed model specifications, maintenance, parts and compatibility references.',
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#items` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Brands', item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        numberOfItems: publishableBrands.length,
+        itemListElement: publishableBrands.map((brand, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `${baseUrl}/brands/${brand.slug}`,
+          name: brand.name,
+        })),
+      },
+    ],
+  };
 
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <span className="eyebrow">Manufacturers</span>
         <h1>Farm equipment brands</h1>
