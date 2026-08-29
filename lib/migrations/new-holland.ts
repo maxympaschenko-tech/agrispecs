@@ -15,6 +15,7 @@ import { newHollandGenesisT8CurrentSpecsMigration } from '@/lib/migrations/20260
 import { newHollandT9CurrentSpecsMigration } from '@/lib/migrations/20260829_286_new_holland_t9_current_specs';
 import { newHollandTS6SeriesIICurrentSpecsMigration } from '@/lib/migrations/20260829_287_new_holland_ts6_series_ii_current_specs';
 import { newHollandWorkmasterPlusCurrentSpecsMigration } from '@/lib/migrations/20260829_288_new_holland_workmaster_plus_current_specs';
+import { newHollandWorkmaster5575CurrentSpecsMigration } from '@/lib/migrations/20260829_291_new_holland_workmaster_55_75_current_specs';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -33,4 +34,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandT9CurrentSpecsMigration,
   newHollandTS6SeriesIICurrentSpecsMigration,
   newHollandWorkmasterPlusCurrentSpecsMigration,
+  newHollandWorkmaster5575CurrentSpecsMigration,
 ];
