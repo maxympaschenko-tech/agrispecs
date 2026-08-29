@@ -40,8 +40,10 @@ function formatSpec(spec: MachineSpec | undefined) {
 }
 
 function rowIsDifferent(rows: Array<MachineSpec | undefined>) {
-  const values = rows.map(formatSpec);
-  return new Set(values).size > 1;
+  const values = rows
+    .filter((spec): spec is MachineSpec => Boolean(spec))
+    .map((spec) => formatSpec(spec));
+  return values.length >= 2 && new Set(values).size > 1;
 }
 
 function numericRange(rows: Array<MachineSpec | undefined>) {
