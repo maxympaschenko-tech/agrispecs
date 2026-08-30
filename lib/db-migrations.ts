@@ -65,6 +65,7 @@ import { kiotiMigrations } from '@/lib/migrations/kioti';
 import { yanmarMigrations } from '@/lib/migrations/yanmar';
 import { bobcatMigrations } from '@/lib/migrations/bobcat';
 import { lsTractorMigrations } from '@/lib/migrations/ls-tractor';
+import { tymMigrations } from '@/lib/migrations/tym';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -139,6 +140,7 @@ const migrations: DbMigration[] = [
   ...yanmarMigrations,
   ...bobcatMigrations,
   ...lsTractorMigrations,
+  ...tymMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
