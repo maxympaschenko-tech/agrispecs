@@ -5,7 +5,6 @@ type IdRow = RowDataPacket & { id: number };
 type Seed = {
   slug: string;
   name: string;
-  groupUrl: string;
   grossHp: number;
   ptoHp: number;
   transmission: string;
@@ -18,10 +17,10 @@ const SERIES_URL = 'https://lstractorusa.com/series/MT3E/';
 const BROCHURE_URL = 'https://lstractorusa.com/wp-content/uploads/2025/10/LS-Tractor-Brochure_MT3E_Update_v7.pdf';
 
 const models: Seed[] = [
-  { slug: 'mt345e', name: 'MT345E', groupUrl: 'https://lstractorusa.com/tractor/mt345e-he/', grossHp: 45, ptoHp: 38.2, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3724 },
-  { slug: 'mt345he', name: 'MT345HE', groupUrl: 'https://lstractorusa.com/tractor/mt345e-he/', grossHp: 45, ptoHp: 36.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
-  { slug: 'mt355e', name: 'MT355E', groupUrl: 'https://lstractorusa.com/tractor/mt355e-he/', grossHp: 55, ptoHp: 46.7, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3750 },
-  { slug: 'mt355he', name: 'MT355HE', groupUrl: 'https://lstractorusa.com/tractor/mt355e-he/', grossHp: 55, ptoHp: 44.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
+  { slug: 'mt345e', name: 'MT345E', grossHp: 45, ptoHp: 38.2, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3724 },
+  { slug: 'mt345he', name: 'MT345HE', grossHp: 45, ptoHp: 36.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
+  { slug: 'mt355e', name: 'MT355E', grossHp: 55, ptoHp: 46.7, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3750 },
+  { slug: 'mt355he', name: 'MT355HE', grossHp: 55, ptoHp: 44.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
 ];
 
 const definitions: Array<[string, string, string, string, string | null, number]> = [
@@ -79,7 +78,7 @@ async function put(c: Parameters<DbMigration['apply']>[0], machineId: number, ve
     `INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence)
      VALUES(?,?,?,?,?,?,?,'official')
      ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`,
-    [machineId, versionId, definitionId, sourceRecordId, typeof value === 'string' ? value : null, typeof value === 'number' ? value : null, unit],
+    [machineId, versionId, definitionId, typeof value === 'string' ? value : null, typeof value === 'number' ? value : null, unit, sourceRecordId],
   );
 }
 
