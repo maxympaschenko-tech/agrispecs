@@ -6,6 +6,7 @@ import { kiotiCsLoadersMigration } from '@/lib/migrations/20260830_333_kioti_cs_
 import { kiotiCx2510CurrentUsMigration } from '@/lib/migrations/20260830_334_kioti_cx2510_current_us';
 import { kiotiCx2510LoadersMigration } from '@/lib/migrations/20260830_335_kioti_cx2510_loaders';
 import { kiotiDkCurrentUsMigration } from '@/lib/migrations/20260830_336_kioti_dk_current_us';
+import { kiotiDkLoadersMigration } from '@/lib/migrations/20260830_337_kioti_dk_loaders';
 
 export const kiotiMigrations: DbMigration[] = [
   kiotiCk20CurrentUsMigration,
@@ -15,4 +16,5 @@ export const kiotiMigrations: DbMigration[] = [
   kiotiCx2510CurrentUsMigration,
   kiotiCx2510LoadersMigration,
   kiotiDkCurrentUsMigration,
+  kiotiDkLoadersMigration,
 ];
