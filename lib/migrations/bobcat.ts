@@ -5,6 +5,7 @@ import { bobcat5000CurrentUsMigration } from '@/lib/migrations/20260830_362_bobc
 import { bobcat1000CurrentUsMigration } from '@/lib/migrations/20260830_363_bobcat_1000_current_us';
 import { bobcatLoadersCurrentUsMigration } from '@/lib/migrations/20260830_364_bobcat_loaders_current_us';
 import { bobcat40005000MaintenanceKitsMigration } from '@/lib/migrations/20260830_365_bobcat_4000_5000_maintenance_kits';
+import { bobcat1000MaintenanceKitsMigration } from '@/lib/migrations/20260830_366_bobcat_1000_maintenance_kits';
 
 export const bobcatMigrations: DbMigration[] = [
   bobcat2000CurrentUsMigration,
@@ -13,4 +14,5 @@ export const bobcatMigrations: DbMigration[] = [
   bobcat1000CurrentUsMigration,
   bobcatLoadersCurrentUsMigration,
   bobcat40005000MaintenanceKitsMigration,
+  bobcat1000MaintenanceKitsMigration,
 ];
