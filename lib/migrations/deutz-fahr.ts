@@ -5,6 +5,7 @@ import { deutzFahr5SeriesCurrentUsMigration } from '@/lib/migrations/20260830_41
 import { deutzFahr5SeriesLoaderMigration } from '@/lib/migrations/20260830_416_deutz_fahr_5_series_loader';
 import { deutzFahr5gTbCurrentUsMigration } from '@/lib/migrations/20260830_417_deutz_fahr_5g_tb_current_us';
 import { deutzFahr3060CurrentUsMigration } from '@/lib/migrations/20260830_418_deutz_fahr_3_series_3060_current_us';
+import { deutzFahr6Series4cCurrentUsMigration } from '@/lib/migrations/20260830_419_deutz_fahr_6_series_4c_current_us';
 
 export const deutzFahrMigrations: DbMigration[] = [
   deutzFahr4SeriesCurrentUsMigration,
@@ -13,4 +14,5 @@ export const deutzFahrMigrations: DbMigration[] = [
   deutzFahr5SeriesLoaderMigration,
   deutzFahr5gTbCurrentUsMigration,
   deutzFahr3060CurrentUsMigration,
+  deutzFahr6Series4cCurrentUsMigration,
 ];
