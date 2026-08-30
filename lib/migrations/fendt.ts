@@ -6,6 +6,7 @@ import { fendt300VarioGen4CurrentUsMigration } from '@/lib/migrations/20260829_3
 import { fendt800VarioGen5CurrentUsMigration } from '@/lib/migrations/20260829_314_fendt_800_vario_gen5_current_us';
 import { fendt1100VarioMtCurrentUsMigration } from '@/lib/migrations/20260830_315_fendt_1100_vario_mt_current_us';
 import { fendt900VarioGen7CurrentUsMigration } from '@/lib/migrations/20260830_316_fendt_900_vario_gen7_current_us';
+import { fendt200VarioCurrentUsMigration } from '@/lib/migrations/20260830_317_fendt_200_vario_current_us';
 
 export const fendtMigrations: DbMigration[] = [
   fendtCurrentUsCoreMigration,
@@ -15,4 +16,5 @@ export const fendtMigrations: DbMigration[] = [
   fendt800VarioGen5CurrentUsMigration,
   fendt1100VarioMtCurrentUsMigration,
   fendt900VarioGen7CurrentUsMigration,
+  fendt200VarioCurrentUsMigration,
 ];
