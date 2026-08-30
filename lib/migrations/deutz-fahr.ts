@@ -10,6 +10,8 @@ import { deutzFahr6Series6cCurrentUsMigration } from '@/lib/migrations/20260830_
 import { deutzFahr7250TtvCurrentUsMigration } from '@/lib/migrations/20260830_421_deutz_fahr_7250_ttv_current_us';
 import { deutzFahr8280TtvCurrentUsMigration } from '@/lib/migrations/20260830_422_deutz_fahr_8280_ttv_current_us';
 import { deutzFahr9340TtvCurrentUsMigration } from '@/lib/migrations/20260830_423_deutz_fahr_9340_ttv_current_us';
+import { deutzFahr5dFvCurrentUsMigration } from '@/lib/migrations/20260830_424_deutz_fahr_5d_fv_current_us';
+import { deutzFahr80fKeylineCurrentUsMigration } from '@/lib/migrations/20260830_425_deutz_fahr_80f_keyline_current_us';
 
 export const deutzFahrMigrations: DbMigration[] = [
   deutzFahr4SeriesCurrentUsMigration,
@@ -23,4 +25,6 @@ export const deutzFahrMigrations: DbMigration[] = [
   deutzFahr7250TtvCurrentUsMigration,
   deutzFahr8280TtvCurrentUsMigration,
   deutzFahr9340TtvCurrentUsMigration,
+  deutzFahr5dFvCurrentUsMigration,
+  deutzFahr80fKeylineCurrentUsMigration,
 ];
