@@ -19,7 +19,7 @@ const BROCHURE_URL = 'https://lstractorusa.com/wp-content/uploads/2025/10/LS-Tra
 const models: Seed[] = [
   { slug: 'mt345e', name: 'MT345E', grossHp: 45, ptoHp: 38.2, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3724 },
   { slug: 'mt345he', name: 'MT345HE', grossHp: 45, ptoHp: 36.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
-  { slug: 'mt355e', name: 'MT355E', grossHp: 55, ptoHp: 46.7, transmission: 'Synchro Shuttle / Constant Mesh', speeds: 'F8 x R8', weightLb: 3750 },
+  { slug: 'mt355e', name: 'MT355E', grossHp: 55, ptoHp: 46.7, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
   { slug: 'mt355he', name: 'MT355HE', grossHp: 55, ptoHp: 44.0, transmission: 'HST', speeds: '3 ranges', weightLb: 3750 },
 ];
 
@@ -113,8 +113,11 @@ export const lsTractorMt3eCurrentUsMigration: DbMigration = {
         displacement: '114.7 cu in stored as 1.88 L',
         fuelTank: '13.7 US gal stored as 51.9 L',
       },
-      sourceConflict: 'The current MT3E brochure publishes CAT I for the 3-point hitch, while current MT345E/HE and MT355E/HE web pages display CAT 2. This migration follows the model-specific brochure table and preserves the conflict here rather than silently reconciling it.',
-      transmissionPolicy: 'The brochure separates E gear and HE hydrostatic configurations by model column; PTO values and transmission values are stored per those four columns.',
+      sourceConflicts: [
+        'The current MT3E brochure publishes CAT I for the 3-point hitch, while current MT345E/HE and MT355E/HE web pages display CAT 2. The normalized spec follows the current model-specific brochure and preserves this conflict here.',
+        'The current MT3E brochure lists MT355E at 3,750 lb while the current grouped MT355E/HE web page currently renders 3,724 lb as its single weight value. The model-column brochure value is retained for MT355E.',
+      ],
+      transmissionPolicy: 'The current brochure table renders MT345E as Synchro Shuttle/Constant Mesh F8 x R8 and MT345HE, MT355E, and MT355HE as HST 3 ranges. Values are stored exactly by those current brochure columns.',
     });
 
     for (const group of [
@@ -174,7 +177,7 @@ export const lsTractorMt3eCurrentUsMigration: DbMigration = {
         ['hydraulics.main_pump_capacity', 8.2, 'gpm'],
         ['hydraulics.power_steering_pump_capacity', 4.8, 'gpm'],
         ['hydraulics.total_flow', 13.0, 'gpm'],
-        ['hitch.category', 'Category I (current MT3E brochure; current web model pages display CAT 2)', null],
+        ['hitch.category', 'Category I', null],
         ['hitch.lift_capacity', 2910, 'lb'],
         ['hydraulics.remote_valves', '2 pairs front; 1 or 2 pairs rear optional', null],
         ['capacities.fuel_tank', 51.9, 'L'],
