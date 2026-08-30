@@ -5,6 +5,7 @@ import { tymSeries1Series2AttachmentsMigration } from '@/lib/migrations/20260830
 import { tymSeries3CoreCurrentUsMigration } from '@/lib/migrations/20260830_401_tym_series3_15_platform_current_us';
 import { tymSeries3T3025T3035CurrentUsMigration } from '@/lib/migrations/20260830_402_tym_series3_t3025_t3035_current_us';
 import { tymSeries3T394T474CurrentUsMigration } from '@/lib/migrations/20260830_403_tym_series3_t394_t474_current_us';
+import { tymSeries3AttachmentsMigration } from '@/lib/migrations/20260830_404_tym_series3_attachments';
 
 export const tymMigrations: DbMigration[] = [
   tymSeries1CurrentUsMigration,
@@ -13,4 +14,5 @@ export const tymMigrations: DbMigration[] = [
   tymSeries3CoreCurrentUsMigration,
   tymSeries3T3025T3035CurrentUsMigration,
   tymSeries3T394T474CurrentUsMigration,
+  tymSeries3AttachmentsMigration,
 ];
