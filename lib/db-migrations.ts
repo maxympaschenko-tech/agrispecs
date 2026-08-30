@@ -68,6 +68,7 @@ import { lsTractorMigrations } from '@/lib/migrations/ls-tractor';
 import { tymMigrations } from '@/lib/migrations/tym';
 import { deutzFahrMigrations } from '@/lib/migrations/deutz-fahr';
 import { claasMigrations } from '@/lib/migrations/claas';
+import { versatileMigrations } from '@/lib/migrations/versatile';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -145,6 +146,7 @@ const migrations: DbMigration[] = [
   ...tymMigrations,
   ...deutzFahrMigrations,
   ...claasMigrations,
+  ...versatileMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
