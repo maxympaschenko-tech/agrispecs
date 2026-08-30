@@ -10,6 +10,8 @@ import { tymSeries4TwentyPlatformCurrentUsMigration } from '@/lib/migrations/202
 import { tymSeries4TymYanmarCurrentUsMigration } from '@/lib/migrations/20260830_406_tym_series4_tym_yanmar_current_us';
 import { tymSeries4T4058pCurrentUsMigration } from '@/lib/migrations/20260830_407_tym_series4_t4058p_current_us';
 import { tymSeries4AttachmentsMigration } from '@/lib/migrations/20260830_408_tym_series4_attachments';
+import { tymSeries5CurrentUsMigration } from '@/lib/migrations/20260830_409_tym_series5_current_us';
+import { tymSeries5AttachmentsMigration } from '@/lib/migrations/20260830_410_tym_series5_attachments';
 
 export const tymMigrations: DbMigration[] = [
   tymSeries1CurrentUsMigration,
@@ -23,4 +25,6 @@ export const tymMigrations: DbMigration[] = [
   tymSeries4TymYanmarCurrentUsMigration,
   tymSeries4T4058pCurrentUsMigration,
   tymSeries4AttachmentsMigration,
+  tymSeries5CurrentUsMigration,
+  tymSeries5AttachmentsMigration,
 ];
