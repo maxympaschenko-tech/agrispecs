@@ -24,6 +24,8 @@ import { lsTractorXjAttachmentsMigration } from '@/lib/migrations/20260830_391_l
 import { lsTractorPreviousMt2eRopsUsMigration } from '@/lib/migrations/20260830_392_ls_tractor_previous_mt2e_rops_us';
 import { lsTractorPreviousMt2eCabUsMigration } from '@/lib/migrations/20260830_393_ls_tractor_previous_mt2e_cab_us';
 import { lsTractorPreviousMt2eAttachmentsMigration } from '@/lib/migrations/20260830_394_ls_tractor_previous_mt2e_attachments';
+import { lsTractorPreviousMt4UsMigration } from '@/lib/migrations/20260830_395_ls_tractor_previous_mt4_us';
+import { lsTractorPreviousMt4AttachmentsMigration } from '@/lib/migrations/20260830_396_ls_tractor_previous_mt4_attachments';
 
 export const lsTractorMigrations: DbMigration[] = [
   lsTractorMt1CurrentUsMigration,
@@ -51,4 +53,6 @@ export const lsTractorMigrations: DbMigration[] = [
   lsTractorPreviousMt2eRopsUsMigration,
   lsTractorPreviousMt2eCabUsMigration,
   lsTractorPreviousMt2eAttachmentsMigration,
+  lsTractorPreviousMt4UsMigration,
+  lsTractorPreviousMt4AttachmentsMigration,
 ];
