@@ -10,6 +10,7 @@ import { lsTractorMt3eLoadersMigration } from '@/lib/migrations/20260830_377_ls_
 import { lsTractorMt3CurrentUsMigration } from '@/lib/migrations/20260830_378_ls_tractor_mt3_current_us';
 import { lsTractorMt3LowHpCurrentUsMigration } from '@/lib/migrations/20260830_379_ls_tractor_mt3_low_hp_current_us';
 import { lsTractorMt3LoadersMigration } from '@/lib/migrations/20260830_380_ls_tractor_mt3_loaders';
+import { lsTractorMt3eLoaderCorrectionMigration } from '@/lib/migrations/20260830_381_ls_tractor_mt3e_loader_correction';
 
 export const lsTractorMigrations: DbMigration[] = [
   lsTractorMt1CurrentUsMigration,
@@ -23,4 +24,5 @@ export const lsTractorMigrations: DbMigration[] = [
   lsTractorMt3CurrentUsMigration,
   lsTractorMt3LowHpCurrentUsMigration,
   lsTractorMt3LoadersMigration,
+  lsTractorMt3eLoaderCorrectionMigration,
 ];
