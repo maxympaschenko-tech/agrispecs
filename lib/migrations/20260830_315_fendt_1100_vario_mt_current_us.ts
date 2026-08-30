@@ -2,15 +2,15 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { DbMigration } from '@/lib/db-migration-types';
 
 type IdRow = RowDataPacket & { id: number };
-type Seed = { slug: string; name: string; maxHp: number; displacementL: number };
+type Seed = { slug: string; name: string; powerHp: number; powerKey: 'engine.maximum_power' | 'engine.maximum_power_with_auxiliary_boost'; displacementL: number };
 
 const VERSION = 'united-states-current-2026-08';
 const URL = 'https://www.fendt.com/us/products/tractors/fendt-1100-vario-mt';
 const models: Seed[] = [
-  { slug: '1151-vario-mt', name: '1151 Vario MT', maxHp: 511, displacementL: 15.2 },
-  { slug: '1156-vario-mt', name: '1156 Vario MT', maxHp: 564, displacementL: 15.2 },
-  { slug: '1162-vario-mt', name: '1162 Vario MT', maxHp: 618, displacementL: 15.2 },
-  { slug: '1167-vario-mt', name: '1167 Vario MT', maxHp: 673, displacementL: 16.2 },
+  { slug: '1151-vario-mt', name: '1151 Vario MT', powerHp: 511, powerKey: 'engine.maximum_power', displacementL: 15.2 },
+  { slug: '1156-vario-mt', name: '1156 Vario MT', powerHp: 564, powerKey: 'engine.maximum_power', displacementL: 15.2 },
+  { slug: '1162-vario-mt', name: '1162 Vario MT', powerHp: 618, powerKey: 'engine.maximum_power', displacementL: 15.2 },
+  { slug: '1167-vario-mt', name: '1167 Vario MT', powerHp: 673, powerKey: 'engine.maximum_power_with_auxiliary_boost', displacementL: 16.2 },
 ];
 
 async function id(c: Parameters<DbMigration['apply']>[0], q: string, p: unknown[] = []) {
@@ -59,6 +59,7 @@ export const fendt1100VarioMtCurrentUsMigration: DbMigration = {
           hydraulicMaxLMin: 440,
           hydraulicMaintenanceInterval: '2,000 hours or two years',
           wheelbaseIn: 118,
+          note: 'The US page states that the 1167 Vario MT offers up to 55 hp extra for power-demanding auxiliary consumers; 673 hp is therefore stored as boosted maximum power rather than ordinary maximum power.',
         })],
       );
       sourceRecordId = Number(inserted.insertId);
@@ -69,6 +70,7 @@ export const fendt1100VarioMtCurrentUsMigration: DbMigration = {
       ['Engine', 'engine.make', 'Engine manufacturer', 'text', null, 1],
       ['Engine', 'engine.displacement', 'Engine displacement', 'decimal', 'L', 2],
       ['Engine', 'engine.maximum_power', 'Maximum engine power', 'decimal', 'hp', 5],
+      ['Engine', 'engine.maximum_power_with_auxiliary_boost', 'Maximum power with auxiliary boost', 'decimal', 'hp', 6],
       ['Transmission', 'transmission.options', 'Transmission / drivetrain', 'text', null, 10],
       ['Hydraulics', 'hydraulics.main_pump_max_flow', 'Maximum hydraulic flow', 'decimal', 'US gal/min', 10],
       ['Hydraulics', 'hydraulics.maintenance_interval', 'Hydraulic maintenance interval', 'text', null, 30],
@@ -96,7 +98,7 @@ export const fendt1100VarioMtCurrentUsMigration: DbMigration = {
       await c.query(`UPDATE machine_versions SET is_current=FALSE WHERE machine_id=? AND slug<>?`, [machineId, VERSION]);
       await c.query(
         `INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes)
-         VALUES(?,?,'US','United States','Current Fendt 1100 Vario MT',TRUE,?,'Current US record using only values explicitly published by the linked Fendt US product page.')
+         VALUES(?,?,'US','United States','Current Fendt 1100 Vario MT',TRUE,?,'Current US record using only values explicitly published by the linked Fendt US product page. Boosted auxiliary-consumer power is kept separate from ordinary maximum power.')
          ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,
         [machineId, VERSION, sourceRecordId],
       );
@@ -105,7 +107,7 @@ export const fendt1100VarioMtCurrentUsMigration: DbMigration = {
         ['configuration.drive', 'Tracked undercarriage', null],
         ['engine.make', 'MAN', null],
         ['engine.displacement', model.displacementL, 'L'],
-        ['engine.maximum_power', model.maxHp, 'hp'],
+        [model.powerKey, model.powerHp, 'hp'],
         ['transmission.options', 'Fendt VarioDrive continuously variable drivetrain', null],
         ['hydraulics.main_pump_max_flow', 116.2, 'US gal/min'],
         ['hydraulics.maintenance_interval', '2,000 hours or two years', null],
