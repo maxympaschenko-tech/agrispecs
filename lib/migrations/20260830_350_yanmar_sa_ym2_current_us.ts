@@ -160,7 +160,7 @@ async function put(c: Parameters<DbMigration['apply']>[0], machineId: number, ve
     `INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence)
      VALUES(?,?,?,?,?,?,?,'official')
      ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`,
-    [machineId, versionId, definitionId, sourceRecordId, typeof value === 'string' ? value : null, typeof value === 'number' ? value : null, unit],
+    [machineId, versionId, definitionId, typeof value === 'string' ? value : null, typeof value === 'number' ? value : null, unit, sourceRecordId],
   );
 }
 
