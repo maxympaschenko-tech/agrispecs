@@ -283,6 +283,39 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'KIOTI', model: 'CK4040H' },
     ],
   },
+  {
+    slug: 'john-deere-5055e-vs-new-holland-workmaster-55-vs-mahindra-5155-shuttle-vs-kioti-ns6010h',
+    title: 'John Deere 5055E vs New Holland WORKMASTER 55 vs Mahindra 5155 Shuttle vs KIOTI NS6010H',
+    description: 'Compare source-backed specifications for four utility and compact-utility tractors spanning roughly 54 to 59 published horsepower. Manufacturer power labels and test standards differ, so values retain their original source definitions.',
+    machines: [
+      { brand: 'John Deere', model: '5055E' },
+      { brand: 'New Holland', model: 'WORKMASTER 55' },
+      { brand: 'Mahindra', model: '5155 Shuttle' },
+      { brand: 'KIOTI', model: 'NS6010H' },
+    ],
+  },
+  {
+    slug: 'john-deere-5065e-vs-new-holland-workmaster-65-vs-mahindra-6065-power-shuttle-vs-kioti-rx6620p',
+    title: 'John Deere 5065E vs New Holland WORKMASTER 65 vs Mahindra 6065 Power Shuttle vs KIOTI RX6620P',
+    description: 'Compare source-backed specifications for four utility tractors in the roughly 62 to 67 published horsepower range. Power terminology is kept manufacturer-specific rather than normalized into an unsupported common rating.',
+    machines: [
+      { brand: 'John Deere', model: '5065E' },
+      { brand: 'New Holland', model: 'WORKMASTER 65' },
+      { brand: 'Mahindra', model: '6065 Power Shuttle' },
+      { brand: 'KIOTI', model: 'RX6620P' },
+    ],
+  },
+  {
+    slug: 'john-deere-5075e-vs-new-holland-workmaster-75-vs-mahindra-6075-power-shuttle-vs-kioti-rx7340p',
+    title: 'John Deere 5075E vs New Holland WORKMASTER 75 vs Mahindra 6075 Power Shuttle vs KIOTI RX7340P',
+    description: 'Compare source-backed specifications for four utility tractors around the 71 to 74 published horsepower class. Manufacturer engine-power labels remain source-specific, while shared PTO, hydraulic and dimensional fields can be compared directly where normalized.',
+    machines: [
+      { brand: 'John Deere', model: '5075E' },
+      { brand: 'New Holland', model: 'WORKMASTER 75' },
+      { brand: 'Mahindra', model: '6075 Power Shuttle' },
+      { brand: 'KIOTI', model: 'RX7340P' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
