@@ -63,6 +63,7 @@ import { fendtMigrations } from '@/lib/migrations/fendt';
 import { mahindraMigrations } from '@/lib/migrations/mahindra';
 import { kiotiMigrations } from '@/lib/migrations/kioti';
 import { yanmarMigrations } from '@/lib/migrations/yanmar';
+import { bobcatMigrations } from '@/lib/migrations/bobcat';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -135,6 +136,7 @@ const migrations: DbMigration[] = [
   ...mahindraMigrations,
   ...kiotiMigrations,
   ...yanmarMigrations,
+  ...bobcatMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
