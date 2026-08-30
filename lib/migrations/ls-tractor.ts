@@ -17,6 +17,10 @@ import { lsTractorMt5CurrentUsMigration } from '@/lib/migrations/20260830_384_ls
 import { lsTractorMt5LoaderMigration } from '@/lib/migrations/20260830_385_ls_tractor_mt5_loader';
 import { lsTractorNewMt7CurrentUsMigration } from '@/lib/migrations/20260830_386_ls_tractor_new_mt7_current_us';
 import { lsTractorNewMt7LoaderMigration } from '@/lib/migrations/20260830_387_ls_tractor_new_mt7_loader';
+import { lsTractorMt2sCurrentUsMigration } from '@/lib/migrations/20260830_388_ls_tractor_mt2s_current_us';
+import { lsTractorMt2sAttachmentsMigration } from '@/lib/migrations/20260830_389_ls_tractor_mt2s_attachments';
+import { lsTractorXjCurrentUsMigration } from '@/lib/migrations/20260830_390_ls_tractor_xj_current_us';
+import { lsTractorXjAttachmentsMigration } from '@/lib/migrations/20260830_391_ls_tractor_xj_attachments';
 
 export const lsTractorMigrations: DbMigration[] = [
   lsTractorMt1CurrentUsMigration,
@@ -37,4 +41,8 @@ export const lsTractorMigrations: DbMigration[] = [
   lsTractorMt5LoaderMigration,
   lsTractorNewMt7CurrentUsMigration,
   lsTractorNewMt7LoaderMigration,
+  lsTractorMt2sCurrentUsMigration,
+  lsTractorMt2sAttachmentsMigration,
+  lsTractorXjCurrentUsMigration,
+  lsTractorXjAttachmentsMigration,
 ];
