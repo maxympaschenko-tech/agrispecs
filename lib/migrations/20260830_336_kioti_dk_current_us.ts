@@ -1,0 +1,181 @@
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { DbMigration } from '@/lib/db-migration-types';
+
+type IdRow = RowDataPacket & { id: number };
+type Seed = {
+  slug: string;
+  name: string;
+  url: string;
+  station: 'ROPS' | 'Cab';
+  engineModel: string;
+  powerHp: number;
+  transmission: string;
+  ptoPowerHp: number;
+  hydraulicPumpGpm: number;
+  hydraulicLiftLb: number;
+  hitchCategory: string;
+  hitchLiftLb: number;
+  fuelL: number;
+  lengthIn: number;
+  widthIn: number;
+  heightIn?: number;
+  wheelbaseIn: number;
+  clearanceIn: number;
+  turningRadiusFt?: number;
+  weightLb: number;
+  note?: string;
+};
+
+const VERSION = 'united-states-current-2026-08';
+const LINEUP_URL = 'https://www.kioti.com/products/tractors/dk';
+const MANUAL = 'Manual: Synchro Shuttle';
+const HST = 'Hydrostatic; 3 ranges with infinite speeds';
+
+const models: Seed[] = [
+  { slug:'dk4520', name:'DK4520', url:'https://www.kioti.com/products/tractors/dk/dk4520', station:'ROPS', engineModel:'3HT-TM4B', powerHp:44.9, transmission:MANUAL, ptoPowerHp:38.9, hydraulicPumpGpm:14.7, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:2716, fuelL:45, lengthIn:124.3, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.56, weightLb:3373 },
+  { slug:'dk5020', name:'DK5020', url:'https://www.kioti.com/products/tractors/dk/dk5020', station:'ROPS', engineModel:'3HT-TM4B', powerHp:50.3, transmission:MANUAL, ptoPowerHp:41.5, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:2716, fuelL:45, lengthIn:124.3, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.56, weightLb:3373, note:'Travel-speed count and mph rows on the current page are internally implausible, so detailed travel-speed fields are omitted.' },
+  { slug:'dk5520', name:'DK5520', url:'https://www.kioti.com/products/tractors/dk/dk5520', station:'ROPS', engineModel:'3HT-TM4B', powerHp:55, transmission:MANUAL, ptoPowerHp:45.6, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:2716, fuelL:45, lengthIn:124.8, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.56, weightLb:3373, note:'Travel-speed count and mph rows on the current page are internally implausible, so detailed travel-speed fields are omitted.' },
+  { slug:'dk4220seh', name:'DK4220SEH', url:'https://www.kioti.com/products/tractors/dk/dk4220seh', station:'ROPS', engineModel:'3H-TH4D', powerHp:39.6, transmission:HST, ptoPowerHp:29.1, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:2716, fuelL:48, lengthIn:125.5, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.95, weightLb:3523 },
+  { slug:'dk4220seh-cab', name:'DK4220SEH Cab', url:'https://www.kioti.com/products/tractors/dk/dk4220seh-cab', station:'Cab', engineModel:'3H-TH4D', powerHp:39.6, transmission:HST, ptoPowerHp:29.1, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:1500, fuelL:48, lengthIn:125.5, widthIn:62.8, heightIn:93, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.95, weightLb:4043 },
+  { slug:'dk4720seh', name:'DK4720SEH', url:'https://www.kioti.com/products/tractors/dk/dk4720seh', station:'ROPS', engineModel:'3HT-TH4C', powerHp:44.9, transmission:HST, ptoPowerHp:33.4, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:1500, fuelL:48, lengthIn:125.5, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, weightLb:3523, note:'Current US page publishes turning radius as 102.80 ft paired with 2,610 m; the malformed field is omitted.' },
+  { slug:'dk4720seh-cab', name:'DK4720SEH Cab', url:'https://www.kioti.com/products/tractors/dk/dk4720seh-cab', station:'Cab', engineModel:'3HT-TH4C', powerHp:44.9, transmission:HST, ptoPowerHp:33.4, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:1500, fuelL:48, lengthIn:125.5, widthIn:62.8, wheelbaseIn:71.3, clearanceIn:14.5, weightLb:4025, note:'Current US page publishes turning radius as 102.80 ft paired with 2,610 m and does not publish an unambiguous overall-height row; both are omitted.' },
+  { slug:'dk5320seh', name:'DK5320SEH', url:'https://www.kioti.com/products/tractors/dk/dk5320hse', station:'ROPS', engineModel:'3HT-TH4C', powerHp:50.3, transmission:HST, ptoPowerHp:39.3, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:1500, fuelL:48, lengthIn:125.5, widthIn:62.8, wheelbaseIn:71.3, clearanceIn:14.5, weightLb:3523, note:'Current US page has malformed turning-radius data and an inconsistent height pair (98.60 in with 2,458 mm); both fields are omitted. Detailed travel-speed rows are also omitted because they conflict with the other current DK HST records.' },
+  { slug:'dk5320seh-cab', name:'DK5320SEH Cab', url:'https://www.kioti.com/products/tractors/dk/dk5320hse-cab', station:'Cab', engineModel:'3HT-TH4C', powerHp:50.3, transmission:HST, ptoPowerHp:39.3, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 1', hitchLiftLb:1500, fuelL:48, lengthIn:125.5, widthIn:62.8, heightIn:93, wheelbaseIn:71.3, clearanceIn:14.5, weightLb:4025, note:'Current US page publishes turning radius as 102.80 ft paired with 2,610 m; the malformed field is omitted.' },
+  { slug:'dk6020seh', name:'DK6020SEH', url:'https://www.kioti.com/products/tractors/dk/dk6020hse', station:'ROPS', engineModel:'3HT-TH4C', powerHp:57.7, transmission:HST, ptoPowerHp:44.9, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 2', hitchLiftLb:2716, fuelL:48, lengthIn:126, widthIn:62.8, heightIn:96.8, wheelbaseIn:71.3, clearanceIn:14.5, weightLb:3523, note:'Current US page publishes turning radius as 102.80 ft paired with 2,610 m; the malformed field is omitted.' },
+  { slug:'dk6020seh-cab', name:'DK6020SEH Cab', url:'https://www.kioti.com/products/tractors/dk/dk6020hse-cab', station:'Cab', engineModel:'3HT-TH4C', powerHp:57.7, transmission:HST, ptoPowerHp:44.9, hydraulicPumpGpm:16.5, hydraulicLiftLb:2716, hitchCategory:'Category 2', hitchLiftLb:2716, fuelL:48, lengthIn:126, widthIn:62.8, heightIn:93, wheelbaseIn:71.3, clearanceIn:14.5, turningRadiusFt:8.63, weightLb:4025 },
+];
+
+const definitions: Array<[string,string,string,string,string|null,number]> = [
+  ['Machine Configuration','configuration.station','Operator station','text',null,1],
+  ['Engine','engine.model','Engine model','text',null,1],
+  ['Engine','engine.make','Engine manufacturer','text',null,2],
+  ['Engine','engine.power','Engine power','decimal','hp',4],
+  ['Engine','engine.displacement','Engine displacement','decimal','L',6],
+  ['Engine','engine.power_speed','Engine speed at published power','integer','rpm',8],
+  ['Transmission','transmission.options','Transmission','text',null,10],
+  ['PTO','pto.type','PTO type','text',null,5],
+  ['PTO','pto.power','PTO power','decimal','hp',10],
+  ['PTO','pto.speeds','PTO speeds','text',null,20],
+  ['Hydraulics','hydraulics.main_pump_flow','Hydraulic pump capacity','decimal','US gal/min',10],
+  ['Hydraulics','hydraulics.lift_capacity','Hydraulics lift capacity','decimal','lb',20],
+  ['Hydraulics','hitch.category','3-point hitch category','text',null,22],
+  ['Hydraulics','hitch.rear_max_lift_capacity','Hitch lift capacity','decimal','lb',25],
+  ['Capacities','capacities.fuel_tank','Fuel tank capacity','decimal','L',10],
+  ['Dimensions & Weight','dimensions.overall_length','Length with hitch','decimal','in',10],
+  ['Dimensions & Weight','dimensions.overall_width','Overall width','decimal','in',20],
+  ['Dimensions & Weight','dimensions.overall_height','Overall height','decimal','in',30],
+  ['Dimensions & Weight','dimensions.wheelbase','Wheelbase','decimal','in',40],
+  ['Dimensions & Weight','dimensions.ground_clearance','Ground clearance','decimal','in',50],
+  ['Dimensions & Weight','dimensions.turning_radius','Turning radius','decimal','ft',60],
+  ['Dimensions & Weight','dimensions.unladen_weight','Tractor weight','decimal','lb',70],
+];
+
+async function id(c: Parameters<DbMigration['apply']>[0], q: string, p: unknown[] = []) {
+  const [rows] = await c.query<IdRow[]>(q, p);
+  if (!rows[0]) throw new Error('KIOTI DK migration dependency missing');
+  return Number(rows[0].id);
+}
+
+async function source(c: Parameters<DbMigration['apply']>[0], sourceId: number, externalId: string, url: string, title: string, raw: unknown) {
+  const [rows] = await c.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? LIMIT 1`, [externalId]);
+  if (rows[0]) return Number(rows[0].id);
+  const [inserted] = await c.query<ResultSetHeader>(
+    `INSERT INTO source_records(source_id,url,external_id,title,raw_reference) VALUES(?,?,?,?,?)`,
+    [sourceId, url, externalId, title, JSON.stringify(raw)],
+  );
+  return Number(inserted.insertId);
+}
+
+async function put(c: Parameters<DbMigration['apply']>[0], machineId: number, versionId: number, definitionId: number, sourceRecordId: number, value: string | number, unit: string | null) {
+  await c.query(
+    `INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence)
+     VALUES(?,?,?,?,?,?,?,'official')
+     ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`,
+    [machineId, versionId, definitionId, typeof value === 'string' ? value : null, typeof value === 'number' ? value : null, unit, sourceRecordId],
+  );
+}
+
+export const kiotiDkCurrentUsMigration: DbMigration = {
+  id: '20260830_336_kioti_dk_current_us',
+  description: 'Add eleven current US KIOTI DK Series compact tractor configurations from official model-specific US pages',
+  async apply(c) {
+    const manufacturerId = await id(c, `SELECT id FROM manufacturers WHERE slug='kioti' LIMIT 1`);
+    const equipmentTypeId = await id(c, `SELECT id FROM equipment_types WHERE slug='tractor' LIMIT 1`);
+    const sourceId = await id(c, `SELECT id FROM sources WHERE name='KIOTI' AND domain='kioti.com' LIMIT 1`);
+
+    await c.query(
+      `INSERT INTO machine_series(manufacturer_id,equipment_type_id,name,slug) VALUES(?,?,'KIOTI DK Series','kioti-dk')
+       ON DUPLICATE KEY UPDATE name=VALUES(name)`,
+      [manufacturerId, equipmentTypeId],
+    );
+    const seriesId = await id(c, `SELECT id FROM machine_series WHERE manufacturer_id=? AND slug='kioti-dk' LIMIT 1`, [manufacturerId]);
+
+    await source(c, sourceId, 'kioti-dk-current-us-lineup-2026-08', LINEUP_URL, 'KIOTI US current DK Series lineup', {
+      market:'United States', captured:'2026-08-30', models:models.map((m) => ({ name:m.name, powerHp:m.powerHp, transmission:m.transmission })),
+    });
+
+    const definitionIds = new Map<string, number>();
+    for (const row of definitions) {
+      await c.query(
+        `INSERT INTO spec_definitions(section,spec_key,label,value_type,canonical_unit,display_order) VALUES(?,?,?,?,?,?)
+         ON DUPLICATE KEY UPDATE section=VALUES(section),label=VALUES(label),value_type=VALUES(value_type),canonical_unit=VALUES(canonical_unit),display_order=VALUES(display_order)`,
+        row,
+      );
+      definitionIds.set(row[1], await id(c, `SELECT id FROM spec_definitions WHERE spec_key=? LIMIT 1`, [row[1]]));
+    }
+
+    for (const model of models) {
+      const sourceRecordId = await source(c, sourceId, `kioti-${model.slug}-current-us-2026-08`, model.url, `KIOTI US ${model.name} current specifications`, {
+        market:'United States', captured:'2026-08-30', model, sourcePolicy:'Model-specific current US page; malformed or internally conflicting fields are omitted rather than corrected by inference.', note:model.note || null,
+      });
+
+      await c.query(
+        `INSERT INTO machines(manufacturer_id,equipment_type_id,series_id,model_name,slug,market_notes,data_status)
+         VALUES(?,?,?,?,?,'Current US KIOTI DK Series compact tractor','partial')
+         ON DUPLICATE KEY UPDATE series_id=VALUES(series_id),model_name=VALUES(model_name),market_notes=VALUES(market_notes),data_status=IF(data_status='verified','verified','partial')`,
+        [manufacturerId, equipmentTypeId, seriesId, model.name, model.slug],
+      );
+      const machineId = await id(c, `SELECT id FROM machines WHERE manufacturer_id=? AND slug=? LIMIT 1`, [manufacturerId, model.slug]);
+      await c.query(`UPDATE machine_versions SET is_current=FALSE WHERE machine_id=? AND slug<>?`, [machineId, VERSION]);
+      await c.query(
+        `INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes)
+         VALUES(?,?,'US','United States',?,TRUE,?,?)
+         ON DUPLICATE KEY UPDATE configuration=VALUES(configuration),is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,
+        [machineId, VERSION, `${model.station}; ${model.transmission}`, sourceRecordId, model.note || 'Current KIOTI US model-specific specification record.'],
+      );
+      const versionId = await id(c, `SELECT id FROM machine_versions WHERE machine_id=? AND slug=? LIMIT 1`, [machineId, VERSION]);
+
+      const values: Array<[string,string|number|undefined,string|null]> = [
+        ['configuration.station',model.station,null],
+        ['engine.model',model.engineModel,null],
+        ['engine.make','KIOTI',null],
+        ['engine.power',model.powerHp,'hp'],
+        ['engine.displacement',1.826,'L'],
+        ['engine.power_speed',2600,'rpm'],
+        ['transmission.options',model.transmission,null],
+        ['pto.type','Independent',null],
+        ['pto.power',model.ptoPowerHp,'hp'],
+        ['pto.speeds','Rear 540 rpm; mid 2,000 rpm',null],
+        ['hydraulics.main_pump_flow',model.hydraulicPumpGpm,'US gal/min'],
+        ['hydraulics.lift_capacity',model.hydraulicLiftLb,'lb'],
+        ['hitch.category',model.hitchCategory,null],
+        ['hitch.rear_max_lift_capacity',model.hitchLiftLb,'lb'],
+        ['capacities.fuel_tank',model.fuelL,'L'],
+        ['dimensions.overall_length',model.lengthIn,'in'],
+        ['dimensions.overall_width',model.widthIn,'in'],
+        ['dimensions.overall_height',model.heightIn,'in'],
+        ['dimensions.wheelbase',model.wheelbaseIn,'in'],
+        ['dimensions.ground_clearance',model.clearanceIn,'in'],
+        ['dimensions.turning_radius',model.turningRadiusFt,'ft'],
+        ['dimensions.unladen_weight',model.weightLb,'lb'],
+      ];
+
+      for (const [key, value, unit] of values) {
+        if (value === undefined) continue;
+        const definitionId = definitionIds.get(key);
+        if (!definitionId) throw new Error(`Missing KIOTI DK spec definition ${key}`);
+        await put(c, machineId, versionId, definitionId, sourceRecordId, value, unit);
+      }
+    }
+  },
+};
