@@ -12,6 +12,8 @@ import { tymSeries4T4058pCurrentUsMigration } from '@/lib/migrations/20260830_40
 import { tymSeries4AttachmentsMigration } from '@/lib/migrations/20260830_408_tym_series4_attachments';
 import { tymSeries5CurrentUsMigration } from '@/lib/migrations/20260830_409_tym_series5_current_us';
 import { tymSeries5AttachmentsMigration } from '@/lib/migrations/20260830_410_tym_series5_attachments';
+import { tymSeries6CurrentUsMigration } from '@/lib/migrations/20260830_411_tym_series6_current_us';
+import { tymSeries6AttachmentsMigration } from '@/lib/migrations/20260830_412_tym_series6_attachments';
 
 export const tymMigrations: DbMigration[] = [
   tymSeries1CurrentUsMigration,
@@ -27,4 +29,6 @@ export const tymMigrations: DbMigration[] = [
   tymSeries4AttachmentsMigration,
   tymSeries5CurrentUsMigration,
   tymSeries5AttachmentsMigration,
+  tymSeries6CurrentUsMigration,
+  tymSeries6AttachmentsMigration,
 ];
