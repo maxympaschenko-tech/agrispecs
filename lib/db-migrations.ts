@@ -60,6 +60,7 @@ import { newHollandMigrations } from '@/lib/migrations/new-holland';
 import { caseIHMigrations } from '@/lib/migrations/case-ih';
 import { masseyFergusonMigrations } from '@/lib/migrations/massey-ferguson';
 import { fendtMigrations } from '@/lib/migrations/fendt';
+import { mahindraMigrations } from '@/lib/migrations/mahindra';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -129,6 +130,7 @@ const migrations: DbMigration[] = [
   ...caseIHMigrations,
   ...masseyFergusonMigrations,
   ...fendtMigrations,
+  ...mahindraMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
