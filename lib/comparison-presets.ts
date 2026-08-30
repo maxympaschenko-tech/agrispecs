@@ -250,6 +250,39 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'Case IH', model: 'Magnum 355' },
     ],
   },
+  {
+    slug: 'john-deere-3025e-vs-kubota-l2502-vs-mahindra-1626-hst-vs-kioti-ck2640h',
+    title: 'John Deere 3025E vs Kubota L2502 vs Mahindra 1626 HST vs KIOTI CK2640H',
+    description: 'Compare current source-backed specifications for four compact tractors in the roughly 23 to 25 horsepower class. Published power labels differ by manufacturer, so each value keeps its original source definition.',
+    machines: [
+      { brand: 'John Deere', model: '3025E' },
+      { brand: 'Kubota', model: 'L2502' },
+      { brand: 'Mahindra', model: '1626 HST' },
+      { brand: 'KIOTI', model: 'CK2640H' },
+    ],
+  },
+  {
+    slug: 'john-deere-3038e-vs-kubota-l3902-vs-mahindra-1635-hst-vs-kioti-ck3540h',
+    title: 'John Deere 3038E vs Kubota L3902 vs Mahindra 1635 HST vs KIOTI CK3540H',
+    description: 'Compare current source-backed specifications for four compact tractors around the 35 to 38 horsepower class. Power terminology remains source-specific rather than being relabeled as a single rating standard.',
+    machines: [
+      { brand: 'John Deere', model: '3038E' },
+      { brand: 'Kubota', model: 'L3902' },
+      { brand: 'Mahindra', model: '1635 HST' },
+      { brand: 'KIOTI', model: 'CK3540H' },
+    ],
+  },
+  {
+    slug: 'john-deere-3039r-vs-kubota-l3902-vs-mahindra-1640-hst-vs-kioti-ck4040h',
+    title: 'John Deere 3039R vs Kubota L3902 vs Mahindra 1640 HST vs KIOTI CK4040H',
+    description: 'Compare current source-backed specifications for four premium and standard compact tractors around the 38 to 40 horsepower class. Engine-power labels are shown according to each official source rather than normalized into an unsupported common rating.',
+    machines: [
+      { brand: 'John Deere', model: '3039R' },
+      { brand: 'Kubota', model: 'L3902' },
+      { brand: 'Mahindra', model: '1640 HST' },
+      { brand: 'KIOTI', model: 'CK4040H' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
