@@ -37,7 +37,7 @@ import { filterPakReplacementsMigration } from '@/lib/migrations/20260827_112_fi
 import { johnDeere4SeriesFilterPakReplacementMigration } from '@/lib/migrations/20260827_113_4_series_filter_pak_replacement';
 import { ta25767SourceUrlCorrectionMigration } from '@/lib/migrations/20260827_114_ta25767_source_url_correction';
 import { partComponentsMigration } from '@/lib/migrations/20260827_115_part_components';
-import { oneSeriesFilterPakComponentsMigration } from '@/lib/migrations/20260827_116_one_series_filter_pak_components';
+import { oneSeriesFilterPakComponentsMigration } from '@/lib/migrations/20260827_116_1_series_filter_pak_components';
 import { threeEFilterPakComponentsMigration } from '@/lib/migrations/20260827_117_3e_filter_pak_components';
 import { lva21128ComponentsMigration } from '@/lib/migrations/20260827_118_lva21128_components';
 import { catalogPerformanceIndexesMigration } from '@/lib/migrations/20260827_119_catalog_performance_indexes';
