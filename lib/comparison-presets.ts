@@ -218,6 +218,38 @@ export const comparisonPresets: ComparisonPreset[] = [
       { brand: 'Case IH', model: 'Magnum 295' },
     ],
   },
+  {
+    slug: 'john-deere-6r-165-vs-fendt-616-vario-vs-case-ih-puma-165-new-vs-new-holland-all-new-t7-210',
+    title: 'John Deere 6R 165 vs Fendt 616 Vario vs Case IH Puma 165 New vs New Holland All-New T7.210',
+    description: 'Compare current source-backed specifications for four major-brand tractors around the 165 to 170 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '6R 165' },
+      { brand: 'Fendt', model: '616 Vario' },
+      { brand: 'Case IH', model: 'Puma 165 New' },
+      { brand: 'New Holland', model: 'All-New T7.210' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-290-vs-fendt-930-vario-vs-massey-ferguson-mf-8s-285-vs-case-ih-magnum-295',
+    title: 'John Deere 7R 290 vs Fendt 930 Vario vs Massey Ferguson MF 8S.285 vs Case IH Magnum 295',
+    description: 'Compare current source-backed specifications for four high-horsepower tractors around the 285 to 296 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '7R 290' },
+      { brand: 'Fendt', model: '930 Vario' },
+      { brand: 'Massey Ferguson', model: 'MF 8S.285' },
+      { brand: 'Case IH', model: 'Magnum 295' },
+    ],
+  },
+  {
+    slug: 'john-deere-7r-350-vs-fendt-936-vario-vs-case-ih-magnum-355',
+    title: 'John Deere 7R 350 vs Fendt 936 Vario vs Case IH Magnum 355',
+    description: 'Compare current source-backed specifications for three high-horsepower tractors around the 350 to 355 horsepower class.',
+    machines: [
+      { brand: 'John Deere', model: '7R 350' },
+      { brand: 'Fendt', model: '936 Vario' },
+      { brand: 'Case IH', model: 'Magnum 355' },
+    ],
+  },
 ];
 
 export function getComparisonPreset(slug: string) {
