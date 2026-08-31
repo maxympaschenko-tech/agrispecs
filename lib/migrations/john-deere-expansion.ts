@@ -33,6 +33,7 @@ import { johnDeerePlantersCurrentMigration } from '@/lib/migrations/20260831_489
 import { johnDeereF8F9ForageHarvestersCurrentMigration } from '@/lib/migrations/20260831_496_john_deere_f8_f9_forage_harvesters_current';
 import { johnDeereCottonHarvestersMy2026Migration } from '@/lib/migrations/20260831_498_john_deere_cotton_harvesters_my2026';
 import { johnDeereCSeriesAirCartsCurrentMigration } from '@/lib/migrations/20260831_514_john_deere_c_series_air_carts_current';
+import { johnDeere2230fhFieldCultivatorsCurrentMigration } from '@/lib/migrations/20260831_516_john_deere_2230fh_field_cultivators_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -69,4 +70,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeereF8F9ForageHarvestersCurrentMigration,
   johnDeereCottonHarvestersMy2026Migration,
   johnDeereCSeriesAirCartsCurrentMigration,
+  johnDeere2230fhFieldCultivatorsCurrentMigration,
 ];
