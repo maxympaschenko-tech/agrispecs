@@ -27,6 +27,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed self-propelled sprayer specifications including engine power, solution tank capacity, rinse tank, boom width, crop clearance and application-system data.',
     lead: 'Compare published self-propelled sprayer specifications from major manufacturers. Model pages keep engine power, solution and rinse tank capacity, boom configuration, crop clearance, travel and application-system data tied to the original market-specific source record.',
   },
+  planter: {
+    title: 'Planter Specs, Row Spacing and Capacity by Brand',
+    description: 'Browse source-backed planter specifications including row count, row spacing, frame type, working width, seed capacity, fertilizer capacity and transport dimensions by model and configuration.',
+    lead: 'Compare current planter configurations by manufacturer, row count and row spacing. Model pages keep frame type, working width, seed and fertilizer capacity, transport dimensions, row-unit details and tractor-power requirements tied to the exact published configuration instead of collapsing unlike planters into one record.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
