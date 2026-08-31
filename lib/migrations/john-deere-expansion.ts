@@ -38,6 +38,7 @@ import { johnDeere2660vtVerticalTillageCurrentMigration } from '@/lib/migrations
 import { johnDeereHsdHighSpeedDisksCurrentMigration } from '@/lib/migrations/20260831_520_john_deere_hsd_high_speed_disks_current';
 import { johnDeere2730CombinationRipperCurrentMigration } from '@/lib/migrations/20260831_522_john_deere_2730_combination_ripper_current';
 import { johnDeere2630SeriesTandemDisksCurrentMigration } from '@/lib/migrations/20260831_524_john_deere_2630_series_tandem_disks_current';
+import { johnDeereMtMinimumTillRippersCurrentMigration } from '@/lib/migrations/20260831_527_john_deere_mt_minimum_till_rippers_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -79,4 +80,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeereHsdHighSpeedDisksCurrentMigration,
   johnDeere2730CombinationRipperCurrentMigration,
   johnDeere2630SeriesTandemDisksCurrentMigration,
+  johnDeereMtMinimumTillRippersCurrentMigration,
 ];
