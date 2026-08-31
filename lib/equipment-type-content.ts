@@ -120,6 +120,11 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed strip-till specifications including row configurations, operating width, frame style, row-unit options, berm conditioning, transport width and current precision implement controls.',
     lead: 'Compare current strip-till systems by row count, toolbar configuration, operating width, residue management and berm conditioning. The new Nutri-Tiller 1000 Series keeps ISOBUS and in-cab row-unit controls separate from the established pull-type 955 configuration, while manufacturer unit inconsistencies are not repeated as converted values.',
   },
+  'in-line-ripper': {
+    title: 'In-Line Ripper Specs, Shank Spacing, Depth and Power',
+    description: 'Browse source-backed in-line and minimum-till ripper specifications including shank systems, spacing, maximum operating depth, field speed, residue conditions, horsepower requirements, transport data and depth control.',
+    lead: 'Compare current Case IH Ecolo-Til and John Deere MT Series in-line ripping tools without inferring unpublished configuration values from model names. Manufacturer family-table specs remain tied to family source records, while model-page details such as MT9 working width, standard count and transport width retain their separate individual source provenance.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
