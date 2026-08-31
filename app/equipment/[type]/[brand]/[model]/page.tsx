@@ -29,6 +29,7 @@ const sectionOrder = [
   'Air Cart System',
   'Tillage System',
   'Strip-Till System',
+  'Nutrient Application System',
   'Application System',
   'Bale Formation',
   'Pickup & Feeding',
