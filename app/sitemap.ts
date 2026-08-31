@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
-import { getNonTractorEquipment } from '@/lib/equipment-service';
+import { getNonTractorEquipment, getNonTractorEquipmentTypes } from '@/lib/equipment-service';
 import { getPartCategories } from '@/lib/part-category-service';
 import { getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
@@ -25,9 +25,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/editorial-policy',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
-  const [machines, equipment, partNumbers, categories, attachments] = await Promise.all([
+  const [machines, equipment, equipmentTypes, partNumbers, categories, attachments] = await Promise.all([
     getMachines(),
     getNonTractorEquipment(),
+    getNonTractorEquipmentTypes(),
     getIndexablePartNumbers(),
     getPartCategories(),
     getAttachmentCatalog(),
@@ -52,6 +53,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const machinePages: MetadataRoute.Sitemap = publishableMachines.map((machine) => ({
     url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+  }));
+
+  const equipmentTypePages: MetadataRoute.Sitemap = equipmentTypes.map((type) => ({
+    url: `${baseUrl}/equipment/${type.slug}`,
   }));
 
   const equipmentPages: MetadataRoute.Sitemap = publishableEquipment.map((machine) => ({
@@ -86,6 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...brandPages,
     ...machinePages,
+    ...equipmentTypePages,
     ...equipmentPages,
     ...comparisonPages,
     ...categoryPages,
