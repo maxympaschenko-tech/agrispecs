@@ -15,6 +15,7 @@ const sectionOrder = [
   'Machine Configuration',
   'Engine',
   'Loader Performance',
+  'Excavator Performance',
   'Cotton Harvesting System',
   'Module Builder',
   'Windrower System',
