@@ -89,6 +89,21 @@ export async function getNonTractorEquipmentByType(equipmentTypeSlug: string): P
   }
 }
 
+export async function getNonTractorEquipmentByBrand(brandSlug: string): Promise<EquipmentMachine[]> {
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
+      WHERE et.slug <> 'tractor'
+        AND mf.slug = ?
+      ORDER BY et.name ASC, m.model_name ASC
+    `, [brandSlug]);
+    return rows.map(rowToEquipment);
+  } catch (error) {
+    console.error('Unable to load non-tractor equipment by brand:', error);
+    return [];
+  }
+}
+
 export async function getEquipmentMachine(
   equipmentTypeSlug: string,
   brandSlug: string,
