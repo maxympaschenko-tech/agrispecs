@@ -135,6 +135,11 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed coulter chisel specifications including working depth, operating speed, horsepower per foot, residue management, depth control and current precision tillage technology.',
     lead: 'Compare current John Deere CC Series coulter chisels using the manufacturer’s current US tillage table. Shared CC11, CC13, CC19, CC21 and CC25 operating ranges remain family-backed, while model-number-derived dimensions or standard counts are not inferred without current individual specification rows.',
   },
+  'mulch-finisher': {
+    title: 'Mulch Finisher Specs, Working Width, Depth and Power',
+    description: 'Browse source-backed mulch finisher specifications including exact configuration width, maximum working depth, operating speed, shank spacing, horsepower per foot, leveling system and disk configuration.',
+    lead: 'Review current mulch finisher configurations using exact manufacturer product-page data. The John Deere 2330 5-Section 44 ft 3 in record keeps its 44 ft 3 in working width, 6 in maximum depth, 6–10 mph operating range, 9 in spacing and 10–14 hp/ft requirement tied to that specific current US configuration rather than treating a family-wide width range as one machine.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
