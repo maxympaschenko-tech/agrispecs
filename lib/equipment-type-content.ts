@@ -140,6 +140,11 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed mulch finisher specifications including exact configuration width, maximum working depth, operating speed, shank spacing, horsepower per foot, leveling system and disk configuration.',
     lead: 'Review current mulch finisher configurations using exact manufacturer product-page data. The John Deere 2330 5-Section 44 ft 3 in record keeps its 44 ft 3 in working width, 6 in maximum depth, 6–10 mph operating range, 9 in spacing and 10–14 hp/ft requirement tied to that specific current US configuration rather than treating a family-wide width range as one machine.',
   },
+  'fertilizer-applicator': {
+    title: 'Fertilizer Applicator Specs, Working Width and Row Units',
+    description: 'Browse source-backed fertilizer applicator specifications including working width, preplant or side-dress configuration, shank and coulter systems, depth control, fold modes, hitch capacity and precision nutrient-management features.',
+    lead: 'Compare current pull-type fertilizer applicators using manufacturer-backed US data. Nutri-Placer family features such as row-unit choices, depth control, folding systems and precision technology remain tied to a family source record, while exact 930 and 940 working widths and applicator styles retain their individual current product-page provenance. Non-US tank capacities are not copied into US records.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
