@@ -26,6 +26,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed small articulated loader specifications including horsepower or battery capacity, operating weight, standard or telescopic-reach boom and current North America configurations.',
     lead: 'Compare current small articulated loaders by powertrain, operating weight and boom configuration. Telescopic-reach TR variants remain separate machines, and electric models retain battery capacity instead of being converted into unsupported horsepower figures.',
   },
+  'large-wheel-loader': {
+    title: 'Large Wheel Loader Specs, Horsepower and Operating Weight',
+    description: 'Browse source-backed large wheel loader specifications including horsepower, operating weight and current CASE North America model data for farm and ranch material handling.',
+    lead: 'Compare current CASE G Series large wheel loaders by manufacturer-published horsepower and operating weight. The family table is kept deliberately narrow: fields that are not published consistently for all eight current models remain blank until an individual current product page is sourced.',
+  },
 };
 
 export function getEquipmentTypePageContent(type: string, typeName: string): EquipmentTypeContent {
