@@ -87,6 +87,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed rotary tedder specifications including tedding width, rotor count, rotor diameter, machine weight, transport width, drive system and minimum tractor power.',
     lead: 'Compare current rotary tedders by tedding width, rotor configuration, machine weight, transport setup and tractor-power requirement. Product-page values stay tied to the exact model, while blank manufacturer table cells remain unpublished instead of being filled from another market.',
   },
+  'air-drill': {
+    title: 'Air Drill Specs, Working Width and Row Spacing',
+    description: 'Browse source-backed air drill specifications including toolbar or working width, row and shank spacing, opener system, transport dimensions, empty weight, operating speed and seed tank configuration.',
+    lead: 'Compare current disk and hoe air drills by working width, row spacing, opener design, transport dimensions and seed-delivery configuration. Multi-width and multi-spacing machines retain the manufacturer-published configuration range instead of being collapsed into one artificial specification.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
