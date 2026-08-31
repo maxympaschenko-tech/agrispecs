@@ -52,6 +52,7 @@ import { caseIhFieldCultivatorsCurrentMigration } from '@/lib/migrations/2026083
 import { caseIhVerticalTillageCurrentMigration } from '@/lib/migrations/20260831_517_case_ih_vertical_tillage_current';
 import { caseIhSpeedTillerHighSpeedDisksCurrentMigration } from '@/lib/migrations/20260831_519_case_ih_speed_tiller_high_speed_disks_current';
 import { caseIhEcoloTiger875DiskRipperCurrentMigration } from '@/lib/migrations/20260831_521_case_ih_ecolo_tiger_875_disk_ripper_current';
+import { caseIhTrueTandemDiskHarrowsCurrentMigration } from '@/lib/migrations/20260831_523_case_ih_true_tandem_disk_harrows_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -87,4 +88,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIhVerticalTillageCurrentMigration,
   caseIhSpeedTillerHighSpeedDisksCurrentMigration,
   caseIhEcoloTiger875DiskRipperCurrentMigration,
+  caseIhTrueTandemDiskHarrowsCurrentMigration,
 ];
