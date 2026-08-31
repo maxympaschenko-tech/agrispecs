@@ -58,6 +58,7 @@ import { kubotaMigrations } from '@/lib/migrations/kubota';
 import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expansion';
 import { newHollandMigrations } from '@/lib/migrations/new-holland';
 import { caseIHMigrations } from '@/lib/migrations/case-ih';
+import { caseConstructionMigrations } from '@/lib/migrations/case-construction';
 import { masseyFergusonMigrations } from '@/lib/migrations/massey-ferguson';
 import { fendtMigrations } from '@/lib/migrations/fendt';
 import { mahindraMigrations } from '@/lib/migrations/mahindra';
@@ -145,6 +146,7 @@ const migrations: DbMigration[] = [
   ...johnDeereExpansionMigrations,
   ...newHollandMigrations,
   ...caseIHMigrations,
+  ...caseConstructionMigrations,
   ...masseyFergusonMigrations,
   ...fendtMigrations,
   ...mahindraMigrations,
