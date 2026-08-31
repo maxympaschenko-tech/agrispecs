@@ -115,6 +115,11 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed tandem disk specifications including working width, working depth, blade size and spacing, weight per blade, operating speed, residue conditions, horsepower requirements and depth control.',
     lead: 'Compare current Case IH True-Tandem and John Deere 2630 Series tandem disks using manufacturer-backed blade, depth, speed and power data. Configuration ranges remain ranges instead of being expanded into artificial model pages, and conflicting unit conversions are omitted when the manufacturer source itself is inconsistent.',
   },
+  'strip-till': {
+    title: 'Strip-Till Specs, Rows, Working Width and Row Units',
+    description: 'Browse source-backed strip-till specifications including row configurations, operating width, frame style, row-unit options, berm conditioning, transport width and current precision implement controls.',
+    lead: 'Compare current strip-till systems by row count, toolbar configuration, operating width, residue management and berm conditioning. The new Nutri-Tiller 1000 Series keeps ISOBUS and in-cab row-unit controls separate from the established pull-type 955 configuration, while manufacturer unit inconsistencies are not repeated as converted values.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
