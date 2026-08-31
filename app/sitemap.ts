@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
+import { getNonTractorEquipment } from '@/lib/equipment-service';
 import { getPartCategories } from '@/lib/part-category-service';
 import { getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
@@ -13,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     '',
     '/tractors',
+    '/equipment',
     '/brands',
     '/parts',
     '/attachments',
@@ -23,14 +25,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/editorial-policy',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
-  const [machines, partNumbers, categories, attachments] = await Promise.all([
+  const [machines, equipment, partNumbers, categories, attachments] = await Promise.all([
     getMachines(),
+    getNonTractorEquipment(),
     getIndexablePartNumbers(),
     getPartCategories(),
     getAttachmentCatalog(),
   ]);
 
   const publishableMachines = machines.filter(
+    (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
+  );
+  const publishableEquipment = equipment.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
 
@@ -46,6 +52,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const machinePages: MetadataRoute.Sitemap = publishableMachines.map((machine) => ({
     url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+  }));
+
+  const equipmentPages: MetadataRoute.Sitemap = publishableEquipment.map((machine) => ({
+    url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
   }));
 
   const comparisonPages: MetadataRoute.Sitemap = comparisonPresets
@@ -76,6 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...brandPages,
     ...machinePages,
+    ...equipmentPages,
     ...comparisonPages,
     ...categoryPages,
     ...partPages,
