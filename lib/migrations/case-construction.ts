@@ -4,6 +4,7 @@ import { caseBSeriesCompactTrackLoadersCurrentMigration } from '@/lib/migrations
 import { caseCompactWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_539_case_compact_wheel_loaders_current';
 import { caseSmallArticulatedLoadersCurrentMigration } from '@/lib/migrations/20260831_540_case_small_articulated_loaders_current';
 import { caseLargeWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_541_case_large_wheel_loaders_current';
+import { caseRoughTerrainForkliftsCurrentMigration } from '@/lib/migrations/20260831_542_case_rough_terrain_forklifts_current';
 
 export const caseConstructionMigrations: DbMigration[] = [
   caseBSeriesSkidSteersCurrentMigration,
@@ -11,4 +12,5 @@ export const caseConstructionMigrations: DbMigration[] = [
   caseCompactWheelLoadersCurrentMigration,
   caseSmallArticulatedLoadersCurrentMigration,
   caseLargeWheelLoadersCurrentMigration,
+  caseRoughTerrainForkliftsCurrentMigration,
 ];
