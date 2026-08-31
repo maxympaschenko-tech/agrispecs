@@ -7,6 +7,8 @@ import { mccormickX6CurrentUsMigration } from '@/lib/migrations/20260830_440_mcc
 import { mccormickX5CurrentUsMigration } from '@/lib/migrations/20260830_441_mccormick_x5_current_us';
 import { mccormickX4CurrentUsMigration } from '@/lib/migrations/20260830_442_mccormick_x4_current_us';
 import { mccormickX4fCurrentUsMigration } from '@/lib/migrations/20260830_443_mccormick_x4f_current_us';
+import { mccormickX4tCurrentUsMigration } from '@/lib/migrations/20260831_444_mccormick_x4t_current_us';
+import { mccormickX1CurrentUsMigration } from '@/lib/migrations/20260831_445_mccormick_x1_current_us';
 
 export const mccormickMigrations: DbMigration[] = [
   mccormickX8CurrentUsMigration,
@@ -17,4 +19,6 @@ export const mccormickMigrations: DbMigration[] = [
   mccormickX5CurrentUsMigration,
   mccormickX4CurrentUsMigration,
   mccormickX4fCurrentUsMigration,
+  mccormickX4tCurrentUsMigration,
+  mccormickX1CurrentUsMigration,
 ];
