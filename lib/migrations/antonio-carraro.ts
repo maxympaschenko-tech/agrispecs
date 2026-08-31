@@ -5,6 +5,7 @@ import { antonioCarraroToraNaCurrentMigration } from '@/lib/migrations/20260831_
 import { antonioCarraroErgitRNaCurrentMigration } from '@/lib/migrations/20260831_474_antonio_carraro_ergit_r_na_current';
 import { antonioCarraroInfinityNaCurrentMigration } from '@/lib/migrations/20260831_475_antonio_carraro_infinity_na_current';
 import { antonioCarraroErgitSTgfNaCurrentMigration } from '@/lib/migrations/20260831_476_antonio_carraro_ergit_s_tgf_na_current';
+import { antonioCarraroMachTonyNaCurrentMigration } from '@/lib/migrations/20260831_477_antonio_carraro_mach_tony_na_current';
 
 export const antonioCarraroMigrations: DbMigration[] = [
   antonioCarraroNaFeaturedCurrentMigration,
@@ -13,4 +14,5 @@ export const antonioCarraroMigrations: DbMigration[] = [
   antonioCarraroErgitRNaCurrentMigration,
   antonioCarraroInfinityNaCurrentMigration,
   antonioCarraroErgitSTgfNaCurrentMigration,
+  antonioCarraroMachTonyNaCurrentMigration,
 ];
