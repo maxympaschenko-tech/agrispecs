@@ -67,6 +67,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed disc mower-conditioner specifications including cutting width, transport width, number of discs, cutterbar type, conditioning systems and minimum PTO power by model.',
     lead: 'Compare current side-pull and center-pivot disc mower-conditioners by cutting width, disc count, cutterbar design, conditioning options, transport width and tractor PTO requirement. Model-specific values remain separate from series-wide features, and unpublished technical-table cells are left blank instead of being inferred.',
   },
+  'wheel-rake': {
+    title: 'Wheel Rake Specs, Working Width and Wheel Count',
+    description: 'Browse source-backed wheel rake specifications including rake wheel count, maximum working width, machine weight, flotation, single-side operation and transport configuration by model.',
+    lead: 'Compare current carted wheel rakes by rake wheel count, maximum working width, machine weight, flotation and operating configuration. Standard and heavy-duty PLUS variants remain separate records when the manufacturer publishes them as distinct machines.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
