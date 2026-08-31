@@ -102,6 +102,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed field cultivator specifications including working width, frame type, shank or tine spacing, operating depth, transport dimensions, horsepower requirements and precision tillage controls.',
     lead: 'Compare current field cultivators by working width, shank system, spacing, operating depth, transport dimensions and tractor power requirements. Configuration-specific John Deere widths remain separate records, while Case IH family ranges are kept exactly as published instead of being expanded into invented individual machines.',
   },
+  'vertical-tillage': {
+    title: 'Vertical Tillage Specs, Blade Size, Gang Angle and Power',
+    description: 'Browse source-backed vertical tillage specifications including working width, blade diameter and spacing, gang angle, operating depth, field speed, transport dimensions, horsepower requirements and in-cab depth controls.',
+    lead: 'Compare current vertical tillage tools by blade system, gang angle, working width, operating depth, speed and tractor-power requirement. Adjustable-gang machines and fixed True-Tandem tools remain distinct, while precision-control features are tied to the configurations where the manufacturer actually offers them.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
