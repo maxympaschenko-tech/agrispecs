@@ -26,6 +26,7 @@ const sectionOrder = [
   'Kernel Processing',
   'Planting System',
   'Seeding System',
+  'Air Cart System',
   'Application System',
   'Bale Formation',
   'Pickup & Feeding',
