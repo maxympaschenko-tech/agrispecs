@@ -31,6 +31,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed large wheel loader specifications including horsepower, operating weight and current CASE North America model data for farm and ranch material handling.',
     lead: 'Compare current CASE G Series large wheel loaders by manufacturer-published horsepower and operating weight. The family table is kept deliberately narrow: fields that are not published consistently for all eight current models remain blank until an individual current product page is sourced.',
   },
+  'rough-terrain-forklift': {
+    title: 'Rough Terrain Forklift Specs, Lift Capacity and Mast Range',
+    description: 'Browse source-backed rough terrain forklift specifications including horsepower, lift capacity, mast range, mast tilt, side shift and road speed for current farm-relevant models.',
+    lead: 'Compare current CASE H Series rough terrain forklifts by horsepower and lift capacity, with family-level mast and travel specifications kept explicitly tied to the H Series source. The 586H and 588H remain separate machines because their rated lift capacities differ materially.',
+  },
 };
 
 export function getEquipmentTypePageContent(type: string, typeName: string): EquipmentTypeContent {
