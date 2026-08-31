@@ -25,11 +25,12 @@ import { johnDeere5MH5MLCurrentSpecsMigration } from '@/lib/migrations/20260828_
 import { johnDeere5ENCurrentSpecsMigration } from '@/lib/migrations/20260828_270_john_deere_5en_current_specs';
 import { johnDeereSpecialty5090EL6120EH6MH155CurrentSpecsMigration } from '@/lib/migrations/20260828_271_john_deere_specialty_5090el_6120eh_6mh155_current_specs';
 import { johnDeereUnitNormalizationCorrectionsMigration } from '@/lib/migrations/20260829_284_john_deere_unit_normalization_corrections';
-import { johnDeere6M120OOSCurrentCorrectionMigration } from '@/lib/migrations/20260829_289_john_deere_6m_120_oos_current_correction';
+import { johnDeere6M120OOSCurrentCorrectionMigration } from '@/lib/migrations/20260829_289_john_deere_6m_oos_current_correction';
 import { johnDeereCombinesCurrentMigration } from '@/lib/migrations/20260831_480_john_deere_combines_current';
 import { johnDeereS7800RotorSpeedCorrectionMigration } from '@/lib/migrations/20260831_481_john_deere_s7_800_rotor_speed_correction';
 import { johnDeereSprayersCurrentMigration } from '@/lib/migrations/20260831_486_john_deere_sprayers_current';
 import { johnDeerePlantersCurrentMigration } from '@/lib/migrations/20260831_489_john_deere_planters_current';
+import { johnDeereF8F9ForageHarvestersCurrentMigration } from '@/lib/migrations/20260831_496_john_deere_f8_f9_forage_harvesters_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -63,4 +64,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeereS7800RotorSpeedCorrectionMigration,
   johnDeereSprayersCurrentMigration,
   johnDeerePlantersCurrentMigration,
+  johnDeereF8F9ForageHarvestersCurrentMigration,
 ];
