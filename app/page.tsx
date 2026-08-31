@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getBrands, getMachines } from '@/lib/catalog-service';
+import { getNonTractorEquipment } from '@/lib/equipment-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Farm Machine Specs - Tractor Specs, Parts and Fitment Reference',
+  title: 'Farm Machine Specs - Equipment Specs, Parts and Fitment Reference',
   description:
-    'Source-backed tractor specifications, OEM parts, attachment fitment, maintenance references and side-by-side comparisons for farm equipment used in the United States.',
+    'Source-backed farm machine specifications, OEM parts, attachment fitment, maintenance references and model comparisons for tractors and agricultural equipment used in the United States.',
   alternates: { canonical: '/' },
 };
 
@@ -18,8 +19,15 @@ function jsonLd(value: unknown) {
 }
 
 export default async function HomePage() {
-  const [brands, machines] = await Promise.all([getBrands(), getMachines()]);
+  const [brands, machines, otherEquipment] = await Promise.all([
+    getBrands(),
+    getMachines(),
+    getNonTractorEquipment(),
+  ]);
   const publishableMachines = machines.filter(
+    (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
+  );
+  const publishableEquipment = otherEquipment.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
   const publishableBrandSlugs = new Set(publishableMachines.map((machine) => machine.brandSlug));
@@ -43,9 +51,9 @@ export default async function HomePage() {
     '@type': 'WebPage',
     '@id': `${baseUrl}/#homepage`,
     url: baseUrl,
-    name: 'Farm Machine Specs - Tractor Specs, Parts and Fitment Reference',
+    name: 'Farm Machine Specs - Equipment Specs, Parts and Fitment Reference',
     description:
-      'Source-backed tractor specifications, OEM parts, attachment fitment, maintenance references and side-by-side comparisons for farm equipment used in the United States.',
+      'Source-backed farm machine specifications, OEM parts, attachment fitment, maintenance references and model comparisons for tractors and agricultural equipment used in the United States.',
     isPartOf: {
       '@id': `${baseUrl}/#website`,
     },
@@ -54,11 +62,12 @@ export default async function HomePage() {
       name: 'Farm equipment reference sections',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Tractors', url: `${baseUrl}/tractors` },
-        { '@type': 'ListItem', position: 2, name: 'Parts', url: `${baseUrl}/parts` },
-        { '@type': 'ListItem', position: 3, name: 'Attachments', url: `${baseUrl}/attachments` },
-        { '@type': 'ListItem', position: 4, name: 'Fitment Checker', url: `${baseUrl}/fitment-checker` },
-        { '@type': 'ListItem', position: 5, name: 'Brands', url: `${baseUrl}/brands` },
-        { '@type': 'ListItem', position: 6, name: 'Compare Tractors', url: `${baseUrl}/compare` },
+        { '@type': 'ListItem', position: 2, name: 'Farm Equipment', url: `${baseUrl}/equipment` },
+        { '@type': 'ListItem', position: 3, name: 'Parts', url: `${baseUrl}/parts` },
+        { '@type': 'ListItem', position: 4, name: 'Attachments', url: `${baseUrl}/attachments` },
+        { '@type': 'ListItem', position: 5, name: 'Fitment Checker', url: `${baseUrl}/fitment-checker` },
+        { '@type': 'ListItem', position: 6, name: 'Brands', url: `${baseUrl}/brands` },
+        { '@type': 'ListItem', position: 7, name: 'Compare Tractors', url: `${baseUrl}/compare` },
       ],
     },
   };
@@ -69,9 +78,9 @@ export default async function HomePage() {
       <section className="hero">
         <div className="container">
           <span className="eyebrow">Farm equipment reference</span>
-          <h1>Find tractor specs, parts and fitment data in one place.</h1>
+          <h1>Find farm machine specs, parts and fitment data in one place.</h1>
           <p>
-            Source-backed specifications, maintenance references, OEM parts, attachment fitment and side-by-side tractor comparisons for equipment used across the United States.
+            Source-backed specifications, maintenance references, OEM parts, attachment fitment and comparisons for tractors and agricultural equipment used across the United States.
           </p>
           <form className="search-shell" action="/search">
             <input name="q" aria-label="Search equipment or part number" placeholder="Try: John Deere 5075E or an OEM part number" />
@@ -84,12 +93,12 @@ export default async function HomePage() {
         <div className="container">
           <div className="parts-stats">
             <div>
-              <strong>{publishableMachines.length.toLocaleString('en-US')}</strong>
-              <span>Published tractor models</span>
+              <strong>{(publishableMachines.length + publishableEquipment.length).toLocaleString('en-US')}</strong>
+              <span>Published machine models</span>
             </div>
             <div>
-              <strong>{publishableBrands.length.toLocaleString('en-US')}</strong>
-              <span>Manufacturers with published data</span>
+              <strong>{publishableMachines.length.toLocaleString('en-US')}</strong>
+              <span>Published tractor models</span>
             </div>
             <div>
               <strong>Official</strong>
@@ -99,10 +108,16 @@ export default async function HomePage() {
 
           <div className="grid">
             <Link className="card" href="/tractors">
-              <span className="eyebrow">Catalog</span>
+              <span className="eyebrow">Tractor catalog</span>
               <h3>Browse tractors</h3>
-              <p>Open the full tractor catalog by manufacturer and model.</p>
+              <p>Open the tractor catalog by manufacturer and model.</p>
               <span className="tool-link">Explore tractors</span>
+            </Link>
+            <Link className="card" href="/equipment">
+              <span className="eyebrow">Equipment catalog</span>
+              <h3>Browse farm equipment</h3>
+              <p>Explore transporters and additional agricultural machine categories without forcing them into the tractor catalog.</p>
+              <span className="tool-link">Explore equipment</span>
             </Link>
             <Link className="card" href="/parts">
               <span className="eyebrow">Parts reference</span>
@@ -146,7 +161,7 @@ export default async function HomePage() {
       <section className="section">
         <div className="container">
           <h2>Featured tractors across brands</h2>
-          <p className="section-lead">A cross-brand sample from the published catalog, with current specifications and supporting reference data where available.</p>
+          <p className="section-lead">A cross-brand sample from the published tractor catalog, with current specifications and supporting reference data where available.</p>
           <div className="grid">
             {featuredMachines.map((machine) => (
               <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
@@ -160,11 +175,30 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {publishableEquipment.length > 0 && (
+        <section className="section">
+          <div className="container">
+            <h2>More farm equipment</h2>
+            <p className="section-lead">Non-tractor agricultural machines keep their manufacturer-defined equipment type and dedicated URLs.</p>
+            <div className="grid">
+              {publishableEquipment.slice(0, 8).map((machine) => (
+                <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                  <span className="eyebrow">{machine.equipmentType}</span>
+                  <h3>{machine.title}</h3>
+                  <p>Source-backed {machine.equipmentType.toLowerCase()} specifications and market reference.</p>
+                </Link>
+              ))}
+            </div>
+            <Link className="tool-link" href="/equipment">View all equipment</Link>
+          </div>
+        </section>
+      )}
+
       {publishableBrands.length > 0 && (
         <section className="section">
           <div className="container">
             <h2>Manufacturers</h2>
-            <p className="section-lead">Browse manufacturers with source-backed equipment data already published.</p>
+            <p className="section-lead">Browse manufacturers with source-backed tractor data already published.</p>
             <div className="grid">
               {publishableBrands.map((brand) => (
                 <Link className="card" key={brand.slug} href={`/brands/${brand.slug}`}>
