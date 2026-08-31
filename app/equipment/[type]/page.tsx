@@ -52,6 +52,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed self-propelled forage harvester specifications including engine power, fuel capacity, header compatibility, kernel processor options, harvest automation and current US configuration data.',
     lead: 'Compare current self-propelled forage harvesters using manufacturer-backed engine, capacity, header, kernel-processing and automation data. Where a manufacturer publishes different power metrics on a family table and an individual product page, those metrics remain separately labeled instead of being silently merged.',
   },
+  'cotton-harvester': {
+    title: 'Cotton Harvester Specs: Pickers and Strippers',
+    description: 'Browse source-backed cotton harvester specifications including picker or stripper configuration, engine power, row spacing, header options, accumulator capacity, round module size and fuel capacity.',
+    lead: 'Compare cotton pickers and cotton strippers using exact US model-year data. Picker row units and stripper heads remain separately described, while engine power, fuel and DEF capacity, cotton accumulator, round module builder and wrap capacity stay tied to the manufacturer specification set for that machine.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
