@@ -41,6 +41,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed mini excavator specifications including horsepower or battery capacity, operating weight, diesel or electric powertrain and current North America model data.',
     lead: 'Compare current CASE mini excavators using the manufacturer’s North America family table. Diesel models keep published horsepower, electric CX15EV and CX25EV models keep battery capacity, and operating weights remain tied to the exact current model instead of being generalized across a size class.',
   },
+  'compact-dozer-loader': {
+    title: 'Compact Dozer Loader Specs, ROC, Drawbar Pull and Weight',
+    description: 'Browse source-backed compact dozer loader specifications including horsepower, rated operating capacity, drawbar pull, breakout force, operating weight, dozer interface and high-flow hydraulics.',
+    lead: 'Review the current CASE Minotaur DL550 using exact North America product-page data. Published greater-than values for breakout force and drawbar pull remain inequalities rather than being converted into false exact numbers, while the integrated C-frame and rated operating capacity stay attached to this specific machine.',
+  },
 };
 
 export function getEquipmentTypePageContent(type: string, typeName: string): EquipmentTypeContent {
