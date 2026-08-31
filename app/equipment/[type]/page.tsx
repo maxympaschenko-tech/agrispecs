@@ -47,6 +47,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed large square baler specifications including bale width, bale height, maximum bale length, plunger speed, feeding configuration, tying system and PTO power requirements.',
     lead: 'Compare current conventional and high-density large square balers by bale dimensions, crop-processing configuration, plunger data, tying system and tractor PTO requirements. CropCutter and high-density variants remain separate records when the manufacturer publishes them as distinct configurations.',
   },
+  'self-propelled-forage-harvester': {
+    title: 'Self-Propelled Forage Harvester Specs by Model',
+    description: 'Browse source-backed self-propelled forage harvester specifications including engine power, fuel capacity, header compatibility, kernel processor options, harvest automation and current US configuration data.',
+    lead: 'Compare current self-propelled forage harvesters using manufacturer-backed engine, capacity, header, kernel-processing and automation data. Where a manufacturer publishes different power metrics on a family table and an individual product page, those metrics remain separately labeled instead of being silently merged.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
