@@ -36,6 +36,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed rough terrain forklift specifications including horsepower, lift capacity, mast range, mast tilt, side shift and road speed for current farm-relevant models.',
     lead: 'Compare current CASE H Series rough terrain forklifts by horsepower and lift capacity, with family-level mast and travel specifications kept explicitly tied to the H Series source. The 586H and 588H remain separate machines because their rated lift capacities differ materially.',
   },
+  'mini-excavator': {
+    title: 'Mini Excavator Specs, Horsepower, Battery and Operating Weight',
+    description: 'Browse source-backed mini excavator specifications including horsepower or battery capacity, operating weight, diesel or electric powertrain and current North America model data.',
+    lead: 'Compare current CASE mini excavators using the manufacturer’s North America family table. Diesel models keep published horsepower, electric CX15EV and CX25EV models keep battery capacity, and operating weights remain tied to the exact current model instead of being generalized across a size class.',
+  },
 };
 
 export function getEquipmentTypePageContent(type: string, typeName: string): EquipmentTypeContent {
