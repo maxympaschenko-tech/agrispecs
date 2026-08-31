@@ -107,6 +107,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed vertical tillage specifications including working width, blade diameter and spacing, gang angle, operating depth, field speed, transport dimensions, horsepower requirements and in-cab depth controls.',
     lead: 'Compare current vertical tillage tools by blade system, gang angle, working width, operating depth, speed and tractor-power requirement. Adjustable-gang machines and fixed True-Tandem tools remain distinct, while precision-control features are tied to the configurations where the manufacturer actually offers them.',
   },
+  'high-speed-disk': {
+    title: 'High-Speed Disk Specs, Working Depth, Speed and Power',
+    description: 'Browse source-backed high-speed disk specifications including working depth, operating speed, disk spacing, working width, transport width, required horsepower, depth control and precision tillage technology.',
+    lead: 'Compare current high-speed disks from Case IH and John Deere by operating depth, speed, frame configuration, power requirement and precision control. Family-wide John Deere HSD values are published only where the current comparison table explicitly applies them, while exact width, disk count and recommended horsepower stay limited to individual current product pages.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
