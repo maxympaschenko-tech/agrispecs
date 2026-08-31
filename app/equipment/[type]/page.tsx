@@ -37,6 +37,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed round baler specifications including bale width, bale diameter, bale size, feeding and wrapping systems, configuration options and PTO power requirements.',
     lead: 'Compare current round balers by bale size, bale width and diameter, feeding system, wrapping system and tractor PTO requirement. Configuration-dependent power requirements stay attached to the exact manufacturer model instead of being reduced to one misleading number.',
   },
+  'small-square-baler': {
+    title: 'Small Square Baler Specs, Bale Size and PTO Power',
+    description: 'Browse source-backed small square baler specifications including bale cross section, bale length, pickup width, feeding system, tying system, plunger speed and PTO power requirements.',
+    lead: 'Compare current small square balers from major hay-equipment manufacturers. Model pages keep bale dimensions, pickup and feeding details, tying system, plunger data and tractor PTO requirements tied to the current manufacturer source and market configuration.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
