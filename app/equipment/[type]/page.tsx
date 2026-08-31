@@ -97,6 +97,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed air cart specifications including total capacity, tank configuration, metering and section control, blower and fill systems, transport dimensions, machine weight and towing configuration.',
     lead: 'Compare current commodity and air-seeding carts by capacity, tank layout, metering, section control, filling and transport configuration. New models can be listed as current when the manufacturer names them, but numerical capacities and dimensions remain unpublished until the current market source explicitly exposes those values.',
   },
+  'field-cultivator': {
+    title: 'Field Cultivator Specs, Working Width and Shank Spacing',
+    description: 'Browse source-backed field cultivator specifications including working width, frame type, shank or tine spacing, operating depth, transport dimensions, horsepower requirements and precision tillage controls.',
+    lead: 'Compare current field cultivators by working width, shank system, spacing, operating depth, transport dimensions and tractor power requirements. Configuration-specific John Deere widths remain separate records, while Case IH family ranges are kept exactly as published instead of being expanded into invented individual machines.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
