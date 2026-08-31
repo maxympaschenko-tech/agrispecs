@@ -8,7 +8,7 @@ import { newHollandWorkmaster35C40CCurrentSpecsMigration } from '@/lib/migration
 import { newHollandT4FSCurrentSpecsMigration } from '@/lib/migrations/20260829_278_new_holland_t4fs_current_specs';
 import { newHollandT4FCurrentSpecsMigration } from '@/lib/migrations/20260829_279_new_holland_t4f_current_specs';
 import { newHollandT5CurrentSpecsMigration } from '@/lib/migrations/20260829_280_new_holland_t5_current_specs';
-import { newHollandT6CurrentSpecsMigration } from '@/lib/migrations/20260829_281_new_holland_t6_current_specs';
+import { newHollandT6CurrentSpecsMigration } from '@/lib/migrations/20260829_281_new_holland_t6_180_methane_current_specs';
 import { newHollandT6180MethaneCurrentSpecsMigration } from '@/lib/migrations/20260829_282_new_holland_t6_180_methane_current_specs';
 import { newHollandT7CurrentVisibleModelsMigration } from '@/lib/migrations/20260829_283_new_holland_t7_current_visible_models';
 import { newHollandGenesisT8CurrentSpecsMigration } from '@/lib/migrations/20260829_285_new_holland_genesis_t8_current_specs';
@@ -24,6 +24,7 @@ import { newHollandT4VCurrentSpecsMigration } from '@/lib/migrations/20260829_29
 import { newHollandCRCombinesCurrentMigration } from '@/lib/migrations/20260831_483_new_holland_cr_combines_current';
 import { newHollandRoundBalersCurrentMigration } from '@/lib/migrations/20260831_491_new_holland_round_balers_current';
 import { newHollandHaylinerSmallSquareBalersCurrentMigration } from '@/lib/migrations/20260831_493_new_holland_hayliner_small_square_balers_current';
+import { newHollandLargeSquareBalersCurrentMigration } from '@/lib/migrations/20260831_495_new_holland_large_square_balers_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -51,4 +52,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandCRCombinesCurrentMigration,
   newHollandRoundBalersCurrentMigration,
   newHollandHaylinerSmallSquareBalersCurrentMigration,
+  newHollandLargeSquareBalersCurrentMigration,
 ];
