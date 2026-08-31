@@ -39,8 +39,8 @@ const TYPE_GROUPS = [
   },
   {
     name: 'Loaders & Material Handling',
-    description: 'Skid steers, track loaders, articulated and wheel loaders, plus rough-terrain forklifts.',
-    slugs: ['skid-steer-loader', 'compact-track-loader', 'compact-wheel-loader', 'small-articulated-loader', 'large-wheel-loader', 'rough-terrain-forklift'],
+    description: 'Skid steers, mini and compact track loaders, articulated and wheel loaders, plus rough-terrain forklifts.',
+    slugs: ['skid-steer-loader', 'mini-track-loader', 'compact-track-loader', 'compact-wheel-loader', 'small-articulated-loader', 'large-wheel-loader', 'rough-terrain-forklift'],
   },
   {
     name: 'Farm & Utility Equipment',
