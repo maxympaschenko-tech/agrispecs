@@ -10,6 +10,10 @@ type PageProps = {
   params: Promise<{ type: string }>;
 };
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type } = await params;
   const equipment = await getNonTractorEquipmentByType(type);
@@ -56,7 +60,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
     <main className="section">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(itemListJsonLd) }}
       />
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / {typeName}
@@ -79,7 +83,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
           return (
             <section className="catalog-group" id={`brand-${brandSlug}`} key={brandSlug}>
               <span className="eyebrow">Manufacturer</span>
-              <h2>{brandName}</h2>
+              <h2><Link href={`/brands/${brandSlug}`}>{brandName}</Link></h2>
               <p className="section-note">Published {brandName} {typeName.toLowerCase()} models with source-backed technical reference data.</p>
               <div className="grid">
                 {machines.map((machine) => (
