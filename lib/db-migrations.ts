@@ -76,6 +76,7 @@ import { jcbMigrations } from '@/lib/migrations/jcb';
 import { badBoyMigrations } from '@/lib/migrations/bad-boy';
 import { ventracMigrations } from '@/lib/migrations/ventrac';
 import { monarchTractorMigrations } from '@/lib/migrations/monarch-tractor';
+import { rkTractorsMigrations } from '@/lib/migrations/rk-tractors';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -161,6 +162,7 @@ const migrations: DbMigration[] = [
   ...badBoyMigrations,
   ...ventracMigrations,
   ...monarchTractorMigrations,
+  ...rkTractorsMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
