@@ -30,6 +30,7 @@ import { newHollandSpeedrowerPowerNormalizationMigration } from '@/lib/migration
 import { newHollandDiscbinePlusCurrentMigration } from '@/lib/migrations/20260831_502_new_holland_discbine_plus_current';
 import { newHollandProCartWheelRakesCurrentMigration } from '@/lib/migrations/20260831_505_new_holland_procart_wheel_rakes_current';
 import { newHollandProRotorRotaryRakesCurrentMigration } from '@/lib/migrations/20260831_506_new_holland_prorotor_rotary_rakes_current';
+import { newHollandProTedRotaryTeddersCurrentMigration } from '@/lib/migrations/20260831_508_new_holland_proted_rotary_tedders_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -63,4 +64,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandDiscbinePlusCurrentMigration,
   newHollandProCartWheelRakesCurrentMigration,
   newHollandProRotorRotaryRakesCurrentMigration,
+  newHollandProTedRotaryTeddersCurrentMigration,
 ];
