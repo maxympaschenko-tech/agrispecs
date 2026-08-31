@@ -14,6 +14,7 @@ type PageProps = {
 const sectionOrder = [
   'Machine Configuration',
   'Engine',
+  'Planting System',
   'Application System',
   'Travel',
   'Feeding',
