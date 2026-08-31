@@ -7,19 +7,19 @@ const overrides: Record<string, EquipmentTypeContent> = {
     lead: 'Compare current agricultural application systems without treating mounted systems as chassis specifications. Liquid and dry systems keep tank, boom, bin, pump, rate-control and compatibility data attached to the exact manufacturer system, including published source discrepancies instead of silently choosing one conflicting value.',
   },
   'skid-steer-loader': {
-    title: 'Skid Steer Loader Specs, Operating Weight and Lift Geometry',
-    description: 'Browse source-backed skid steer loader specifications including horsepower, operating weight, rated operating capacity, lift geometry, auxiliary hydraulics and current North America configurations.',
-    lead: 'Compare current farm-relevant skid steer loaders by engine power, operating weight, rated operating capacity and lift geometry. CASE B Series models remain separate current records so radial- and vertical-lift machines are not collapsed into one generic specification.',
+    title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
+    description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
+    lead: 'Compare current farm-relevant skid steer loaders from CASE and Bobcat without collapsing unlike manufacturer metrics. Bobcat Classic and Pro models retain their current 2026 designations and published horsepower/ROC, while CASE B Series keeps net-power, operating-weight and lift-geometry values tied to the source table that actually publishes them.',
   },
   'compact-track-loader': {
     title: 'Compact Track Loader Specs, Horsepower, ROC and Weight',
-    description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, track configuration and current North America model data.',
-    lead: 'Compare current compact track loaders using manufacturer-backed North America specifications. Performance values and operating dimensions remain tied to the source that publishes them, while model-specific rated operating capacity and lift geometry stay attached to the exact machine.',
+    description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, electric-system data and current North America model configurations.',
+    lead: 'Compare current CASE and Bobcat compact track loaders using manufacturer-backed North America specifications. Model-specific rated capacity and operating data remain tied to their original source, while Bobcat’s all-electric T7X keeps its ISO ROC, battery capacity and system voltage separate from diesel Classic and Pro loaders.',
   },
   'compact-wheel-loader': {
-    title: 'Compact Wheel Loader Specs, Horsepower and Operating Weight',
-    description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, powertrain and current North America model data.',
-    lead: 'Compare current CASE compact wheel loaders by powertrain, published horsepower or battery capacity and operating weight. Electric models remain electric records with manufacturer-published battery capacity rather than receiving an invented horsepower equivalent.',
+    title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
+    description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hydraulics, travel speed and current North America model data.',
+    lead: 'Compare current compact wheel loaders from CASE and Bobcat by powertrain, published power, operating weight and loader performance. Electric CASE models retain battery capacity instead of invented horsepower, while Bobcat L65/L95 use direct current model-page ROC, travel and hydraulic values; conflicting or non-current family text is not promoted into the catalog.',
   },
   'small-articulated-loader': {
     title: 'Small Articulated Loader Specs, Weight, Power and Boom Type',
@@ -28,8 +28,8 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'large-wheel-loader': {
     title: 'Large Wheel Loader Specs, Horsepower and Operating Weight',
-    description: 'Browse source-backed large wheel loader specifications including horsepower, operating weight and current CASE North America model data for farm and ranch material handling.',
-    lead: 'Compare current CASE G Series large wheel loaders by manufacturer-published horsepower and operating weight. The family table is kept deliberately narrow: fields that are not published consistently for all eight current models remain blank until an individual current product page is sourced.',
+    description: 'Browse source-backed large wheel loader specifications from current North America catalogs, including horsepower, operating weight and model-specific material-handling data where published.',
+    lead: 'Compare current CASE and Bobcat large wheel loaders using manufacturer-published horsepower and operating weight. Family-table fields remain deliberately narrow when a manufacturer does not expose the same detailed specification for every current model, so missing values are not filled from a neighboring machine.',
   },
   'rough-terrain-forklift': {
     title: 'Rough Terrain Forklift Specs, Lift Capacity and Mast Range',
