@@ -8,6 +8,7 @@ import { claasArion600Fl150LoaderMigration } from '@/lib/migrations/20260830_431
 import { claasCombinesCurrentUsMigration } from '@/lib/migrations/20260831_485_claas_combines_current_us';
 import { claasJaguarForageHarvestersCurrentUsMigration } from '@/lib/migrations/20260831_497_claas_jaguar_forage_harvesters_current_us';
 import { claasLinerRotaryRakesCurrentUsMigration } from '@/lib/migrations/20260831_507_claas_liner_rotary_rakes_current_us';
+import { claasVoltoRotaryTeddersCurrentUsMigration } from '@/lib/migrations/20260831_509_claas_volto_rotary_tedders_current_us';
 
 export const claasMigrations: DbMigration[] = [
   claasArion600CurrentUsMigration,
@@ -19,4 +20,5 @@ export const claasMigrations: DbMigration[] = [
   claasCombinesCurrentUsMigration,
   claasJaguarForageHarvestersCurrentUsMigration,
   claasLinerRotaryRakesCurrentUsMigration,
+  claasVoltoRotaryTeddersCurrentUsMigration,
 ];
