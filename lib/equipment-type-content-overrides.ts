@@ -1,0 +1,33 @@
+import { getEquipmentTypeContent, type EquipmentTypeContent } from '@/lib/equipment-type-content';
+
+const overrides: Record<string, EquipmentTypeContent> = {
+  'application-system': {
+    title: 'Agricultural Application System Specs and Capacities',
+    description: 'Browse source-backed agricultural application-system specifications including liquid tank capacity, boom width, air-boom capacity, application rate, compatible chassis and precision controls.',
+    lead: 'Compare current agricultural application systems without treating mounted systems as chassis specifications. Liquid and dry systems keep tank, boom, bin, pump, rate-control and compatibility data attached to the exact manufacturer system, including published source discrepancies instead of silently choosing one conflicting value.',
+  },
+  'skid-steer-loader': {
+    title: 'Skid Steer Loader Specs, Operating Weight and Lift Geometry',
+    description: 'Browse source-backed skid steer loader specifications including horsepower, operating weight, rated operating capacity, lift geometry, auxiliary hydraulics and current North America configurations.',
+    lead: 'Compare current farm-relevant skid steer loaders by engine power, operating weight, rated operating capacity and lift geometry. CASE B Series models remain separate current records so radial- and vertical-lift machines are not collapsed into one generic specification.',
+  },
+  'compact-track-loader': {
+    title: 'Compact Track Loader Specs, Horsepower, ROC and Weight',
+    description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, track configuration and current North America model data.',
+    lead: 'Compare current compact track loaders using manufacturer-backed North America specifications. Performance values and operating dimensions remain tied to the source that publishes them, while model-specific rated operating capacity and lift geometry stay attached to the exact machine.',
+  },
+  'compact-wheel-loader': {
+    title: 'Compact Wheel Loader Specs, Horsepower and Operating Weight',
+    description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, powertrain and current North America model data.',
+    lead: 'Compare current CASE compact wheel loaders by powertrain, published horsepower or battery capacity and operating weight. Electric models remain electric records with manufacturer-published battery capacity rather than receiving an invented horsepower equivalent.',
+  },
+  'small-articulated-loader': {
+    title: 'Small Articulated Loader Specs, Weight, Power and Boom Type',
+    description: 'Browse source-backed small articulated loader specifications including horsepower or battery capacity, operating weight, standard or telescopic-reach boom and current North America configurations.',
+    lead: 'Compare current small articulated loaders by powertrain, operating weight and boom configuration. Telescopic-reach TR variants remain separate machines, and electric models retain battery capacity instead of being converted into unsupported horsepower figures.',
+  },
+};
+
+export function getEquipmentTypePageContent(type: string, typeName: string): EquipmentTypeContent {
+  return overrides[type] || getEquipmentTypeContent(type, typeName);
+}
