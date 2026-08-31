@@ -42,6 +42,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed small square baler specifications including bale cross section, bale length, pickup width, feeding system, tying system, plunger speed and PTO power requirements.',
     lead: 'Compare current small square balers from major hay-equipment manufacturers. Model pages keep bale dimensions, pickup and feeding details, tying system, plunger data and tractor PTO requirements tied to the current manufacturer source and market configuration.',
   },
+  'large-square-baler': {
+    title: 'Large Square Baler Specs, Bale Size and PTO Power',
+    description: 'Browse source-backed large square baler specifications including bale width, bale height, maximum bale length, plunger speed, feeding configuration, tying system and PTO power requirements.',
+    lead: 'Compare current conventional and high-density large square balers by bale dimensions, crop-processing configuration, plunger data, tying system and tractor PTO requirements. CropCutter and high-density variants remain separate records when the manufacturer publishes them as distinct configurations.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
