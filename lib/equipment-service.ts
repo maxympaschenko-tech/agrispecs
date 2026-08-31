@@ -44,22 +44,25 @@ function rowToEquipment(row: EquipmentRow): EquipmentMachine {
   };
 }
 
+const equipmentSelect = `
+  SELECT
+    m.id,
+    m.model_name,
+    m.slug AS model_slug,
+    m.data_status,
+    mf.name AS manufacturer_name,
+    mf.slug AS manufacturer_slug,
+    et.name AS equipment_type_name,
+    et.slug AS equipment_type_slug
+  FROM machines m
+  INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+  INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+`;
+
 export async function getNonTractorEquipment(): Promise<EquipmentMachine[]> {
   try {
     const db = await getDbReady();
-    const [rows] = await db.query<EquipmentRow[]>(`
-      SELECT
-        m.id,
-        m.model_name,
-        m.slug AS model_slug,
-        m.data_status,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        et.name AS equipment_type_name,
-        et.slug AS equipment_type_slug
-      FROM machines m
-      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
       ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
     `);
@@ -77,19 +80,7 @@ export async function getEquipmentMachine(
 ): Promise<EquipmentMachine | undefined> {
   try {
     const db = await getDbReady();
-    const [rows] = await db.query<EquipmentRow[]>(`
-      SELECT
-        m.id,
-        m.model_name,
-        m.slug AS model_slug,
-        m.data_status,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        et.name AS equipment_type_name,
-        et.slug AS equipment_type_slug
-      FROM machines m
-      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug = ?
         AND mf.slug = ?
         AND m.slug = ?
@@ -99,6 +90,30 @@ export async function getEquipmentMachine(
   } catch (error) {
     console.error('Unable to load equipment machine:', error);
     return undefined;
+  }
+}
+
+export async function searchNonTractorEquipment(term: string): Promise<EquipmentMachine[]> {
+  const normalized = term.trim();
+  if (!normalized) return [];
+  try {
+    const db = await getDbReady();
+    const like = `%${normalized}%`;
+    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
+      WHERE et.slug <> 'tractor'
+        AND (
+          m.model_name LIKE ?
+          OR mf.name LIKE ?
+          OR et.name LIKE ?
+          OR CONCAT(mf.name, ' ', m.model_name) LIKE ?
+        )
+      ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
+      LIMIT 50
+    `, [like, like, like, like]);
+    return rows.map(rowToEquipment);
+  } catch (error) {
+    console.error('Unable to search non-tractor equipment:', error);
+    return [];
   }
 }
 
