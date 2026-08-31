@@ -92,6 +92,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed air drill specifications including toolbar or working width, row and shank spacing, opener system, transport dimensions, empty weight, operating speed and seed tank configuration.',
     lead: 'Compare current disk and hoe air drills by working width, row spacing, opener design, transport dimensions and seed-delivery configuration. Multi-width and multi-spacing machines retain the manufacturer-published configuration range instead of being collapsed into one artificial specification.',
   },
+  'air-cart': {
+    title: 'Air Cart Specs, Capacity, Tanks and Metering Systems',
+    description: 'Browse source-backed air cart specifications including total capacity, tank configuration, metering and section control, blower and fill systems, transport dimensions, machine weight and towing configuration.',
+    lead: 'Compare current commodity and air-seeding carts by capacity, tank layout, metering, section control, filling and transport configuration. New models can be listed as current when the manufacturer names them, but numerical capacities and dimensions remain unpublished until the current market source explicitly exposes those values.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
