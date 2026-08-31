@@ -57,6 +57,8 @@ import { caseIhNutriTillerStripTillCurrentMigration } from '@/lib/migrations/202
 import { caseIhEcoloTil2500InLineRipperCurrentMigration } from '@/lib/migrations/20260831_526_case_ih_ecolo_til_2500_in_line_ripper_current';
 import { caseIhFlexTill600ChiselPlowCurrentMigration } from '@/lib/migrations/20260831_529_case_ih_flex_till_600_chisel_plow_current';
 import { caseIhNutriPlacerFertilizerApplicatorsCurrentMigration } from '@/lib/migrations/20260831_533_case_ih_nutri_placer_fertilizer_applicators_current';
+import { caseIhTitanFloatersCurrentMigration } from '@/lib/migrations/20260831_534_case_ih_titan_floaters_current';
+import { caseIhTrident5550CombinationApplicatorCurrentMigration } from '@/lib/migrations/20260831_535_case_ih_trident_5550_combination_applicator_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -97,4 +99,6 @@ export const caseIHMigrations: DbMigration[] = [
   caseIhEcoloTil2500InLineRipperCurrentMigration,
   caseIhFlexTill600ChiselPlowCurrentMigration,
   caseIhNutriPlacerFertilizerApplicatorsCurrentMigration,
+  caseIhTitanFloatersCurrentMigration,
+  caseIhTrident5550CombinationApplicatorCurrentMigration,
 ];
