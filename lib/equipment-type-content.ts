@@ -110,6 +110,11 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed combination ripper specifications including maximum working depth, field speed, residue conditions, horsepower requirements, depth control and current precision technology.',
     lead: 'Review current combination ripper data using the manufacturer’s current US comparison table. Older price-book dimensions are not promoted into the current record when the live catalog no longer exposes those configuration-specific values.',
   },
+  'tandem-disk': {
+    title: 'Tandem Disk Specs, Working Depth, Blade Size and Power',
+    description: 'Browse source-backed tandem disk specifications including working width, working depth, blade size and spacing, weight per blade, operating speed, residue conditions, horsepower requirements and depth control.',
+    lead: 'Compare current Case IH True-Tandem and John Deere 2630 Series tandem disks using manufacturer-backed blade, depth, speed and power data. Configuration ranges remain ranges instead of being expanded into artificial model pages, and conflicting unit conversions are omitted when the manufacturer source itself is inconsistent.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
