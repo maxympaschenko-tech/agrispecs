@@ -28,6 +28,7 @@ const sectionOrder = [
   'Seeding System',
   'Air Cart System',
   'Tillage System',
+  'Strip-Till System',
   'Application System',
   'Bale Formation',
   'Pickup & Feeding',
