@@ -42,6 +42,7 @@ import { johnDeereMtMinimumTillRippersCurrentMigration } from '@/lib/migrations/
 import { johnDeereStStripTillCurrentMigration } from '@/lib/migrations/20260831_528_john_deere_st_strip_till_current';
 import { johnDeereChiselPlowsCurrentMigration } from '@/lib/migrations/20260831_530_john_deere_chisel_plows_current';
 import { johnDeereCcCoulterChiselsCurrentMigration } from '@/lib/migrations/20260831_531_john_deere_cc_coulter_chisels_current';
+import { johnDeere2330MulchFinisherCurrentMigration } from '@/lib/migrations/20260831_532_john_deere_2330_mulch_finisher_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -87,4 +88,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeereStStripTillCurrentMigration,
   johnDeereChiselPlowsCurrentMigration,
   johnDeereCcCoulterChiselsCurrentMigration,
+  johnDeere2330MulchFinisherCurrentMigration,
 ];
