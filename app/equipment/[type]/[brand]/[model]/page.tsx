@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getEquipmentMachine } from '@/lib/equipment-service';
+import { getEquipmentMachine, getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
 import { getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 
 export const dynamic = 'force-dynamic';
@@ -44,6 +44,10 @@ function formatSpecValue(spec: MachineSpec) {
   return `${trimNumber(value, Number.isInteger(value) ? 0 : 1)}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand, model } = await params;
   const machine = await getEquipmentMachine(type, brand, model);
@@ -62,7 +66,10 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const machine = await getEquipmentMachine(type, brand, model);
   if (!machine) notFound();
 
-  const versions = await getMachineVersions(machine.id);
+  const [versions, brandEquipment] = await Promise.all([
+    getMachineVersions(machine.id),
+    getNonTractorEquipmentByBrand(machine.brandSlug),
+  ]);
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
   const specsBySection = new Map<string, MachineSpec[]>();
@@ -82,11 +89,54 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         .map((spec) => [spec.sourceUrl as string, { url: spec.sourceUrl as string, title: spec.sourceTitle || 'Manufacturer source', publishedDate: spec.sourcePublishedDate }]),
     ).values(),
   );
+  const relatedModels = brandEquipment
+    .filter((item) =>
+      item.id !== machine.id
+      && item.equipmentTypeSlug === machine.equipmentTypeSlug
+      && (item.dataStatus === 'partial' || item.dataStatus === 'verified'),
+    )
+    .slice(0, 6);
+
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Equipment', item: `${baseUrl}/equipment` },
+          { '@type': 'ListItem', position: 3, name: machine.equipmentType, item: `${baseUrl}/equipment/${machine.equipmentTypeSlug}` },
+          { '@type': 'ListItem', position: 4, name: machine.brand, item: `${baseUrl}/brands/${machine.brandSlug}` },
+          { '@type': 'ListItem', position: 5, name: machine.model, item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'Product',
+        '@id': `${canonicalUrl}#product`,
+        url: canonicalUrl,
+        name: machine.title,
+        model: machine.model,
+        category: `${machine.equipmentType} agricultural equipment`,
+        description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed current market reference data.`,
+        brand: { '@type': 'Brand', name: machine.brand },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        additionalProperty: specs.map((spec) => ({
+          '@type': 'PropertyValue',
+          name: spec.label,
+          value: formatSpecValue(spec),
+        })),
+      },
+    ],
+  };
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
-        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / <Link href={`/equipment/${machine.equipmentTypeSlug}`}>{machine.equipmentType}</Link> / {machine.brand} / {machine.model}
+        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / <Link href={`/equipment/${machine.equipmentTypeSlug}`}>{machine.equipmentType}</Link> / <Link href={`/brands/${machine.brandSlug}`}>{machine.brand}</Link> / {machine.model}
       </div>
       <div className="container">
         <section className="machine-header">
@@ -107,6 +157,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             <strong>On this page</strong>
             {orderedSections.map((section) => <a key={section} href={`#${sectionId(section)}`}>{section}</a>)}
             {sources.length > 0 && <a href="#sources">Sources</a>}
+            {relatedModels.length > 0 && <a href="#related-models">Related models</a>}
           </aside>
           <div>
             {orderedSections.map((section) => (
@@ -141,6 +192,22 @@ export default async function EquipmentModelPage({ params }: PageProps) {
                       </span>
                       <span>Source →</span>
                     </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {relatedModels.length > 0 && (
+              <section className="data-section" id="related-models">
+                <h2>More {machine.brand} {machine.equipmentType.toLowerCase()} models</h2>
+                <p className="section-note">Continue through the same manufacturer and equipment type without leaving the source-backed catalog hierarchy.</p>
+                <div className="grid">
+                  {relatedModels.map((related) => (
+                    <Link className="card" key={related.id} href={`/equipment/${related.equipmentTypeSlug}/${related.brandSlug}/${related.modelSlug}`}>
+                      <span className="eyebrow">{related.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
+                      <h3>{related.title}</h3>
+                      <p>{related.equipmentType} specifications and current market reference.</p>
+                    </Link>
                   ))}
                 </div>
               </section>
