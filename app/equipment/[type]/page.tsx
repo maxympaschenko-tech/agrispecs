@@ -77,6 +77,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed rotary rake specifications including working width, rotor count, rotor diameter, side or center delivery, tine system and tractor PTO requirements by model.',
     lead: 'Compare current single-, dual- and four-rotor rakes by working width, rotor diameter, crop delivery and tine configuration. Business, Trend, TWIN and North American variants stay separate whenever the manufacturer publishes them as distinct configurations.',
   },
+  'rotary-tedder': {
+    title: 'Rotary Tedder Specs, Working Width, Weight and Power',
+    description: 'Browse source-backed rotary tedder specifications including tedding width, rotor count, rotor diameter, machine weight, transport width, drive system and minimum tractor power.',
+    lead: 'Compare current rotary tedders by tedding width, rotor configuration, machine weight, transport setup and tractor-power requirement. Product-page values stay tied to the exact model, while blank manufacturer table cells remain unpublished instead of being filled from another market.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
