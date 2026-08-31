@@ -10,6 +10,7 @@ import { bobcatSkidSteerLoadersCurrentMigration } from '@/lib/migrations/2026083
 import { bobcatCompactTrackLoadersCurrentMigration } from '@/lib/migrations/20260831_548_bobcat_compact_track_loaders_current';
 import { bobcatCompactWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_549_bobcat_compact_wheel_loaders_current';
 import { bobcatLargeWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_550_bobcat_large_wheel_loaders_current';
+import { bobcatMiniExcavatorsCurrentMigration } from '@/lib/migrations/20260831_551_bobcat_mini_excavators_current';
 
 export const bobcatMigrations: DbMigration[] = [
   bobcat2000CurrentUsMigration,
@@ -23,4 +24,5 @@ export const bobcatMigrations: DbMigration[] = [
   bobcatCompactTrackLoadersCurrentMigration,
   bobcatCompactWheelLoadersCurrentMigration,
   bobcatLargeWheelLoadersCurrentMigration,
+  bobcatMiniExcavatorsCurrentMigration,
 ];
