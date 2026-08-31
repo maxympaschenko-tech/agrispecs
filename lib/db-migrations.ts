@@ -18,7 +18,7 @@ import { johnDeere5ECapacityVariantsMigration } from '@/lib/migrations/20260827_
 import { johnDeere2032R2038RMaintenanceMigration } from '@/lib/migrations/20260827_094_2032r_2038r_maintenance';
 import { johnDeere3EMY22MaintenanceMigration } from '@/lib/migrations/20260827_095_3e_my22_maintenance';
 import { johnDeere3RMY24MaintenanceMigration } from '@/lib/migrations/20260827_096_3r_my24_maintenance';
-import { johnDeere3DNorthAmericaMaintenanceMigration } from '@/lib/migrations/20260827_097_3d_north_america_maintenance';
+import { johnDeere3DNorthAmericaMaintenanceMigration } from '@/lib/migrations/20260827_097_3d_north_america';
 import { johnDeere4SeriesMY24MaintenanceMigration } from '@/lib/migrations/20260827_098_4_series_my24_maintenance';
 import { johnDeere4075RMaintenanceMigration } from '@/lib/migrations/20260827_099_4075r_maintenance';
 import { johnDeere4044MFuelWaterCorrectionMigration } from '@/lib/migrations/20260827_100_4044m_fuel_water_correction';
@@ -73,6 +73,7 @@ import { mccormickMigrations } from '@/lib/migrations/mccormick';
 import { zetorMigrations } from '@/lib/migrations/zetor';
 import { solisMigrations } from '@/lib/migrations/solis';
 import { jcbMigrations } from '@/lib/migrations/jcb';
+import { badBoyMigrations } from '@/lib/migrations/bad-boy';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -155,6 +156,7 @@ const migrations: DbMigration[] = [
   ...zetorMigrations,
   ...solisMigrations,
   ...jcbMigrations,
+  ...badBoyMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
