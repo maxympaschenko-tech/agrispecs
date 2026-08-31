@@ -8,7 +8,6 @@ type Seed = {
   series: 'JAGUAR 900' | 'JAGUAR 1000';
   sourceUrl: string;
   engineModel: string;
-  cylinders: number;
   cylinderArrangement: string;
   knifeDrum: string;
   maximumHp?: number;
@@ -20,24 +19,23 @@ const JAGUAR_1000_URL = 'https://www.claas.com/en-us/agricultural-machinery/fora
 const FRONT_ATTACHMENTS_URL = 'https://www.claas.com/en-us/agricultural-machinery/forage-harvesters/front-attachments';
 
 const models: Seed[] = [
-  { slug: 'jaguar-930', model: 'JAGUAR 930', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 471 LA', cylinders: 6, cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-940', model: 'JAGUAR 940', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 471 LA', cylinders: 6, cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-950', model: 'JAGUAR 950', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 473 LA', cylinders: 6, cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-960', model: 'JAGUAR 960', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 473 LA', cylinders: 6, cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-970', model: 'JAGUAR 970', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D4276', cylinders: 6, cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-980', model: 'JAGUAR 980', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX / V-MAX' },
-  { slug: 'jaguar-990', model: 'JAGUAR 990', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX / V-MAX', maximumHp: 925 },
-  { slug: 'jaguar-1080', model: 'JAGUAR 1080', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 850 },
-  { slug: 'jaguar-1090', model: 'JAGUAR 1090', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 925 },
-  { slug: 'jaguar-1100', model: 'JAGUAR 1100', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 1020 },
-  { slug: 'jaguar-1200', model: 'JAGUAR 1200', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinders: 12, cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 1110 },
+  { slug: 'jaguar-930', model: 'JAGUAR 930', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 471 LA', cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-940', model: 'JAGUAR 940', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 471 LA', cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-950', model: 'JAGUAR 950', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 473 LA', cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-960', model: 'JAGUAR 960', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'Mercedes-Benz OM 473 LA', cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-970', model: 'JAGUAR 970', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D4276', cylinderArrangement: 'In-line engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-980', model: 'JAGUAR 980', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX / V-MAX' },
+  { slug: 'jaguar-990', model: 'JAGUAR 990', series: 'JAGUAR 900', sourceUrl: JAGUAR_900_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX / V-MAX', maximumHp: 925 },
+  { slug: 'jaguar-1080', model: 'JAGUAR 1080', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 850 },
+  { slug: 'jaguar-1090', model: 'JAGUAR 1090', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 925 },
+  { slug: 'jaguar-1100', model: 'JAGUAR 1100', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 1020 },
+  { slug: 'jaguar-1200', model: 'JAGUAR 1200', series: 'JAGUAR 1000', sourceUrl: JAGUAR_1000_URL, engineModel: 'MAN D2862', cylinderArrangement: 'V-engine', knifeDrum: 'V-FLEX', maximumHp: 1110 },
 ];
 
 const defs: Array<[string, string, string, string, string | null, number]> = [
   ['Machine Configuration', 'configuration.type', 'Machine configuration', 'text', null, 1],
   ['Machine Configuration', 'configuration.market_scope', 'Official market scope', 'text', null, 2],
   ['Engine', 'engine.model', 'Engine model', 'text', null, 5],
-  ['Engine', 'engine.cylinders', 'Cylinders', 'integer', null, 15],
   ['Engine', 'engine.cylinder_arrangement', 'Cylinder arrangement', 'text', null, 20],
   ['Engine', 'engine.ece_r120_max_power', 'Maximum output (ECE R 120)', 'decimal', 'hp', 30],
   ['Harvesting System', 'forage.knife_drum_type', 'Knife drum type', 'text', null, 10],
@@ -80,7 +78,7 @@ async function sourceRecord(connection: Parameters<DbMigration['apply']>[0], sou
         market: 'United States',
         equipmentType: 'Self-Propelled Forage Harvester',
         frontAttachmentsSource: FRONT_ATTACHMENTS_URL,
-        note: 'JAGUAR 900 maximum-output values are left unpublished except where the current CLAAS US page explicitly states the value. Model identity, engine type, cylinder arrangement and knife-drum data come from the current US JAGUAR 900 specification table.',
+        note: 'JAGUAR 900 maximum-output values are left unpublished except where the current CLAAS US page explicitly states the value. Model identity, engine type, cylinder arrangement and knife-drum data come from the current US JAGUAR 900 specification table. Cylinder counts are intentionally not inferred from engine-family knowledge.',
         ...model,
       }),
     ],
@@ -174,7 +172,6 @@ export const claasJaguarForageHarvestersCurrentUsMigration: DbMigration = {
       await put(connection, machineId, versionId, def('configuration.type'), sourceRecordId, 'Self-propelled forage harvester');
       await put(connection, machineId, versionId, def('configuration.market_scope'), sourceRecordId, 'United States current catalog');
       await put(connection, machineId, versionId, def('engine.model'), sourceRecordId, model.engineModel);
-      await put(connection, machineId, versionId, def('engine.cylinders'), sourceRecordId, model.cylinders);
       await put(connection, machineId, versionId, def('engine.cylinder_arrangement'), sourceRecordId, model.cylinderArrangement);
       if (model.maximumHp !== undefined) {
         await put(connection, machineId, versionId, def('engine.ece_r120_max_power'), sourceRecordId, model.maximumHp, 'hp');
