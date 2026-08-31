@@ -57,6 +57,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed cotton harvester specifications including picker or stripper configuration, engine power, row spacing, header options, accumulator capacity, round module size and fuel capacity.',
     lead: 'Compare cotton pickers and cotton strippers using exact US model-year data. Picker row units and stripper heads remain separately described, while engine power, fuel and DEF capacity, cotton accumulator, round module builder and wrap capacity stay tied to the manufacturer specification set for that machine.',
   },
+  windrower: {
+    title: 'Self-Propelled Windrower Specs and Engine Power',
+    description: 'Browse source-backed self-propelled windrower specifications including engine horsepower, cylinders, fuel and DEF capacity, header drive, field and transport speed, precision technology and windrow-management features.',
+    lead: 'Compare current self-propelled windrowers using manufacturer-backed engine, drive, capacity, travel-speed and header-system data. Series-wide features are published only when the manufacturer explicitly applies them to the lineup, while model-specific horsepower and engine configuration stay attached to the individual machine.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
