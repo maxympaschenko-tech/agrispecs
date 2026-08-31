@@ -82,7 +82,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   return (
     <main>
       <div className="container breadcrumbs">
-        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / {machine.equipmentType} / {machine.brand} / {machine.model}
+        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / <Link href={`/equipment/${machine.equipmentTypeSlug}`}>{machine.equipmentType}</Link> / {machine.brand} / {machine.model}
       </div>
       <div className="container">
         <section className="machine-header">
