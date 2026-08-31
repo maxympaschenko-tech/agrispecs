@@ -145,6 +145,16 @@ const content: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed fertilizer applicator specifications including working width, preplant or side-dress configuration, shank and coulter systems, depth control, fold modes, hitch capacity and precision nutrient-management features.',
     lead: 'Compare current pull-type fertilizer applicators using manufacturer-backed US data. Nutri-Placer family features such as row-unit choices, depth control, folding systems and precision technology remain tied to a family source record, while exact 930 and 940 working widths and applicator styles retain their individual current product-page provenance. Non-US tank capacities are not copied into US records.',
   },
+  floater: {
+    title: 'Agricultural Floater Specs, Horsepower and Application Systems',
+    description: 'Browse source-backed agricultural floater specifications including engine horsepower, wheel layout, transmission, compatible liquid and air-boom systems, and current precision-control options.',
+    lead: 'Compare current self-propelled floater chassis by engine power, three- or four-wheel layout, transmission and compatible application systems. Titan chassis specifications stay separate from 610 Liquid System and FA 1030 Air Boom implement specifications so attachment capacities and boom data are not incorrectly presented as chassis properties.',
+  },
+  'combination-applicator': {
+    title: 'Combination Applicator Specs, Liquid/Dry Capacity and Power',
+    description: 'Browse source-backed combination applicator specifications including rated and peak horsepower, liquid capacity, dry spread width, changeover time, drive system, travel speed and precision application technology.',
+    lead: 'Review current liquid/dry combination applicators with configuration boundaries preserved. The Trident 5550 record covers the convertible liquid/dry machine and its current US application systems; the separate dry-only Hi-Flow chassis is not merged into this record because the manufacturer states that configuration is not convertible to liquid.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
