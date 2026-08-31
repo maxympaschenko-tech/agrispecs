@@ -19,6 +19,7 @@ const sectionOrder = [
   'Windrower System',
   'Cutting System',
   'Conditioning System',
+  'Raking System',
   'Harvesting System',
   'Header Connection',
   'Kernel Processing',
@@ -103,7 +104,14 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     new Map(
       specs
         .filter((spec) => spec.sourceUrl)
-        .map((spec) => [spec.sourceUrl as string, { url: spec.sourceUrl as string, title: spec.sourceTitle || 'Manufacturer source', publishedDate: spec.sourcePublishedDate }]),
+        .map((spec) => [
+          spec.sourceUrl as string,
+          {
+            url: spec.sourceUrl as string,
+            title: spec.sourceTitle || 'Manufacturer source',
+            publishedDate: spec.sourcePublishedDate,
+          },
+        ]),
     ).values(),
   );
   const relatedModels = brandEquipment
