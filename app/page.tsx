@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getBrands, getMachines } from '@/lib/catalog-service';
-import { getNonTractorEquipment } from '@/lib/equipment-service';
+import { getNonTractorEquipment, type EquipmentMachine } from '@/lib/equipment-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +18,34 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+function featuredEquipmentAcrossCatalog(equipment: EquipmentMachine[], limit = 10) {
+  const groups = Array.from(
+    equipment.reduce<Map<string, EquipmentMachine[]>>((map, machine) => {
+      const key = `${machine.equipmentTypeSlug}\u0000${machine.brandSlug}`;
+      const list = map.get(key) || [];
+      list.push(machine);
+      map.set(key, list);
+      return map;
+    }, new Map()),
+  ).map(([, machines]) => machines);
+
+  const featured: EquipmentMachine[] = [];
+  let row = 0;
+  while (featured.length < limit) {
+    let added = false;
+    for (const machines of groups) {
+      const machine = machines[row];
+      if (!machine) continue;
+      featured.push(machine);
+      added = true;
+      if (featured.length >= limit) break;
+    }
+    if (!added) break;
+    row += 1;
+  }
+  return featured;
+}
+
 export default async function HomePage() {
   const [tractorBrands, machines, otherEquipment] = await Promise.all([
     getBrands(),
@@ -30,6 +58,7 @@ export default async function HomePage() {
   const publishableEquipment = otherEquipment.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
+  const featuredEquipment = featuredEquipmentAcrossCatalog(publishableEquipment);
   const brandMap = new Map(tractorBrands.map((brand) => [brand.slug, brand]));
   for (const machine of publishableEquipment) {
     if (!brandMap.has(machine.brandSlug)) {
@@ -94,7 +123,7 @@ export default async function HomePage() {
             Source-backed specifications, maintenance references, OEM parts, attachment fitment and comparisons for tractors and agricultural equipment used across the United States.
           </p>
           <form className="search-shell" action="/search">
-            <input name="q" aria-label="Search equipment or part number" placeholder="Try: John Deere 5075E or an OEM part number" />
+            <input name="q" aria-label="Search equipment or part number" placeholder="Try: John Deere S7 600, 5075E or an OEM part number" />
             <button type="submit">Search</button>
           </form>
         </div>
@@ -127,7 +156,7 @@ export default async function HomePage() {
             <Link className="card" href="/equipment">
               <span className="eyebrow">Equipment catalog</span>
               <h3>Browse farm equipment</h3>
-              <p>Explore transporters and additional agricultural machine categories without forcing them into the tractor catalog.</p>
+              <p>Explore combine harvesters, transporters and additional agricultural machine categories with dedicated catalog hierarchies.</p>
               <span className="tool-link">Explore equipment</span>
             </Link>
             <Link className="card" href="/parts">
@@ -186,16 +215,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {publishableEquipment.length > 0 && (
+      {featuredEquipment.length > 0 && (
         <section className="section">
           <div className="container">
-            <h2>More farm equipment</h2>
-            <p className="section-lead">Non-tractor agricultural machines keep their manufacturer-defined equipment type and dedicated URLs.</p>
+            <h2>Farm equipment across brands</h2>
+            <p className="section-lead">A cross-brand sample of combine harvesters, transporters and other non-tractor machines from the source-backed equipment catalog.</p>
             <div className="grid">
-              {publishableEquipment.slice(0, 8).map((machine) => (
+              {featuredEquipment.map((machine) => (
                 <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
-                  <span className="eyebrow">{machine.equipmentType}</span>
-                  <h3>{machine.title}</h3>
+                  <span className="eyebrow">{machine.equipmentType} · {machine.brand}</span>
+                  <h3>{machine.model}</h3>
                   <p>Source-backed {machine.equipmentType.toLowerCase()} specifications and market reference.</p>
                 </Link>
               ))}
