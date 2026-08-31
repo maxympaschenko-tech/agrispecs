@@ -46,7 +46,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const brandPages: MetadataRoute.Sitemap = Array.from(
-    new Map(publishableMachines.map((machine) => [machine.brandSlug, machine.brandSlug])).values(),
+    new Set([
+      ...publishableMachines.map((machine) => machine.brandSlug),
+      ...publishableEquipment.map((machine) => machine.brandSlug),
+    ]),
   ).map((brandSlug) => ({
     url: `${baseUrl}/brands/${brandSlug}`,
   }));
