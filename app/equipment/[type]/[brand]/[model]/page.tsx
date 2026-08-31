@@ -30,6 +30,8 @@ const sectionOrder = [
   'Tillage System',
   'Strip-Till System',
   'Nutrient Application System',
+  'Liquid Application System',
+  'Dry Application System',
   'Application System',
   'Bale Formation',
   'Pickup & Feeding',
