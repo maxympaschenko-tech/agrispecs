@@ -72,6 +72,7 @@ import { versatileMigrations } from '@/lib/migrations/versatile';
 import { mccormickMigrations } from '@/lib/migrations/mccormick';
 import { zetorMigrations } from '@/lib/migrations/zetor';
 import { solisMigrations } from '@/lib/migrations/solis';
+import { jcbMigrations } from '@/lib/migrations/jcb';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -153,6 +154,7 @@ const migrations: DbMigration[] = [
   ...mccormickMigrations,
   ...zetorMigrations,
   ...solisMigrations,
+  ...jcbMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
