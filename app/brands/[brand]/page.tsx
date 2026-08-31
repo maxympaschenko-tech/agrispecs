@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
+import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,17 +11,23 @@ type PageProps = { params: Promise<{ brand: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand } = await params;
-  const [brands, machines] = await Promise.all([getBrands(), getMachinesByBrand(brand)]);
-  const info = brands.find((item) => item.slug === brand);
+  const [brands, tractors, equipment] = await Promise.all([
+    getBrands(),
+    getMachinesByBrand(brand),
+    getNonTractorEquipmentByBrand(brand),
+  ]);
+  const tractorBrand = brands.find((item) => item.slug === brand);
+  const equipmentBrand = equipment[0] ? { slug: equipment[0].brandSlug, name: equipment[0].brand } : undefined;
+  const info = tractorBrand || equipmentBrand;
   if (!info) return {};
 
-  const publishableCount = machines.filter(
+  const publishableCount = [...tractors, ...equipment].filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   ).length;
 
   return {
-    title: `${info.name} Tractor Specs and Farm Equipment Models`,
-    description: `Browse ${info.name} tractor specifications, model references, maintenance, OEM parts, attachments and compatibility data.`,
+    title: `${info.name} Farm Equipment Specs and Models`,
+    description: `Browse ${info.name} tractor and farm equipment specifications, model references, maintenance, OEM parts, attachments and compatibility data where available.`,
     alternates: { canonical: `/brands/${info.slug}` },
     robots: publishableCount > 0 ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -28,21 +35,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BrandPage({ params }: PageProps) {
   const { brand } = await params;
-  const [brands, brandMachines] = await Promise.all([
+  const [brands, brandTractors, brandEquipment] = await Promise.all([
     getBrands(),
     getMachinesByBrand(brand),
+    getNonTractorEquipmentByBrand(brand),
   ]);
-  const info = brands.find((item) => item.slug === brand);
+  const tractorBrand = brands.find((item) => item.slug === brand);
+  const equipmentBrand = brandEquipment[0] ? { slug: brandEquipment[0].brandSlug, name: brandEquipment[0].brand } : undefined;
+  const info = tractorBrand || equipmentBrand;
   if (!info) notFound();
 
-  const publishedMachines = brandMachines.filter(
+  const publishedTractors = brandTractors.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
+  const publishedEquipment = brandEquipment.filter(
+    (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
+  );
+  const publishedMachines = [...publishedTractors, ...publishedEquipment];
   const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
   const partialCount = publishedMachines.length - verifiedCount;
-  const researchMachines = brandMachines.filter(
+  const researchTractors = brandTractors.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
+  const researchEquipment = brandEquipment.filter(
+    (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
+  );
+  const equipmentTypeCount = new Set(publishedEquipment.map((machine) => machine.equipmentTypeSlug)).size;
 
   return (
     <main>
@@ -53,9 +71,9 @@ export default async function BrandPage({ params }: PageProps) {
       <section className="section" style={{ paddingTop: 18 }}>
         <div className="container">
           <span className="eyebrow">Manufacturer</span>
-          <h1>{info.name} tractor specs and model reference</h1>
+          <h1>{info.name} farm equipment specs and model reference</h1>
           <p className="section-lead">
-            Source-backed tractor specifications, maintenance schedules, OEM parts, replacement numbers, attachments and compatibility references for {info.name} equipment.
+            Source-backed tractor and agricultural equipment specifications, maintenance references, OEM parts, attachments and compatibility data for {info.name} machines where available.
           </p>
 
           <div className="parts-stats">
@@ -68,18 +86,27 @@ export default async function BrandPage({ params }: PageProps) {
               <span>Verified model records</span>
             </div>
             <div>
-              <strong>{partialCount.toLocaleString('en-US')}</strong>
-              <span>Source-backed partial records</span>
+              <strong>{(publishedTractors.length > 0 ? 1 : 0) + equipmentTypeCount}</strong>
+              <span>Equipment types represented</span>
             </div>
           </div>
 
           <div className="grid">
-            <Link className="card" href="/compare">
-              <span className="eyebrow">Comparison</span>
-              <h3>Compare {info.name} tractors</h3>
-              <p>Put published normalized specifications side by side with models from other brands.</p>
-              <span className="tool-link">Open Compare</span>
-            </Link>
+            {publishedTractors.length > 0 ? (
+              <Link className="card" href="/compare">
+                <span className="eyebrow">Comparison</span>
+                <h3>Compare {info.name} tractors</h3>
+                <p>Put published normalized tractor specifications side by side with models from other brands.</p>
+                <span className="tool-link">Open Compare</span>
+              </Link>
+            ) : (
+              <Link className="card" href="/equipment">
+                <span className="eyebrow">Equipment catalog</span>
+                <h3>Browse farm equipment</h3>
+                <p>Explore source-backed agricultural equipment by machine type, manufacturer and model.</p>
+                <span className="tool-link">Open equipment catalog</span>
+              </Link>
+            )}
             <Link className="card" href="/parts">
               <span className="eyebrow">Parts reference</span>
               <h3>Search OEM parts</h3>
@@ -94,30 +121,53 @@ export default async function BrandPage({ params }: PageProps) {
             </Link>
           </div>
 
-          {publishedMachines.length > 0 && (
+          {publishedTractors.length > 0 && (
             <section className="catalog-group">
-              <h2>{info.name} models with published data</h2>
-              <p className="section-note">These pages contain source-backed technical, maintenance, parts or compatibility data.</p>
+              <h2>{info.name} tractors with published data</h2>
+              <p className="section-note">These tractor pages contain source-backed technical, maintenance, parts or compatibility data.</p>
               <div className="grid">
-                {publishedMachines.map((machine) => (
+                {publishedTractors.map((machine) => (
                   <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
-                    <p>Specifications, maintenance, parts and compatibility reference.</p>
+                    <p>Tractor specifications, maintenance, parts and compatibility reference.</p>
                   </Link>
                 ))}
               </div>
             </section>
           )}
 
-          {researchMachines.length > 0 && (
+          {publishedEquipment.length > 0 && (
+            <section className="catalog-group">
+              <h2>{info.name} farm equipment with published data</h2>
+              <p className="section-note">Non-tractor machines stay in the equipment category used by the manufacturer and link to their dedicated catalog hierarchy.</p>
+              <div className="grid">
+                {publishedEquipment.map((machine) => (
+                  <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                    <span className="eyebrow">{machine.equipmentType}</span>
+                    <h3>{machine.title}</h3>
+                    <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and current market reference.</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {(researchTractors.length > 0 || researchEquipment.length > 0) && (
             <section className="catalog-group">
               <h2>Models being researched</h2>
-              <p className="section-note">These model records are present in the catalog, but numerical specifications are not published until the source data is verified.</p>
+              <p className="section-note">These records are present in the catalog, but specifications are not treated as published until source verification reaches the publication threshold.</p>
               <div className="grid">
-                {researchMachines.map((machine) => (
-                  <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    <span className="eyebrow">Research queue</span>
+                {researchTractors.map((machine) => (
+                  <Link className="card" key={`tractor-${machine.id}`} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                    <span className="eyebrow">Research queue · Tractor</span>
+                    <h3>{machine.title}</h3>
+                    <p>Source verification in progress</p>
+                  </Link>
+                ))}
+                {researchEquipment.map((machine) => (
+                  <Link className="card" key={`equipment-${machine.id}`} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                    <span className="eyebrow">Research queue · {machine.equipmentType}</span>
                     <h3>{machine.title}</h3>
                     <p>Source verification in progress</p>
                   </Link>
@@ -134,7 +184,7 @@ export default async function BrandPage({ params }: PageProps) {
             <Link className="tool-link" href="/methodology">Read our data methodology</Link>
           </section>
 
-          {brandMachines.length === 0 && <div className="notice">No model records are available for this manufacturer yet.</div>}
+          {brandTractors.length === 0 && brandEquipment.length === 0 && <div className="notice">No model records are available for this manufacturer yet.</div>}
         </div>
       </section>
     </main>
