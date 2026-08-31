@@ -22,6 +22,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed combine harvester specifications including engine power, grain tank capacity, unloading rate, feeder, threshing, separating and cleaning data.',
     lead: 'Compare published combine harvester specifications from major manufacturers. Model pages keep engine power, grain handling, feeder, threshing, separating, cleaning and market-specific configuration data tied to the original source record.',
   },
+  sprayer: {
+    title: 'Self-Propelled Sprayer Specs by Brand and Model',
+    description: 'Browse source-backed self-propelled sprayer specifications including engine power, solution tank capacity, rinse tank, boom width, crop clearance and application-system data.',
+    lead: 'Compare published self-propelled sprayer specifications from major manufacturers. Model pages keep engine power, solution and rinse tank capacity, boom configuration, crop clearance, travel and application-system data tied to the original market-specific source record.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
