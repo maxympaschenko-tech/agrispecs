@@ -70,6 +70,7 @@ import { deutzFahrMigrations } from '@/lib/migrations/deutz-fahr';
 import { claasMigrations } from '@/lib/migrations/claas';
 import { versatileMigrations } from '@/lib/migrations/versatile';
 import { mccormickMigrations } from '@/lib/migrations/mccormick';
+import { zetorMigrations } from '@/lib/migrations/zetor';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
 type LockRow = RowDataPacket & { acquired: number | null };
@@ -149,6 +150,7 @@ const migrations: DbMigration[] = [
   ...claasMigrations,
   ...versatileMigrations,
   ...mccormickMigrations,
+  ...zetorMigrations,
 ];
 
 let migrationPromise: Promise<void> | null = null;
