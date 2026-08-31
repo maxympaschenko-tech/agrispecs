@@ -37,9 +37,9 @@ const overrides: Record<string, EquipmentTypeContent> = {
     lead: 'Compare current CASE H Series rough terrain forklifts by horsepower and lift capacity, with family-level mast and travel specifications kept explicitly tied to the H Series source. The 586H and 588H remain separate machines because their rated lift capacities differ materially.',
   },
   'mini-excavator': {
-    title: 'Mini Excavator Specs, Horsepower, Battery and Operating Weight',
-    description: 'Browse source-backed mini excavator specifications including horsepower or battery capacity, operating weight, diesel or electric powertrain and current North America model data.',
-    lead: 'Compare current CASE mini excavators using the manufacturer’s North America family table. Diesel models keep published horsepower, electric CX15EV and CX25EV models keep battery capacity, and operating weights remain tied to the exact current model instead of being generalized across a size class.',
+    title: 'Mini Excavator Specs, Horsepower, Battery, Weight and Dig Depth',
+    description: 'Browse source-backed mini excavator specifications from current North America catalogs including horsepower or battery capacity, operating weight, maximum dig depth, diesel or electric powertrain and arm configuration.',
+    lead: 'Compare current CASE and Bobcat mini excavators without flattening unlike configurations. CASE diesel and EV models retain the values exposed in the current North America family table, while Bobcat standard, long-arm and extendable-arm configurations stay separate when the manufacturer lists different weights or dig depths. Electric Bobcat E10e/E19e and CASE EV models keep battery data rather than receiving invented horsepower values.',
   },
   'compact-dozer-loader': {
     title: 'Compact Dozer Loader Specs, ROC, Drawbar Pull and Weight',
