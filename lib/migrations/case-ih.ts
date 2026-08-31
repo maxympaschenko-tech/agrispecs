@@ -38,6 +38,7 @@ import { caseIHPuma165185NewCurrentMigration } from '@/lib/migrations/20260828_2
 import { caseIHFarmall110MStrictCurrentCorrectionMigration } from '@/lib/migrations/20260829_290_case_ih_farmall_110m_strict_current_correction';
 import { caseIHCombinesCurrentMigration } from '@/lib/migrations/20260831_482_case_ih_combines_current';
 import { caseIHPatriotSprayersCurrentMigration } from '@/lib/migrations/20260831_487_case_ih_patriot_sprayers_current';
+import { caseIHEarlyRiserPlantersCurrentMigration } from '@/lib/migrations/20260831_488_case_ih_early_riser_planters_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -59,4 +60,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHPuma165185NewCurrentMigration, caseIHFarmall110MStrictCurrentCorrectionMigration,
   caseIHCombinesCurrentMigration,
   caseIHPatriotSprayersCurrentMigration,
+  caseIHEarlyRiserPlantersCurrentMigration,
 ];
