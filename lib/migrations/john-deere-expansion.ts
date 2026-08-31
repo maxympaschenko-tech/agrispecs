@@ -37,6 +37,7 @@ import { johnDeere2230fhFieldCultivatorsCurrentMigration } from '@/lib/migration
 import { johnDeere2660vtVerticalTillageCurrentMigration } from '@/lib/migrations/20260831_518_john_deere_2660vt_vertical_tillage_current';
 import { johnDeereHsdHighSpeedDisksCurrentMigration } from '@/lib/migrations/20260831_520_john_deere_hsd_high_speed_disks_current';
 import { johnDeere2730CombinationRipperCurrentMigration } from '@/lib/migrations/20260831_522_john_deere_2730_combination_ripper_current';
+import { johnDeere2630SeriesTandemDisksCurrentMigration } from '@/lib/migrations/20260831_524_john_deere_2630_series_tandem_disks_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -77,4 +78,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere2660vtVerticalTillageCurrentMigration,
   johnDeereHsdHighSpeedDisksCurrentMigration,
   johnDeere2730CombinationRipperCurrentMigration,
+  johnDeere2630SeriesTandemDisksCurrentMigration,
 ];
