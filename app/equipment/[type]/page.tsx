@@ -10,8 +10,35 @@ type PageProps = {
   params: Promise<{ type: string }>;
 };
 
+type TypeContent = {
+  title: string;
+  description: string;
+  lead: string;
+};
+
+const typeContent: Record<string, TypeContent> = {
+  combine: {
+    title: 'Combine Harvester Specs by Brand and Model',
+    description: 'Browse source-backed combine harvester specifications including engine power, grain tank capacity, unloading rate, feeder, threshing, separating and cleaning data.',
+    lead: 'Compare published combine harvester specifications from major manufacturers. Model pages keep engine power, grain handling, feeder, threshing, separating, cleaning and market-specific configuration data tied to the original source record.',
+  },
+  transporter: {
+    title: 'Farm Transporter Specs by Brand and Model',
+    description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
+    lead: 'Browse agricultural transporter models with source-backed engine, drivetrain, loading-bed, capacity and current market configuration data.',
+  },
+};
+
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function getContent(type: string, typeName: string): TypeContent {
+  return typeContent[type] || {
+    title: `${typeName} Specs by Brand and Model`,
+    description: `Browse source-backed ${typeName.toLowerCase()} specifications by manufacturer and model, including current market configuration and technical reference data.`,
+    lead: `Browse published ${typeName.toLowerCase()} records organized by manufacturer. Model pages use source-backed specifications and keep market or configuration differences attached to the underlying version record.`,
+  };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -19,10 +46,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const equipment = await getNonTractorEquipmentByType(type);
   const typeName = equipment[0]?.equipmentType;
   if (!typeName) return {};
+  const content = getContent(type, typeName);
 
   return {
-    title: `${typeName} Specs by Brand and Model`,
-    description: `Browse source-backed ${typeName.toLowerCase()} specifications by manufacturer and model, including current market configuration and technical reference data.`,
+    title: content.title,
+    description: content.description,
     alternates: { canonical: `/equipment/${type}` },
   };
 }
@@ -33,6 +61,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
   if (equipment.length === 0) notFound();
 
   const typeName = equipment[0].equipmentType;
+  const content = getContent(type, typeName);
   const brandGroups = Array.from(
     equipment.reduce<Map<string, typeof equipment>>((map, machine) => {
       const list = map.get(machine.brandSlug) || [];
@@ -42,35 +71,55 @@ export default async function EquipmentTypePage({ params }: PageProps) {
     }, new Map()),
   );
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
-  const itemListJsonLd = {
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/equipment/${type}`;
+  const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: `${typeName} specifications by brand and model`,
-    numberOfItems: equipment.length,
-    itemListElement: equipment.map((machine, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: machine.title,
-      url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
-    })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: content.title,
+        description: content.description,
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#items` },
+        isPartOf: { '@id': `${baseUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Equipment', item: `${baseUrl}/equipment` },
+          { '@type': 'ListItem', position: 3, name: typeName, item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        name: `${typeName} specifications by brand and model`,
+        numberOfItems: equipment.length,
+        itemListElement: equipment.map((machine, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: machine.title,
+          url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
+        })),
+      },
+    ],
   };
 
   return (
     <main className="section">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd(itemListJsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / {typeName}
       </div>
       <div className="container">
         <span className="eyebrow">Equipment type</span>
-        <h1>{typeName} specifications by brand and model</h1>
-        <p className="section-lead">
-          Browse published {typeName.toLowerCase()} records organized by manufacturer. Model pages use source-backed specifications and keep market or configuration differences attached to the underlying version record.
-        </p>
+        <h1>{content.title}</h1>
+        <p className="section-lead">{content.lead}</p>
 
         <div className="parts-stats">
           <div><strong>{equipment.length.toLocaleString('en-US')}</strong><span>Published models</span></div>
