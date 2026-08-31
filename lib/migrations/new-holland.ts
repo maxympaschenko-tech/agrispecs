@@ -23,6 +23,7 @@ import { newHollandTK4CurrentSpecsMigration } from '@/lib/migrations/20260829_29
 import { newHollandT4VCurrentSpecsMigration } from '@/lib/migrations/20260829_296_new_holland_t4v_current_specs';
 import { newHollandCRCombinesCurrentMigration } from '@/lib/migrations/20260831_483_new_holland_cr_combines_current';
 import { newHollandRoundBalersCurrentMigration } from '@/lib/migrations/20260831_491_new_holland_round_balers_current';
+import { newHollandHaylinerSmallSquareBalersCurrentMigration } from '@/lib/migrations/20260831_493_new_holland_hayliner_small_square_balers_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -49,4 +50,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandT4VCurrentSpecsMigration,
   newHollandCRCombinesCurrentMigration,
   newHollandRoundBalersCurrentMigration,
+  newHollandHaylinerSmallSquareBalersCurrentMigration,
 ];
