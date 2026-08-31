@@ -62,6 +62,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed self-propelled windrower specifications including engine horsepower, cylinders, fuel and DEF capacity, header drive, field and transport speed, precision technology and windrow-management features.',
     lead: 'Compare current self-propelled windrowers using manufacturer-backed engine, drive, capacity, travel-speed and header-system data. Series-wide features are published only when the manufacturer explicitly applies them to the lineup, while model-specific horsepower and engine configuration stay attached to the individual machine.',
   },
+  'disc-mower-conditioner': {
+    title: 'Disc Mower-Conditioner Specs, Cutting Width and PTO',
+    description: 'Browse source-backed disc mower-conditioner specifications including cutting width, transport width, number of discs, cutterbar type, conditioning systems and minimum PTO power by model.',
+    lead: 'Compare current side-pull and center-pivot disc mower-conditioners by cutting width, disc count, cutterbar design, conditioning options, transport width and tractor PTO requirement. Model-specific values remain separate from series-wide features, and unpublished technical-table cells are left blank instead of being inferred.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
