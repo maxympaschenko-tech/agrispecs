@@ -72,6 +72,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed wheel rake specifications including rake wheel count, maximum working width, machine weight, flotation, single-side operation and transport configuration by model.',
     lead: 'Compare current carted wheel rakes by rake wheel count, maximum working width, machine weight, flotation and operating configuration. Standard and heavy-duty PLUS variants remain separate records when the manufacturer publishes them as distinct machines.',
   },
+  'rotary-rake': {
+    title: 'Rotary Rake Specs, Working Width and Rotor Size',
+    description: 'Browse source-backed rotary rake specifications including working width, rotor count, rotor diameter, side or center delivery, tine system and tractor PTO requirements by model.',
+    lead: 'Compare current single-, dual- and four-rotor rakes by working width, rotor diameter, crop delivery and tine configuration. Business, Trend, TWIN and North American variants stay separate whenever the manufacturer publishes them as distinct configurations.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
