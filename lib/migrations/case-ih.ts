@@ -41,6 +41,7 @@ import { caseIHPatriotSprayersCurrentMigration } from '@/lib/migrations/20260831
 import { caseIHEarlyRiserPlantersCurrentMigration } from '@/lib/migrations/20260831_488_case_ih_early_riser_planters_current';
 import { caseIHRoundBalersCurrentMigration } from '@/lib/migrations/20260831_490_case_ih_round_balers_current';
 import { caseIHSmallSquareBalersCurrentMigration } from '@/lib/migrations/20260831_492_case_ih_small_square_balers_current';
+import { caseIHLargeSquareBalersCurrentMigration } from '@/lib/migrations/20260831_494_case_ih_large_square_balers_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -65,4 +66,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHEarlyRiserPlantersCurrentMigration,
   caseIHRoundBalersCurrentMigration,
   caseIHSmallSquareBalersCurrentMigration,
+  caseIHLargeSquareBalersCurrentMigration,
 ];
