@@ -25,6 +25,7 @@ const sectionOrder = [
   'Header Connection',
   'Kernel Processing',
   'Planting System',
+  'Seeding System',
   'Application System',
   'Bale Formation',
   'Pickup & Feeding',
