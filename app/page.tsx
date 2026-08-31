@@ -19,7 +19,7 @@ function jsonLd(value: unknown) {
 }
 
 export default async function HomePage() {
-  const [brands, machines, otherEquipment] = await Promise.all([
+  const [tractorBrands, machines, otherEquipment] = await Promise.all([
     getBrands(),
     getMachines(),
     getNonTractorEquipment(),
@@ -30,8 +30,19 @@ export default async function HomePage() {
   const publishableEquipment = otherEquipment.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
-  const publishableBrandSlugs = new Set(publishableMachines.map((machine) => machine.brandSlug));
-  const publishableBrands = brands.filter((brand) => publishableBrandSlugs.has(brand.slug));
+  const brandMap = new Map(tractorBrands.map((brand) => [brand.slug, brand]));
+  for (const machine of publishableEquipment) {
+    if (!brandMap.has(machine.brandSlug)) {
+      brandMap.set(machine.brandSlug, { slug: machine.brandSlug, name: machine.brand });
+    }
+  }
+  const publishableBrandSlugs = new Set([
+    ...publishableMachines.map((machine) => machine.brandSlug),
+    ...publishableEquipment.map((machine) => machine.brandSlug),
+  ]);
+  const publishableBrands = Array.from(brandMap.values())
+    .filter((brand) => publishableBrandSlugs.has(brand.slug))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const featuredMachines = Array.from(
     publishableMachines.reduce<Map<string, typeof publishableMachines>>((map, machine) => {
@@ -198,7 +209,7 @@ export default async function HomePage() {
         <section className="section">
           <div className="container">
             <h2>Manufacturers</h2>
-            <p className="section-lead">Browse manufacturers with source-backed tractor data already published.</p>
+            <p className="section-lead">Browse manufacturers with source-backed tractor and farm equipment data already published.</p>
             <div className="grid">
               {publishableBrands.map((brand) => (
                 <Link className="card" key={brand.slug} href={`/brands/${brand.slug}`}>
