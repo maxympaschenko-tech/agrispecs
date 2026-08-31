@@ -46,6 +46,7 @@ import { caseIHWd5WindrowersCurrentMigration } from '@/lib/migrations/20260831_4
 import { caseIHDcDiscMowerConditionersCurrentMigration } from '@/lib/migrations/20260831_503_case_ih_dc_disc_mower_conditioners_current';
 import { caseIhWrWheelRakesCurrentMigration } from '@/lib/migrations/20260831_504_case_ih_wr_wheel_rakes_current';
 import { caseIhMdMdxDiscMowersCurrentMigration } from '@/lib/migrations/20260831_511_case_ih_md_mdx_disc_mowers_current';
+import { caseIhAirDrillsCurrentMigration } from '@/lib/migrations/20260831_512_case_ih_air_drills_current';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -75,4 +76,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHDcDiscMowerConditionersCurrentMigration,
   caseIhWrWheelRakesCurrentMigration,
   caseIhMdMdxDiscMowersCurrentMigration,
+  caseIhAirDrillsCurrentMigration,
 ];
