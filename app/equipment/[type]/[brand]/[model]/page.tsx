@@ -20,6 +20,7 @@ const sectionOrder = [
   'Cutting System',
   'Conditioning System',
   'Raking System',
+  'Tedding System',
   'Harvesting System',
   'Header Connection',
   'Kernel Processing',
