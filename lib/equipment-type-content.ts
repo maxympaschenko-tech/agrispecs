@@ -117,13 +117,23 @@ const content: Record<string, EquipmentTypeContent> = {
   },
   'strip-till': {
     title: 'Strip-Till Specs, Rows, Working Width and Row Units',
-    description: 'Browse source-backed strip-till specifications including row configurations, operating width, frame style, row-unit options, berm conditioning, transport width and current precision implement controls.',
-    lead: 'Compare current strip-till systems by row count, toolbar configuration, operating width, residue management and berm conditioning. The new Nutri-Tiller 1000 Series keeps ISOBUS and in-cab row-unit controls separate from the established pull-type 955 configuration, while manufacturer unit inconsistencies are not repeated as converted values.',
+    description: 'Browse source-backed strip-till specifications including row configurations, operating width, frame style, row-unit options, berm conditioning, fertilizer capacity and current precision implement controls.',
+    lead: 'Compare current Case IH Nutri-Tiller and John Deere ST Series strip-till systems by row or spacing configuration, frame style, coulter/shank setup, working depth, fertilizer capability and precision controls. Family-level Deere values and model-specific Case IH values remain tied to their own current US source records.',
   },
   'in-line-ripper': {
     title: 'In-Line Ripper Specs, Shank Spacing, Depth and Power',
     description: 'Browse source-backed in-line and minimum-till ripper specifications including shank systems, spacing, maximum operating depth, field speed, residue conditions, horsepower requirements, transport data and depth control.',
     lead: 'Compare current Case IH Ecolo-Til and John Deere MT Series in-line ripping tools without inferring unpublished configuration values from model names. Manufacturer family-table specs remain tied to family source records, while model-page details such as MT9 working width, standard count and transport width retain their separate individual source provenance.',
+  },
+  'chisel-plow': {
+    title: 'Chisel Plow Specs, Shank Spacing, Depth and Power',
+    description: 'Browse source-backed chisel plow specifications including shank count and spacing, working width, working depth, field speed, horsepower requirements, residue conditions, depth control and finishing systems.',
+    lead: 'Compare current Case IH Flex-Till and John Deere chisel plows using current US manufacturer data. Case IH model-page width, transport and shank ranges remain explicit, while John Deere configuration-dependent depth and power requirements stay as published ranges rather than being reduced to a misleading single value.',
+  },
+  'coulter-chisel': {
+    title: 'Coulter Chisel Specs, Working Depth, Speed and HP per Foot',
+    description: 'Browse source-backed coulter chisel specifications including working depth, operating speed, horsepower per foot, residue management, depth control and current precision tillage technology.',
+    lead: 'Compare current John Deere CC Series coulter chisels using the manufacturer’s current US tillage table. Shared CC11, CC13, CC19, CC21 and CC25 operating ranges remain family-backed, while model-number-derived dimensions or standard counts are not inferred without current individual specification rows.',
   },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
