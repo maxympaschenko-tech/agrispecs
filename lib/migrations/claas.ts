@@ -6,6 +6,7 @@ import { claasXerion50004500CurrentUsMigration } from '@/lib/migrations/20260830
 import { claasXerion12CurrentUsMigration } from '@/lib/migrations/20260830_430_claas_xerion_12_current_us';
 import { claasArion600Fl150LoaderMigration } from '@/lib/migrations/20260830_431_claas_arion_600_fl150_loader';
 import { claasCombinesCurrentUsMigration } from '@/lib/migrations/20260831_485_claas_combines_current_us';
+import { claasJaguarForageHarvestersCurrentUsMigration } from '@/lib/migrations/20260831_497_claas_jaguar_forage_harvesters_current_us';
 
 export const claasMigrations: DbMigration[] = [
   claasArion600CurrentUsMigration,
@@ -15,4 +16,5 @@ export const claasMigrations: DbMigration[] = [
   claasXerion12CurrentUsMigration,
   claasArion600Fl150LoaderMigration,
   claasCombinesCurrentUsMigration,
+  claasJaguarForageHarvestersCurrentUsMigration,
 ];
