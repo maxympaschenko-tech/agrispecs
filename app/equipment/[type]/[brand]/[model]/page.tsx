@@ -16,6 +16,7 @@ const sectionOrder = [
   'Engine',
   'Cotton Harvesting System',
   'Module Builder',
+  'Windrower System',
   'Harvesting System',
   'Header Connection',
   'Kernel Processing',
