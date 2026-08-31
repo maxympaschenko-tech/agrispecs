@@ -19,6 +19,7 @@ const sectionOrder = [
   'Bale Formation',
   'Pickup & Feeding',
   'Wrapping System',
+  'Tying System',
   'Tractor Requirements',
   'Travel',
   'Feeding',
