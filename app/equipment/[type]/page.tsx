@@ -32,6 +32,11 @@ const typeContent: Record<string, TypeContent> = {
     description: 'Browse source-backed planter specifications including row count, row spacing, frame type, working width, seed capacity, fertilizer capacity and transport dimensions by model and configuration.',
     lead: 'Compare current planter configurations by manufacturer, row count and row spacing. Model pages keep frame type, working width, seed and fertilizer capacity, transport dimensions, row-unit details and tractor-power requirements tied to the exact published configuration instead of collapsing unlike planters into one record.',
   },
+  'round-baler': {
+    title: 'Round Baler Specs, Bale Size and PTO Requirements',
+    description: 'Browse source-backed round baler specifications including bale width, bale diameter, bale size, feeding and wrapping systems, configuration options and PTO power requirements.',
+    lead: 'Compare current round balers by bale size, bale width and diameter, feeding system, wrapping system and tractor PTO requirement. Configuration-dependent power requirements stay attached to the exact manufacturer model instead of being reduced to one misleading number.',
+  },
   transporter: {
     title: 'Farm Transporter Specs by Brand and Model',
     description: 'Browse source-backed agricultural transporter specifications by manufacturer and model, including engine, drivetrain, payload and loading-bed configuration.',
