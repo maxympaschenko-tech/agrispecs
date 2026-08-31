@@ -21,6 +21,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hydraulics, travel speed and current North America model data.',
     lead: 'Compare current compact wheel loaders from CASE and Bobcat by powertrain, published power, operating weight and loader performance. Electric CASE models retain battery capacity instead of invented horsepower, while Bobcat L65/L95 use direct current model-page ROC, travel and hydraulic values; conflicting or non-current family text is not promoted into the catalog.',
   },
+  'mini-track-loader': {
+    title: 'Mini Track Loader Specs, ROC, Weight and Hydraulic Flow',
+    description: 'Browse source-backed mini track loader specifications including horsepower, rated operating capacity, operating weight, ground pressure, travel speed, auxiliary hydraulic flow and lift dimensions.',
+    lead: 'Compare the current Bobcat MT100 and MT120 using direct North America product-page specifications for rated operating capacity, operating weight, ground pressure, travel speed, auxiliary hydraulics and lift geometry. The older MT85 is intentionally excluded from the current catalog because Bobcat lists it under non-current models.',
+  },
   'small-articulated-loader': {
     title: 'Small Articulated Loader Specs, Weight, Power and Boom Type',
     description: 'Browse source-backed small articulated loader specifications including horsepower or battery capacity, operating weight, standard or telescopic-reach boom and current North America configurations.',
