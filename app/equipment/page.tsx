@@ -39,12 +39,30 @@ export default async function EquipmentPage() {
           <div><strong>{new Set(published.map((machine) => machine.brandSlug)).size.toLocaleString('en-US')}</strong><span>Manufacturers represented</span></div>
         </div>
 
+        {types.length > 0 && (
+          <section className="catalog-group">
+            <span className="eyebrow">Browse catalog</span>
+            <h2>Equipment types</h2>
+            <p className="section-note">Open a dedicated equipment-type catalog to browse its published manufacturers and models.</p>
+            <div className="grid">
+              {types.map((type) => (
+                <Link className="card" href={`/equipment/${type.slug}`} key={type.slug}>
+                  <span className="eyebrow">Equipment type</span>
+                  <h3>{type.name}</h3>
+                  <p>{type.machineCount.toLocaleString('en-US')} published {type.machineCount === 1 ? 'model' : 'models'}</p>
+                  <span className="tool-link">Browse {type.name.toLowerCase()} →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {groups.map(([typeSlug, machines]) => {
           const typeName = machines[0]?.equipmentType || typeSlug;
           return (
             <section className="catalog-group" id={`type-${typeSlug}`} key={typeSlug}>
               <span className="eyebrow">Equipment type</span>
-              <h2>{typeName}</h2>
+              <h2><Link href={`/equipment/${typeSlug}`}>{typeName}</Link></h2>
               <p className="section-note">Current published {typeName.toLowerCase()} records with source-backed model specifications.</p>
               <div className="grid">
                 {machines.map((machine) => (
@@ -56,6 +74,7 @@ export default async function EquipmentPage() {
                   </div>
                 ))}
               </div>
+              <p><Link className="tool-link" href={`/equipment/${typeSlug}`}>Browse all {typeName.toLowerCase()} →</Link></p>
             </section>
           );
         })}
