@@ -11,6 +11,7 @@ type Seed = {
   maxLengthIn: number;
   ptoRequirement: string;
   densityClass: string;
+  tyingSystem?: string;
 };
 
 const VERSION = 'united-states-current-2026-08';
@@ -31,7 +32,7 @@ const models: Seed[] = [
     slug: 'lb436-hd', model: 'LB436 HD',
     sourceUrl: 'https://www.caseih.com/en-us/unitedstates/products/balers/large-square-balers/lb436-hd',
     baleWidthIn: 48, baleHeightIn: 35, maxLengthIn: 118,
-    ptoRequirement: '250 hp minimum PTO requirement', densityClass: 'High-density large square baler',
+    ptoRequirement: '250 hp minimum PTO requirement', densityClass: 'High-density large square baler', tyingSystem: 'TwinePro knotter system',
   },
 ];
 
@@ -103,7 +104,7 @@ export const caseIHLargeSquareBalersCurrentMigration: DbMigration = {
       await connection.query(`INSERT INTO machines(manufacturer_id,equipment_type_id,series_id,model_name,slug,market_notes,data_status) VALUES(?,?,?,?,?,'Current Case IH United States large square baler lineup','partial') ON DUPLICATE KEY UPDATE series_id=VALUES(series_id),model_name=VALUES(model_name),market_notes=VALUES(market_notes)`, [manufacturerId, equipmentTypeId, seriesId, model.model, model.slug]);
       const machineId = await id(connection, `SELECT id FROM machines WHERE manufacturer_id=? AND equipment_type_id=? AND slug=? LIMIT 1`, [manufacturerId, equipmentTypeId, model.slug]);
       await connection.query(`UPDATE machine_versions SET is_current=FALSE WHERE machine_id=? AND slug<>?`, [machineId, VERSION]);
-      await connection.query(`INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes) VALUES(?,?,'US','United States','Current US large square baler specification',TRUE,?,'Official Case IH US product-page values captured 2026-08-31. PTO requirements that vary by configuration remain stored as ranges.') ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`, [machineId, VERSION, sourceRecordId]);
+      await connection.query(`INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes) VALUES(?,?,'US','United States','Current US large square baler specification',TRUE,?,'Official Case IH US product-page values captured 2026-08-31. PTO requirements that vary by configuration remain stored as ranges. Tying-system data is published only where the current source names the system explicitly.') ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),notes=VALUES(notes)`, [machineId, VERSION, sourceRecordId]);
       const versionId = await id(connection, `SELECT id FROM machine_versions WHERE machine_id=? AND slug=? LIMIT 1`, [machineId, VERSION]);
       await put(connection, machineId, versionId, def('configuration.type'), sourceRecordId, 'Large square baler');
       await put(connection, machineId, versionId, def('configuration.market_scope'), sourceRecordId, 'United States current catalog');
@@ -112,7 +113,7 @@ export const caseIHLargeSquareBalersCurrentMigration: DbMigration = {
       await put(connection, machineId, versionId, def('baler.bale_height'), sourceRecordId, model.baleHeightIn, 'in');
       await put(connection, machineId, versionId, def('baler.maximum_bale_length'), sourceRecordId, model.maxLengthIn, 'in');
       await put(connection, machineId, versionId, def('baler.plunger_speed'), sourceRecordId, 48, 'strokes/min');
-      await put(connection, machineId, versionId, def('baler.tying_system'), sourceRecordId, model.slug === 'lb436-hd' ? 'TwinePro knotter system' : 'Double-knot tying system');
+      if (model.tyingSystem) await put(connection, machineId, versionId, def('baler.tying_system'), sourceRecordId, model.tyingSystem);
       await put(connection, machineId, versionId, def('baler.pto_power_requirement'), sourceRecordId, model.ptoRequirement);
     }
   },
