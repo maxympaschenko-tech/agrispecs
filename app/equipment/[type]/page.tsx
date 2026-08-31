@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
-import { getEquipmentTypeContent } from '@/lib/equipment-type-content';
+import { getEquipmentTypePageContent } from '@/lib/equipment-type-content-overrides';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const equipment = await getNonTractorEquipmentByType(type);
   const typeName = equipment[0]?.equipmentType;
   if (!typeName) return {};
-  const content = getEquipmentTypeContent(type, typeName);
+  const content = getEquipmentTypePageContent(type, typeName);
 
   return {
     title: content.title,
@@ -35,7 +35,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
   if (equipment.length === 0) notFound();
 
   const typeName = equipment[0].equipmentType;
-  const content = getEquipmentTypeContent(type, typeName);
+  const content = getEquipmentTypePageContent(type, typeName);
   const brandGroups = Array.from(
     equipment.reduce<Map<string, typeof equipment>>((map, machine) => {
       const list = map.get(machine.brandSlug) || [];
