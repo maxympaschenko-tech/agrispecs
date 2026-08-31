@@ -28,6 +28,7 @@ import { johnDeereUnitNormalizationCorrectionsMigration } from '@/lib/migrations
 import { johnDeere6M120OOSCurrentCorrectionMigration } from '@/lib/migrations/20260829_289_john_deere_6m_120_oos_current_correction';
 import { johnDeereCombinesCurrentMigration } from '@/lib/migrations/20260831_480_john_deere_combines_current';
 import { johnDeereS7800RotorSpeedCorrectionMigration } from '@/lib/migrations/20260831_481_john_deere_s7_800_rotor_speed_correction';
+import { johnDeereSprayersCurrentMigration } from '@/lib/migrations/20260831_486_john_deere_sprayers_current';
 
 export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere7RCurrentSpecsMigration,
@@ -59,4 +60,5 @@ export const johnDeereExpansionMigrations: DbMigration[] = [
   johnDeere6M120OOSCurrentCorrectionMigration,
   johnDeereCombinesCurrentMigration,
   johnDeereS7800RotorSpeedCorrectionMigration,
+  johnDeereSprayersCurrentMigration,
 ];
