@@ -25,6 +25,7 @@ import { newHollandCRCombinesCurrentMigration } from '@/lib/migrations/20260831_
 import { newHollandRoundBalersCurrentMigration } from '@/lib/migrations/20260831_491_new_holland_round_balers_current';
 import { newHollandHaylinerSmallSquareBalersCurrentMigration } from '@/lib/migrations/20260831_493_new_holland_hayliner_small_square_balers_current';
 import { newHollandLargeSquareBalersCurrentMigration } from '@/lib/migrations/20260831_495_new_holland_large_square_balers_current';
+import { newHollandSpeedrowerPlusCurrentMigration } from '@/lib/migrations/20260831_500_new_holland_speedrower_plus_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -53,4 +54,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandRoundBalersCurrentMigration,
   newHollandHaylinerSmallSquareBalersCurrentMigration,
   newHollandLargeSquareBalersCurrentMigration,
+  newHollandSpeedrowerPlusCurrentMigration,
 ];
