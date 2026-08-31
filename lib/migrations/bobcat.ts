@@ -6,6 +6,10 @@ import { bobcat1000CurrentUsMigration } from '@/lib/migrations/20260830_363_bobc
 import { bobcatLoadersCurrentUsMigration } from '@/lib/migrations/20260830_364_bobcat_loaders_current_us';
 import { bobcat40005000MaintenanceKitsMigration } from '@/lib/migrations/20260830_365_bobcat_4000_5000_maintenance_kits';
 import { bobcat1000MaintenanceKitsMigration } from '@/lib/migrations/20260830_366_bobcat_1000_maintenance_kits';
+import { bobcatSkidSteerLoadersCurrentMigration } from '@/lib/migrations/20260831_547_bobcat_skid_steer_loaders_current';
+import { bobcatCompactTrackLoadersCurrentMigration } from '@/lib/migrations/20260831_548_bobcat_compact_track_loaders_current';
+import { bobcatCompactWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_549_bobcat_compact_wheel_loaders_current';
+import { bobcatLargeWheelLoadersCurrentMigration } from '@/lib/migrations/20260831_550_bobcat_large_wheel_loaders_current';
 
 export const bobcatMigrations: DbMigration[] = [
   bobcat2000CurrentUsMigration,
@@ -15,4 +19,8 @@ export const bobcatMigrations: DbMigration[] = [
   bobcatLoadersCurrentUsMigration,
   bobcat40005000MaintenanceKitsMigration,
   bobcat1000MaintenanceKitsMigration,
+  bobcatSkidSteerLoadersCurrentMigration,
+  bobcatCompactTrackLoadersCurrentMigration,
+  bobcatCompactWheelLoadersCurrentMigration,
+  bobcatLargeWheelLoadersCurrentMigration,
 ];
