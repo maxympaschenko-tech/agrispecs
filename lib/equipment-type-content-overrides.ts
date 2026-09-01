@@ -31,6 +31,16 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed carted wheel rake specifications including minimum and maximum working width, transport dimensions, typical weight, tractor horsepower, hydraulic requirements and rake-wheel suspension.',
     lead: 'Compare the current Kubota RA108CR, RA110CR, RA210CR and RA212CR carted wheel rakes without mixing them into the rotary-rake catalog. Current Kubota model cards keep their 30, 40, 40 and 50 hp requirements, while the 2026 U.S. table supplies distinct RA100 and RA200 chassis dimensions, working-width ranges and typical weights. Independent rake-wheel suspension, adjustable drawbar height and RA200 multi-point windrow adjustment remain attached to the correct current family.',
   },
+  'round-baler': {
+    title: 'Round Baler Specs, Bale Size, Tractor HP and Binding',
+    description: 'Browse source-backed round baler specifications including current model status, nominal bale size, minimum tractor horsepower, density system, binding system, silage capability, controls and crop-intake family.',
+    lead: 'Compare the current Kubota BV4160, BV4180, BV4580, BV5160, BV5160RN, BV5200 and BV5200RN directly from the live U.S. Round Balers lineup. BV4000 and BV5000 remain separate families with their current 4x5, 4x6 and 5x6 model-card configurations and 40–75 hp requirements. Intelligent Density 3-D, PowerBind and silage capability remain manufacturer-level current features, while BV4000 Focus III/fork-feeder data and BV5000 ISOGO/drop-floor data are attached only at the family level; optional SuperCut details are not inferred onto base model cards.',
+  },
+  'square-baler': {
+    title: 'Square Baler Specs, Bale Size, PTO and Tractor HP',
+    description: 'Browse source-backed high-capacity small square baler specifications including bale cross section, tractor horsepower, PTO requirement, plunger rate, dual-chamber design, knotters, twine capacity and ISOBUS controls.',
+    lead: 'Compare the current Kubota SSB2012 and SSB2014 introduced for the U.S. market in 2026. The live Kubota lineup confirms both current 100 hp model cards and the independent dual-chamber design; Kubota’s February 11, 2026 launch release keeps the models distinct at 12.25 x 18 in and 14 x 18 in bale cross sections and records 100 plunger strokes per minute, 100+ hp minimum, 120 hp recommended, a 1000-spline PTO requirement and standard full ISOBUS compatibility.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
@@ -44,7 +54,7 @@ const overrides: Record<string, EquipmentTypeContent> = {
   'compact-wheel-loader': {
     title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
     description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hinge-pin height, hydraulics, travel speed and current North America model data.',
-    lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, published power, operating weight and loader geometry. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
+    lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, operating weight and boom configuration. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
   },
   'wheel-loader': {
     title: 'Wheel Loader Specs, Horsepower, ROC and Tipping Load',
