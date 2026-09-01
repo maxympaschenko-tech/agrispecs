@@ -59,7 +59,7 @@ const overrides: Record<string, EquipmentTypeContent> = {
   'utility-vehicle': {
     title: 'Utility Vehicle Specs, Cargo Capacity, Towing and Speed',
     description: 'Browse source-backed farm utility vehicle specifications including horsepower, cargo-bed load, towing capacity, drive system, transmission, maximum speed, fuel capacity and overall dimensions.',
-    lead: 'Compare current Kubota utility vehicles using U.S. manufacturer data for RTV520, RTV-XG850 Sidekick and RTV-X. Gas and diesel drivetrains remain distinct, cargo-bed and towing ratings stay model-specific, and published discrepancies are preserved in source notes instead of being silently reconciled. Sidekick keeps its California cargo-bed limit separate, while RTV-X uses the live Kubota series-table values attached to that exact source version.',
+    lead: 'Compare current Kubota utility vehicles using U.S. manufacturer sources for RTV520, RTV-XG850 Sidekick and the diesel RTV-X family. RTV-X Cab, RTV-X Crew and RTV-X Long Bed remain separate 2026 catalog configurations with their own published weights, dimensions and cargo ratings; Crew long/short cargo-bed capacities are preserved as a pair, and Long Bed keeps its 1,212 lb cargo rating. Gas and diesel drivetrains stay distinct, and source conflicts are documented rather than silently reconciled.',
   },
   'mini-excavator': {
     title: 'Mini Excavator Specs, Horsepower, Battery, Weight and Dig Depth',
