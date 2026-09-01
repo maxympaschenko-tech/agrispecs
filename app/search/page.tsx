@@ -4,6 +4,8 @@ import { searchMachines } from '@/lib/catalog-service';
 import { searchNonTractorEquipment } from '@/lib/equipment-service';
 import { searchParts } from '@/lib/parts-service';
 import { searchAttachments } from '@/lib/attachments-service';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
+import { getPartImages } from '@/lib/part-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -25,6 +27,24 @@ function attachmentTypeLabel(type: string) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ') || 'Attachment';
+}
+
+function cardImage(imageUrl: string, alt: string) {
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      loading="lazy"
+      style={{
+        display: 'block',
+        width: '100%',
+        aspectRatio: '4 / 3',
+        objectFit: 'contain',
+        borderRadius: 12,
+        marginBottom: 14,
+      }}
+    />
+  );
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -61,13 +81,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <section className="search-group">
               <h2>Tractors</h2>
               <div className="grid">
-                {publishableMachines.map((machine) => (
-                  <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    <span className="eyebrow">Tractor</span>
-                    <h3>{machine.title}</h3>
-                    <p>Specifications, maintenance and compatible parts</p>
-                  </Link>
-                ))}
+                {publishableMachines.map((machine) => {
+                  const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug);
+                  return (
+                    <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                      {image && cardImage(image.imageUrl, image.altText || machine.title)}
+                      <span className="eyebrow">Tractor</span>
+                      <h3>{machine.title}</h3>
+                      <p>Specifications, maintenance and compatible parts</p>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -106,13 +130,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <section className="search-group">
               <h2>Parts</h2>
               <div className="grid">
-                {verifiedParts.map((part) => (
-                  <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
-                    <span className="eyebrow">{part.categoryName || 'Part'}</span>
-                    <h3>{part.partNumber}</h3>
-                    <p>{part.name || 'OEM part'}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
-                  </Link>
-                ))}
+                {verifiedParts.map((part) => {
+                  const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug)[0];
+                  return (
+                    <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+                      {image && cardImage(image.imageUrl, image.altText || `${part.partNumber} ${part.name || 'part'}`)}
+                      <span className="eyebrow">{part.categoryName || 'Part'}{image?.imageKind === 'representative' ? ' · Representative image' : ''}</span>
+                      <h3>{part.partNumber}</h3>
+                      <p>{part.name || 'OEM part'}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
