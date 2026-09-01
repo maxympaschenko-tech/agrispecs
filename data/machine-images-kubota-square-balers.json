@@ -1,0 +1,32 @@
+[
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "ssb2012",
+    "sourceKey": "kubota-ssb2012-current-family-card-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/ssb2014-1.png",
+    "outputPath": "public/media/machines/kubota/ssb2012/main.png",
+    "publicUrl": "/media/machines/kubota/ssb2012/main.png",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/ssb-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Current Kubota SSB Series model-card image used for SSB2012; Kubota USA uses the SSB2014 asset for the family card.",
+    "altText": "Kubota SSB2012 small square baler",
+    "imageKind": "family"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "ssb2014",
+    "sourceKey": "kubota-ssb2014-official-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/ssb2014-1.png",
+    "outputPath": "public/media/machines/kubota/ssb2014/main.png",
+    "publicUrl": "/media/machines/kubota/ssb2014/main.png",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/ssb-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota SSB2014 official current model-card image.",
+    "altText": "Kubota SSB2014 small square baler",
+    "imageKind": "exact"
+  }
+]
