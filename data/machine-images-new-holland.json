@@ -1,0 +1,47 @@
+[
+  {
+    "brandSlug": "new-holland",
+    "modelSlug": "boomer-50",
+    "sourceKey": "commons-new-holland-boomer-50-agritechnica-2025-dsc08360",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/New_Holland_Boomer_50_Agritechnica_2025_%28DSC08360%29.jpg?width=1600",
+    "outputPath": "public/media/machines/new-holland/boomer-50/main.jpg",
+    "publicUrl": "/media/machines/new-holland/boomer-50/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:New_Holland_Boomer_50_Agritechnica_2025_(DSC08360).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "New Holland Boomer 50 displayed at Agritechnica 2025.",
+    "altText": "New Holland Boomer 50 compact tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "new-holland",
+    "modelSlug": "t6-180",
+    "sourceKey": "commons-new-holland-t6-180-agritechnica-2025-dsc00717",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/New_Holland_T6.180_Agritechnica_2025_%28DSC00717%29.jpg?width=1600",
+    "outputPath": "public/media/machines/new-holland/t6-180/main.jpg",
+    "publicUrl": "/media/machines/new-holland/t6-180/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:New_Holland_T6.180_Agritechnica_2025_(DSC00717).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "New Holland T6.180 displayed at Agritechnica 2025.",
+    "altText": "New Holland T6.180 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "new-holland",
+    "modelSlug": "t6-180-methane-power",
+    "sourceKey": "commons-new-holland-t6-180-methane-gotland-2023",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/New_Holland_T6.180_Methane_Power.jpg?width=1600",
+    "outputPath": "public/media/machines/new-holland/t6-180-methane-power/main.jpg",
+    "publicUrl": "/media/machines/new-holland/t6-180-methane-power/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:New_Holland_T6.180_Methane_Power.jpg",
+    "author": "Bene Riobó",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "New Holland T6.180 Methane Power at Gotlands Skördefestival 2023.",
+    "altText": "New Holland T6.180 Methane Power tractor",
+    "imageKind": "exact"
+  }
+]
