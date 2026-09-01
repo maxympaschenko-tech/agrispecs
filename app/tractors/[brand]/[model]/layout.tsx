@@ -87,6 +87,12 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
 
   return (
     <>
+      <style>{`
+        .machine-photo:has(img[src^="/media/machines/kubota/"]) figcaption,
+        .machine-photo:has(img[src^="/media/fallbacks/"]) figcaption {
+          display: none;
+        }
+      `}</style>
       {structuredData && (
         <script
           type="application/ld+json"
