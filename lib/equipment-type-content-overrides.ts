@@ -56,6 +56,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed tractor loader backhoe specifications and current U.S. model status including 4WD, independent PTO, three-point-hitch capability, integrated loader/backhoe frame and visibility features.',
     lead: 'Compare the current Kubota B26, L47 and M62 as the manufacturer-defined TLB Series rather than flattening them into a generic tractor or backhoe category. The current U.S. lineup confirms all three machines and family-level standard 4WD, independent PTO, three-point-hitch capability, integrated reinforced main frame and slanted boom/hood design. Model-specific engine, loader and backhoe geometry is intentionally left for a separately verified source layer instead of copying values from a PDF that could not be screenshot-validated.',
   },
+  'stand-on-compact-loader': {
+    title: 'Stand-On Compact Loader Specs, ROC, Width and Horsepower',
+    description: 'Browse source-backed stand-on compact loader specifications including gross horsepower, engine displacement, machine width, rated operating capacity, tipping load, auxiliary hydraulics, track width, coupler and operator controls.',
+    lead: 'Review the current Kubota SCL1000 from the live U.S. SCL Series page. The current manufacturer page publishes 23.7 SAE J1995 gross hp, 54.8 cu in displacement, a narrow 36 in machine, 9.8 in standard tracks, 1,000 lb rated operating capacity at 35% tipping load, 2,857 lb tipping load and 2,800 psi auxiliary pressure. The live current 23.7 hp figure is kept instead of silently substituting the 24.8 hp value found in older brochure generations; CII coupler, LCD/keyless security and joystick continuous-flow controls remain tied to the same current page.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
