@@ -1,0 +1,40 @@
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { DbMigration } from '@/lib/db-migration-types';
+
+type IdRow = RowDataPacket & { id:number };
+type Seed = { slug:string; model:string; minimumHp:number; configuration:string };
+const VERSION='united-states-current-2026-09';
+const LIVE_URL='https://www.kubotausa.com/equipment-series/spreaders';
+const models:Seed[]=[
+  {slug:'vs220',model:'VS220',minimumHp:10,configuration:'VS pendulum spreader'},
+  {slug:'vs400viti',model:'VS400VITI',minimumHp:20,configuration:'VS VITI pendulum spreader'},
+  {slug:'vs400',model:'VS400',minimumHp:20,configuration:'VS pendulum spreader'},
+  {slug:'vs600',model:'VS600',minimumHp:35,configuration:'VS pendulum spreader'},
+];
+const defs:Array<[string,string,string,string,string|null,number]>=[
+  ['Machine Configuration','configuration.type','Machine configuration','text',null,1],
+  ['Machine Configuration','configuration.market_scope','Official market scope','text',null,2],
+  ['Machine Configuration','kubota.pendulum_spreader.series','Kubota spreader series','text',null,3],
+  ['Attachment to Tractor','kubota.pendulum_spreader.minimum_tractor_hp','Minimum tractor horsepower','decimal','hp',10],
+  ['Spreading System','kubota.pendulum_spreader.spreading_system','Spreading system','text',null,10],
+  ['Spreading System','kubota.pendulum_spreader.control_options','Control options','text',null,20],
+  ['Spreading System','kubota.pendulum_spreader.application_rate_adjustment','Application-rate adjustment','text',null,30],
+  ['Construction','kubota.pendulum_spreader.hopper_material','Hopper material','text',null,10],
+  ['Construction','kubota.pendulum_spreader.metering_discs','Metering discs','text',null,20],
+  ['Construction','kubota.pendulum_spreader.corrosion_protection','Corrosion protection','text',null,30],
+];
+async function id(c:Parameters<DbMigration['apply']>[0],sql:string,p:unknown[]=[]){const[r]=await c.query<IdRow[]>(sql,p);if(!r[0])throw new Error('Kubota VS spreader migration dependency missing');return Number(r[0].id);}
+async function source(c:Parameters<DbMigration['apply']>[0]){const[r]=await c.query<IdRow[]>(`SELECT id FROM sources WHERE name='Kubota' AND domain='kubotausa.com' ORDER BY id LIMIT 1`);if(r[0])return Number(r[0].id);const[x]=await c.query<ResultSetHeader>(`INSERT INTO sources(name,domain,source_type,authority_level) VALUES('Kubota','kubotausa.com','manufacturer','official')`);return Number(x.insertId);}
+async function record(c:Parameters<DbMigration['apply']>[0],sid:number){const externalId='kubota-vs-spreaders-live-current-2026-09';const[r]=await c.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? LIMIT 1`,[externalId]);if(r[0])return Number(r[0].id);const raw={captured:'2026-09-01',models:models.map(m=>({model:m.model,hp:m.minimumHp})),features:{system:'SuperFlow pendulum spreading system',controls:'Manual, hydraulic or electric',rate:'Continuous application-rate adjustment in lb/acre',hopper:'Glass-fiber reinforced polyester',metering:'Stainless steel metering discs',paint:'Duracoat corrosion-resistant paint'}};const[x]=await c.query<ResultSetHeader>(`INSERT INTO source_records(source_id,url,external_id,title,raw_reference) VALUES(?,?,?,?,?)`,[sid,LIVE_URL,externalId,'Kubota USA current Spreaders lineup and live VS features',JSON.stringify(raw)]);return Number(x.insertId);}
+async function put(c:Parameters<DbMigration['apply']>[0],mid:number,vid:number,did:number,rid:number,value:string|number,unit:string|null=null){await c.query(`INSERT INTO machine_specs(machine_id,machine_version_id,spec_definition_id,value_text,value_number,unit,source_record_id,confidence) VALUES(?,?,?,?,?,?,?,'official') ON DUPLICATE KEY UPDATE value_text=VALUES(value_text),value_number=VALUES(value_number),unit=VALUES(unit),source_record_id=VALUES(source_record_id),confidence='official'`,[mid,vid,did,typeof value==='string'?value:null,typeof value==='number'?value:null,unit,rid]);}
+
+export const kubotaCurrentVsPendulumSpreadersMigration:DbMigration={
+  id:'20260901_580_kubota_current_vs_pendulum_spreaders',description:'Add current Kubota USA VS220, VS400VITI, VS400 and VS600 pendulum spreaders from the live manufacturer page',
+  async apply(c){
+    await c.query(`INSERT INTO equipment_types(name,slug) VALUES('Pendulum Spreader','pendulum-spreader') ON DUPLICATE KEY UPDATE name=VALUES(name)`);await c.query(`INSERT INTO manufacturers(name,slug) VALUES('Kubota','kubota') ON DUPLICATE KEY UPDATE name=VALUES(name)`);
+    const mf=await id(c,`SELECT id FROM manufacturers WHERE slug='kubota' LIMIT 1`),et=await id(c,`SELECT id FROM equipment_types WHERE slug='pendulum-spreader' LIMIT 1`),sid=await source(c),rid=await record(c,sid);
+    const seriesSlug='kubota-vs-series-spreaders';await c.query(`INSERT INTO machine_series(manufacturer_id,equipment_type_id,name,slug) VALUES(?,?,'Kubota VS Series',?) ON DUPLICATE KEY UPDATE name=VALUES(name)`,[mf,et,seriesSlug]);const series=await id(c,`SELECT id FROM machine_series WHERE manufacturer_id=? AND equipment_type_id=? AND slug=? LIMIT 1`,[mf,et,seriesSlug]);
+    const ids=new Map<string,number>();for(const d of defs){await c.query(`INSERT INTO spec_definitions(section,spec_key,label,value_type,canonical_unit,display_order) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE section=VALUES(section),label=VALUES(label),value_type=VALUES(value_type),canonical_unit=VALUES(canonical_unit),display_order=VALUES(display_order)`,d);ids.set(d[1],await id(c,`SELECT id FROM spec_definitions WHERE spec_key=? LIMIT 1`,[d[1]]));}const def=(k:string)=>{const v=ids.get(k);if(!v)throw new Error(`Missing Kubota VS spreader definition ${k}`);return v;};
+    for(const m of models){await c.query(`INSERT INTO machines(manufacturer_id,equipment_type_id,series_id,model_name,slug,market_notes,data_status) VALUES(?,?,?,?,?,'Current Kubota USA VS pendulum spreader','partial') ON DUPLICATE KEY UPDATE series_id=VALUES(series_id),model_name=VALUES(model_name),market_notes=VALUES(market_notes),data_status=IF(data_status='verified','verified','partial')`,[mf,et,series,m.model,m.slug]);const mid=await id(c,`SELECT id FROM machines WHERE manufacturer_id=? AND equipment_type_id=? AND slug=? LIMIT 1`,[mf,et,m.slug]);await c.query(`UPDATE machine_versions SET is_current=FALSE WHERE machine_id=? AND slug<>?`,[mid,VERSION]);await c.query(`INSERT INTO machine_versions(machine_id,slug,market_code,market_name,configuration,is_current,source_record_id,notes) VALUES(?,?,'US','United States',?,TRUE,?,?) ON DUPLICATE KEY UPDATE is_current=TRUE,source_record_id=VALUES(source_record_id),configuration=VALUES(configuration),notes=VALUES(notes)`,[mid,VERSION,m.configuration,rid,'Current Kubota USA live Spreaders model card captured 2026-09-01. Only live model-card horsepower and family-level VS features are stored; hopper capacity and weight are intentionally left for a later model-specific provenance layer.']);const vid=await id(c,`SELECT id FROM machine_versions WHERE machine_id=? AND slug=? LIMIT 1`,[mid,VERSION]);const vals:Array<[string,string|number,string|null]>=[['configuration.type','Pendulum spreader',null],['configuration.market_scope','United States current lineup',null],['kubota.pendulum_spreader.series','VS Series',null],['kubota.pendulum_spreader.minimum_tractor_hp',m.minimumHp,'hp'],['kubota.pendulum_spreader.spreading_system','SuperFlow pendulum spreading system',null],['kubota.pendulum_spreader.control_options','Manual, hydraulic or electric control',null],['kubota.pendulum_spreader.application_rate_adjustment','Continuous adjustment in pounds per acre using scale and spreading table',null],['kubota.pendulum_spreader.hopper_material','Glass-fiber reinforced polyester',null],['kubota.pendulum_spreader.metering_discs','Stainless steel',null],['kubota.pendulum_spreader.corrosion_protection','Duracoat corrosion-resistant paint',null]];for(const[k,v,u]of vals)await put(c,mid,vid,def(k),rid,v,u);}
+  }
+};
