@@ -106,6 +106,21 @@
   },
   {
     "brandSlug": "john-deere",
+    "modelSlug": "9rx-640",
+    "sourceKey": "commons-jd-9rx-640-agritechnica-2023-dsc06207",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_9RX_640_Agritechnica_2023_%28DSC06207%29.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/9rx-640/main.jpg",
+    "publicUrl": "/media/machines/john-deere/9rx-640/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_9RX_640_Agritechnica_2023_(DSC06207).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 9RX 640 displayed at Agritechnica 2023.",
+    "altText": "John Deere 9RX 640 four-track tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
     "modelSlug": "9rx-830",
     "sourceKey": "commons-jd-9rx-830-agritechnica-2025-dsc09735",
     "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_9RX_830_Agritechnica_2025_%28DSC09735%29.jpg?width=1600",
