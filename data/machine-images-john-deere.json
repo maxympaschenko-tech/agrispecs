@@ -1,6 +1,36 @@
 [
   {
     "brandSlug": "john-deere",
+    "modelSlug": "6r-150",
+    "sourceKey": "commons-jd-6r-150-agritechnica-2023-dsc06284",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_150_Agritechnica_2023_%28DSC06284%29.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/6r-150/main.jpg",
+    "publicUrl": "/media/machines/john-deere/6r-150/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_6R_150_Agritechnica_2023_(DSC06284).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 6R 150 displayed at Agritechnica 2023.",
+    "altText": "John Deere 6R 150 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "6r-165",
+    "sourceKey": "commons-jd-6r-165-agritechnica-2023-dsc06306",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_165_Agritechnica_2023_%28DSC06306%29.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/6r-165/main.jpg",
+    "publicUrl": "/media/machines/john-deere/6r-165/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_6R_165_Agritechnica_2023_(DSC06306).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 6R 165 displayed at Agritechnica 2023.",
+    "altText": "John Deere 6R 165 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
     "modelSlug": "6r-185",
     "sourceKey": "commons-jd-6r-185-agra-2024-dsc03350",
     "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_185_agra_2024_%28DSC03350%29.jpg?width=1600",
