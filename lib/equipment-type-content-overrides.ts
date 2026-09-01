@@ -56,6 +56,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed loader backhoe specifications including horsepower, operating weight, loader lift capacity, maximum backhoe reach, transmission options and hydraulic performance.',
     lead: 'Compare current New Holland D Series loader backhoes including B75D, B95D, B95D Tool Carrier, B95D Long Reach and B110D. Horsepower, operating weight, loader lift capacity and maximum backhoe reach remain model-specific, while the shared FPT 3.4-liter engine family, transmission choices and hydraulic systems stay explicitly labeled as D Series family specifications.',
   },
+  'utility-vehicle': {
+    title: 'Utility Vehicle Specs, Cargo Capacity, Towing and Speed',
+    description: 'Browse source-backed farm utility vehicle specifications including horsepower, cargo-bed load, towing capacity, drive system, transmission, maximum speed, fuel capacity and overall dimensions.',
+    lead: 'Compare current Kubota utility vehicles using U.S. manufacturer data for RTV520, RTV-XG850 Sidekick and RTV-X. Gas and diesel drivetrains remain distinct, cargo-bed and towing ratings stay model-specific, and published discrepancies are preserved in source notes instead of being silently reconciled. Sidekick keeps its California cargo-bed limit separate, while RTV-X uses the live Kubota series-table values attached to that exact source version.',
+  },
   'mini-excavator': {
     title: 'Mini Excavator Specs, Horsepower, Battery, Weight and Dig Depth',
     description: 'Browse source-backed mini excavator specifications from current North America catalogs including horsepower or battery capacity, operating-weight configurations, maximum dig depth, dump height, hydraulics, diesel or electric powertrain and arm options.',
