@@ -28,5 +28,50 @@
     "caption": "Case IH Vestrum 130 displayed at agra 2024.",
     "altText": "Case IH Vestrum 130 tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "optum-440",
+    "sourceKey": "commons-case-ih-optum-440-agritechnica-2025-dsc05823",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Optum_440_CVXDrive_Agritechnica_2025_%28DSC05823%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/optum-440/main.jpg",
+    "publicUrl": "/media/machines/case-ih/optum-440/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Optum_440_CVXDrive_Agritechnica_2025_(DSC05823).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Optum 440 CVXDrive displayed at Agritechnica 2025.",
+    "altText": "Case IH Optum 440 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "magnum-405",
+    "sourceKey": "commons-case-ih-magnum-405-black-edition-agritechnica-2025-dsc08447",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Magnum_405_Black_Edition_Agritechnica_2025_%28DSC08447%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/magnum-405/main.jpg",
+    "publicUrl": "/media/machines/case-ih/magnum-405/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Magnum_405_Black_Edition_Agritechnica_2025_(DSC08447).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Magnum 405 Black Edition displayed at Agritechnica 2025; used as a Magnum 405 model-family image and not asserted as the exact U.S. configuration.",
+    "altText": "Case IH Magnum 405 tractor family image",
+    "imageKind": "family"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "axial-flow-7160",
+    "sourceKey": "commons-case-ih-axial-flow-7160-agritechnica-2025-dsc03421",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Axial-Flow_7160_Agritechnica_2025_%28DSC03421%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/axial-flow-7160/main.jpg",
+    "publicUrl": "/media/machines/case-ih/axial-flow-7160/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Axial-Flow_7160_Agritechnica_2025_(DSC03421).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Axial-Flow 7160 combine displayed at Agritechnica 2025.",
+    "altText": "Case IH Axial-Flow 7160 combine harvester",
+    "imageKind": "exact"
   }
 ]
