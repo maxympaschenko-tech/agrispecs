@@ -1,6 +1,7 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
-import machineImageManifest from '@/data/machine-images.json';
+import coreMachineImageManifest from '@/data/machine-images.json';
+import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-utility.json';
 
 export type MachineImage = {
   id: number;
@@ -46,7 +47,10 @@ type ManifestImage = {
   altText: string | null;
 };
 
-const manifest = machineImageManifest as ManifestImage[];
+const manifest = [
+  ...(coreMachineImageManifest as ManifestImage[]),
+  ...(kubotaUtilityMachineImageManifest as ManifestImage[]),
+];
 
 function rowToImage(row: MachineImageRow): MachineImage {
   return {
