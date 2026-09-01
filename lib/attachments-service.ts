@@ -30,6 +30,8 @@ export type AttachmentCompatibleMachine = {
   brandSlug: string;
   model: string;
   modelSlug: string;
+  equipmentType: string;
+  equipmentTypeSlug: string;
   compatibilityNote: string | null;
   performanceCapacityText: string | null;
   performanceHeightText: string | null;
@@ -77,6 +79,8 @@ type CompatibleMachineRow = RowDataPacket & {
   brand_slug: string;
   model: string;
   model_slug: string;
+  equipment_type: string;
+  equipment_type_slug: string;
   compatibility_note: string | null;
   performance_capacity_text: string | null;
   performance_height_text: string | null;
@@ -239,6 +243,8 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         mf.slug AS brand_slug,
         m.model_name AS model,
         m.slug AS model_slug,
+        et.name AS equipment_type,
+        et.slug AS equipment_type_slug,
         ma.compatibility_note,
         ma.performance_capacity_text,
         ma.performance_height_text,
@@ -248,9 +254,10 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
       FROM machine_attachments ma
       JOIN machines m ON m.id=ma.machine_id
       JOIN manufacturers mf ON mf.id=m.manufacturer_id
+      JOIN equipment_types et ON et.id=m.equipment_type_id
       LEFT JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.attachment_id=? AND m.data_status IN ('partial','verified')
-      ORDER BY mf.name,m.model_name
+      ORDER BY mf.name,et.name,m.model_name
     `, [Number(attachment.id)]);
 
     const firstSource = machineRows.find((row) => row.source_url);
@@ -272,6 +279,8 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         brandSlug: row.brand_slug,
         model: row.model,
         modelSlug: row.model_slug,
+        equipmentType: row.equipment_type,
+        equipmentTypeSlug: row.equipment_type_slug,
         compatibilityNote: row.compatibility_note,
         performanceCapacityText: row.performance_capacity_text,
         performanceHeightText: row.performance_height_text,
