@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getEquipmentMachine, getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
-import { getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
+import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipment-service';
+import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -78,6 +78,10 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+function formatAttachmentType(value: string) {
+  return value.replace(/-/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand, model } = await params;
   const machine = await getEquipmentMachine(type, brand, model);
@@ -96,9 +100,10 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const machine = await getEquipmentMachine(type, brand, model);
   if (!machine) notFound();
 
-  const [versions, brandEquipment] = await Promise.all([
+  const [versions, brandEquipment, attachments] = await Promise.all([
     getMachineVersions(machine.id),
     getNonTractorEquipmentByBrand(machine.brandSlug),
+    getMachineAttachments(machine.id),
   ]);
   const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
@@ -193,6 +198,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             {orderedSections.map((section) => <a key={section} href={`#${sectionId(section)}`}>{section}</a>)}
+            {attachments.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
             {relatedModels.length > 0 && <a href="#related-models">Related models</a>}
           </aside>
@@ -213,6 +219,30 @@ export default async function EquipmentModelPage({ params }: PageProps) {
               <section className="data-section">
                 <h2>Specifications</h2>
                 <div className="notice">Numerical specifications are published only after source verification.</div>
+              </section>
+            )}
+
+            {attachments.length > 0 && (
+              <section className="data-section" id="compatible-attachments">
+                <h2>Compatible attachments</h2>
+                <p className="section-note">Manufacturer-backed fitment records for this machine. A compatibility listing does not mean the attachment is standard equipment; hydraulic flow, hitch, carrier, model year and dealer configuration may still matter.</p>
+                <div className="parts-list">
+                  {attachments.map((attachment) => (
+                    <div className="part-row" key={`${attachment.id}-${attachment.slug}`}>
+                      <span>
+                        <strong>{attachment.modelName}</strong>
+                        <small>{formatAttachmentType(attachment.attachmentType)} · {attachment.confidence === 'official' ? 'Official fitment' : `${attachment.confidence} confidence`}</small>
+                        {attachment.configurationText && <small>{attachment.configurationText}</small>}
+                        {attachment.liftCapacityText && <small>Lift/capacity: {attachment.liftCapacityText}</small>}
+                        {attachment.liftHeightText && <small>Lift height: {attachment.liftHeightText}</small>}
+                        {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
+                      </span>
+                      {attachment.sourceUrl ? (
+                        <a href={attachment.sourceUrl} target="_blank" rel="noopener noreferrer">Source →</a>
+                      ) : <span>Source-backed</span>}
+                    </div>
+                  ))}
+                </div>
               </section>
             )}
 
