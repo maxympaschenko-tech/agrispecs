@@ -51,6 +51,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed pendulum spreader specifications including current model status, minimum tractor horsepower, SuperFlow spreading system, manual/hydraulic/electric controls, rate adjustment and corrosion-resistant construction.',
     lead: 'Compare the current Kubota VS220, VS400VITI, VS400 and VS600 directly from the live U.S. Spreaders page. Current model-card horsepower stays at 10, 20, 20 and 35 hp respectively, while SuperFlow pendulum distribution, manual/hydraulic/electric control, continuous pounds-per-acre adjustment, reinforced polyester hoppers, stainless metering discs and Duracoat protection remain family-level VS features. Hopper capacities and weights are deliberately left for a later model-specific source layer rather than copied from an older brochure.',
   },
+  'tractor-loader-backhoe': {
+    title: 'Tractor Loader Backhoe Specs, 4WD, PTO and Integrated Frame',
+    description: 'Browse source-backed tractor loader backhoe specifications and current U.S. model status including 4WD, independent PTO, three-point-hitch capability, integrated loader/backhoe frame and visibility features.',
+    lead: 'Compare the current Kubota B26, L47 and M62 as the manufacturer-defined TLB Series rather than flattening them into a generic tractor or backhoe category. The current U.S. lineup confirms all three machines and family-level standard 4WD, independent PTO, three-point-hitch capability, integrated reinforced main frame and slanted boom/hood design. Model-specific engine, loader and backhoe geometry is intentionally left for a separately verified source layer instead of copying values from a PDF that could not be screenshot-validated.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
@@ -64,7 +69,7 @@ const overrides: Record<string, EquipmentTypeContent> = {
   'compact-wheel-loader': {
     title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
     description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hinge-pin height, hydraulics, travel speed and current North America model data.',
-    lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, operating weight and boom configuration. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
+    lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, operating weight and loader geometry. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
   },
   'wheel-loader': {
     title: 'Wheel Loader Specs, Horsepower, ROC and Tipping Load',
