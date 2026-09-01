@@ -12,6 +12,7 @@ const manifests = [
   { kind: 'machine', path: path.join(root, 'data', 'machine-images.json') },
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-utility.json') },
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-equipment.json') },
+  { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-excavators.json') },
   { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
 ];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
