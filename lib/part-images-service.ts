@@ -2,13 +2,13 @@ import partImageManifest from '@/data/part-images.json';
 
 export type PartImage = {
   imageUrl: string;
-  sourcePageUrl: string;
+  sourcePageUrl: string | null;
   author: string | null;
   licenseName: string | null;
   licenseUrl: string | null;
   caption: string | null;
   altText: string | null;
-  imageKind: 'exact' | 'representative';
+  imageKind: 'exact' | 'representative' | 'fallback';
 };
 
 type ManifestPartImage = {
@@ -30,8 +30,21 @@ type ManifestPartImage = {
 
 const manifest = partImageManifest as ManifestPartImage[];
 
+function fallbackImage(normalizedPartNumber: string): PartImage {
+  return {
+    imageUrl: '/media/fallbacks/part.svg',
+    sourcePageUrl: null,
+    author: null,
+    licenseName: null,
+    licenseUrl: null,
+    caption: `Exact product photo for ${normalizedPartNumber} is being sourced.`,
+    altText: `Farm equipment part ${normalizedPartNumber} image pending`,
+    imageKind: 'fallback',
+  };
+}
+
 export function getPartImages(normalizedPartNumber: string, brandSlug?: string | null): PartImage[] {
-  return manifest
+  const images = manifest
     .filter((image) =>
       image.normalizedPartNumber.toLowerCase() === normalizedPartNumber.toLowerCase()
       && (!brandSlug || image.brandSlug === brandSlug),
@@ -45,5 +58,7 @@ export function getPartImages(normalizedPartNumber: string, brandSlug?: string |
       caption: image.caption,
       altText: image.altText,
       imageKind: image.imageKind,
-    }));
+    } satisfies PartImage));
+
+  return images.length > 0 ? images : [fallbackImage(normalizedPartNumber)];
 }
