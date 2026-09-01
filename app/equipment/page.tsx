@@ -19,8 +19,8 @@ const TYPE_GROUPS = [
   },
   {
     name: 'Hay & Forage',
-    description: 'Mowing, conditioning, raking, tedding, windrowing and baling equipment.',
-    slugs: ['windrower', 'disc-mower-conditioner', 'disc-mower', 'wheel-rake', 'rotary-rake', 'rotary-tedder', 'round-baler', 'small-square-baler', 'large-square-baler'],
+    description: 'Mowing, conditioning, raking, tedding, windrowing, baling and bale-handling equipment.',
+    slugs: ['windrower', 'disc-mower-conditioner', 'disc-mower', 'wheel-rake', 'rotary-rake', 'rotary-tedder', 'round-baler', 'square-baler', 'small-square-baler', 'large-square-baler', 'bale-wrapper'],
   },
   {
     name: 'Planting & Seeding',
@@ -34,13 +34,13 @@ const TYPE_GROUPS = [
   },
   {
     name: 'Application',
-    description: 'Spraying, fertilizer placement, floaters and liquid or dry application systems.',
-    slugs: ['sprayer', 'fertilizer-applicator', 'floater', 'combination-applicator', 'application-system'],
+    description: 'Spraying, fertilizer placement, spreaders, floaters and liquid or dry application systems.',
+    slugs: ['sprayer', 'fertilizer-applicator', 'pendulum-spreader', 'floater', 'combination-applicator', 'application-system'],
   },
   {
     name: 'Loaders & Material Handling',
-    description: 'Skid steers, mini and compact track loaders, manufacturer-defined wheel loaders, articulated loaders, tractor loaders, loader backhoes and rough-terrain forklifts.',
-    slugs: ['skid-steer-loader', 'mini-track-loader', 'compact-track-loader', 'compact-wheel-loader', 'wheel-loader', 'small-articulated-loader', 'large-wheel-loader', 'tractor-loader', 'loader-backhoe', 'rough-terrain-forklift'],
+    description: 'Stand-on loaders, skid steers, mini and compact track loaders, manufacturer-defined wheel loaders, articulated loaders, tractor loaders, tractor-loader-backhoes, loader backhoes and rough-terrain forklifts.',
+    slugs: ['stand-on-compact-loader', 'skid-steer-loader', 'mini-track-loader', 'compact-track-loader', 'compact-wheel-loader', 'wheel-loader', 'small-articulated-loader', 'large-wheel-loader', 'tractor-loader', 'tractor-loader-backhoe', 'loader-backhoe', 'rough-terrain-forklift'],
   },
   {
     name: 'Farm & Utility Equipment',
