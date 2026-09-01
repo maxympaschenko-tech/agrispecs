@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
 import { getEquipmentTypePageContent } from '@/lib/equipment-type-content-overrides';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,6 +14,25 @@ type PageProps = {
 
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function machineThumbnail(brandSlug: string, modelSlug: string, equipmentTypeSlug: string, title: string) {
+  const image = getManifestMachinePrimaryImage(brandSlug, modelSlug, equipmentTypeSlug);
+  return (
+    <img
+      src={image.imageUrl}
+      alt={image.altText || title}
+      loading="lazy"
+      style={{
+        display: 'block',
+        width: '100%',
+        aspectRatio: '4 / 3',
+        objectFit: 'contain',
+        borderRadius: 12,
+        marginBottom: 14,
+      }}
+    />
+  );
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -119,6 +139,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
               <div className="grid">
                 {machines.map((machine) => (
                   <div className="card" key={machine.id}>
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug, machine.title)}
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
                     <p>{typeName} specifications, configuration and current market reference.</p>
