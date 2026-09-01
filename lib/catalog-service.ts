@@ -46,6 +46,21 @@ type SpecRow = RowDataPacket & {
   source_published_date: string | null;
 };
 
+type AttachmentRow = RowDataPacket & {
+  id: number;
+  attachment_type: string;
+  model_name: string;
+  slug: string;
+  lift_capacity_text: string | null;
+  lift_height_text: string | null;
+  configuration_text: string | null;
+  data_status: 'seed' | 'partial' | 'verified' | 'review';
+  compatibility_note: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
+  source_title: string | null;
+  source_url: string | null;
+};
+
 export type MachineVersion = {
   id: number;
   slug: string;
@@ -70,6 +85,21 @@ export type MachineSpec = {
   sourceTitle: string | null;
   sourceUrl: string | null;
   sourcePublishedDate: string | null;
+};
+
+export type MachineAttachment = {
+  id: number;
+  attachmentType: string;
+  modelName: string;
+  slug: string;
+  liftCapacityText: string | null;
+  liftHeightText: string | null;
+  configurationText: string | null;
+  dataStatus: 'seed' | 'partial' | 'verified' | 'review';
+  compatibilityNote: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
+  sourceTitle: string | null;
+  sourceUrl: string | null;
 };
 
 function rowToMachine(row: MachineRow): Machine {
@@ -281,6 +311,52 @@ export async function getMachineSpecs(machineId: string, machineVersionId?: numb
     }));
   } catch (error) {
     console.error('Unable to load machine specifications:', error);
+    return [];
+  }
+}
+
+export async function getMachineAttachments(machineId: string): Promise<MachineAttachment[]> {
+  if (!/^\d+$/.test(machineId)) return [];
+
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<AttachmentRow[]>(`
+      SELECT
+        a.id,
+        a.attachment_type,
+        a.model_name,
+        a.slug,
+        a.lift_capacity_text,
+        a.lift_height_text,
+        a.configuration_text,
+        a.data_status,
+        ma.compatibility_note,
+        ma.confidence,
+        sr.title AS source_title,
+        sr.url AS source_url
+      FROM machine_attachments ma
+      INNER JOIN attachments a ON a.id = ma.attachment_id
+      LEFT JOIN source_records sr ON sr.id = ma.source_record_id
+      WHERE ma.machine_id = ?
+      ORDER BY a.attachment_type ASC, a.model_name ASC
+    `, [Number(machineId)]);
+
+    return rows.map((row) => ({
+      id: row.id,
+      attachmentType: row.attachment_type,
+      modelName: row.model_name,
+      slug: row.slug,
+      liftCapacityText: row.lift_capacity_text,
+      liftHeightText: row.lift_height_text,
+      configurationText: row.configuration_text,
+      dataStatus: row.data_status,
+      compatibilityNote: row.compatibility_note,
+      confidence: row.confidence,
+      sourceTitle: row.source_title,
+      sourceUrl: row.source_url,
+    }));
+  } catch (error) {
+    console.error('Unable to load machine attachments:', error);
     return [];
   }
 }
