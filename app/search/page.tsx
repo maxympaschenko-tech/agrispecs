@@ -17,6 +17,16 @@ type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
+function attachmentTypeLabel(type: string) {
+  if (type === 'front-loader') return 'Front loader';
+  if (type === 'backhoe') return 'Backhoe';
+  return type
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || 'Attachment';
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = '' } = await searchParams;
   const term = q.trim();
@@ -38,7 +48,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <span className="eyebrow">Catalog search</span>
         <h1>Search</h1>
         <form className="search-shell" action="/search">
-          <input name="q" defaultValue={q} aria-label="Search equipment, attachment or part number" placeholder="Try: John Deere 5075E, Tigrecar 5800 or RE519626" />
+          <input name="q" defaultValue={q} aria-label="Search equipment, attachment or part number" placeholder="Try: Kubota SCL1000, SSG2024 or RE519626" />
           <button type="submit">Search</button>
         </form>
 
@@ -83,9 +93,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="grid">
                 {attachments.map((attachment) => (
                   <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
-                    <span className="eyebrow">{attachment.attachmentType === 'front-loader' ? 'Front loader' : 'Attachment'}</span>
+                    <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
                     <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
-                    <p>{attachment.compatibleMachineCount} verified compatible tractor{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
+                    <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
                   </Link>
                 ))}
               </div>
