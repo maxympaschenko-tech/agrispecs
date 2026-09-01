@@ -9,7 +9,7 @@ const overrides: Record<string, EquipmentTypeContent> = {
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
-    lead: 'Compare current farm-relevant skid steer loaders from CASE, Bobcat and New Holland without collapsing unlike manufacturer metrics. New Holland L Series keeps gross horsepower, operating weight, ROC at 50% tipping load and lift type exactly as published; Bobcat Classic and Pro models retain current designations and published horsepower/ROC; CASE B Series keeps net-power, weight and geometry tied to its source table.',
+    lead: 'Compare current farm-relevant skid steer loaders from CASE, Bobcat, New Holland and Kubota without collapsing unlike manufacturer metrics. Kubota SSV65/SSV75 keep SAE J1995 gross and SAE J1349 net horsepower as separate fields plus open- and closed-cab weights; New Holland L Series keeps gross horsepower, ROC at 50% tipping load and lift type; Bobcat retains its published horsepower/ROC; CASE B Series keeps net-power, weight and geometry tied to its source table.',
   },
   'compact-track-loader': {
     title: 'Compact Track Loader Specs, Horsepower, ROC and Weight',
