@@ -21,6 +21,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hinge-pin height, hydraulics, travel speed and current North America model data.',
     lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, published power, operating weight and loader geometry. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
   },
+  'wheel-loader': {
+    title: 'Wheel Loader Specs, Horsepower, ROC and Tipping Load',
+    description: 'Browse source-backed manufacturer-defined wheel loader specifications including gross horsepower, canopy and cab operating weights, bucket breakout force, tipping loads, rated operating capacity, hydraulics and articulation.',
+    lead: 'Browse Kubota R Series machines in the manufacturer-defined Wheel Loader category rather than forcing them into compact or large wheel-loader buckets. R430, R540 and R640 keep 2026 U.S. catalog canopy/cab weights, tipping loads and rated operating capacities as separate configuration fields, with gross SAE J1995 horsepower, bucket breakout force, articulation and hydraulic flow tied to the same factory source.',
+  },
   'mini-track-loader': {
     title: 'Mini Track Loader Specs, ROC, Weight and Electric Options',
     description: 'Browse source-backed mini track loader specifications including horsepower or battery capacity, rated operating capacity, operating weight, lift type, ground pressure, hydraulics and current North America configurations.',
