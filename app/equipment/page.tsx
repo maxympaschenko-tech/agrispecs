@@ -44,8 +44,8 @@ const TYPE_GROUPS = [
   },
   {
     name: 'Farm & Utility Equipment',
-    description: 'Additional farm-relevant machines that do not belong in the tractor catalog.',
-    slugs: ['mini-excavator', 'compact-dozer-loader', 'transporter'],
+    description: 'Utility vehicles, compact excavation and other farm-relevant machines that do not belong in the tractor catalog.',
+    slugs: ['utility-vehicle', 'mini-excavator', 'compact-dozer-loader', 'transporter'],
   },
 ] as const;
 
