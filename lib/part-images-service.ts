@@ -30,14 +30,21 @@ type ManifestPartImage = {
   imageKind: 'exact' | 'representative';
 };
 
+type RepresentativeSeed = { normalizedPartNumber: string; label: string };
+
 const manifest = partImageManifest as ManifestPartImage[];
 
-const categoryRepresentativeSeeds: Record<string, { normalizedPartNumber: string; label: string }> = {
-  'engine-oil-filters': { normalizedPartNumber: 'HH16432430', label: 'engine oil filter' },
-  'fuel-filters': { normalizedPartNumber: '6A32059930', label: 'fuel filter' },
-  'hydraulic-filters': { normalizedPartNumber: 'HH3A082623', label: 'hydraulic filter' },
-  'engine-air-filters': { normalizedPartNumber: 'TC82093230', label: 'engine air filter' },
-  'transmission-filters': { normalizedPartNumber: 'HHK7014073', label: 'transmission filter' },
+const categoryRepresentativeSeeds: Record<string, Record<string, RepresentativeSeed>> = {
+  kubota: {
+    'engine-oil-filters': { normalizedPartNumber: 'HH16432430', label: 'engine oil filter' },
+    'fuel-filters': { normalizedPartNumber: '6A32059930', label: 'fuel filter' },
+    'hydraulic-filters': { normalizedPartNumber: 'HH3A082623', label: 'hydraulic filter' },
+    'engine-air-filters': { normalizedPartNumber: 'TC82093230', label: 'engine air filter' },
+    'transmission-filters': { normalizedPartNumber: 'HHK7014073', label: 'transmission filter' },
+  },
+  'john-deere': {
+    'engine-oil-filters': { normalizedPartNumber: 'RE519626', label: 'engine oil filter' },
+  },
 };
 
 function localMediaExists(publicUrl: string) {
@@ -77,7 +84,7 @@ function categoryRepresentative(
   categorySlug?: string | null,
 ): PartImage | null {
   if (!brandSlug || !categorySlug) return null;
-  const seed = categoryRepresentativeSeeds[categorySlug];
+  const seed = categoryRepresentativeSeeds[brandSlug]?.[categorySlug];
   if (!seed) return null;
 
   const source = manifest.find((image) =>
