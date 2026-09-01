@@ -11,6 +11,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed disc mower specifications including cutting width, approximate weight, transport width, hitch category, PTO speed, minimum PTO horsepower, discs, blades, remotes and cutterbar range.',
     lead: 'Compare the current Kubota DM1017, DM1022, DM1024, DM2028, DM2032, DM3087, DM4032, DM5028, DM5032 and DM5040 using the live U.S. lineup plus current product and series specification sheets. Newer DM brochure weights remain separate from older family-sheet figures, DM1024 and DM2032 width differences are documented rather than averaged, and DM3087 keeps the live/current-product 140 hp and 3,000 lb value set while the conflicting 2026 full-line 120 hp and 3,420 lb figures remain visible in source notes.',
   },
+  'disc-mower-conditioner': {
+    title: 'Disc Mower Conditioner Specs, PTO HP and Conditioner Type',
+    description: 'Browse source-backed disc mower conditioner specifications including current model status, minimum PTO horsepower, DMC series and SemiSwing tine, roller or steel-roller conditioner configuration.',
+    lead: 'Browse the complete current Kubota USA DMC lineup across DMC6300, DMC7300, DMC8000 and DMC8500 Series. All 29 current model cards retain their live manufacturer horsepower requirement, while T, R and RS configurations remain distinct SemiSwing tine, roller and steel-roller machines instead of being collapsed into one family record. Detailed cutting widths, weights and transport dimensions are layered from family-specific publications separately so changing DMC brochure generations are not silently mixed.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
