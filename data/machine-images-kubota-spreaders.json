@@ -1,0 +1,62 @@
+[
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "vs220",
+    "sourceKey": "kubota-vs220-current-family-2026-09",
+    "remoteUrl": "https://kubotausa.wpenginepowered.com/wp-content/uploads/2026/04/vs400viti-02-spreader.jpg",
+    "outputPath": "public/media/machines/kubota/vs220/main.jpg",
+    "publicUrl": "/media/machines/kubota/vs220/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/hay-forage",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Current Kubota VS Series family product photo used as a representative image for VS220.",
+    "altText": "Kubota VS220 pendulum spreader",
+    "imageKind": "family"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "vs400viti",
+    "sourceKey": "kubota-vs400viti-official-2026-09",
+    "remoteUrl": "https://kubotausa.wpenginepowered.com/wp-content/uploads/2026/04/vs400viti-02-spreader.jpg",
+    "outputPath": "public/media/machines/kubota/vs400viti/main.jpg",
+    "publicUrl": "/media/machines/kubota/vs400viti/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/hay-forage",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota VS400VITI manufacturer product photo used by the current Kubota USA Hay & Forage page.",
+    "altText": "Kubota VS400VITI pendulum spreader",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "vs400",
+    "sourceKey": "kubota-vs400-current-family-2026-09",
+    "remoteUrl": "https://kubotausa.wpenginepowered.com/wp-content/uploads/2026/04/vs400viti-02-spreader.jpg",
+    "outputPath": "public/media/machines/kubota/vs400/main.jpg",
+    "publicUrl": "/media/machines/kubota/vs400/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/hay-forage",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Current Kubota VS Series family product photo; the live Hay & Forage page presents this image in the VS400 spreader section while the underlying manufacturer filename identifies VS400VITI.",
+    "altText": "Kubota VS400 pendulum spreader",
+    "imageKind": "family"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "vs600",
+    "sourceKey": "kubota-vs600-current-family-2026-09",
+    "remoteUrl": "https://kubotausa.wpenginepowered.com/wp-content/uploads/2026/04/vs400viti-02-spreader.jpg",
+    "outputPath": "public/media/machines/kubota/vs600/main.jpg",
+    "publicUrl": "/media/machines/kubota/vs600/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/hay-forage",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Current Kubota VS Series family product photo used as a representative image for VS600.",
+    "altText": "Kubota VS600 pendulum spreader",
+    "imageKind": "family"
+  }
+]
