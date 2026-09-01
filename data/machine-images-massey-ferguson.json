@@ -1,0 +1,62 @@
+[
+  {
+    "brandSlug": "massey-ferguson",
+    "modelSlug": "mf-5s-145",
+    "sourceKey": "commons-mf-5s-145-agritechnica-2025-dsc09527",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Massey_Ferguson_5S.145_Dyna-VT_Agritechnica_2025_%28DSC09527%29.jpg?width=1600",
+    "outputPath": "public/media/machines/massey-ferguson/mf-5s-145/main.jpg",
+    "publicUrl": "/media/machines/massey-ferguson/mf-5s-145/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Massey_Ferguson_5S.145_Dyna-VT_Agritechnica_2025_(DSC09527).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Massey Ferguson MF 5S.145 Dyna-VT displayed at Agritechnica 2025.",
+    "altText": "Massey Ferguson MF 5S.145 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "massey-ferguson",
+    "modelSlug": "mf-7s-190",
+    "sourceKey": "commons-mf-7s-190-agra-2022-dsc05431",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Massey_Ferguson_MF_7S.190_agra_2022_%28DSC05431%29.jpg?width=1600",
+    "outputPath": "public/media/machines/massey-ferguson/mf-7s-190/main.jpg",
+    "publicUrl": "/media/machines/massey-ferguson/mf-7s-190/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Massey_Ferguson_MF_7S.190_agra_2022_(DSC05431).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Massey Ferguson MF 7S.190 displayed at agra 2022.",
+    "altText": "Massey Ferguson MF 7S.190 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "massey-ferguson",
+    "modelSlug": "mf-8s-225",
+    "sourceKey": "commons-mf-8s-225-agra-2024-dsc02101",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Massey_Ferguson_8S.225_agra_2024_%28DSC02101%29.jpg?width=1600",
+    "outputPath": "public/media/machines/massey-ferguson/mf-8s-225/main.jpg",
+    "publicUrl": "/media/machines/massey-ferguson/mf-8s-225/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Massey_Ferguson_8S.225_agra_2024_(DSC02101).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Massey Ferguson MF 8S.225 displayed at agra 2024.",
+    "altText": "Massey Ferguson MF 8S.225 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "massey-ferguson",
+    "modelSlug": "mf-8s-305",
+    "sourceKey": "commons-mf-8s-305-gotland-2024-01",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Massey_Ferguson_8S.305_01.jpg?width=1600",
+    "outputPath": "public/media/machines/massey-ferguson/mf-8s-305/main.jpg",
+    "publicUrl": "/media/machines/massey-ferguson/mf-8s-305/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Massey_Ferguson_8S.305_01.jpg",
+    "author": "Bene Riobó",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Massey Ferguson MF 8S.305 at Gotlands Skördefestival 2024.",
+    "altText": "Massey Ferguson MF 8S.305 tractor",
+    "imageKind": "exact"
+  }
+]
