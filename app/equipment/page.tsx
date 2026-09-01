@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getNonTractorEquipment, getNonTractorEquipmentTypes, type EquipmentMachine } from '@/lib/equipment-service';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -74,6 +75,25 @@ function featuredByBrand(machines: EquipmentMachine[], limit = 8) {
     row += 1;
   }
   return featured;
+}
+
+function machineThumbnail(machine: EquipmentMachine) {
+  const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug);
+  return (
+    <img
+      src={image.imageUrl}
+      alt={image.altText || machine.title}
+      loading="lazy"
+      style={{
+        display: 'block',
+        width: '100%',
+        aspectRatio: '4 / 3',
+        objectFit: 'contain',
+        borderRadius: 12,
+        marginBottom: 14,
+      }}
+    />
+  );
 }
 
 function jsonLd(value: unknown) {
@@ -164,14 +184,20 @@ export default async function EquipmentPage() {
                 <h3>{group.name}</h3>
                 <p className="section-note">{group.description}</p>
                 <div className="grid">
-                  {group.types.map((type) => (
-                    <Link className="card" href={`/equipment/${type.slug}`} key={type.slug}>
-                      <span className="eyebrow">Equipment type</span>
-                      <h3>{type.name}</h3>
-                      <p>{type.machineCount.toLocaleString('en-US')} published {type.machineCount === 1 ? 'model' : 'models'}</p>
-                      <span className="tool-link">Browse {type.name.toLowerCase()} →</span>
-                    </Link>
-                  ))}
+                  {group.types.map((type) => {
+                    const representative = published.find((machine) => machine.equipmentTypeSlug === type.slug);
+                    return (
+                      <Link className="card" href={`/equipment/${type.slug}`} key={type.slug}>
+                        {representative ? machineThumbnail(representative) : (
+                          <img src="/media/fallbacks/equipment.svg" alt={`${type.name} image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
+                        )}
+                        <span className="eyebrow">Equipment type</span>
+                        <h3>{type.name}</h3>
+                        <p>{type.machineCount.toLocaleString('en-US')} published {type.machineCount === 1 ? 'model' : 'models'}</p>
+                        <span className="tool-link">Browse {type.name.toLowerCase()} →</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -181,14 +207,20 @@ export default async function EquipmentPage() {
                 <h3>Other equipment</h3>
                 <p className="section-note">Additional manufacturer-defined machine types with published source-backed records.</p>
                 <div className="grid">
-                  {uncategorizedTypes.map((type) => (
-                    <Link className="card" href={`/equipment/${type.slug}`} key={type.slug}>
-                      <span className="eyebrow">Equipment type</span>
-                      <h3>{type.name}</h3>
-                      <p>{type.machineCount.toLocaleString('en-US')} published {type.machineCount === 1 ? 'model' : 'models'}</p>
-                      <span className="tool-link">Browse {type.name.toLowerCase()} →</span>
-                    </Link>
-                  ))}
+                  {uncategorizedTypes.map((type) => {
+                    const representative = published.find((machine) => machine.equipmentTypeSlug === type.slug);
+                    return (
+                      <Link className="card" href={`/equipment/${type.slug}`} key={type.slug}>
+                        {representative ? machineThumbnail(representative) : (
+                          <img src="/media/fallbacks/equipment.svg" alt={`${type.name} image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
+                        )}
+                        <span className="eyebrow">Equipment type</span>
+                        <h3>{type.name}</h3>
+                        <p>{type.machineCount.toLocaleString('en-US')} published {type.machineCount === 1 ? 'model' : 'models'}</p>
+                        <span className="tool-link">Browse {type.name.toLowerCase()} →</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -209,6 +241,7 @@ export default async function EquipmentPage() {
               <div className="grid">
                 {featured.map((machine) => (
                   <div className="card" key={machine.id}>
+                    {machineThumbnail(machine)}
                     <span className="eyebrow">{machine.brand} · {machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
                     <p>{machine.equipmentType} specifications and current market reference data.</p>
