@@ -40,6 +40,7 @@ import { newHollandCompactWheelLoadersCurrentMigration } from '@/lib/migrations/
 import { newHollandMiniExcavatorsCurrentMigration } from '@/lib/migrations/20260901_559_new_holland_mini_excavators_current';
 import { newHollandF50cRoughTerrainForkliftCurrentMigration } from '@/lib/migrations/20260901_560_new_holland_f50c_rough_terrain_forklift_current';
 import { newHollandDSeriesLoaderBackhoesCurrentMigration } from '@/lib/migrations/20260901_561_new_holland_d_series_loader_backhoes_current';
+import { newHollandU80dTractorLoaderCurrentMigration } from '@/lib/migrations/20260901_562_new_holland_u80d_tractor_loader_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -83,4 +84,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandMiniExcavatorsCurrentMigration,
   newHollandF50cRoughTerrainForkliftCurrentMigration,
   newHollandDSeriesLoaderBackhoesCurrentMigration,
+  newHollandU80dTractorLoaderCurrentMigration,
 ];
