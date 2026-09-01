@@ -6,6 +6,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed agricultural application-system specifications including liquid tank capacity, boom width, air-boom capacity, application rate, compatible chassis and precision controls.',
     lead: 'Compare current agricultural application systems without treating mounted systems as chassis specifications. Liquid and dry systems keep tank, boom, bin, pump, rate-control and compatibility data attached to the exact manufacturer system, including published source discrepancies instead of silently choosing one conflicting value.',
   },
+  'disc-mower': {
+    title: 'Disc Mower Specs, Cutting Width, Weight and PTO HP',
+    description: 'Browse source-backed disc mower specifications including cutting width, approximate weight, transport width, hitch category, PTO speed, minimum PTO horsepower, discs, blades, remotes and cutterbar range.',
+    lead: 'Compare the current Kubota DM1017, DM1022, DM1024, DM2028, DM2032, DM3087, DM4032, DM5028, DM5032 and DM5040 using the live U.S. lineup plus current product and series specification sheets. Newer DM brochure weights remain separate from older family-sheet figures, DM1024 and DM2032 width differences are documented rather than averaged, and DM3087 keeps the live/current-product 140 hp and 3,000 lb value set while the conflicting 2026 full-line 120 hp and 3,420 lb figures remain visible in source notes.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
