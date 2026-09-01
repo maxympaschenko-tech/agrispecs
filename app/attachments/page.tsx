@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Farm Equipment Attachments and Compatibility',
-  description: 'Source-backed farm equipment attachment fitment, including front loaders, backhoes and tractor-specific configuration requirements.',
+  description: 'Source-backed farm equipment attachment fitment, including loaders, backhoes, buckets, grapples, forks, cutters and machine-specific configuration requirements.',
   alternates: { canonical: '/attachments' },
 };
 
@@ -46,7 +46,7 @@ export default async function AttachmentsPage() {
         '@id': `${canonicalUrl}#collection`,
         url: canonicalUrl,
         name: 'Farm Equipment Attachments and Compatibility',
-        description: 'Source-backed farm equipment attachment fitment, including front loaders, backhoes and tractor-specific configuration requirements.',
+        description: 'Source-backed farm equipment attachment fitment, including loaders, backhoes, material-handling tools and machine-specific configuration requirements.',
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
@@ -84,7 +84,7 @@ export default async function AttachmentsPage() {
       <div className="container">
         <span className="eyebrow">Attachment compatibility</span>
         <h1>Farm equipment attachments</h1>
-        <p className="section-lead">Browse source-backed loader, backhoe and other attachment fitment by tractor model, including configuration requirements when the manufacturer publishes them.</p>
+        <p className="section-lead">Browse source-backed loaders, backhoes, buckets, grapples, pallet forks, cutters and other attachment fitment by machine model, including hydraulic, hitch and configuration requirements when the manufacturer publishes them.</p>
 
         {attachments.length > 0 && (
           <div className="parts-stats">
@@ -94,7 +94,7 @@ export default async function AttachmentsPage() {
             </div>
             <div>
               <strong>{fitmentCount.toLocaleString('en-US')}</strong>
-              <span>Verified tractor fitment records</span>
+              <span>Verified machine fitment records</span>
             </div>
             <div>
               <strong>{manufacturerCount.toLocaleString('en-US')}</strong>
@@ -106,13 +106,13 @@ export default async function AttachmentsPage() {
         {Array.from(groups.entries()).map(([manufacturer, items]) => (
           <section className="catalog-group" key={manufacturer}>
             <h2>{manufacturer} attachments</h2>
-            <p className="section-note">{items.length} published attachment{items.length === 1 ? '' : 's'} with source-backed tractor compatibility.</p>
+            <p className="section-note">{items.length} published attachment{items.length === 1 ? '' : 's'} with source-backed machine compatibility.</p>
             <div className="grid">
               {items.map((attachment) => (
                 <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
                   <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
                   <h3>{attachment.modelName}</h3>
-                  <p>{attachment.compatibleMachineCount} verified tractor fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
+                  <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
                   <span className="tool-link">View fitment</span>
                 </Link>
               ))}
