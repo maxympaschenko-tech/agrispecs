@@ -40,5 +40,61 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "caption": "John Deere 6R 150 at Gotlands Skördefestival, Sweden, 2024.",
     "altText": "John Deere 6R 150 tractor"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "l2502",
+    "sourceKey": "kubota-standard-l-l2502-official-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/l2502-studio-image.jpg",
+    "outputPath": "public/media/machines/kubota/l2502/main.jpg",
+    "publicUrl": "/media/machines/kubota/l2502/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/standard-l-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota L2502 official studio product image.",
+    "altText": "Kubota L2502 tractor"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "l3302",
+    "sourceKey": "kubota-standard-l-l3302-official-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/l3302-studio-image.jpg",
+    "outputPath": "public/media/machines/kubota/l3302/main.jpg",
+    "publicUrl": "/media/machines/kubota/l3302/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/standard-l-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota L3302 official studio product image.",
+    "altText": "Kubota L3302 tractor"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "l3902",
+    "sourceKey": "kubota-standard-l-l3902-official-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/FL3902.jpg",
+    "outputPath": "public/media/machines/kubota/l3902/main.jpg",
+    "publicUrl": "/media/machines/kubota/l3902/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/standard-l-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota L3902 official product image.",
+    "altText": "Kubota L3902 tractor"
+  },
+  {
+    "brandSlug": "kubota",
+    "modelSlug": "l4802",
+    "sourceKey": "kubota-standard-l-l4802-official-2026-09",
+    "remoteUrl": "https://assets.kubotacore.com/images/l4802-studio-image.jpg",
+    "outputPath": "public/media/machines/kubota/l4802/main.jpg",
+    "publicUrl": "/media/machines/kubota/l4802/main.jpg",
+    "sourcePageUrl": "https://www.kubotausa.com/equipment-series/standard-l-series",
+    "author": "Kubota Tractor Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Kubota L4802 official studio product image.",
+    "altText": "Kubota L4802 tractor"
   }
 ]
