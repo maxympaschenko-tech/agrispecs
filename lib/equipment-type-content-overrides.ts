@@ -28,8 +28,8 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'small-articulated-loader': {
     title: 'Small Articulated Loader Specs, Weight, Power and Boom Type',
-    description: 'Browse source-backed small articulated loader specifications including horsepower or battery capacity, operating weight, standard or telescopic-reach boom and current North America configurations.',
-    lead: 'Compare current small articulated loaders by powertrain, operating weight and boom configuration. Telescopic-reach TR variants remain separate machines, and electric models retain battery capacity instead of being converted into unsupported horsepower figures.',
+    description: 'Browse source-backed small articulated loader specifications from current North America catalogs including horsepower or battery capacity, operating weight, overall dimensions and standard or telescopic boom configurations.',
+    lead: 'Compare current CASE and New Holland small articulated loaders by powertrain, operating weight and boom configuration. Telescopic variants remain separate machines, electric SL22EV and ML22X retain manufacturer-published battery capacity without invented horsepower, and New Holland family technical-card values are not overwritten by inconsistent marketing prose on individual product pages.',
   },
   'large-wheel-loader': {
     title: 'Large Wheel Loader Specs, Horsepower and Operating Weight',
