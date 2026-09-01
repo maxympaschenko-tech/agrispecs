@@ -1,5 +1,6 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import machineImageManifest from '@/data/machine-images.json';
 
 export type MachineImage = {
   id: number;
@@ -25,8 +26,45 @@ type MachineImageRow = RowDataPacket & {
   is_primary: number;
 };
 
+type MachineIdentityRow = RowDataPacket & {
+  brand_slug: string;
+  model_slug: string;
+};
+
+type ManifestImage = {
+  brandSlug: string;
+  modelSlug: string;
+  sourceKey: string;
+  remoteUrl: string;
+  outputPath: string;
+  publicUrl: string;
+  sourcePageUrl: string;
+  author: string | null;
+  licenseName: string | null;
+  licenseUrl: string | null;
+  caption: string | null;
+  altText: string | null;
+};
+
+const manifest = machineImageManifest as ManifestImage[];
+
+function rowToImage(row: MachineImageRow): MachineImage {
+  return {
+    id: Number(row.id),
+    imageUrl: row.image_url,
+    sourcePageUrl: row.source_page_url,
+    author: row.author,
+    licenseName: row.license_name,
+    licenseUrl: row.license_url,
+    caption: row.caption,
+    altText: row.alt_text,
+    isPrimary: Boolean(row.is_primary),
+  };
+}
+
 export async function getMachineImages(machineId: string): Promise<MachineImage[]> {
   if (!/^\d+$/.test(machineId)) return [];
+
   try {
     const db = await getDbReady();
     const [rows] = await db.query<MachineImageRow[]>(`
@@ -35,17 +73,42 @@ export async function getMachineImages(machineId: string): Promise<MachineImage[
       WHERE machine_id=?
       ORDER BY is_primary DESC,display_order ASC,id ASC
     `,[Number(machineId)]);
-    return rows.map((row) => ({
-      id: Number(row.id),
-      imageUrl: row.image_url,
-      sourcePageUrl: row.source_page_url,
-      author: row.author,
-      licenseName: row.license_name,
-      licenseUrl: row.license_url,
-      caption: row.caption,
-      altText: row.alt_text,
-      isPrimary: Boolean(row.is_primary),
-    }));
+
+    const images = rows.map(rowToImage);
+
+    const [identityRows] = await db.query<MachineIdentityRow[]>(`
+      SELECT mf.slug AS brand_slug,m.slug AS model_slug
+      FROM machines m
+      INNER JOIN manufacturers mf ON mf.id=m.manufacturer_id
+      WHERE m.id=?
+      LIMIT 1
+    `,[Number(machineId)]);
+
+    const identity = identityRows[0];
+    if (!identity) return images;
+
+    const localImages = manifest.filter(
+      (image) => image.brandSlug === identity.brand_slug && image.modelSlug === identity.model_slug,
+    );
+    const existingUrls = new Set(images.map((image) => image.imageUrl));
+
+    localImages.forEach((image, index) => {
+      if (existingUrls.has(image.publicUrl)) return;
+      images.push({
+        id: -(index + 1),
+        imageUrl: image.publicUrl,
+        sourcePageUrl: image.sourcePageUrl,
+        author: image.author,
+        licenseName: image.licenseName,
+        licenseUrl: image.licenseUrl,
+        caption: image.caption,
+        altText: image.altText,
+        isPrimary: images.length === 0 && index === 0,
+      });
+      existingUrls.add(image.publicUrl);
+    });
+
+    return images.sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
   } catch (error) {
     console.error('Unable to load machine images:', error);
     return [];
