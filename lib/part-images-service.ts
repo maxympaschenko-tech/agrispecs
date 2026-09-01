@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import partImageManifest from '@/data/part-images.json';
 
 export type PartImage = {
@@ -38,6 +40,11 @@ const categoryRepresentativeSeeds: Record<string, { normalizedPartNumber: string
   'transmission-filters': { normalizedPartNumber: 'HHK7014073', label: 'transmission filter' },
 };
 
+function localMediaExists(publicUrl: string) {
+  if (!publicUrl.startsWith('/media/')) return true;
+  return existsSync(path.join(process.cwd(), 'public', publicUrl.replace(/^\/+/, '')));
+}
+
 function fallbackImage(normalizedPartNumber: string): PartImage {
   return {
     imageUrl: '/media/fallbacks/part.svg',
@@ -75,7 +82,8 @@ function categoryRepresentative(
 
   const source = manifest.find((image) =>
     image.brandSlug === brandSlug
-    && image.normalizedPartNumber.toLowerCase() === seed.normalizedPartNumber.toLowerCase(),
+    && image.normalizedPartNumber.toLowerCase() === seed.normalizedPartNumber.toLowerCase()
+    && localMediaExists(image.publicUrl),
   );
   if (!source) return null;
 
@@ -99,7 +107,8 @@ export function getPartImages(
   const images = manifest
     .filter((image) =>
       image.normalizedPartNumber.toLowerCase() === normalizedPartNumber.toLowerCase()
-      && (!brandSlug || image.brandSlug === brandSlug),
+      && (!brandSlug || image.brandSlug === brandSlug)
+      && localMediaExists(image.publicUrl),
     )
     .map(mapManifestImage);
 
