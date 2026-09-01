@@ -17,6 +17,7 @@ const manifests = [
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-mowing.json') },
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-square-balers.json') },
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-spreaders.json') },
+  { kind: 'machine', path: path.join(root, 'data', 'machine-images-john-deere.json') },
   { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
 ];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
