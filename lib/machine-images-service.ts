@@ -11,6 +11,7 @@ import kubotaMowingMachineImageManifest from '@/data/machine-images-kubota-mowin
 import kubotaSquareBalerMachineImageManifest from '@/data/machine-images-kubota-square-balers.json';
 import kubotaSpreaderMachineImageManifest from '@/data/machine-images-kubota-spreaders.json';
 import johnDeereMachineImageManifest from '@/data/machine-images-john-deere.json';
+import caseIHMachineImageManifest from '@/data/machine-images-case-ih.json';
 
 export type MachineImage = {
   id: number;
@@ -69,6 +70,7 @@ const manifest = [
   ...(kubotaSquareBalerMachineImageManifest as ManifestImage[]),
   ...(kubotaSpreaderMachineImageManifest as ManifestImage[]),
   ...(johnDeereMachineImageManifest as ManifestImage[]),
+  ...(caseIHMachineImageManifest as ManifestImage[]),
 ];
 
 function localMediaExists(publicUrl: string) {
