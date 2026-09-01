@@ -6,7 +6,7 @@ import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-util
 export type MachineImage = {
   id: number;
   imageUrl: string;
-  sourcePageUrl: string | null;
+  sourcePageUrl: string;
   author: string | null;
   licenseName: string | null;
   licenseUrl: string | null;
@@ -60,7 +60,7 @@ function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'):
   return {
     id: -999999,
     imageUrl: isTractor ? '/media/fallbacks/tractor.svg' : '/media/fallbacks/equipment.svg',
-    sourcePageUrl: null,
+    sourcePageUrl: '/methodology',
     author: null,
     licenseName: null,
     licenseUrl: null,
