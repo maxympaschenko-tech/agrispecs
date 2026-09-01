@@ -121,8 +121,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="grid">
                 {attachments.map((attachment) => (
                   <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
-                    <img src="/media/fallbacks/equipment.svg" alt={`${attachment.manufacturerName} ${attachment.modelName} image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
-                    <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
+                    <img src="/media/fallbacks/attachment.svg" alt={`${attachment.manufacturerName} ${attachment.modelName} attachment image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
+                    <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)} · Photo pending</span>
                     <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
                     <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
                   </Link>
