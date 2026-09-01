@@ -38,8 +38,13 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'rough-terrain-forklift': {
     title: 'Rough Terrain Forklift Specs, Lift Capacity and Mast Range',
-    description: 'Browse source-backed rough terrain forklift specifications including horsepower, lift capacity, mast range, mast tilt, side shift and road speed for current farm-relevant models.',
-    lead: 'Compare current CASE H Series rough terrain forklifts by horsepower and lift capacity, with family-level mast and travel specifications kept explicitly tied to the H Series source. The 586H and 588H remain separate machines because their rated lift capacities differ materially.',
+    description: 'Browse source-backed rough terrain forklift specifications including horsepower, lift capacity, mast height, side shift, drivetrain, travel speed and operating weight for current farm-relevant models.',
+    lead: 'Compare current CASE H Series and New Holland F50C rough terrain forklifts using manufacturer-backed North America specifications. CASE 586H/588H retain their family-level mast and travel data, while the New Holland F50C keeps its 5,000 lb lift rating, 12 ft mast, 4WD driveline and 24.1 mph travel data tied to its direct product page; published greater-than ground-clearance wording remains text rather than a false exact value.',
+  },
+  'loader-backhoe': {
+    title: 'Loader Backhoe Specs, Lift Capacity, Reach and Horsepower',
+    description: 'Browse source-backed loader backhoe specifications including horsepower, operating weight, loader lift capacity, maximum backhoe reach, transmission options and hydraulic performance.',
+    lead: 'Compare current New Holland D Series loader backhoes including B75D, B95D, B95D Tool Carrier, B95D Long Reach and B110D. Horsepower, operating weight, loader lift capacity and maximum backhoe reach remain model-specific, while the shared FPT 3.4-liter engine family, transmission choices and hydraulic systems stay explicitly labeled as D Series family specifications.',
   },
   'mini-excavator': {
     title: 'Mini Excavator Specs, Horsepower, Battery, Weight and Dig Depth',
