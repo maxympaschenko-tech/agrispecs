@@ -22,9 +22,9 @@ const overrides: Record<string, EquipmentTypeContent> = {
     lead: 'Compare current compact wheel loaders from CASE and Bobcat by powertrain, published power, operating weight and loader performance. Electric CASE models retain battery capacity instead of invented horsepower, while Bobcat L65/L95 use direct current model-page ROC, travel and hydraulic values; conflicting or non-current family text is not promoted into the catalog.',
   },
   'mini-track-loader': {
-    title: 'Mini Track Loader Specs, ROC, Weight and Hydraulic Flow',
-    description: 'Browse source-backed mini track loader specifications including horsepower, rated operating capacity, operating weight, ground pressure, travel speed, auxiliary hydraulic flow and lift dimensions.',
-    lead: 'Compare the current Bobcat MT100 and MT120 using direct North America product-page specifications for rated operating capacity, operating weight, ground pressure, travel speed, auxiliary hydraulics and lift geometry. The older MT85 is intentionally excluded from the current catalog because Bobcat lists it under non-current models.',
+    title: 'Mini Track Loader Specs, ROC, Weight and Electric Options',
+    description: 'Browse source-backed mini track loader specifications including horsepower or battery capacity, rated operating capacity, operating weight, lift type, ground pressure, hydraulics and current North America configurations.',
+    lead: 'Compare current Bobcat MT100/MT120 and New Holland C314/C314X mini track loaders using manufacturer-backed North America specifications. New Holland technical-card ROC at 50% tipping load is kept as the numeric comparison value while the different rated-operating-capacity wording in its marketing copy is preserved as a source note; the electric C314X keeps its 23.5 kWh battery capacity rather than receiving invented horsepower.',
   },
   'small-articulated-loader': {
     title: 'Small Articulated Loader Specs, Weight, Power and Boom Type',
