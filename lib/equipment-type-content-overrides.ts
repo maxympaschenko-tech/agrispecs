@@ -41,6 +41,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed rough terrain forklift specifications including horsepower, lift capacity, mast height, side shift, drivetrain, travel speed and operating weight for current farm-relevant models.',
     lead: 'Compare current CASE H Series and New Holland F50C rough terrain forklifts using manufacturer-backed North America specifications. CASE 586H/588H retain their family-level mast and travel data, while the New Holland F50C keeps its 5,000 lb lift rating, 12 ft mast, 4WD driveline and 24.1 mph travel data tied to its direct product page; published greater-than ground-clearance wording remains text rather than a false exact value.',
   },
+  'tractor-loader': {
+    title: 'Tractor Loader Specs, Lift Capacity, Hitch and Horsepower',
+    description: 'Browse source-backed tractor loader specifications including gross horsepower, operating weight, bucket lift capacity, breakout force, three-point hitch capacity, PTO and transmission data.',
+    lead: 'Review the current New Holland U80D as the manufacturer-defined Tractor Loader it is, rather than forcing it into the agricultural tractor catalog. Direct North America product data keeps its 74 gross hp, loader lift ratings, three-point hitch capacities, optional 540-rpm PTO and power-shuttle transmission together in the correct equipment category.',
+  },
   'loader-backhoe': {
     title: 'Loader Backhoe Specs, Lift Capacity, Reach and Horsepower',
     description: 'Browse source-backed loader backhoe specifications including horsepower, operating weight, loader lift capacity, maximum backhoe reach, transmission options and hydraulic performance.',
