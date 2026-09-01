@@ -30,6 +30,8 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
   const canonicalUrl = `${baseUrl}/attachments/${item.manufacturerSlug}/${item.slug}`;
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const equipmentTypes = Array.from(new Set(item.compatibleMachines.map((machine) => machine.equipmentType)));
+  const localImageUrl = '/media/fallbacks/attachment.svg';
+  const absoluteImageUrl = `${baseUrl}${localImageUrl}`;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -40,6 +42,7 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
         url: canonicalUrl,
         name: `${item.manufacturerName} ${item.modelName} ${typeLabel} compatibility`,
         description: `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatibility, published specifications and source-backed machine fitment${equipmentTypes.length ? ` for ${equipmentTypes.join(', ')}` : ''}.`,
+        image: absoluteImageUrl,
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
@@ -53,6 +56,7 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
           '@type': 'Thing',
           name: `${item.manufacturerName} ${item.modelName}`,
           additionalType: typeLabel,
+          image: absoluteImageUrl,
         },
       },
       {
@@ -88,6 +92,18 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
+      <section className="section" style={{ paddingTop: 18, paddingBottom: 0 }}>
+        <div className="container">
+          <figure className="machine-photo" style={{ maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
+            <img
+              src={localImageUrl}
+              alt={`${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} image pending`}
+              loading="eager"
+            />
+            <figcaption>Exact attachment product photo is being sourced and will replace this local placeholder automatically.</figcaption>
+          </figure>
+        </div>
+      </section>
       {children}
     </>
   );
