@@ -21,6 +21,16 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed rotary tedder specifications including working width, transport dimensions, approximate weight, theoretical field capacity, attachment type, rotor count, tine-arm count and current tractor-horsepower requirements where Kubota publishes them.',
     lead: 'Compare the current Kubota TE4052T, TE6576C, TE6583T, TE8511T, TE8590C, TE10511C, TE12513C and TE14515C across FarmLine and ProLine. Live U.S. model status is kept separate from older brochures, TerraFlow remains attached only to the current ProLine models Kubota identifies, and source conflicts are preserved: TE4052T uses the live 904 lb figure rather than silently replacing it with the 2026 catalog’s 1,014 lb, while TE6576C keeps the live 24 ft 11 in working width and treats the catalog’s 25 ft 7 in figure as working-position width instead of averaging the two.',
   },
+  'rotary-rake': {
+    title: 'Rotary Rake Specs, Working Width, Weight and Rotor Setup',
+    description: 'Browse source-backed rotary rake specifications including working and swath width, transport dimensions, weight, hitch system, rotor diameter, tine-arm configuration, rake capacity and TerraLink ground-following data.',
+    lead: 'Compare the eight current Kubota rotary rakes separately from the newer CR wheel-rake family: RA1035, RA1042T, RA1047T, RA2071T EVO, RA2072, RA2076, RA2577 and RA2584. FarmLine and ProLine gearbox families remain distinct, multi-rotor tine layouts stay model-specific, and publication conflicts are retained instead of averaged—for example RA2584 keeps the newer broad-brochure and 2026-catalog 9 ft 9 in transport width while its dedicated RA2000 sheet’s 9 ft 2 in value is preserved in the source note.',
+  },
+  'wheel-rake': {
+    title: 'Wheel Rake Specs, Working Width, Weight and Tractor HP',
+    description: 'Browse source-backed carted wheel rake specifications including minimum and maximum working width, transport dimensions, typical weight, tractor horsepower, hydraulic requirements and rake-wheel suspension.',
+    lead: 'Compare the current Kubota RA108CR, RA110CR, RA210CR and RA212CR carted wheel rakes without mixing them into the rotary-rake catalog. Current Kubota model cards keep their 30, 40, 40 and 50 hp requirements, while the 2026 U.S. table supplies distinct RA100 and RA200 chassis dimensions, working-width ranges and typical weights. Independent rake-wheel suspension, adjustable drawbar height and RA200 multi-point windrow adjustment remain attached to the correct current family.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
