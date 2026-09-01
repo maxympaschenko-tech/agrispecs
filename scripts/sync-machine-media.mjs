@@ -2,11 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-if (process.env.SKIP_MEDIA_SYNC === '1') {
-  console.log('[media] Skipping external media sync for CI build.');
-  process.exit(0);
-}
-
+const skipDownloads = process.env.SKIP_MEDIA_SYNC === '1';
 const root = process.cwd();
 const manifests = [
   { kind: 'machine', path: path.join(root, 'data', 'machine-images.json') },
@@ -27,7 +23,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readManifest(entry) {
   try {
     const items = JSON.parse(await readFile(entry.path, 'utf8'));
-    return items.map((item) => ({ ...item, kind: entry.kind }));
+    if (!Array.isArray(items)) throw new Error(`Media manifest must contain an array: ${entry.path}`);
+    return items.map((item) => ({ ...item, kind: entry.kind, manifestPath: entry.path }));
   } catch (error) {
     if (error?.code === 'ENOENT') return [];
     throw error;
@@ -71,17 +68,55 @@ async function download(url, attempts = 3) {
 }
 
 const manifest = (await Promise.all(manifests.map(readManifest))).flat();
+const sourceKeys = new Map();
+const outputPaths = new Map();
+const publicUrls = new Map();
+const publicRoot = path.resolve(root, 'public');
+
+for (const image of manifest) {
+  for (const required of ['sourceKey', 'remoteUrl', 'outputPath', 'publicUrl']) {
+    if (!image[required] || typeof image[required] !== 'string') {
+      throw new Error(`[media] Missing ${required} in ${image.manifestPath}`);
+    }
+  }
+
+  const previousSource = sourceKeys.get(image.sourceKey);
+  if (previousSource) {
+    throw new Error(`[media] Duplicate sourceKey ${image.sourceKey} in ${previousSource} and ${image.manifestPath}`);
+  }
+  sourceKeys.set(image.sourceKey, image.manifestPath);
+
+  for (const [field, value, registry] of [
+    ['outputPath', image.outputPath, outputPaths],
+    ['publicUrl', image.publicUrl, publicUrls],
+  ]) {
+    const previous = registry.get(value);
+    if (previous && previous.sourceKey !== image.sourceKey) {
+      throw new Error(
+        `[media] ${field} collision for ${value}: ${previous.sourceKey} (${previous.manifestPath}) vs ${image.sourceKey} (${image.manifestPath})`,
+      );
+    }
+    registry.set(value, { sourceKey: image.sourceKey, manifestPath: image.manifestPath });
+  }
+
+  const target = path.resolve(root, image.outputPath);
+  if (!target.startsWith(`${publicRoot}${path.sep}`)) {
+    throw new Error(`Refusing to write media outside public/: ${image.outputPath}`);
+  }
+}
+
+console.log(`[media] Validated ${manifest.length} source-tracked catalog image records with no path collisions.`);
+
+if (skipDownloads) {
+  console.log('[media] Skipping external media downloads for CI build after manifest validation.');
+  process.exit(0);
+}
+
 const built = [];
 const failed = [];
 
 for (const image of manifest) {
   const target = path.resolve(root, image.outputPath);
-  const publicRoot = path.resolve(root, 'public');
-
-  if (!target.startsWith(`${publicRoot}${path.sep}`)) {
-    throw new Error(`Refusing to write media outside public/: ${image.outputPath}`);
-  }
-
   const label = image.kind === 'part'
     ? `${image.brandSlug || 'part'} ${image.partNumber || image.normalizedPartNumber}`
     : `${image.brandSlug} ${image.modelSlug}`;
