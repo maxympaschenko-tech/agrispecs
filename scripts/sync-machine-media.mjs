@@ -11,6 +11,7 @@ const root = process.cwd();
 const manifests = [
   { kind: 'machine', path: path.join(root, 'data', 'machine-images.json') },
   { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-utility.json') },
+  { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-equipment.json') },
   { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
 ];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
@@ -92,6 +93,7 @@ for (const image of manifest) {
     author: image.author,
     licenseName: image.licenseName,
     licenseUrl: image.licenseUrl,
+    imageKind: image.imageKind || 'exact',
     sha256,
     bytes: result.bytes.length,
     contentType: result.contentType,
@@ -103,4 +105,4 @@ for (const image of manifest) {
 
 await mkdir(path.dirname(buildManifestPath), { recursive: true });
 await writeFile(buildManifestPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), images: built }, null, 2)}\n`);
-console.log(`[media] Synced ${built.length} catalog images to local public storage.`);
+console.log(`[media] Synced ${built.length} licensed/source-tracked catalog images to local public storage.`);
