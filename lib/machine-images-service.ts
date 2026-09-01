@@ -3,6 +3,7 @@ import { getDbReady } from '@/lib/db-migrations';
 import coreMachineImageManifest from '@/data/machine-images.json';
 import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-utility.json';
 import kubotaEquipmentMachineImageManifest from '@/data/machine-images-kubota-equipment.json';
+import kubotaExcavatorMachineImageManifest from '@/data/machine-images-kubota-excavators.json';
 
 export type MachineImage = {
   id: number;
@@ -55,6 +56,7 @@ const manifest = [
   ...(coreMachineImageManifest as ManifestImage[]),
   ...(kubotaUtilityMachineImageManifest as ManifestImage[]),
   ...(kubotaEquipmentMachineImageManifest as ManifestImage[]),
+  ...(kubotaExcavatorMachineImageManifest as ManifestImage[]),
 ];
 
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
