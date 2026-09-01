@@ -32,6 +32,8 @@ import { newHollandProCartWheelRakesCurrentMigration } from '@/lib/migrations/20
 import { newHollandProRotorRotaryRakesCurrentMigration } from '@/lib/migrations/20260831_506_new_holland_prorotor_rotary_rakes_current';
 import { newHollandProTedRotaryTeddersCurrentMigration } from '@/lib/migrations/20260831_508_new_holland_proted_rotary_tedders_current';
 import { newHollandDuraDiscDiscMowersCurrentMigration } from '@/lib/migrations/20260831_510_new_holland_duradisc_disc_mowers_current';
+import { newHollandSkidSteerLoadersCurrentMigration } from '@/lib/migrations/20260901_554_new_holland_skid_steer_loaders_current';
+import { newHollandCompactTrackLoadersCurrentMigration } from '@/lib/migrations/20260901_555_new_holland_compact_track_loaders_current';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -67,4 +69,6 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandProRotorRotaryRakesCurrentMigration,
   newHollandProTedRotaryTeddersCurrentMigration,
   newHollandDuraDiscDiscMowersCurrentMigration,
+  newHollandSkidSteerLoadersCurrentMigration,
+  newHollandCompactTrackLoadersCurrentMigration,
 ];
