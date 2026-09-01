@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMachines } from '@/lib/catalog-service';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,6 +11,26 @@ export const metadata: Metadata = {
   description: 'Browse source-backed tractor specifications by manufacturer, including maintenance, OEM parts, attachment fitment and side-by-side tractor comparisons.',
   alternates: { canonical: '/tractors' },
 };
+
+function tractorThumbnail(brandSlug: string, modelSlug: string, title: string) {
+  const image = getManifestMachinePrimaryImage(brandSlug, modelSlug);
+  if (!image) return null;
+  return (
+    <img
+      src={image.imageUrl}
+      alt={image.altText || title}
+      loading="lazy"
+      style={{
+        display: 'block',
+        width: '100%',
+        aspectRatio: '4 / 3',
+        objectFit: 'contain',
+        borderRadius: 12,
+        marginBottom: 14,
+      }}
+    />
+  );
+}
 
 export default async function TractorsPage() {
   const machines = await getMachines();
@@ -89,6 +110,9 @@ export default async function TractorsPage() {
               <div className="grid">
                 {brandMachines.map((machine) => (
                   <div className="card" key={machine.id}>
+                    <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`} aria-label={`View ${machine.title}`}>
+                      {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
+                    </Link>
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.model}</h3>
                     <p>Specs, maintenance, parts, fitment and related equipment.</p>
@@ -109,6 +133,7 @@ export default async function TractorsPage() {
             <div className="grid">
               {researchMachines.map((machine) => (
                 <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                  {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                   <span className="eyebrow">Research queue</span>
                   <h3>{machine.title}</h3>
                   <p>Source verification in progress.</p>
