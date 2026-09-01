@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
 import { getPartCategories } from '@/lib/part-category-service';
+import { getPartImages } from '@/lib/part-images-service';
 import {
   getPartCatalogPage,
   getPartCatalogStats,
@@ -60,10 +61,26 @@ function PartCard({ part }: { part: PartCatalogItem }) {
     part.componentCount > 0 ? `${part.componentCount} verified kit component${part.componentCount === 1 ? '' : 's'}` : null,
     part.kitMembershipCount > 0 ? `included in ${part.kitMembershipCount} verified kit${part.kitMembershipCount === 1 ? '' : 's'}` : null,
   ].filter(Boolean).join(' · ');
+  const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug)[0];
 
   return (
     <Link className="card" href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
-      <span className="eyebrow">{part.categoryName || 'Part'}</span>
+      {image && (
+        <img
+          src={image.imageUrl}
+          alt={image.altText || `${part.partNumber} ${part.name || 'part'}`}
+          loading="lazy"
+          style={{
+            display: 'block',
+            width: '100%',
+            aspectRatio: '4 / 3',
+            objectFit: 'contain',
+            borderRadius: 12,
+            marginBottom: 14,
+          }}
+        />
+      )}
+      <span className="eyebrow">{part.categoryName || 'Part'}{image?.imageKind === 'representative' ? ' · Representative image' : ''}</span>
       <h3>{part.partNumber}</h3>
       <p>{part.manufacturerName ? `${part.manufacturerName} · ` : ''}{part.name || 'Farm equipment part'}</p>
       {details && <p style={{ marginTop: 8 }}>{details}</p>}
