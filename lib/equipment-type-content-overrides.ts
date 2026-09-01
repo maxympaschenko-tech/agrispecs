@@ -16,6 +16,11 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed disc mower conditioner specifications including current model status, minimum PTO horsepower, DMC series and SemiSwing tine, roller or steel-roller conditioner configuration.',
     lead: 'Browse the complete current Kubota USA DMC lineup across DMC6300, DMC7300, DMC8000 and DMC8500 Series. All 29 current model cards retain their live manufacturer horsepower requirement, while T, R and RS configurations remain distinct SemiSwing tine, roller and steel-roller machines instead of being collapsed into one family record. Detailed cutting widths, weights and transport dimensions are layered from family-specific publications separately so changing DMC brochure generations are not silently mixed.',
   },
+  'rotary-tedder': {
+    title: 'Rotary Tedder Specs, Working Width, Weight and Tractor HP',
+    description: 'Browse source-backed rotary tedder specifications including working width, transport dimensions, approximate weight, theoretical field capacity, attachment type, rotor count, tine-arm count and current tractor-horsepower requirements where Kubota publishes them.',
+    lead: 'Compare the current Kubota TE4052T, TE6576C, TE6583T, TE8511T, TE8590C, TE10511C, TE12513C and TE14515C across FarmLine and ProLine. Live U.S. model status is kept separate from older brochures, TerraFlow remains attached only to the current ProLine models Kubota identifies, and source conflicts are preserved: TE4052T uses the live 904 lb figure rather than silently replacing it with the 2026 catalog’s 1,014 lb, while TE6576C keeps the live 24 ft 11 in working width and treats the catalog’s 25 ft 7 in figure as working-position width instead of averaging the two.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
