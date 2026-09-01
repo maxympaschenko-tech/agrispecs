@@ -3,11 +3,32 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
 import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 type PageProps = { params: Promise<{ brand: string }> };
+
+function tractorThumbnail(brandSlug: string, modelSlug: string, title: string) {
+  const image = getManifestMachinePrimaryImage(brandSlug, modelSlug);
+  if (!image) return null;
+  return (
+    <img
+      src={image.imageUrl}
+      alt={image.altText || title}
+      loading="lazy"
+      style={{
+        display: 'block',
+        width: '100%',
+        aspectRatio: '4 / 3',
+        objectFit: 'contain',
+        borderRadius: 12,
+        marginBottom: 14,
+      }}
+    />
+  );
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand } = await params;
@@ -53,7 +74,6 @@ export default async function BrandPage({ params }: PageProps) {
   );
   const publishedMachines = [...publishedTractors, ...publishedEquipment];
   const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
-  const partialCount = publishedMachines.length - verifiedCount;
   const researchTractors = brandTractors.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
@@ -128,6 +148,7 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {publishedTractors.map((machine) => (
                   <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                    {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
                     <p>Tractor specifications, maintenance, parts and compatibility reference.</p>
@@ -160,6 +181,7 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {researchTractors.map((machine) => (
                   <Link className="card" key={`tractor-${machine.id}`} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                    {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                     <span className="eyebrow">Research queue · Tractor</span>
                     <h3>{machine.title}</h3>
                     <p>Source verification in progress</p>
