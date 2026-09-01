@@ -44,6 +44,9 @@ const categoryRepresentativeSeeds: Record<string, Record<string, RepresentativeS
   },
   'john-deere': {
     'engine-oil-filters': { normalizedPartNumber: 'RE519626', label: 'engine oil filter' },
+    'fuel-filters': { normalizedPartNumber: 'MIU804763', label: 'fuel filter' },
+    'hydraulic-filters': { normalizedPartNumber: 'RE45864', label: 'hydraulic / transmission filter' },
+    'air-filters': { normalizedPartNumber: 'M113621', label: 'air filter' },
   },
 };
 
