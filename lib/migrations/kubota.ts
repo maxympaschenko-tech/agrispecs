@@ -77,6 +77,7 @@ import { kubotaM8CurrentSpecsMigration } from '@/lib/migrations/20260828_207_kub
 import { kubotaM8M77LoaderMigration } from '@/lib/migrations/20260828_208_kubota_m8_m77_loader';
 import { kubotaM8ServiceFiltersMigration } from '@/lib/migrations/20260828_209_kubota_m8_service_filters';
 import { kubotaM8AirFilterSupersessionMigration } from '@/lib/migrations/20260828_210_kubota_m8_air_filter_supersession';
+import { kubotaSSVSkidSteerLoadersCurrentMigration } from '@/lib/migrations/20260901_563_kubota_ssv_skid_steer_loaders_current';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -157,4 +158,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM8M77LoaderMigration,
   kubotaM8ServiceFiltersMigration,
   kubotaM8AirFilterSupersessionMigration,
+  kubotaSSVSkidSteerLoadersCurrentMigration,
 ];
