@@ -13,6 +13,7 @@ import kubotaSpreaderMachineImageManifest from '@/data/machine-images-kubota-spr
 import johnDeereMachineImageManifest from '@/data/machine-images-john-deere.json';
 import caseIHMachineImageManifest from '@/data/machine-images-case-ih.json';
 import masseyFergusonMachineImageManifest from '@/data/machine-images-massey-ferguson.json';
+import newHollandMachineImageManifest from '@/data/machine-images-new-holland.json';
 
 export type MachineImage = {
   id: number;
@@ -73,6 +74,7 @@ const manifest = [
   ...(johnDeereMachineImageManifest as ManifestImage[]),
   ...(caseIHMachineImageManifest as ManifestImage[]),
   ...(masseyFergusonMachineImageManifest as ManifestImage[]),
+  ...(newHollandMachineImageManifest as ManifestImage[]),
 ];
 
 function localMediaExists(publicUrl: string) {
