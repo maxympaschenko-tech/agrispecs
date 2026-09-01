@@ -13,8 +13,8 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'compact-track-loader': {
     title: 'Compact Track Loader Specs, Horsepower, ROC and Weight',
-    description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, electric-system data and current North America model configurations.',
-    lead: 'Compare current CASE, Bobcat and New Holland compact track loaders using manufacturer-backed North America specifications. New Holland C Series keeps gross horsepower, operating weight, ROC and lift type from its current construction catalog, while Bobcat’s all-electric T7X keeps ISO ROC, battery capacity and system voltage separate from diesel loaders.',
+    description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, hydraulic flow, electric-system data and current North America model configurations.',
+    lead: 'Compare current CASE, Bobcat, New Holland and Kubota compact track loaders using manufacturer-backed North America specifications. Kubota SVL generations remain separate current models and use the 2026 construction catalog or direct model sheet as their primary value set; documented conflicts between Kubota publications stay in the version notes instead of being averaged. New Holland C Series keeps gross horsepower and ROC from its current catalog, while Bobcat’s all-electric T7X keeps ISO ROC, battery capacity and voltage separate from diesel loaders.',
   },
   'compact-wheel-loader': {
     title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
