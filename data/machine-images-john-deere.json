@@ -61,6 +61,21 @@
   },
   {
     "brandSlug": "john-deere",
+    "modelSlug": "7r-330",
+    "sourceKey": "commons-jd-7r-330-agra-2024-dsc01432",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_7R_330_agra_2024_%28DSC01432%29.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/7r-330/main.jpg",
+    "publicUrl": "/media/machines/john-deere/7r-330/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_7R_330_agra_2024_(DSC01432).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 7R 330 displayed at agra 2024.",
+    "altText": "John Deere 7R 330 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
     "modelSlug": "8r-410",
     "sourceKey": "commons-jd-8r-410-agritechnica-2025-dsc06100",
     "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_8R_410_Agritechnica_2025_%28DSC06100%29.jpg?width=1600",
