@@ -88,6 +88,7 @@ import { kubotaRtvXCargoCapacitySemanticsMigration } from '@/lib/migrations/2026
 import { kubotaSpecialtyAgTractorsCurrentMigration } from '@/lib/migrations/20260901_571_kubota_specialty_ag_tractors_current';
 import { kubotaCurrentDiscMowersMigration } from '@/lib/migrations/20260901_572_kubota_current_disc_mowers';
 import { kubotaCurrentDiscMowerConditionersMigration } from '@/lib/migrations/20260901_573_kubota_current_disc_mower_conditioners';
+import { kubotaCurrentTeddersMigration } from '@/lib/migrations/20260901_574_kubota_current_tedders';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -179,4 +180,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaSpecialtyAgTractorsCurrentMigration,
   kubotaCurrentDiscMowersMigration,
   kubotaCurrentDiscMowerConditionersMigration,
+  kubotaCurrentTeddersMigration,
 ];
