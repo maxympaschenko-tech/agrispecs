@@ -225,21 +225,22 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {attachments.length > 0 && (
               <section className="data-section" id="compatible-attachments">
                 <h2>Compatible attachments</h2>
-                <p className="section-note">Manufacturer-backed fitment records for this machine. A compatibility listing does not mean the attachment is standard equipment; hydraulic flow, hitch, carrier, model year and dealer configuration may still matter.</p>
+                <p className="section-note">Manufacturer-backed fitment records for this machine. Open an attachment page for its published configuration and full fitment list. A compatibility listing does not mean the attachment is standard equipment; hydraulic flow, hitch, carrier, model year and dealer configuration may still matter.</p>
                 <div className="parts-list">
                   {attachments.map((attachment) => (
                     <div className="part-row" key={`${attachment.id}-${attachment.slug}`}>
                       <span>
-                        <strong>{attachment.modelName}</strong>
-                        <small>{formatAttachmentType(attachment.attachmentType)} · {attachment.confidence === 'official' ? 'Official fitment' : `${attachment.confidence} confidence`}</small>
+                        <strong><Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>{attachment.modelName}</Link></strong>
+                        <small>{attachment.manufacturerName} · {formatAttachmentType(attachment.attachmentType)} · {attachment.confidence === 'official' ? 'Official fitment' : `${attachment.confidence} confidence`}</small>
                         {attachment.configurationText && <small>{attachment.configurationText}</small>}
                         {attachment.liftCapacityText && <small>Lift/capacity: {attachment.liftCapacityText}</small>}
                         {attachment.liftHeightText && <small>Lift height: {attachment.liftHeightText}</small>}
                         {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
                       </span>
-                      {attachment.sourceUrl ? (
-                        <a href={attachment.sourceUrl} target="_blank" rel="noopener noreferrer">Source →</a>
-                      ) : <span>Source-backed</span>}
+                      <span>
+                        <Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>Fitment →</Link>
+                        {attachment.sourceUrl && <>{' · '}<a href={attachment.sourceUrl} target="_blank" rel="noopener noreferrer">Source →</a></>}
+                      </span>
                     </div>
                   ))}
                 </div>
