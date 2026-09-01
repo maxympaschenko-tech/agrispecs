@@ -1,6 +1,6 @@
 import type { DbMigration } from '@/lib/db-migration-types';
 import { newHollandPowerStarCurrentSpecsMigration } from '@/lib/migrations/20260828_272_new_holland_powerstar_current_specs';
-import { newHollandWorkmaster5070CurrentSpecsMigration } from '@/lib/migrations/20260828_273_new_holland_powerstar_current_specs';
+import { newHollandWorkmaster5070CurrentSpecsMigration } from '@/lib/migrations/20260828_273_new_holland_workmaster_50_70_current_specs';
 import { newHollandWorkmasterCompactCurrentSpecsMigration } from '@/lib/migrations/20260828_274_new_holland_workmaster_compact_current_specs';
 import { newHollandBoomer3555CurrentSpecsMigration } from '@/lib/migrations/20260828_275_new_holland_boomer_35_55_current_specs';
 import { newHollandWorkmaster25SCurrentSpecsMigration } from '@/lib/migrations/20260828_276_new_holland_workmaster_25s_current_specs';
