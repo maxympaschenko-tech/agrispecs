@@ -78,5 +78,37 @@
     "caption": "Representative Kubota Genuine filter-family image; not asserted as an exact product photo of HST filter HHK70-14073.",
     "altText": "Kubota HHK70-14073 HST filter representative image",
     "imageKind": "representative"
+  },
+  {
+    "brandSlug": "john-deere",
+    "partNumber": "M806418",
+    "normalizedPartNumber": "M806418",
+    "sourceKey": "john-deere-m806418-exact-nimerparts-2026-09",
+    "remoteUrl": "https://nimerparts.com/WebRoot/Store/Shops/Nimerparts/61F1/848D/9885/DA18/F26F/B976/3928/1073/M806418.jpg",
+    "outputPath": "public/media/parts/john-deere/m806418/main.jpg",
+    "publicUrl": "/media/parts/john-deere/m806418/main.jpg",
+    "sourcePageUrl": "https://nimerparts.com/en/m806418-filtro-aceite-motor-john-deere",
+    "author": null,
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Exact product image published for John Deere M806418 engine oil filter; product identity cross-checked against Shop.Deere.com.",
+    "altText": "John Deere M806418 engine oil filter",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
+    "partNumber": "RE519626",
+    "normalizedPartNumber": "RE519626",
+    "sourceKey": "john-deere-re519626-exact-nimerparts-2026-09",
+    "remoteUrl": "https://nimerparts.com/WebRoot/Store/Shops/Nimerparts/61F1/8344/3035/CA2D/6449/B976/3928/A3F1/RE519626aa.jpg",
+    "outputPath": "public/media/parts/john-deere/re519626/main.jpg",
+    "publicUrl": "/media/parts/john-deere/re519626/main.jpg",
+    "sourcePageUrl": "https://nimerparts.com/en/re519626-filtro-aceite-motor-75f-5000e-john-deere",
+    "author": null,
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Exact product image published for John Deere RE519626 engine oil filter; product identity cross-checked against Shop.Deere.com.",
+    "altText": "John Deere RE519626 engine oil filter",
+    "imageKind": "exact"
   }
 ]
