@@ -26,9 +26,10 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
 
   if (!item) return children;
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/attachments/${item.manufacturerSlug}/${item.slug}`;
   const typeLabel = attachmentTypeLabel(item.attachmentType);
+  const equipmentTypes = Array.from(new Set(item.compatibleMachines.map((machine) => machine.equipmentType)));
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -38,7 +39,7 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
         '@id': `${canonicalUrl}#webpage`,
         url: canonicalUrl,
         name: `${item.manufacturerName} ${item.modelName} ${typeLabel} compatibility`,
-        description: `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatibility, published specifications and source-backed tractor fitment.`,
+        description: `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatibility, published specifications and source-backed machine fitment${equipmentTypes.length ? ` for ${equipmentTypes.join(', ')}` : ''}.`,
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
