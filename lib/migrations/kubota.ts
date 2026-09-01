@@ -96,6 +96,7 @@ import { kubotaCurrentSquareBalersMigration } from '@/lib/migrations/20260901_57
 import { kubotaCurrentBaleWrappersMigration } from '@/lib/migrations/20260901_579_kubota_current_bale_wrappers';
 import { kubotaCurrentVsPendulumSpreadersMigration } from '@/lib/migrations/20260901_580_kubota_current_vs_pendulum_spreaders';
 import { kubotaCurrentTlbSeriesMigration } from '@/lib/migrations/20260901_581_kubota_current_tlb_series';
+import { kubotaCurrentScl1000Migration } from '@/lib/migrations/20260901_582_kubota_current_scl1000';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -195,4 +196,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaCurrentBaleWrappersMigration,
   kubotaCurrentVsPendulumSpreadersMigration,
   kubotaCurrentTlbSeriesMigration,
+  kubotaCurrentScl1000Migration,
 ];
