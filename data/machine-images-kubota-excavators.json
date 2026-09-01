@@ -1,0 +1,47 @@
+[
+  {
+    "brandSlug":"kubota","modelSlug":"u10-5","sourceKey":"kubota-u10-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/0x4a3743.jpg","outputPath":"public/media/machines/kubota/u10-5/main.jpg","publicUrl":"/media/machines/kubota/u10-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U10-5 official current model-card image.","altText":"Kubota U10-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u17","sourceKey":"kubota-u17-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/u17.jpg","outputPath":"public/media/machines/kubota/u17/main.jpg","publicUrl":"/media/machines/kubota/u17/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U17 official current model-card image.","altText":"Kubota U17 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u17-5","sourceKey":"kubota-u17-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/U17-5.jpg","outputPath":"public/media/machines/kubota/u17-5/main.jpg","publicUrl":"/media/machines/kubota/u17-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U17-5 official current model-card image.","altText":"Kubota U17-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u27-4","sourceKey":"kubota-u27-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/u27-4-studio.jpg","outputPath":"public/media/machines/kubota/u27-4/main.jpg","publicUrl":"/media/machines/kubota/u27-4/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U27-4 official current studio image.","altText":"Kubota U27-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u35-4","sourceKey":"kubota-u35-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/U35-4-Cab.jpg","outputPath":"public/media/machines/kubota/u35-4/main.jpg","publicUrl":"/media/machines/kubota/u35-4/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U35-4 official current cab image.","altText":"Kubota U35-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u48-5","sourceKey":"kubota-u48-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/U48-5-Cab.jpg","outputPath":"public/media/machines/kubota/u48-5/main.jpg","publicUrl":"/media/machines/kubota/u48-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U48-5 official current cab image.","altText":"Kubota U48-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"u55-5","sourceKey":"kubota-u55-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/U55-5-Cab.jpg","outputPath":"public/media/machines/kubota/u55-5/main.jpg","publicUrl":"/media/machines/kubota/u55-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/u-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota U55-5 official current cab image.","altText":"Kubota U55-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"k008-5","sourceKey":"kubota-k008-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/Studio/0x4a3814.jpg","outputPath":"public/media/machines/kubota/k008-5/main.jpg","publicUrl":"/media/machines/kubota/k008-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota K008-5 official current studio image.","altText":"Kubota K008-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx018-4","sourceKey":"kubota-kx018-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/KX018-4_cCb_Studio.png","outputPath":"public/media/machines/kubota/kx018-4/main.png","publicUrl":"/media/machines/kubota/kx018-4/main.png","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX018-4 official current studio image.","altText":"Kubota KX018-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx030-4","sourceKey":"kubota-kx030-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/kx030-4-performance.jpg","outputPath":"public/media/machines/kubota/kx030-4/main.jpg","publicUrl":"/media/machines/kubota/kx030-4/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX030-4 official current product image.","altText":"Kubota KX030-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx033-4","sourceKey":"kubota-kx033-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/KX033-4-Cab.jpg","outputPath":"public/media/machines/kubota/kx033-4/main.jpg","publicUrl":"/media/machines/kubota/kx033-4/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX033-4 official current cab image.","altText":"Kubota KX033-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx040-4","sourceKey":"kubota-kx040-4-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/kx040-4.jpg","outputPath":"public/media/machines/kubota/kx040-4/main.jpg","publicUrl":"/media/machines/kubota/kx040-4/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX040-4 official current model-card image.","altText":"Kubota KX040-4 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx040-5","sourceKey":"kubota-kx040-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/KX040-5-Cab.jpg","outputPath":"public/media/machines/kubota/kx040-5/main.jpg","publicUrl":"/media/machines/kubota/kx040-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX040-5 official current cab image.","altText":"Kubota KX040-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx057-5","sourceKey":"kubota-kx057-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/KX057-5-Cab.jpg","outputPath":"public/media/machines/kubota/kx057-5/main.jpg","publicUrl":"/media/machines/kubota/kx057-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX057-5 official current cab image.","altText":"Kubota KX057-5 mini excavator","imageKind":"exact"
+  },
+  {
+    "brandSlug":"kubota","modelSlug":"kx080-5","sourceKey":"kubota-kx080-5-official-2026-09","remoteUrl":"https://assets.kubotacore.com/images/KX080-5.jpg","outputPath":"public/media/machines/kubota/kx080-5/main.jpg","publicUrl":"/media/machines/kubota/kx080-5/main.jpg","sourcePageUrl":"https://www.kubotausa.com/equipment-series/kx-series","author":"Kubota Tractor Corporation","licenseName":null,"licenseUrl":null,"caption":"Kubota KX080-5 official current model-card image.","altText":"Kubota KX080-5 mini excavator","imageKind":"exact"
+  }
+]
