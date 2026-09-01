@@ -18,8 +18,8 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'compact-wheel-loader': {
     title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
-    description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hydraulics, travel speed and current North America model data.',
-    lead: 'Compare current compact wheel loaders from CASE and Bobcat by powertrain, published power, operating weight and loader performance. Electric CASE models retain battery capacity instead of invented horsepower, while Bobcat L65/L95 use direct current model-page ROC, travel and hydraulic values; conflicting or non-current family text is not promoted into the catalog.',
+    description: 'Browse source-backed compact wheel loader specifications including horsepower or battery capacity, operating weight, rated operating capacity, hinge-pin height, hydraulics, travel speed and current North America model data.',
+    lead: 'Compare current compact wheel loaders from CASE, Bobcat and New Holland by powertrain, published power, operating weight and loader geometry. New Holland W Series keeps family-card horsepower, weight, cab height and hinge-pin height attached to each exact Z-Bar, Long Reach or High Speed configuration; electric CASE models retain battery capacity, while Bobcat model-page ROC and hydraulic values stay tied to their own sources.',
   },
   'mini-track-loader': {
     title: 'Mini Track Loader Specs, ROC, Weight and Electric Options',
