@@ -1,0 +1,32 @@
+[
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "farmall-65a",
+    "sourceKey": "commons-case-ih-farmall-65a-agra-2024-dsc02174",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Farmall_65_A_agra_2024_%28DSC02174%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/farmall-65a/main.jpg",
+    "publicUrl": "/media/machines/case-ih/farmall-65a/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Farmall_65_A_agra_2024_(DSC02174).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Farmall 65A displayed at agra 2024.",
+    "altText": "Case IH Farmall Utility 65A tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "vestrum-130",
+    "sourceKey": "commons-case-ih-vestrum-130-agra-2024-dsc03621",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Vestrum_130_MC_agra_2024_%28DSC03621%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/vestrum-130/main.jpg",
+    "publicUrl": "/media/machines/case-ih/vestrum-130/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Vestrum_130_MC_agra_2024_(DSC03621).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Vestrum 130 displayed at agra 2024.",
+    "altText": "Case IH Vestrum 130 tractor",
+    "imageKind": "exact"
+  }
+]
