@@ -43,8 +43,8 @@ const overrides: Record<string, EquipmentTypeContent> = {
   },
   'mini-excavator': {
     title: 'Mini Excavator Specs, Horsepower, Battery, Weight and Dig Depth',
-    description: 'Browse source-backed mini excavator specifications from current North America catalogs including horsepower or battery capacity, operating weight, maximum dig depth, diesel or electric powertrain and arm configuration.',
-    lead: 'Compare current CASE and Bobcat mini excavators without flattening unlike configurations. CASE diesel and EV models retain the values exposed in the current North America family table, while Bobcat standard, long-arm and extendable-arm configurations stay separate when the manufacturer lists different weights or dig depths. Electric Bobcat E10e/E19e and CASE EV models keep battery data rather than receiving invented horsepower values.',
+    description: 'Browse source-backed mini excavator specifications from current North America catalogs including horsepower or battery capacity, operating-weight configurations, maximum dig depth, dump height, diesel or electric powertrain and arm options.',
+    lead: 'Compare current CASE, Bobcat and New Holland mini excavators without flattening unlike configurations. New Holland keeps Cab/Canopy and Standard/Long Arm values as published pairs, Bobcat arm variants remain separate where the manufacturer exposes distinct configurations, and CASE family values stay tied to the exact model. Electric New Holland E15X/E25X, Bobcat E10e/E19e and CASE EV machines retain battery capacity rather than receiving invented horsepower.',
   },
   'compact-dozer-loader': {
     title: 'Compact Dozer Loader Specs, ROC, Drawbar Pull and Weight',
