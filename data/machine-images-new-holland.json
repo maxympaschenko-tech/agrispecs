@@ -43,5 +43,20 @@
     "caption": "New Holland T6.180 Methane Power at Gotlands Skördefestival 2023.",
     "altText": "New Holland T6.180 Methane Power tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "new-holland",
+    "modelSlug": "cr11",
+    "sourceKey": "commons-new-holland-cr11-agritechnica-2023-dsc06941",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/New_Holland_CR11_Agritechnica_2023_%28DSC06941%29.jpg?width=1600",
+    "outputPath": "public/media/machines/new-holland/cr11/main.jpg",
+    "publicUrl": "/media/machines/new-holland/cr11/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:New_Holland_CR11_Agritechnica_2023_(DSC06941).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "New Holland CR11 combine displayed at Agritechnica 2023.",
+    "altText": "New Holland CR11 combine harvester",
+    "imageKind": "exact"
   }
 ]
