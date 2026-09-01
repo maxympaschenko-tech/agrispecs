@@ -79,6 +79,8 @@ import { kubotaM8ServiceFiltersMigration } from '@/lib/migrations/20260828_209_k
 import { kubotaM8AirFilterSupersessionMigration } from '@/lib/migrations/20260828_210_kubota_m8_air_filter_supersession';
 import { kubotaSSVSkidSteerLoadersCurrentMigration } from '@/lib/migrations/20260901_563_kubota_ssv_skid_steer_loaders_current';
 import { kubotaSVLCompactTrackLoadersCurrentMigration } from '@/lib/migrations/20260901_564_kubota_svl_compact_track_loaders_current';
+import { kubotaCurrentMiniExcavators2026CatalogMigration } from '@/lib/migrations/20260901_565_kubota_current_mini_excavators_2026_catalog';
+import { kubotaRemainingCurrentMiniExcavatorsMigration } from '@/lib/migrations/20260901_566_kubota_remaining_current_mini_excavators';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -161,4 +163,6 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaM8AirFilterSupersessionMigration,
   kubotaSSVSkidSteerLoadersCurrentMigration,
   kubotaSVLCompactTrackLoadersCurrentMigration,
+  kubotaCurrentMiniExcavators2026CatalogMigration,
+  kubotaRemainingCurrentMiniExcavatorsMigration,
 ];
