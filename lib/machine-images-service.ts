@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import coreMachineImageManifest from '@/data/machine-images.json';
@@ -67,6 +69,11 @@ const manifest = [
   ...(kubotaSpreaderMachineImageManifest as ManifestImage[]),
 ];
 
+function localMediaExists(publicUrl: string) {
+  if (!publicUrl.startsWith('/media/')) return true;
+  return existsSync(path.join(process.cwd(), 'public', publicUrl.replace(/^\/+/, '')));
+}
+
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
   const isTractor = equipmentTypeSlug === 'tractor';
   return {
@@ -118,7 +125,11 @@ export function getManifestMachinePrimaryImage(
   modelSlug: string,
   equipmentTypeSlug = 'tractor',
 ): MachineImage {
-  const image = manifest.find((item) => item.brandSlug === brandSlug && item.modelSlug === modelSlug);
+  const image = manifest.find((item) =>
+    item.brandSlug === brandSlug
+    && item.modelSlug === modelSlug
+    && localMediaExists(item.publicUrl),
+  );
   return image ? manifestToImage(image) : fallbackImage(equipmentTypeSlug, `${brandSlug} ${modelSlug}`.replace(/-/g, ' '));
 }
 
@@ -149,7 +160,9 @@ export async function getMachineImages(machineId: string): Promise<MachineImage[
     if (!identity) return images.length > 0 ? images : [fallbackImage()];
 
     const localImages = manifest.filter(
-      (image) => image.brandSlug === identity.brand_slug && image.modelSlug === identity.model_slug,
+      (image) => image.brandSlug === identity.brand_slug
+        && image.modelSlug === identity.model_slug
+        && localMediaExists(image.publicUrl),
     );
     const existingUrls = new Set(images.map((image) => image.imageUrl));
 
