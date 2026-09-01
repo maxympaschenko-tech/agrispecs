@@ -11,6 +11,11 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+function needsVisibleAttribution(licenseName: string | null) {
+  if (!licenseName) return false;
+  return /\bCC\s+BY\b|\bCC\s+BY-SA\b|Creative Commons Attribution/i.test(licenseName);
+}
+
 export default async function PartLayout({ children, params }: LayoutProps) {
   const { part: slug } = await params;
   const part = await getPart(slug);
@@ -90,6 +95,8 @@ export default async function PartLayout({ children, params }: LayoutProps) {
     ],
   };
 
+  const showAttribution = needsVisibleAttribution(primaryImage?.licenseName || null);
+
   return (
     <>
       <script
@@ -102,18 +109,23 @@ export default async function PartLayout({ children, params }: LayoutProps) {
             <figure className="machine-photo" style={{ maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
               <img src={primaryImage.imageUrl} alt={primaryImage.altText || `${part.partNumber} ${part.name || 'part'}`} loading="eager" />
               <figcaption>
+                {primaryImage.imageKind === 'fallback' && <strong>Exact part photo pending. </strong>}
                 {primaryImage.imageKind === 'representative' && <strong>Representative image. </strong>}
                 {primaryImage.caption && <span>{primaryImage.caption} </span>}
-                Source:{' '}
-                <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
-                  {primaryImage.author || 'source'}
-                </a>
-                {primaryImage.licenseName && (
+                {showAttribution && primaryImage.sourcePageUrl && (
                   <>
-                    {' '}·{' '}
-                    {primaryImage.licenseUrl ? (
-                      <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
-                    ) : primaryImage.licenseName}
+                    Photo:{' '}
+                    <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
+                      {primaryImage.author || 'source'}
+                    </a>
+                    {primaryImage.licenseName && (
+                      <>
+                        {' '}·{' '}
+                        {primaryImage.licenseUrl ? (
+                          <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
+                        ) : primaryImage.licenseName}
+                      </>
+                    )}
                   </>
                 )}
               </figcaption>
