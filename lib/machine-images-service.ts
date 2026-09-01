@@ -52,6 +52,20 @@ const manifest = [
   ...(kubotaUtilityMachineImageManifest as ManifestImage[]),
 ];
 
+function manifestToImage(image: ManifestImage, id = -1): MachineImage {
+  return {
+    id,
+    imageUrl: image.publicUrl,
+    sourcePageUrl: image.sourcePageUrl,
+    author: image.author,
+    licenseName: image.licenseName,
+    licenseUrl: image.licenseUrl,
+    caption: image.caption,
+    altText: image.altText,
+    isPrimary: true,
+  };
+}
+
 function rowToImage(row: MachineImageRow): MachineImage {
   return {
     id: Number(row.id),
@@ -64,6 +78,11 @@ function rowToImage(row: MachineImageRow): MachineImage {
     altText: row.alt_text,
     isPrimary: Boolean(row.is_primary),
   };
+}
+
+export function getManifestMachinePrimaryImage(brandSlug: string, modelSlug: string): MachineImage | null {
+  const image = manifest.find((item) => item.brandSlug === brandSlug && item.modelSlug === modelSlug);
+  return image ? manifestToImage(image) : null;
 }
 
 export async function getMachineImages(machineId: string): Promise<MachineImage[]> {
@@ -98,17 +117,9 @@ export async function getMachineImages(machineId: string): Promise<MachineImage[
 
     localImages.forEach((image, index) => {
       if (existingUrls.has(image.publicUrl)) return;
-      images.push({
-        id: -(index + 1),
-        imageUrl: image.publicUrl,
-        sourcePageUrl: image.sourcePageUrl,
-        author: image.author,
-        licenseName: image.licenseName,
-        licenseUrl: image.licenseUrl,
-        caption: image.caption,
-        altText: image.altText,
-        isPrimary: images.length === 0 && index === 0,
-      });
+      const manifestImage = manifestToImage(image, -(index + 1));
+      manifestImage.isPrimary = images.length === 0 && index === 0;
+      images.push(manifestImage);
       existingUrls.add(image.publicUrl);
     });
 
