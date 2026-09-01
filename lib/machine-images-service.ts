@@ -4,6 +4,7 @@ import coreMachineImageManifest from '@/data/machine-images.json';
 import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-utility.json';
 import kubotaEquipmentMachineImageManifest from '@/data/machine-images-kubota-equipment.json';
 import kubotaExcavatorMachineImageManifest from '@/data/machine-images-kubota-excavators.json';
+import kubotaHayMachineImageManifest from '@/data/machine-images-kubota-hay.json';
 
 export type MachineImage = {
   id: number;
@@ -57,6 +58,7 @@ const manifest = [
   ...(kubotaUtilityMachineImageManifest as ManifestImage[]),
   ...(kubotaEquipmentMachineImageManifest as ManifestImage[]),
   ...(kubotaExcavatorMachineImageManifest as ManifestImage[]),
+  ...(kubotaHayMachineImageManifest as ManifestImage[]),
 ];
 
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
