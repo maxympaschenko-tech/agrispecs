@@ -101,6 +101,14 @@ export default async function EquipmentTypePage({ params }: PageProps) {
           <div><strong>{equipment.filter((machine) => machine.dataStatus === 'verified').length.toLocaleString('en-US')}</strong><span>Verified records</span></div>
         </div>
 
+        {equipment.length >= 2 && (
+          <div className="notice">
+            <strong>Compare {typeName.toLowerCase()} models:</strong>{' '}
+            place two to four published machines side by side using only shared source-backed specification labels.{' '}
+            <Link className="tool-link" href={`/equipment/compare?type=${type}`}>Open {typeName.toLowerCase()} comparison →</Link>
+          </div>
+        )}
+
         {brandGroups.map(([brandSlug, machines]) => {
           const brandName = machines[0]?.brand || brandSlug;
           return (
