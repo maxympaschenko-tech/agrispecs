@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Data Sources and Methodology',
   description:
-    'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed tractor, parts and attachment data.',
+    'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed farm equipment, parts and attachment data.',
   alternates: { canonical: '/methodology' },
 };
 
@@ -13,7 +13,7 @@ function jsonLd(value: unknown) {
 }
 
 export default function MethodologyPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/methodology`;
   const structuredData = {
     '@context': 'https://schema.org',
@@ -24,7 +24,7 @@ export default function MethodologyPage() {
         url: canonicalUrl,
         name: 'Data Sources and Methodology',
         description:
-          'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed tractor, parts and attachment data.',
+          'How Farm Machine Specs collects, normalizes and publishes manufacturer-backed farm equipment, parts and attachment data.',
         isPartOf: { '@id': `${baseUrl}/#website` },
         breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
         about: {
@@ -70,7 +70,7 @@ export default function MethodologyPage() {
         <section className="data-section">
           <h2>Normalized specifications</h2>
           <p>
-            Published values are mapped to normalized specification keys so tractors from different brands can be compared consistently. Units are normalized only when a reliable conversion is possible. Text values remain text when converting them would change their meaning.
+            Published values are mapped to normalized specification keys so comparable machines from different brands can be evaluated consistently. Units are normalized only when a reliable conversion is possible. Text values remain text when converting them would change their meaning or erase a configuration distinction.
           </p>
         </section>
 
@@ -91,17 +91,22 @@ export default function MethodologyPage() {
         <section className="data-section">
           <h2>Parts and fitment</h2>
           <p>
-            Parts, replacements and attachment compatibility are published only when a source record supports the relationship. Fitment notes and serial-number context are retained when the manufacturer provides them because a part number can vary by machine configuration or production range.
+            Parts, replacements and attachment compatibility are published only when a source record supports the relationship. A fitment published for one tractor, loader, excavator, utility vehicle or other machine is not automatically copied to a neighboring model or series. Hydraulic-flow ranges, hitch or coupler type, carrier or mount, axle or transmission requirements, serial-number context and other configuration limits are retained when the manufacturer provides them.
+          </p>
+          <p>
+            A compatible-attachment record means the cited source supports that relationship; it does not mean the attachment is standard equipment or that every configuration of the machine can use it. Missing fitment is also not interpreted as proof of incompatibility.
           </p>
         </section>
 
         <section className="data-section">
           <h2>Independent reference</h2>
           <p>
-            Farm Machine Specs is an independent reference and is not affiliated with John Deere, Case IH, New Holland or other equipment manufacturers. Product names and trademarks belong to their respective owners.
+            Farm Machine Specs is an independent reference and is not affiliated with John Deere, Case IH, New Holland, Kubota or other equipment manufacturers. Product names and trademarks belong to their respective owners.
           </p>
           <p>
-            <Link className="tool-link" href="/tractors">Browse tractor specifications</Link>
+            <Link className="tool-link" href="/equipment">Browse farm equipment</Link>{' · '}
+            <Link className="tool-link" href="/tractors">Browse tractor specifications</Link>{' · '}
+            <Link className="tool-link" href="/attachments">Browse attachments</Link>
           </p>
         </section>
       </div>
