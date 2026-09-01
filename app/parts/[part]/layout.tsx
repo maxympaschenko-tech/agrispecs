@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { getPart } from '@/lib/parts-service';
+import { getPartImages } from '@/lib/part-images-service';
 
 type LayoutProps = {
   children: ReactNode;
@@ -16,9 +17,14 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   if (!part) return children;
 
+  const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug);
+  const primaryImage = images[0];
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
   const canonicalPath = `/parts/${part.normalizedPartNumber.toLowerCase()}`;
   const canonicalUrl = `${baseUrl}${canonicalPath}`;
+  const absoluteImageUrl = primaryImage?.imageUrl
+    ? `${baseUrl.replace(/\/$/, '')}${primaryImage.imageUrl}`
+    : undefined;
   const breadcrumbItems = [
     {
       '@type': 'ListItem',
@@ -59,6 +65,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
         url: canonicalUrl,
         name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber} ${part.name || 'part reference'}`,
         description: part.description || `${part.partNumber} source-backed farm equipment part fitment, replacement and cross-reference reference.`,
+        image: absoluteImageUrl,
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
@@ -72,6 +79,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
           '@type': 'Thing',
           name: part.partNumber,
           description: part.name || undefined,
+          image: absoluteImageUrl,
         },
       },
       {
@@ -88,6 +96,31 @@ export default async function PartLayout({ children, params }: LayoutProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
+      {primaryImage && (
+        <section className="section" style={{ paddingTop: 18, paddingBottom: 0 }}>
+          <div className="container">
+            <figure className="machine-photo" style={{ maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
+              <img src={primaryImage.imageUrl} alt={primaryImage.altText || `${part.partNumber} ${part.name || 'part'}`} loading="eager" />
+              <figcaption>
+                {primaryImage.imageKind === 'representative' && <strong>Representative image. </strong>}
+                {primaryImage.caption && <span>{primaryImage.caption} </span>}
+                Source:{' '}
+                <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
+                  {primaryImage.author || 'source'}
+                </a>
+                {primaryImage.licenseName && (
+                  <>
+                    {' '}·{' '}
+                    {primaryImage.licenseUrl ? (
+                      <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
+                    ) : primaryImage.licenseName}
+                  </>
+                )}
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      )}
       {children}
     </>
   );
