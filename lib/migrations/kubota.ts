@@ -98,6 +98,7 @@ import { kubotaCurrentVsPendulumSpreadersMigration } from '@/lib/migrations/2026
 import { kubotaCurrentTlbSeriesMigration } from '@/lib/migrations/20260901_581_kubota_current_tlb_series';
 import { kubotaCurrentScl1000Migration } from '@/lib/migrations/20260901_582_kubota_current_scl1000';
 import { kubotaScl1000CurrentAttachmentsMigration } from '@/lib/migrations/20260901_583_kubota_scl1000_current_attachments';
+import { kubotaScl1000LandPrideAttachmentDepthMigration } from '@/lib/migrations/20260901_584_kubota_scl1000_land_pride_attachment_depth';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -199,4 +200,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaCurrentTlbSeriesMigration,
   kubotaCurrentScl1000Migration,
   kubotaScl1000CurrentAttachmentsMigration,
+  kubotaScl1000LandPrideAttachmentDepthMigration,
 ];
