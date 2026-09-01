@@ -22,7 +22,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   if (!part) return children;
 
-  const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug);
+  const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug);
   const primaryImage = images[0];
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
   const canonicalPath = `/parts/${part.normalizedPartNumber.toLowerCase()}`;
