@@ -10,6 +10,7 @@ if (process.env.SKIP_MEDIA_SYNC === '1') {
 const root = process.cwd();
 const manifests = [
   { kind: 'machine', path: path.join(root, 'data', 'machine-images.json') },
+  { kind: 'machine', path: path.join(root, 'data', 'machine-images-kubota-utility.json') },
   { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
 ];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
