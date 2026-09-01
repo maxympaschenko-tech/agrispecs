@@ -1,6 +1,22 @@
 [
   {
     "brandSlug": "kubota",
+    "partNumber": "HH164-32430",
+    "normalizedPartNumber": "HH16432430",
+    "sourceKey": "kubota-engine-oil-filter-representative-2026-09",
+    "remoteUrl": "https://www.kubotaengine.com/wp-content/uploads/2021/07/5H0A6311_Oil_Oil_Filters_2_2000-300x200.jpg",
+    "outputPath": "public/media/parts/kubota/hh16432430/main.jpg",
+    "publicUrl": "/media/parts/kubota/hh16432430/main.jpg",
+    "sourcePageUrl": "https://www.kubotaengine.com/get-the-job-done-with-genuine-kubota-oil-and-oil-filters-kea/",
+    "author": "Kubota Engine America Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Representative Genuine Kubota oil-filter product image from Kubota Engine America; not asserted as an exact product photo of part HH164-32430.",
+    "altText": "Kubota HH164-32430 oil filter representative image",
+    "imageKind": "representative"
+  },
+  {
+    "brandSlug": "kubota",
     "partNumber": "6A320-59930",
     "normalizedPartNumber": "6A32059930",
     "sourceKey": "kubota-engine-fuel-filter-representative-2026-09",
@@ -13,6 +29,54 @@
     "licenseUrl": null,
     "caption": "Representative Genuine Kubota fuel filter image from Kubota Engine America; not asserted as an exact product photo of part 6A320-59930.",
     "altText": "Kubota 6A320-59930 fuel filter representative image",
+    "imageKind": "representative"
+  },
+  {
+    "brandSlug": "kubota",
+    "partNumber": "HH3A0-82623",
+    "normalizedPartNumber": "HH3A082623",
+    "sourceKey": "kubota-genuine-filter-family-hh3a082623-representative-2026-09",
+    "remoteUrl": "https://www.kubotaengine.com/wp-content/uploads/2026/01/genuine-kubota-filters-comparision-800x600-1.webp",
+    "outputPath": "public/media/parts/kubota/hh3a082623/main.webp",
+    "publicUrl": "/media/parts/kubota/hh3a082623/main.webp",
+    "sourcePageUrl": "https://www.kubotaengine.com/genuine-kubota-parts/filters-lubricants/",
+    "author": "Kubota Engine America Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Representative Kubota Genuine filter-family image; not asserted as an exact product photo of hydraulic filter HH3A0-82623.",
+    "altText": "Kubota HH3A0-82623 hydraulic filter representative image",
+    "imageKind": "representative"
+  },
+  {
+    "brandSlug": "kubota",
+    "partNumber": "TC820-93230",
+    "normalizedPartNumber": "TC82093230",
+    "sourceKey": "kubota-genuine-filter-family-tc82093230-representative-2026-09",
+    "remoteUrl": "https://www.kubotaengine.com/wp-content/uploads/2026/01/genuine-kubota-filters-comparision-800x600-1.webp",
+    "outputPath": "public/media/parts/kubota/tc82093230/main.webp",
+    "publicUrl": "/media/parts/kubota/tc82093230/main.webp",
+    "sourcePageUrl": "https://www.kubotaengine.com/genuine-kubota-parts/filters-lubricants/",
+    "author": "Kubota Engine America Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Representative Kubota Genuine filter-family image; not asserted as an exact product photo of air-cleaner element TC820-93230.",
+    "altText": "Kubota TC820-93230 air filter representative image",
+    "imageKind": "representative"
+  },
+  {
+    "brandSlug": "kubota",
+    "partNumber": "HHK70-14073",
+    "normalizedPartNumber": "HHK7014073",
+    "sourceKey": "kubota-genuine-filter-family-hhk7014073-representative-2026-09",
+    "remoteUrl": "https://www.kubotaengine.com/wp-content/uploads/2026/01/genuine-kubota-filters-comparision-800x600-1.webp",
+    "outputPath": "public/media/parts/kubota/hhk7014073/main.webp",
+    "publicUrl": "/media/parts/kubota/hhk7014073/main.webp",
+    "sourcePageUrl": "https://www.kubotaengine.com/genuine-kubota-parts/filters-lubricants/",
+    "author": "Kubota Engine America Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Representative Kubota Genuine filter-family image; not asserted as an exact product photo of HST filter HHK70-14073.",
+    "altText": "Kubota HHK70-14073 HST filter representative image",
     "imageKind": "representative"
   }
 ]
