@@ -85,8 +85,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug);
                   return (
                     <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                      {image && cardImage(image.imageUrl, image.altText || machine.title)}
-                      <span className="eyebrow">Tractor</span>
+                      {cardImage(image.imageUrl, image.altText || machine.title)}
+                      <span className="eyebrow">Tractor{image.imageKind === 'fallback' ? ' · Photo pending' : ''}</span>
                       <h3>{machine.title}</h3>
                       <p>Specifications, maintenance and compatible parts</p>
                     </Link>
@@ -100,13 +100,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <section className="search-group">
               <h2>Farm equipment</h2>
               <div className="grid">
-                {publishableEquipment.map((machine) => (
-                  <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
-                    <span className="eyebrow">{machine.equipmentType}</span>
-                    <h3>{machine.title}</h3>
-                    <p>Source-backed specifications and current market configuration</p>
-                  </Link>
-                ))}
+                {publishableEquipment.map((machine) => {
+                  const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug);
+                  return (
+                    <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                      {cardImage(image.imageUrl, image.altText || machine.title)}
+                      <span className="eyebrow">{machine.equipmentType}{image.imageKind === 'fallback' ? ' · Photo pending' : ''}</span>
+                      <h3>{machine.title}</h3>
+                      <p>Source-backed specifications and current market configuration</p>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -117,6 +121,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="grid">
                 {attachments.map((attachment) => (
                   <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
+                    <img src="/media/fallbacks/equipment.svg" alt={`${attachment.manufacturerName} ${attachment.modelName} image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
                     <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
                     <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
                     <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
@@ -134,8 +139,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug)[0];
                   return (
                     <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
-                      {image && cardImage(image.imageUrl, image.altText || `${part.partNumber} ${part.name || 'part'}`)}
-                      <span className="eyebrow">{part.categoryName || 'Part'}{image?.imageKind === 'representative' ? ' · Representative image' : ''}</span>
+                      {cardImage(image.imageUrl, image.altText || `${part.partNumber} ${part.name || 'part'}`)}
+                      <span className="eyebrow">
+                        {part.categoryName || 'Part'}
+                        {image.imageKind === 'representative' ? ' · Representative image' : ''}
+                        {image.imageKind === 'fallback' ? ' · Photo pending' : ''}
+                      </span>
                       <h3>{part.partNumber}</h3>
                       <p>{part.name || 'OEM part'}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
                     </Link>
