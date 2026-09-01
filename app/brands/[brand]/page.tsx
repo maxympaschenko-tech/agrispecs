@@ -10,9 +10,13 @@ export const revalidate = 0;
 
 type PageProps = { params: Promise<{ brand: string }> };
 
-function tractorThumbnail(brandSlug: string, modelSlug: string, title: string) {
-  const image = getManifestMachinePrimaryImage(brandSlug, modelSlug);
-  if (!image) return null;
+function machineThumbnail(
+  brandSlug: string,
+  modelSlug: string,
+  title: string,
+  equipmentTypeSlug = 'tractor',
+) {
+  const image = getManifestMachinePrimaryImage(brandSlug, modelSlug, equipmentTypeSlug);
   return (
     <img
       src={image.imageUrl}
@@ -148,7 +152,7 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {publishedTractors.map((machine) => (
                   <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                     <h3>{machine.title}</h3>
                     <p>Tractor specifications, maintenance, parts and compatibility reference.</p>
@@ -165,6 +169,7 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {publishedEquipment.map((machine) => (
                   <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title, machine.equipmentTypeSlug)}
                     <span className="eyebrow">{machine.equipmentType}</span>
                     <h3>{machine.title}</h3>
                     <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and current market reference.</p>
@@ -181,7 +186,7 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {researchTractors.map((machine) => (
                   <Link className="card" key={`tractor-${machine.id}`} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                     <span className="eyebrow">Research queue · Tractor</span>
                     <h3>{machine.title}</h3>
                     <p>Source verification in progress</p>
@@ -189,6 +194,7 @@ export default async function BrandPage({ params }: PageProps) {
                 ))}
                 {researchEquipment.map((machine) => (
                   <Link className="card" key={`equipment-${machine.id}`} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title, machine.equipmentTypeSlug)}
                     <span className="eyebrow">Research queue · {machine.equipmentType}</span>
                     <h3>{machine.title}</h3>
                     <p>Source verification in progress</p>
