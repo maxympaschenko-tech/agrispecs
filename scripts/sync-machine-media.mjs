@@ -8,11 +8,23 @@ if (process.env.SKIP_MEDIA_SYNC === '1') {
 }
 
 const root = process.cwd();
-const manifestPath = path.join(root, 'data', 'machine-images.json');
+const manifests = [
+  { kind: 'machine', path: path.join(root, 'data', 'machine-images.json') },
+  { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
+];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
-const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function readManifest(entry) {
+  try {
+    const items = JSON.parse(await readFile(entry.path, 'utf8'));
+    return items.map((item) => ({ ...item, kind: entry.kind }));
+  } catch (error) {
+    if (error?.code === 'ENOENT') return [];
+    throw error;
+  }
+}
 
 async function download(url, attempts = 3) {
   let lastError;
@@ -28,9 +40,7 @@ async function download(url, attempts = 3) {
         signal: AbortSignal.timeout(45000),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
 
       const contentType = response.headers.get('content-type') || '';
       if (!contentType.toLowerCase().startsWith('image/')) {
@@ -38,7 +48,7 @@ async function download(url, attempts = 3) {
       }
 
       const bytes = Buffer.from(await response.arrayBuffer());
-      if (bytes.length < 10_000) {
+      if (bytes.length < 5_000) {
         throw new Error(`Downloaded file is unexpectedly small (${bytes.length} bytes)`);
       }
 
@@ -52,6 +62,7 @@ async function download(url, attempts = 3) {
   throw lastError;
 }
 
+const manifest = (await Promise.all(manifests.map(readManifest))).flat();
 const built = [];
 
 for (const image of manifest) {
@@ -62,13 +73,18 @@ for (const image of manifest) {
     throw new Error(`Refusing to write media outside public/: ${image.outputPath}`);
   }
 
-  console.log(`[media] Downloading ${image.brandSlug} ${image.modelSlug}`);
+  const label = image.kind === 'part'
+    ? `${image.brandSlug || 'part'} ${image.partNumber || image.normalizedPartNumber}`
+    : `${image.brandSlug} ${image.modelSlug}`;
+  console.log(`[media] Downloading ${image.kind}: ${label}`);
+
   const result = await download(image.remoteUrl);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, result.bytes);
 
   const sha256 = createHash('sha256').update(result.bytes).digest('hex');
   built.push({
+    kind: image.kind,
     sourceKey: image.sourceKey,
     publicUrl: image.publicUrl,
     sourcePageUrl: image.sourcePageUrl,
@@ -86,4 +102,4 @@ for (const image of manifest) {
 
 await mkdir(path.dirname(buildManifestPath), { recursive: true });
 await writeFile(buildManifestPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), images: built }, null, 2)}\n`);
-console.log(`[media] Synced ${built.length} licensed machine images to local public storage.`);
+console.log(`[media] Synced ${built.length} catalog images to local public storage.`);
