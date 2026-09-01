@@ -41,6 +41,16 @@ const overrides: Record<string, EquipmentTypeContent> = {
     description: 'Browse source-backed high-capacity small square baler specifications including bale cross section, tractor horsepower, PTO requirement, plunger rate, dual-chamber design, knotters, twine capacity and ISOBUS controls.',
     lead: 'Compare the current Kubota SSB2012 and SSB2014 introduced for the U.S. market in 2026. The live Kubota lineup confirms both current 100 hp model cards and the independent dual-chamber design; Kubota’s February 11, 2026 launch release keeps the models distinct at 12.25 x 18 in and 14 x 18 in bale cross sections and records 100 plunger strokes per minute, 100+ hp minimum, 120 hp recommended, a 1000-spline PTO requirement and standard full ISOBUS compatibility.',
   },
+  'bale-wrapper': {
+    title: 'Bale Wrapper Specs, Bale Capacity and Wrapping Features',
+    description: 'Browse source-backed bale wrapper specifications including current model status, wrapper configuration, transport dimensions, machine weight, maximum bale size and weight, mounting and film-applicator features.',
+    lead: 'Compare the current Kubota WR1100, WR1400 and WR1600C from the live U.S. Wrappers lineup. WR1100 retains its live 1,653 lb machine weight, 47 x 50 in maximum bale size and 2,650 lb bale rating plus mounted/static configuration; WR1400 keeps the current 8 ft 4 in narrow-transport feature; WR1600C remains the high-capacity DuoWrap model that can wrap one bale while carrying another with two film applicators. Older brochure generations are not used to fill missing live dimensions automatically.',
+  },
+  'pendulum-spreader': {
+    title: 'Pendulum Spreader Specs, Tractor HP and Application Control',
+    description: 'Browse source-backed pendulum spreader specifications including current model status, minimum tractor horsepower, SuperFlow spreading system, manual/hydraulic/electric controls, rate adjustment and corrosion-resistant construction.',
+    lead: 'Compare the current Kubota VS220, VS400VITI, VS400 and VS600 directly from the live U.S. Spreaders page. Current model-card horsepower stays at 10, 20, 20 and 35 hp respectively, while SuperFlow pendulum distribution, manual/hydraulic/electric control, continuous pounds-per-acre adjustment, reinforced polyester hoppers, stainless metering discs and Duracoat protection remain family-level VS features. Hopper capacities and weights are deliberately left for a later model-specific source layer rather than copied from an older brochure.',
+  },
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
