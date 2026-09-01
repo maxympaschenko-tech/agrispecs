@@ -136,7 +136,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <h2>Parts</h2>
               <div className="grid">
                 {verifiedParts.map((part) => {
-                  const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug)[0];
+                  const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
                   return (
                     <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
                       {cardImage(image.imageUrl, image.altText || `${part.partNumber} ${part.name || 'part'}`)}
