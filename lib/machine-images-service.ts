@@ -2,6 +2,7 @@ import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import coreMachineImageManifest from '@/data/machine-images.json';
 import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-utility.json';
+import kubotaEquipmentMachineImageManifest from '@/data/machine-images-kubota-equipment.json';
 
 export type MachineImage = {
   id: number;
@@ -53,6 +54,7 @@ type ManifestImage = {
 const manifest = [
   ...(coreMachineImageManifest as ManifestImage[]),
   ...(kubotaUtilityMachineImageManifest as ManifestImage[]),
+  ...(kubotaEquipmentMachineImageManifest as ManifestImage[]),
 ];
 
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
