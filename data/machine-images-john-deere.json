@@ -1,6 +1,21 @@
 [
   {
     "brandSlug": "john-deere",
+    "modelSlug": "6r-185",
+    "sourceKey": "commons-jd-6r-185-agra-2024-dsc03350",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_185_agra_2024_%28DSC03350%29.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/6r-185/main.jpg",
+    "publicUrl": "/media/machines/john-deere/6r-185/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_6R_185_agra_2024_(DSC03350).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 6R 185 displayed at agra 2024.",
+    "altText": "John Deere 6R 185 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
     "modelSlug": "6r-215",
     "sourceKey": "commons-jd-6r-215-agritechnica-2025-dsc07432",
     "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_215_Agritechnica_2025_%28DSC07432%29.jpg?width=1600",
@@ -12,6 +27,21 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "caption": "John Deere 6R 215 displayed at Agritechnica 2025.",
     "altText": "John Deere 6R 215 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "6r-250",
+    "sourceKey": "commons-jd-6r-250-droschka-2026",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_250_at_agricultural_facility_near_Droschka.jpg?width=1600",
+    "outputPath": "public/media/machines/john-deere/6r-250/main.jpg",
+    "publicUrl": "/media/machines/john-deere/6r-250/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:John_Deere_6R_250_at_agricultural_facility_near_Droschka.jpg",
+    "author": "Steffen Mokosch",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "John Deere 6R 250 at an agricultural facility near Droschka, Germany, in July 2026.",
+    "altText": "John Deere 6R 250 tractor",
     "imageKind": "exact"
   },
   {
