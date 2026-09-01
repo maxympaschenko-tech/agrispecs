@@ -48,6 +48,13 @@ const categoryRepresentativeSeeds: Record<string, Record<string, RepresentativeS
     'hydraulic-filters': { normalizedPartNumber: 'RE45864', label: 'hydraulic / transmission filter' },
     'air-filters': { normalizedPartNumber: 'M113621', label: 'air filter' },
   },
+  'new-holland': {
+    'engine-oil-filters': { normalizedPartNumber: 'MT40318591', label: 'engine oil filter' },
+    'fuel-filters': { normalizedPartNumber: 'MT40271228', label: 'fuel filter' },
+    'air-filters': { normalizedPartNumber: 'MT40007576', label: 'engine air filter' },
+    'hydraulic-filters': { normalizedPartNumber: 'MT40007563', label: 'hydraulic / transmission filter' },
+    'cab-filters': { normalizedPartNumber: 'MT40032863', label: 'cab air filter' },
+  },
 };
 
 function localMediaExists(publicUrl: string) {
