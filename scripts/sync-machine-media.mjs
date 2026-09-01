@@ -71,6 +71,7 @@ async function download(url, attempts = 3) {
 
 const manifest = (await Promise.all(manifests.map(readManifest))).flat();
 const built = [];
+const failed = [];
 
 for (const image of manifest) {
   const target = path.resolve(root, image.outputPath);
@@ -85,29 +86,44 @@ for (const image of manifest) {
     : `${image.brandSlug} ${image.modelSlug}`;
   console.log(`[media] Downloading ${image.kind}: ${label}`);
 
-  const result = await download(image.remoteUrl);
-  await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, result.bytes);
+  try {
+    const result = await download(image.remoteUrl);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, result.bytes);
 
-  const sha256 = createHash('sha256').update(result.bytes).digest('hex');
-  built.push({
-    kind: image.kind,
-    sourceKey: image.sourceKey,
-    publicUrl: image.publicUrl,
-    sourcePageUrl: image.sourcePageUrl,
-    author: image.author,
-    licenseName: image.licenseName,
-    licenseUrl: image.licenseUrl,
-    imageKind: image.imageKind || 'exact',
-    sha256,
-    bytes: result.bytes.length,
-    contentType: result.contentType,
-    fetchedFrom: result.finalUrl,
-  });
+    const sha256 = createHash('sha256').update(result.bytes).digest('hex');
+    built.push({
+      kind: image.kind,
+      sourceKey: image.sourceKey,
+      publicUrl: image.publicUrl,
+      sourcePageUrl: image.sourcePageUrl,
+      author: image.author,
+      licenseName: image.licenseName,
+      licenseUrl: image.licenseUrl,
+      imageKind: image.imageKind || 'exact',
+      sha256,
+      bytes: result.bytes.length,
+      contentType: result.contentType,
+      fetchedFrom: result.finalUrl,
+    });
 
-  console.log(`[media] Saved ${image.publicUrl} (${Math.round(result.bytes.length / 1024)} KB)`);
+    console.log(`[media] Saved ${image.publicUrl} (${Math.round(result.bytes.length / 1024)} KB)`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    failed.push({
+      kind: image.kind,
+      sourceKey: image.sourceKey,
+      remoteUrl: image.remoteUrl,
+      publicUrl: image.publicUrl,
+      error: message,
+    });
+    console.warn(`[media] Failed ${label}: ${message}. Site will use the local fallback instead.`);
+  }
 }
 
 await mkdir(path.dirname(buildManifestPath), { recursive: true });
-await writeFile(buildManifestPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), images: built }, null, 2)}\n`);
-console.log(`[media] Synced ${built.length} licensed/source-tracked catalog images to local public storage.`);
+await writeFile(
+  buildManifestPath,
+  `${JSON.stringify({ generatedAt: new Date().toISOString(), images: built, failed }, null, 2)}\n`,
+);
+console.log(`[media] Synced ${built.length} catalog images to local public storage; ${failed.length} source downloads failed and will use fallbacks.`);
