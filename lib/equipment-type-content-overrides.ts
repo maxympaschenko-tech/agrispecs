@@ -9,12 +9,12 @@ const overrides: Record<string, EquipmentTypeContent> = {
   'skid-steer-loader': {
     title: 'Skid Steer Loader Specs, Horsepower and Rated Capacity',
     description: 'Browse source-backed skid steer loader specifications from current North America manufacturer catalogs, including horsepower, rated operating capacity, operating weight and loader configuration where published.',
-    lead: 'Compare current farm-relevant skid steer loaders from CASE and Bobcat without collapsing unlike manufacturer metrics. Bobcat Classic and Pro models retain their current 2026 designations and published horsepower/ROC, while CASE B Series keeps net-power, operating-weight and lift-geometry values tied to the source table that actually publishes them.',
+    lead: 'Compare current farm-relevant skid steer loaders from CASE, Bobcat and New Holland without collapsing unlike manufacturer metrics. New Holland L Series keeps gross horsepower, operating weight, ROC at 50% tipping load and lift type exactly as published; Bobcat Classic and Pro models retain current designations and published horsepower/ROC; CASE B Series keeps net-power, weight and geometry tied to its source table.',
   },
   'compact-track-loader': {
     title: 'Compact Track Loader Specs, Horsepower, ROC and Weight',
     description: 'Browse source-backed compact track loader specifications including horsepower, rated operating capacity, operating weight, lift geometry, electric-system data and current North America model configurations.',
-    lead: 'Compare current CASE and Bobcat compact track loaders using manufacturer-backed North America specifications. Model-specific rated capacity and operating data remain tied to their original source, while Bobcat’s all-electric T7X keeps its ISO ROC, battery capacity and system voltage separate from diesel Classic and Pro loaders.',
+    lead: 'Compare current CASE, Bobcat and New Holland compact track loaders using manufacturer-backed North America specifications. New Holland C Series keeps gross horsepower, operating weight, ROC and lift type from its current construction catalog, while Bobcat’s all-electric T7X keeps ISO ROC, battery capacity and system voltage separate from diesel loaders.',
   },
   'compact-wheel-loader': {
     title: 'Compact Wheel Loader Specs, Horsepower, ROC and Weight',
