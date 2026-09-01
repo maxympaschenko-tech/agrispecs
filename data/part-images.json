@@ -1,0 +1,18 @@
+[
+  {
+    "brandSlug": "kubota",
+    "partNumber": "6A320-59930",
+    "normalizedPartNumber": "6A32059930",
+    "sourceKey": "kubota-engine-fuel-filter-representative-2026-09",
+    "remoteUrl": "https://www.kubotaengine.com/wp-content/uploads/2020/01/62077-Kubota-Filter_300x250_150.png",
+    "outputPath": "public/media/parts/kubota/6a32059930/main.png",
+    "publicUrl": "/media/parts/kubota/6a32059930/main.png",
+    "sourcePageUrl": "https://www.kubotaengine.com/parts-service/genuine-kubota-parts/fuel-filters/",
+    "author": "Kubota Engine America Corporation",
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Representative Genuine Kubota fuel filter image from Kubota Engine America; not asserted as an exact product photo of part 6A320-59930.",
+    "altText": "Kubota 6A320-59930 fuel filter representative image",
+    "imageKind": "representative"
+  }
+]
