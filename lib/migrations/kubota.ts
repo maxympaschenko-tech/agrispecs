@@ -83,6 +83,7 @@ import { kubotaCurrentMiniExcavators2026CatalogMigration } from '@/lib/migration
 import { kubotaRemainingCurrentMiniExcavatorsMigration } from '@/lib/migrations/20260901_566_kubota_remaining_current_mini_excavators';
 import { kubotaRSeriesWheelLoadersCurrentMigration } from '@/lib/migrations/20260901_567_kubota_r_series_wheel_loaders_current';
 import { kubotaCurrentUtilityVehiclesMigration } from '@/lib/migrations/20260901_568_kubota_current_utility_vehicles';
+import { kubotaRtvXCurrentConfigurationsMigration } from '@/lib/migrations/20260901_569_kubota_rtv_x_current_configurations';
 
 export const kubotaMigrations: DbMigration[] = [
   kubotaM7060CurrentSpecsMigration,
@@ -169,4 +170,5 @@ export const kubotaMigrations: DbMigration[] = [
   kubotaRemainingCurrentMiniExcavatorsMigration,
   kubotaRSeriesWheelLoadersCurrentMigration,
   kubotaCurrentUtilityVehiclesMigration,
+  kubotaRtvXCurrentConfigurationsMigration,
 ];
