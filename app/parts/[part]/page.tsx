@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
 import { getReplacementChain } from '@/lib/replacement-chain-service';
-import { getReplacementSetsForLegacyPart } from '@/lib/replacement-set-service';
+import { getReplacementSetMembershipsForPart, getReplacementSetsForLegacyPart } from '@/lib/replacement-set-service';
 import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
 
 export const dynamic = 'force-dynamic';
@@ -70,15 +70,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const part = await getPart(slug);
   if (!part) return {};
 
+  const replacementSets = await getReplacementSetsForLegacyPart(part.id);
   const publishable = part.dataStatus === 'verified' || part.dataStatus === 'partial';
-  const hasReplacement = part.relations.some((relation) => relation.direction === 'outgoing' && relation.relationType === 'replaces');
+  const hasSingleReplacement = part.relations.some((relation) => relation.direction === 'outgoing' && relation.relationType === 'replaces');
+  const hasReplacementSet = replacementSets.length > 0;
+  const hasReplacement = hasSingleReplacement || hasReplacementSet;
   const hasComponents = part.components.length > 0;
   const title = hasReplacement
     ? `${part.manufacturerName || 'OEM'} ${part.partNumber} Replacement Part Number`
     : `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'Part'} Fitment`;
-  const description = hasReplacement
-    ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number, source-backed fitment${hasComponents ? ', kit contents' : ''} and technical sources.`
-    : `${part.partNumber} ${part.name || 'OEM part'} reference with source-backed compatible farm equipment, fitment confidence, serial-number notes${hasComponents ? ', kit contents' : ''} and technical sources.`;
+  const description = hasReplacementSet
+    ? `${part.partNumber} service replacement reference showing the complete source-backed multi-part replacement set, compatible equipment and technical sources.`
+    : hasSingleReplacement
+      ? `${part.partNumber} replacement and supersession reference with the current OEM substitute part number, source-backed fitment${hasComponents ? ', kit contents' : ''} and technical sources.`
+      : `${part.partNumber} ${part.name || 'OEM part'} reference with source-backed compatible farm equipment, fitment confidence, serial-number notes${hasComponents ? ', kit contents' : ''} and technical sources.`;
 
   return {
     title,
@@ -93,9 +98,10 @@ export default async function PartPage({ params }: PageProps) {
   const part = await getPart(slug);
   if (!part) notFound();
 
-  const [replacementChain, replacementSets] = await Promise.all([
+  const [replacementChain, replacementSets, replacementMemberships] = await Promise.all([
     getReplacementChain(part.id),
     getReplacementSetsForLegacyPart(part.id),
+    getReplacementSetMembershipsForPart(part.id),
   ]);
   const sourceEntries = [
     ...part.fitments
@@ -117,6 +123,13 @@ export default async function PartPage({ params }: PageProps) {
       .map((set) => ({
         url: set.sourceUrl as string,
         title: set.sourceTitle || 'Service replacement-set source',
+        publishedDate: null,
+      })),
+    ...replacementMemberships
+      .filter((membership) => membership.sourceUrl)
+      .map((membership) => ({
+        url: membership.sourceUrl as string,
+        title: membership.sourceTitle || 'Service replacement-set source',
         publishedDate: null,
       })),
     ...part.components
@@ -166,6 +179,11 @@ export default async function PartPage({ params }: PageProps) {
               <strong>Service replacement:</strong> this legacy part is replaced by a documented multi-part service set. See the required items below.
             </div>
           )}
+          {replacementMemberships.length > 0 && (
+            <div className="replacement-summary">
+              <strong>Replacement-set component:</strong> this part is required in a documented multi-part service replacement. See the legacy part below.
+            </div>
+          )}
           <div className="notice">
             Fitment and replacement relationships are shown only where a source record is attached. Confidence labels distinguish direct model fitment from broader engine- or family-level references. Always confirm serial number, machine generation and configuration before ordering.
           </div>
@@ -177,6 +195,7 @@ export default async function PartPage({ params }: PageProps) {
             <strong>On this page</strong>
             <a href="#part-details">Part details</a>
             {replacementSets.length > 0 && <a href="#service-replacement">Service replacement set</a>}
+            {replacementMemberships.length > 0 && <a href="#replacement-set-membership">Used in service replacement</a>}
             {part.components.length > 0 && <a href="#kit-contents">Kit contents</a>}
             {part.includedInKits.length > 0 && <a href="#included-in-kits">Included in Filter Paks</a>}
             {part.relations.length > 0 && <a href="#cross-references">Replacements & cross references</a>}
@@ -198,6 +217,7 @@ export default async function PartPage({ params }: PageProps) {
               )}
               <div className="placeholder-row"><span>Source-backed fitments</span><span>{part.fitmentCount}</span></div>
               {replacementSets.length > 0 && <div className="placeholder-row"><span>Service replacement sets</span><span>{replacementSets.length}</span></div>}
+              {replacementMemberships.length > 0 && <div className="placeholder-row"><span>Service replacement memberships</span><span>{replacementMemberships.length}</span></div>}
               {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
             </section>
 
@@ -221,6 +241,25 @@ export default async function PartPage({ params }: PageProps) {
                         </span>
                       </div>
                     ))}
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {replacementMemberships.length > 0 && (
+              <section className="data-section" id="replacement-set-membership">
+                <h2>Used in service replacement</h2>
+                <p className="section-note">This part is one component of a documented multi-part service replacement. The legacy number links back to the complete required set.</p>
+                {replacementMemberships.map((membership) => (
+                  <div className="placeholder-row" key={`${membership.id}-${membership.legacyNormalizedPartNumber}`}>
+                    <span>
+                      <Link href={`/parts/${membership.legacyNormalizedPartNumber.toLowerCase()}`}>{membership.legacyPartNumber}</Link>
+                    </span>
+                    <span>
+                      {membership.role || 'Replacement component'}
+                      {membership.quantity !== null ? ` · Qty ${membership.quantity}` : ''}
+                      {' · '}{membership.title}
+                    </span>
                   </div>
                 ))}
               </section>
