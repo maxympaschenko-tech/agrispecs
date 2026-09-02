@@ -47,6 +47,7 @@ import { newHollandBoomer50FilterProvenanceCorrectionMigration } from '@/lib/mig
 import { newHollandBoomerPost2022FilterCutoversMigration } from '@/lib/migrations/20260902_580_new_holland_boomer_post_2022_filter_cutovers';
 import { newHollandBoomerHstCabFiltersMigration } from '@/lib/migrations/20260902_581_new_holland_boomer_hst_cab_filters';
 import { newHollandBoomer55ServoHstFilterMigration } from '@/lib/migrations/20260902_582_new_holland_boomer55_servo_hst_filter';
+import { newHollandBoomerAirFilterReplacementsMigration } from '@/lib/migrations/20260902_583_new_holland_boomer_air_filter_replacements';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -97,4 +98,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandBoomerPost2022FilterCutoversMigration,
   newHollandBoomerHstCabFiltersMigration,
   newHollandBoomer55ServoHstFilterMigration,
+  newHollandBoomerAirFilterReplacementsMigration,
 ];
