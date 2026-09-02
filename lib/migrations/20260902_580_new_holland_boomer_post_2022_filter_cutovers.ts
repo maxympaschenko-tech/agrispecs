@@ -2,6 +2,7 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { DbMigration } from '@/lib/db-migration-types';
 
 type IdRow = RowDataPacket & { id: number };
+type MachineSlug = 'boomer-35' | 'boomer-40' | 'boomer-45' | 'boomer-50' | 'boomer-55';
 
 type CutoverPart = {
   number: string;
@@ -9,6 +10,7 @@ type CutoverPart = {
   category: 'engine-oil-filters' | 'fuel-filters' | 'hydraulic-filters';
   messicksUrl: string;
   externalId: string;
+  machineSlugs: MachineSlug[];
   fitmentNote: string;
 };
 
@@ -16,7 +18,7 @@ const MYCNH_URL = 'https://www.mycnhstore.com/es/es/newhollandag/na/traktoren/ko
 const MYCNH_EXTERNAL_ID = 'new-holland-boomer-tier4b-modern-filter-diagram-abc2895516-2026-09';
 const CURRENT_VERSION = 'united-states-current-2026-08';
 const CONFIGURATION_NOTE = 'Tier 4B North America; production date after 01-Sep-2022';
-const MACHINE_SLUGS = ['boomer-35', 'boomer-40', 'boomer-45', 'boomer-50', 'boomer-55'] as const;
+const ALL_MACHINE_SLUGS: MachineSlug[] = ['boomer-35', 'boomer-40', 'boomer-45', 'boomer-50', 'boomer-55'];
 
 const parts: CutoverPart[] = [
   {
@@ -25,6 +27,7 @@ const parts: CutoverPart[] = [
     category: 'engine-oil-filters',
     messicksUrl: 'https://www.messicks.com/parts/new-holland/mt40409065',
     externalId: 'messicks-new-holland-mt40409065-boomer-post-2022-09',
+    machineSlugs: ALL_MACHINE_SLUGS,
     fitmentNote: 'Engine oil filter shown for Boomer 35, 40, 45, 50 and 55 Tier 4B North America applications with production dates after 01-Sep-2022. Exact production-date fitment is secondary dealer-catalog evidence; OEM part identity is corroborated by the current MyCNH filter diagram.',
   },
   {
@@ -33,6 +36,7 @@ const parts: CutoverPart[] = [
     category: 'fuel-filters',
     messicksUrl: 'https://www.messicks.com/parts/new-holland/mt40407354',
     externalId: 'messicks-new-holland-mt40407354-boomer-post-2022-09',
+    machineSlugs: ALL_MACHINE_SLUGS,
     fitmentNote: 'Fuel filter shown for Boomer 35, 40, 45, 50 and 55 Tier 4B North America applications with production dates after 01-Sep-2022. Exact production-date fitment is secondary dealer-catalog evidence; OEM part identity is corroborated by the current MyCNH filter diagram.',
   },
   {
@@ -41,7 +45,8 @@ const parts: CutoverPart[] = [
     category: 'hydraulic-filters',
     messicksUrl: 'https://www.messicks.com/parts/new-holland/MT40347273',
     externalId: 'messicks-new-holland-mt40347273-boomer-post-2022-09',
-    fitmentNote: 'Hydraulic oil/suction filter shown for the current Boomer 35, 40, 45, 50 and 55 Tier 4B family; post-01-Sep-2022 service diagrams use MT40347273. OEM part identity and the MT40007638 replacement relationship are separately supported by MyCNH data.',
+    machineSlugs: ['boomer-35', 'boomer-40', 'boomer-45', 'boomer-50'],
+    fitmentNote: 'Hydraulic oil/suction filter shown for Boomer 35, 40, 45 and 50 Tier 4B North America applications with production dates after 01-Sep-2022. Boomer 55 is intentionally excluded from this dated relation until equally explicit model-specific evidence is available. OEM part identity and the MT40007638 replacement relationship are separately supported by MyCNH data.',
   },
 ];
 
@@ -137,18 +142,18 @@ export const newHollandBoomerPost2022FilterCutoversMigration: DbMigration = {
         `Messick's New Holland ${part.number} Boomer fitment catalog`,
         {
           role: 'Exact model and production-date fitment evidence',
-          models: MACHINE_SLUGS.map((slug) => slug.replace('boomer-', 'Boomer ')),
+          models: part.machineSlugs.map((slug) => slug.replace('boomer-', 'Boomer ')),
           productionDateRule: 'After 01-Sep-2022',
           oemCorroboration: MYCNH_URL,
           note: part.number === 'MT40347273'
-            ? 'Supplier catalog identifies MT40347273 for the Boomer 35/40/45/50/55 family and post-2022 filter/suction diagrams; MyCNH independently documents it as the MT40007638 replacement.'
+            ? 'The dated supplier-catalog relation is stored only for Boomer 35/40/45/50. Boomer 55 is excluded until equally explicit post-2022 hydraulic-filter evidence is available.'
             : 'Supplier catalog explicitly lists the post-01-Sep-2022 Boomer filter diagrams for this part.',
         },
       );
       fitmentSourceIds.set(part.number, sourceRecordId);
     }
 
-    for (const machineSlug of MACHINE_SLUGS) {
+    for (const machineSlug of ALL_MACHINE_SLUGS) {
       const machineId = await selectId(
         connection,
         `SELECT m.id FROM machines m INNER JOIN manufacturers mf ON mf.id=m.manufacturer_id WHERE mf.slug='new-holland' AND m.slug=? LIMIT 1`,
@@ -161,6 +166,8 @@ export const newHollandBoomerPost2022FilterCutoversMigration: DbMigration = {
       );
 
       for (const part of parts) {
+        if (!part.machineSlugs.includes(machineSlug)) continue;
+
         const partId = await selectId(
           connection,
           `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number=? LIMIT 1`,
