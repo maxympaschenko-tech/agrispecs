@@ -2,47 +2,63 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { DbMigration } from '@/lib/db-migration-types';
 
 type IdRow = RowDataPacket & { id: number };
-type PartSeed = { number: string; name: string; category: string; fitmentNote: string };
+type SourceKey = 'list-a' | 'list-b';
+type PartSeed = { number: string; name: string; category: string; source: SourceKey; fitmentNote: string };
 
-const MYCNH_URL = 'https://www.mycnhstore.com/us/en/newhollandag/na/tractors/compact/naba17com227boomer/compact-tractor-wcab-tier-4b-na/service-maintenance/initial-stocking-list-list-a/cn/DDA1CD92-148D-487F-A9E2-58C76CDDF168';
-const MYCNH_EXTERNAL_ID = 'new-holland-boomer-40-tier4b-initial-stocking-filters-2026-09';
+const LIST_A_URL = 'https://www.mycnhstore.com/us/en/newhollandag/na/tractors/compact/naba17com227boomer/compact-tractor-wcab-tier-4b-na/service-maintenance/initial-stocking-list-list-a/cn/DDA1CD92-148D-487F-A9E2-58C76CDDF168';
+const LIST_B_URL = 'https://www.mycnhstore.com/ca/fr/newhollandag/na/tracteurs/compact/naba17com227boomer/tracteur-compact-wrops-tier-4b-na/entretien-maintenance/liste-de-stock-initial-liste-b/cn/25602CAB-9B0F-41DC-AC55-B05F01AC6A4F/FA9AF5F9-6631-4164-8057-0C92829F48D5';
+const LIST_A_EXTERNAL_ID = 'new-holland-boomer-40-tier4b-initial-stocking-list-a-2026-09';
+const LIST_B_EXTERNAL_ID = 'new-holland-boomer-40-tier4b-initial-stocking-list-b-2026-09';
 
 const parts: PartSeed[] = [
   {
     number: 'MT40318591',
     name: 'Engine Oil Filter',
     category: 'engine-oil-filters',
+    source: 'list-a',
     fitmentNote: 'Engine oil filter from the official MyCNH North America Tier 4B Boomer initial stocking list used for the current Boomer 40 family. Verify serial/build date before ordering because CNH may supersede service part numbers.',
   },
   {
     number: 'MT40271228',
     name: 'Fuel Filter',
     category: 'fuel-filters',
+    source: 'list-a',
     fitmentNote: 'Fuel filter from the official MyCNH North America Tier 4B Boomer initial stocking list used for the current Boomer 40 family. Verify serial/build date before ordering because CNH may supersede service part numbers.',
   },
   {
-    number: 'MT40049446',
-    name: 'Inner Engine Air Filter',
+    number: 'MT40007576',
+    name: 'Primary Engine Air Filter',
     category: 'air-filters',
-    fitmentNote: 'Inner engine air filter listed in the official MyCNH North America Tier 4B Boomer initial stocking list. Verify serial/build date and air-cleaner configuration before ordering.',
+    source: 'list-b',
+    fitmentNote: 'Primary/outer engine air filter listed in the official MyCNH North America Tier 4B Boomer Initial Stocking List B. Verify serial/build date and air-cleaner configuration before ordering.',
+  },
+  {
+    number: 'MT40049446',
+    name: 'Safety Engine Air Filter',
+    category: 'air-filters',
+    source: 'list-a',
+    fitmentNote: 'Inner/safety engine air filter listed in the official MyCNH North America Tier 4B Boomer Initial Stocking List A. Verify serial/build date and air-cleaner configuration before ordering.',
   },
   {
     number: 'MT40007563',
     name: 'HST Hydraulic Oil Filter',
     category: 'hydraulic-filters',
-    fitmentNote: 'Hydraulic oil filter listed in the official MyCNH Tier 4B Boomer initial stocking list for HST transmission service. Verify transmission, serial number, and build date before ordering.',
+    source: 'list-a',
+    fitmentNote: 'Hydraulic oil filter listed in the official MyCNH Tier 4B Boomer Initial Stocking List A for HST transmission service. Verify transmission, serial number, and build date before ordering.',
   },
   {
     number: 'MT40007638',
     name: 'Hydraulic Suction / Transmission Filter',
     category: 'hydraulic-filters',
+    source: 'list-a',
     fitmentNote: 'Hydraulic suction filter listed by MyCNH with an explicit Boomer 40 / Boomer 50 model note; the catalog also identifies replacement filter MT40347273 in the suction-line note. Verify serial/build date and supersession before ordering.',
   },
   {
     number: 'MT40032863',
     name: 'Cab Air Filter',
     category: 'cab-filters',
-    fitmentNote: 'Cab air filter listed in the official MyCNH North America Tier 4B Boomer initial stocking list; applies to cab-equipped Boomer 40 configurations. Verify cab configuration and serial/build date.',
+    source: 'list-a',
+    fitmentNote: 'Cab air filter listed in the official MyCNH North America Tier 4B Boomer Initial Stocking List A; applies to cab-equipped Boomer 40 configurations. Verify cab configuration and serial/build date.',
   },
 ];
 
@@ -50,6 +66,39 @@ async function selectId(connection: Parameters<DbMigration['apply']>[0], sql: st
   const [rows] = await connection.query<IdRow[]>(sql, params);
   if (!rows[0]) throw new Error('Missing New Holland Boomer 40 parts migration dependency.');
   return Number(rows[0].id);
+}
+
+async function ensureSourceRecord(
+  connection: Parameters<DbMigration['apply']>[0],
+  sourceId: number,
+  source: SourceKey,
+) {
+  const externalId = source === 'list-a' ? LIST_A_EXTERNAL_ID : LIST_B_EXTERNAL_ID;
+  const url = source === 'list-a' ? LIST_A_URL : LIST_B_URL;
+  const [rows] = await connection.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? ORDER BY id LIMIT 1`, [externalId]);
+  if (rows[0]?.id) return Number(rows[0].id);
+
+  const sourceParts = parts.filter((part) => part.source === source);
+  const [result] = await connection.query<ResultSetHeader>(
+    `INSERT INTO source_records (source_id,url,external_id,title,raw_reference) VALUES (?,?,?,?,?)`,
+    [
+      sourceId,
+      url,
+      externalId,
+      source === 'list-a'
+        ? 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List A for Boomer 40 fitment'
+        : 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List B for Boomer 40 fitment',
+      JSON.stringify({
+        modelScope: 'North America Tier 4B Boomer compact tractors; Boomer 40 fitment retained with configuration/serial cautions',
+        catalogPage: source === 'list-a' ? '05.100.10 - INITIAL STOCKING LIST (LIST A)' : 'INITIAL STOCKING LIST (LIST B)',
+        explicitCatalogNote: source === 'list-a'
+          ? 'MT40007638 suction-line note names BOOMER 40 and BOOMER 50 and references replacement filter MT40347273.'
+          : 'MT40007576 is listed as AIR FILTER; Primary.',
+        filters: sourceParts.map((part) => ({ partNumber: part.number, name: part.name })),
+      }),
+    ],
+  );
+  return Number(result.insertId);
 }
 
 export const newHollandBoomer40FiltersPartsMigration: DbMigration = {
@@ -84,26 +133,10 @@ export const newHollandBoomer40FiltersPartsMigration: DbMigration = {
       sourceId = Number(result.insertId);
     }
 
-    const [sourceRecordRows] = await connection.query<IdRow[]>(`SELECT id FROM source_records WHERE external_id=? ORDER BY id LIMIT 1`, [MYCNH_EXTERNAL_ID]);
-    let sourceRecordId = sourceRecordRows[0]?.id ? Number(sourceRecordRows[0].id) : 0;
-    if (!sourceRecordId) {
-      const [result] = await connection.query<ResultSetHeader>(
-        `INSERT INTO source_records (source_id,url,external_id,title,raw_reference) VALUES (?,?,?,?,?)`,
-        [
-          sourceId,
-          MYCNH_URL,
-          MYCNH_EXTERNAL_ID,
-          'New Holland MyCNH North America Tier 4B Boomer initial stocking filter list for Boomer 40 fitment',
-          JSON.stringify({
-            modelScope: 'North America Tier 4B Boomer compact tractor service list; Boomer 40 fitment retained with configuration/serial cautions',
-            catalogPage: '05.100.10 - INITIAL STOCKING LIST (LIST A)',
-            explicitCatalogNote: 'MT40007638 suction-line note names BOOMER 40 and BOOMER 50 and references replacement filter MT40347273.',
-            filters: parts.map((part) => ({ partNumber: part.number, name: part.name })),
-          }),
-        ],
-      );
-      sourceRecordId = Number(result.insertId);
-    }
+    const sourceRecordIds: Record<SourceKey, number> = {
+      'list-a': await ensureSourceRecord(connection, sourceId, 'list-a'),
+      'list-b': await ensureSourceRecord(connection, sourceId, 'list-b'),
+    };
 
     const categoryIds = new Map<string, number>();
     for (const [, slug] of childCategories) {
@@ -139,7 +172,7 @@ export const newHollandBoomer40FiltersPartsMigration: DbMigration = {
       if (!existing[0]) {
         await connection.query(
           `INSERT INTO machine_parts (machine_id,part_id,fitment_note,source_record_id) VALUES (?,?,?,?)`,
-          [machineId, partId, part.fitmentNote, sourceRecordId],
+          [machineId, partId, part.fitmentNote, sourceRecordIds[part.source]],
         );
       }
     }
