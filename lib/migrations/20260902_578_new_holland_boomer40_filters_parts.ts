@@ -103,7 +103,7 @@ async function ensureSourceRecord(
 
 export const newHollandBoomer40FiltersPartsMigration: DbMigration = {
   id: '20260902_578_new_holland_boomer40_filters_parts',
-  description: 'Add manufacturer-verified New Holland Boomer 40 Tier 4B maintenance filters and machine fitment from MyCNH parts data',
+  description: 'Add manufacturer-verified New Holland Boomer 40 Tier 4B filters, fitment, and documented hydraulic filter replacement from MyCNH parts data',
   async apply(connection) {
     await connection.query(`INSERT INTO manufacturers (name,slug) VALUES ('New Holland','new-holland') ON DUPLICATE KEY UPDATE name=VALUES(name)`);
     const manufacturerId = await selectId(connection, `SELECT id FROM manufacturers WHERE slug='new-holland' LIMIT 1`);
@@ -153,6 +153,38 @@ export const newHollandBoomer40FiltersPartsMigration: DbMigration = {
         [manufacturerId, categoryId, part.number, part.number.toUpperCase(), part.name],
       );
     }
+
+    const hydraulicCategoryId = categoryIds.get('hydraulic-filters');
+    if (!hydraulicCategoryId) throw new Error('Missing New Holland hydraulic filters category.');
+    await connection.query(
+      `INSERT INTO parts (manufacturer_id,category_id,part_number,normalized_part_number,name,description,data_status)
+       VALUES (?,?,?,?,?,?,'verified')
+       ON DUPLICATE KEY UPDATE category_id=VALUES(category_id),name=VALUES(name),description=VALUES(description),data_status='verified'`,
+      [
+        manufacturerId,
+        hydraulicCategoryId,
+        'MT40347273',
+        'MT40347273',
+        'Hydraulic Oil Filter',
+        'New Holland hydraulic oil filter referenced by the official MyCNH Tier 4B Boomer catalog as the replacement filter in the MT40007638 suction-line application.',
+      ],
+    );
+    const oldHydraulicFilterId = await selectId(
+      connection,
+      `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number='MT40007638' LIMIT 1`,
+      [manufacturerId],
+    );
+    const replacementHydraulicFilterId = await selectId(
+      connection,
+      `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number='MT40347273' LIMIT 1`,
+      [manufacturerId],
+    );
+    await connection.query(
+      `INSERT INTO part_cross_references (part_id,cross_part_id,relation_type,source_record_id)
+       VALUES (?,?,'replaces',?)
+       ON DUPLICATE KEY UPDATE source_record_id=VALUES(source_record_id)`,
+      [oldHydraulicFilterId, replacementHydraulicFilterId, sourceRecordIds['list-a']],
+    );
 
     const machineId = await selectId(
       connection,
