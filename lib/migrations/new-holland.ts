@@ -52,6 +52,7 @@ import { newHollandBoomerEngineOilReplacementMigration } from '@/lib/migrations/
 import { serviceReplacementSetsMigration } from '@/lib/migrations/20260902_585_service_replacement_sets';
 import { newHollandHydraulicLegacyChainMigration } from '@/lib/migrations/20260902_587_new_holland_hydraulic_legacy_chain';
 import { newHollandEngineOilLegacyChainMigration } from '@/lib/migrations/20260902_588_new_holland_engine_oil_legacy_chain';
+import { newHollandWorkmaster25SFiltersMigration } from '@/lib/migrations/20260902_589_new_holland_workmaster25s_filters';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -107,4 +108,5 @@ export const newHollandMigrations: DbMigration[] = [
   serviceReplacementSetsMigration,
   newHollandHydraulicLegacyChainMigration,
   newHollandEngineOilLegacyChainMigration,
+  newHollandWorkmaster25SFiltersMigration,
 ];
