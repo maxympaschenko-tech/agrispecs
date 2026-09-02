@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
 import { getReplacementChain } from '@/lib/replacement-chain-service';
+import { getReplacementSetsForLegacyPart } from '@/lib/replacement-set-service';
 import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
 
 export const dynamic = 'force-dynamic';
@@ -92,7 +93,10 @@ export default async function PartPage({ params }: PageProps) {
   const part = await getPart(slug);
   if (!part) notFound();
 
-  const replacementChain = await getReplacementChain(part.id);
+  const [replacementChain, replacementSets] = await Promise.all([
+    getReplacementChain(part.id),
+    getReplacementSetsForLegacyPart(part.id),
+  ]);
   const sourceEntries = [
     ...part.fitments
       .filter((fitment) => fitment.sourceUrl)
@@ -106,6 +110,13 @@ export default async function PartPage({ params }: PageProps) {
       .map((relation) => ({
         url: relation.sourceUrl as string,
         title: relation.sourceTitle || 'Part substitution source',
+        publishedDate: null,
+      })),
+    ...replacementSets
+      .filter((set) => set.sourceUrl)
+      .map((set) => ({
+        url: set.sourceUrl as string,
+        title: set.sourceTitle || 'Service replacement-set source',
         publishedDate: null,
       })),
     ...part.components
@@ -150,6 +161,11 @@ export default async function PartPage({ params }: PageProps) {
               <Link href={`/parts/${finalReplacement.normalizedPartNumber.toLowerCase()}`}>{finalReplacement.partNumber}</Link>
             </div>
           )}
+          {replacementSets.length > 0 && (
+            <div className="replacement-summary">
+              <strong>Service replacement:</strong> this legacy part is replaced by a documented multi-part service set. See the required items below.
+            </div>
+          )}
           <div className="notice">
             Fitment and replacement relationships are shown only where a source record is attached. Confidence labels distinguish direct model fitment from broader engine- or family-level references. Always confirm serial number, machine generation and configuration before ordering.
           </div>
@@ -160,6 +176,7 @@ export default async function PartPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             <a href="#part-details">Part details</a>
+            {replacementSets.length > 0 && <a href="#service-replacement">Service replacement set</a>}
             {part.components.length > 0 && <a href="#kit-contents">Kit contents</a>}
             {part.includedInKits.length > 0 && <a href="#included-in-kits">Included in Filter Paks</a>}
             {part.relations.length > 0 && <a href="#cross-references">Replacements & cross references</a>}
@@ -180,8 +197,34 @@ export default async function PartPage({ params }: PageProps) {
                 </div>
               )}
               <div className="placeholder-row"><span>Source-backed fitments</span><span>{part.fitmentCount}</span></div>
+              {replacementSets.length > 0 && <div className="placeholder-row"><span>Service replacement sets</span><span>{replacementSets.length}</span></div>}
               {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
             </section>
+
+            {replacementSets.length > 0 && (
+              <section className="data-section" id="service-replacement">
+                <h2>Service replacement set</h2>
+                <p className="section-note">Some legacy assemblies are replaced by multiple parts rather than one superseding part number. All listed items belong to the same source-backed replacement set.</p>
+                {replacementSets.map((set) => (
+                  <div key={set.id} style={{ marginBottom: 22 }}>
+                    <h3>{set.title}</h3>
+                    {set.notes && <p className="section-note">{set.notes}</p>}
+                    {set.items.map((item) => (
+                      <div className="placeholder-row" key={`${set.id}-${item.normalizedPartNumber}`}>
+                        <span>
+                          <Link href={`/parts/${item.normalizedPartNumber.toLowerCase()}`}>{item.partNumber}</Link>
+                        </span>
+                        <span>
+                          {item.role || item.name || 'Replacement component'}
+                          {item.name && item.role ? ` · ${item.name}` : ''}
+                          {item.quantity !== null ? ` · Qty ${item.quantity}` : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </section>
+            )}
 
             {part.components.length > 0 && (
               <section className="data-section" id="kit-contents">

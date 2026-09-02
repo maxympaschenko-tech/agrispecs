@@ -49,6 +49,7 @@ import { newHollandBoomerHstCabFiltersMigration } from '@/lib/migrations/2026090
 import { newHollandBoomer55ServoHstFilterMigration } from '@/lib/migrations/20260902_582_new_holland_boomer55_servo_hst_filter';
 import { newHollandBoomerAirFiltersReplacementsMigration } from '@/lib/migrations/20260902_583_new_holland_boomer_air_filters_replacements';
 import { newHollandBoomerEngineOilReplacementMigration } from '@/lib/migrations/20260902_584_new_holland_boomer_engine_oil_replacement';
+import { serviceReplacementSetsMigration } from '@/lib/migrations/20260902_585_service_replacement_sets';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -101,4 +102,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandBoomer55ServoHstFilterMigration,
   newHollandBoomerAirFiltersReplacementsMigration,
   newHollandBoomerEngineOilReplacementMigration,
+  serviceReplacementSetsMigration,
 ];
