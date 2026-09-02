@@ -3,12 +3,38 @@ import type { DbMigration } from '@/lib/db-migration-types';
 
 type IdRow = RowDataPacket & { id: number };
 
+type ReplacementComponent = {
+  number: string;
+  name: string;
+  role: string;
+  officialSource: 'new-holland' | 'cnh' | null;
+  officialUrl: string | null;
+};
+
 const LEGACY_PART = 'MT40271228';
-const REPLACEMENT_COMPONENTS = [
-  { number: 'MT40416089', name: 'Fuel Filter Element', category: 'fuel-filters', role: 'Filter element', oemUrl: 'https://www.mycnhstore.com/ca/en/caseih/category/filters/air-filters/element/p/MT40416089' },
-  { number: 'MT40416097', name: 'Fuel Filter Bowl', category: 'fuel-filters', role: 'Filter bowl', oemUrl: 'https://www.mycnhstore.com/gb/en/newhollandag/category/filters/filters-components/filter-bowl/p/MT40416097' },
-  { number: 'MT40416102', name: 'Fuel Filter Cover', category: 'fuel-filters', role: 'Filter cover', oemUrl: 'https://www.mycnhstore.com/us/en/newhollandag/category/filters/filters-components/filter-cover/p/MT40416102' },
-] as const;
+const REPLACEMENT_COMPONENTS: ReplacementComponent[] = [
+  {
+    number: 'MT40416089',
+    name: 'Fuel Filter Element',
+    role: 'Filter element',
+    officialSource: 'cnh',
+    officialUrl: 'https://www.mycnhstore.com/ca/en/caseih/category/filters/air-filters/element/p/MT40416089',
+  },
+  {
+    number: 'MT40416097',
+    name: 'Fuel Filter Bowl',
+    role: 'Filter bowl',
+    officialSource: 'new-holland',
+    officialUrl: 'https://www.mycnhstore.com/gb/en/newhollandag/category/filters/filters-components/filter-bowl/p/MT40416097',
+  },
+  {
+    number: 'MT40416102',
+    name: 'Fuel Filter Cover',
+    role: 'Filter cover',
+    officialSource: null,
+    officialUrl: null,
+  },
+];
 const DEALER_URL = 'https://www.newhollandrochester.com/shop/mt40271228/';
 const DEALER_EXTERNAL_ID = 'new-holland-rochester-mt40271228-three-part-service-replacement-2026-09';
 const CURRENT_VERSION = 'united-states-current-2026-08';
@@ -77,10 +103,21 @@ export const serviceReplacementSetsMigration: DbMigration = {
       `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number=? LIMIT 1`,
       [manufacturerId, LEGACY_PART],
     );
-    const officialSourceId = await selectId(
+    const newHollandOfficialSourceId = await selectId(
       connection,
       `SELECT id FROM sources WHERE name='New Holland Parts' AND domain='mycnhstore.com' ORDER BY id LIMIT 1`,
     );
+
+    let [cnhRows] = await connection.query<IdRow[]>(
+      `SELECT id FROM sources WHERE name='CNH MyCNH' AND domain='mycnhstore.com' ORDER BY id LIMIT 1`,
+    );
+    let cnhOfficialSourceId = cnhRows[0]?.id ? Number(cnhRows[0].id) : 0;
+    if (!cnhOfficialSourceId) {
+      const [result] = await connection.query<ResultSetHeader>(
+        `INSERT INTO sources (name,domain,source_type,authority_level) VALUES ('CNH MyCNH','mycnhstore.com','manufacturer','official')`,
+      );
+      cnhOfficialSourceId = Number(result.insertId);
+    }
 
     let [dealerRows] = await connection.query<IdRow[]>(
       `SELECT id FROM sources WHERE name='New Holland Rochester' AND domain='newhollandrochester.com' ORDER BY id LIMIT 1`,
@@ -122,14 +159,18 @@ export const serviceReplacementSetsMigration: DbMigration = {
         [manufacturerId, component.number],
       );
       componentIds.set(component.number, componentId);
-      await ensureSourceRecord(
-        connection,
-        officialSourceId,
-        `new-holland-mycnh-${component.number.toLowerCase()}-2026-09`,
-        component.oemUrl,
-        `New Holland MyCNH ${component.number} ${component.name}`,
-        { role: 'Official OEM identity for service replacement component', partNumber: component.number, name: component.name },
-      );
+
+      if (component.officialSource && component.officialUrl) {
+        const sourceId = component.officialSource === 'new-holland' ? newHollandOfficialSourceId : cnhOfficialSourceId;
+        await ensureSourceRecord(
+          connection,
+          sourceId,
+          `cnh-mycnh-${component.number.toLowerCase()}-2026-09`,
+          component.officialUrl,
+          `CNH MyCNH ${component.number} ${component.name}`,
+          { role: 'Official OEM identity for service replacement component', partNumber: component.number, name: component.name },
+        );
+      }
     }
 
     const [setRows] = await connection.query<IdRow[]>(
