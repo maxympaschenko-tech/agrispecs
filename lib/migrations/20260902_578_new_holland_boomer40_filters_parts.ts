@@ -7,8 +7,8 @@ type PartSeed = { number: string; name: string; category: string; source: Source
 
 const LIST_A_URL = 'https://www.mycnhstore.com/us/en/newhollandag/na/tractors/compact/naba17com227boomer/compact-tractor-wcab-tier-4b-na/service-maintenance/initial-stocking-list-list-a/cn/DDA1CD92-148D-487F-A9E2-58C76CDDF168';
 const LIST_B_URL = 'https://www.mycnhstore.com/ca/fr/newhollandag/na/tracteurs/compact/naba17com227boomer/tracteur-compact-wrops-tier-4b-na/entretien-maintenance/liste-de-stock-initial-liste-b/cn/25602CAB-9B0F-41DC-AC55-B05F01AC6A4F/FA9AF5F9-6631-4164-8057-0C92829F48D5';
-const LIST_A_EXTERNAL_ID = 'new-holland-boomer-40-tier4b-initial-stocking-list-a-2026-09';
-const LIST_B_EXTERNAL_ID = 'new-holland-boomer-40-tier4b-initial-stocking-list-b-2026-09';
+const LIST_A_EXTERNAL_ID = 'new-holland-boomer-tier4b-na-initial-stocking-filters-2026-09';
+const LIST_B_EXTERNAL_ID = 'new-holland-boomer-tier4b-na-initial-stocking-list-b-2026-09';
 
 const parts: PartSeed[] = [
   {
@@ -86,10 +86,10 @@ async function ensureSourceRecord(
       url,
       externalId,
       source === 'list-a'
-        ? 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List A for Boomer 40 fitment'
-        : 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List B for Boomer 40 fitment',
+        ? 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List A'
+        : 'New Holland MyCNH North America Tier 4B Boomer Initial Stocking List B',
       JSON.stringify({
-        modelScope: 'North America Tier 4B Boomer compact tractors; Boomer 40 fitment retained with configuration/serial cautions',
+        modelScope: 'North America Tier 4B Boomer compact tractors; individual machine fitment remains constrained by model/configuration notes',
         catalogPage: source === 'list-a' ? '05.100.10 - INITIAL STOCKING LIST (LIST A)' : 'INITIAL STOCKING LIST (LIST B)',
         explicitCatalogNote: source === 'list-a'
           ? 'MT40007638 suction-line note names BOOMER 40 and BOOMER 50 and references replacement filter MT40347273.'
