@@ -45,6 +45,7 @@ import { newHollandBoomer50FiltersPartsMigration } from '@/lib/migrations/202609
 import { newHollandBoomer40FiltersPartsMigration } from '@/lib/migrations/20260902_578_new_holland_boomer40_filters_parts';
 import { newHollandBoomer50FilterProvenanceCorrectionMigration } from '@/lib/migrations/20260902_579_new_holland_boomer50_filter_provenance_correction';
 import { newHollandBoomerPost2022FilterCutoversMigration } from '@/lib/migrations/20260902_580_new_holland_boomer_post_2022_filter_cutovers';
+import { newHollandBoomerHstCabFiltersMigration } from '@/lib/migrations/20260902_581_new_holland_boomer_hst_cab_filters';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -93,4 +94,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandBoomer40FiltersPartsMigration,
   newHollandBoomer50FilterProvenanceCorrectionMigration,
   newHollandBoomerPost2022FilterCutoversMigration,
+  newHollandBoomerHstCabFiltersMigration,
 ];
