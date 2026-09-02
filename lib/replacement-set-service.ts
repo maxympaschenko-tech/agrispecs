@@ -18,6 +18,18 @@ export type ReplacementSet = {
   items: ReplacementSetItem[];
 };
 
+export type ReplacementSetMembership = {
+  id: number;
+  title: string;
+  legacyPartNumber: string;
+  legacyNormalizedPartNumber: string;
+  legacyPartName: string | null;
+  quantity: number | null;
+  role: string | null;
+  sourceTitle: string | null;
+  sourceUrl: string | null;
+};
+
 type SetRow = RowDataPacket & {
   id: number;
   title: string;
@@ -33,6 +45,18 @@ type ItemRow = RowDataPacket & {
   name: string | null;
   quantity: string | number | null;
   role: string | null;
+};
+
+type MembershipRow = RowDataPacket & {
+  id: number;
+  title: string;
+  legacy_part_number: string;
+  legacy_normalized_part_number: string;
+  legacy_part_name: string | null;
+  quantity: string | number | null;
+  role: string | null;
+  source_title: string | null;
+  source_url: string | null;
 };
 
 export async function getReplacementSetsForLegacyPart(partId: number): Promise<ReplacementSet[]> {
@@ -78,6 +102,43 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
     }));
   } catch (error) {
     console.error('Unable to load service replacement sets:', error);
+    return [];
+  }
+}
+
+export async function getReplacementSetMembershipsForPart(partId: number): Promise<ReplacementSetMembership[]> {
+  if (!Number.isInteger(partId) || partId <= 0) return [];
+
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<MembershipRow[]>(`
+      SELECT prs.id, prs.title,
+             legacy.part_number AS legacy_part_number,
+             legacy.normalized_part_number AS legacy_normalized_part_number,
+             legacy.name AS legacy_part_name,
+             prsi.quantity, prsi.role,
+             sr.title AS source_title, sr.url AS source_url
+      FROM part_replacement_set_items prsi
+      INNER JOIN part_replacement_sets prs ON prs.id=prsi.replacement_set_id
+      INNER JOIN parts legacy ON legacy.id=prs.legacy_part_id
+      LEFT JOIN source_records sr ON sr.id=prs.source_record_id
+      WHERE prsi.part_id=?
+      ORDER BY prs.id ASC
+    `, [partId]);
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      title: row.title,
+      legacyPartNumber: row.legacy_part_number,
+      legacyNormalizedPartNumber: row.legacy_normalized_part_number,
+      legacyPartName: row.legacy_part_name,
+      quantity: row.quantity === null ? null : Number(row.quantity),
+      role: row.role,
+      sourceTitle: row.source_title,
+      sourceUrl: row.source_url,
+    }));
+  } catch (error) {
+    console.error('Unable to load service replacement-set memberships:', error);
     return [];
   }
 }
