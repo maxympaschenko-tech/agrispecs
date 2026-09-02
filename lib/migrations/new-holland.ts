@@ -42,6 +42,7 @@ import { newHollandF50cRoughTerrainForkliftCurrentMigration } from '@/lib/migrat
 import { newHollandDSeriesLoaderBackhoesCurrentMigration } from '@/lib/migrations/20260901_561_new_holland_d_series_loader_backhoes_current';
 import { newHollandU80dTractorLoaderCurrentMigration } from '@/lib/migrations/20260901_562_new_holland_u80d_tractor_loader_current';
 import { newHollandBoomer50FiltersPartsMigration } from '@/lib/migrations/20260901_577_new_holland_boomer50_filters_parts';
+import { newHollandBoomer40FiltersPartsMigration } from '@/lib/migrations/20260902_578_new_holland_boomer40_filters_parts';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -87,4 +88,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandDSeriesLoaderBackhoesCurrentMigration,
   newHollandU80dTractorLoaderCurrentMigration,
   newHollandBoomer50FiltersPartsMigration,
+  newHollandBoomer40FiltersPartsMigration,
 ];
