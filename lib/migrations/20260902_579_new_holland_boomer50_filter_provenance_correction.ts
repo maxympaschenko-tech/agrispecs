@@ -1,4 +1,4 @@
-import type { RowDataPacket } from 'mysql2';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { DbMigration } from '@/lib/db-migration-types';
 
 type IdRow = RowDataPacket & { id: number };
@@ -39,14 +39,17 @@ export const newHollandBoomer50FilterProvenanceCorrectionMigration: DbMigration 
       [LIST_B_EXTERNAL_ID],
     );
 
-    await connection.query(
+    const [fitmentUpdate] = await connection.query<ResultSetHeader>(
       `UPDATE machine_parts
        SET source_record_id=?, fitment_note=?
        WHERE machine_id=? AND part_id=? AND source_record_id=? AND fitment_note=?`,
       [listBSourceRecordId, NEW_PRIMARY_NOTE, machineId, primaryAirFilterId, listASourceRecordId, OLD_PRIMARY_NOTE],
     );
+    if (fitmentUpdate.affectedRows !== 1) {
+      throw new Error(`Expected to correct exactly one Boomer 50 MT40007576 fitment, updated ${fitmentUpdate.affectedRows}.`);
+    }
 
-    await connection.query(
+    const [sourceUpdate] = await connection.query<ResultSetHeader>(
       `UPDATE source_records
        SET title=?, raw_reference=?
        WHERE id=?`,
@@ -69,5 +72,8 @@ export const newHollandBoomer50FilterProvenanceCorrectionMigration: DbMigration 
         listASourceRecordId,
       ],
     );
+    if (sourceUpdate.affectedRows !== 1) {
+      throw new Error(`Expected to correct exactly one Boomer List A source record, updated ${sourceUpdate.affectedRows}.`);
+    }
   },
 };
