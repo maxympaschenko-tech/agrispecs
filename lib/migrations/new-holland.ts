@@ -69,6 +69,7 @@ import { newHollandPowerStarMy25PowerShuttleFiltersMigration } from '@/lib/migra
 import { newHollandEngineBreatherReplacementsMigration } from '@/lib/migrations/20260903_603_new_holland_engine_breather_replacements';
 import { newHollandPowerStar110BreatherFitmentMigration } from '@/lib/migrations/20260903_604_new_holland_powerstar110_breather_fitment';
 import { newHollandPowerStarMy24RopsCoreFiltersMigration } from '@/lib/migrations/20260903_605_new_holland_powerstar_my24_rops_core_filters';
+import { newHollandT5EcStageV48195967Migration } from '@/lib/migrations/20260903_606_new_holland_t5_ec_stagev_48195967';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -141,4 +142,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandEngineBreatherReplacementsMigration,
   newHollandPowerStar110BreatherFitmentMigration,
   newHollandPowerStarMy24RopsCoreFiltersMigration,
+  newHollandT5EcStageV48195967Migration,
 ];
