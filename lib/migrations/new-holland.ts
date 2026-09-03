@@ -59,6 +59,7 @@ import { newHollandWorkmaster5070FiltersMigration } from '@/lib/migrations/20260
 import { newHollandWorkmaster5575FiltersMigration } from '@/lib/migrations/20260902_593_new_holland_workmaster5575_filters';
 import { newHollandWorkmaster5575FuelReplacementMigration } from '@/lib/migrations/20260903_594_new_holland_workmaster5575_fuel_replacement';
 import { newHollandWorkmaster5575HistoricalFilterMigration } from '@/lib/migrations/20260903_595_new_holland_workmaster5575_2018_2021_filter_history';
+import { newHollandWorkmaster5575CabFilterMigration } from '@/lib/migrations/20260903_596_new_holland_workmaster5575_cab_filter';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -121,4 +122,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandWorkmaster5575FiltersMigration,
   newHollandWorkmaster5575FuelReplacementMigration,
   newHollandWorkmaster5575HistoricalFilterMigration,
+  newHollandWorkmaster5575CabFilterMigration,
 ];
