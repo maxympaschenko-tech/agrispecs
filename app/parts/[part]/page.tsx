@@ -43,7 +43,7 @@ function fitmentVersionLabel(fitment: PartFitment) {
     fitment.versionMarketName,
     years,
     fitment.versionConfiguration,
-    fitment.versionIsCurrent ? 'current version' : null,
+    fitment.versionIsCurrent ? 'current version' : 'historical version',
   ].filter(Boolean).join(' · ');
 }
 
