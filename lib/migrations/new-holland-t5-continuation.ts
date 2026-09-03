@@ -4,6 +4,7 @@ import { newHollandT5110120BrakeReservoirFilterMigration } from '@/lib/migration
 import { newHollandT5110120LowRoofCabFilterMigration } from '@/lib/migrations/20260903_617_new_holland_t5_110_120_low_roof_cab_filter';
 import { newHollandT5110120CabFilterMigration } from '@/lib/migrations/20260903_618_new_holland_t5_110_120_cab_filter';
 import { newHollandT5110120HydraulicMigration } from '@/lib/migrations/20260903_619_new_holland_t5_110_120_hydraulic';
+import { newHollandT5StageVEngineOilFilterMigration } from '@/lib/migrations/20260903_620_new_holland_t5_stagev_engine_oil_filter';
 
 export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120SecondaryAirMigration,
@@ -11,4 +12,5 @@ export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120LowRoofCabFilterMigration,
   newHollandT5110120CabFilterMigration,
   newHollandT5110120HydraulicMigration,
+  newHollandT5StageVEngineOilFilterMigration,
 ];
