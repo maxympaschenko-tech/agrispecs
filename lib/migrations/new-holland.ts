@@ -57,6 +57,7 @@ import { newHollandWorkmaster25SSuctionLegacyMigration } from '@/lib/migrations/
 import { newHollandWorkmaster25SAirReplacementMigration } from '@/lib/migrations/20260902_591_new_holland_workmaster25s_air_replacement';
 import { newHollandWorkmaster5070FiltersMigration } from '@/lib/migrations/20260902_592_new_holland_workmaster5070_filters';
 import { newHollandWorkmaster5575FiltersMigration } from '@/lib/migrations/20260902_593_new_holland_workmaster5575_filters';
+import { newHollandWorkmaster5575FuelReplacementMigration } from '@/lib/migrations/20260903_594_new_holland_workmaster5575_fuel_replacement';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -117,4 +118,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandWorkmaster25SAirReplacementMigration,
   newHollandWorkmaster5070FiltersMigration,
   newHollandWorkmaster5575FiltersMigration,
+  newHollandWorkmaster5575FuelReplacementMigration,
 ];
