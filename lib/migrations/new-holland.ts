@@ -76,6 +76,7 @@ import { newHollandT5130140HydraulicMigration } from '@/lib/migrations/20260903_
 import { newHollandT5130140CabFiltersMigration } from '@/lib/migrations/20260903_610_new_holland_t5_130_140_cab_filters';
 import { newHollandT5130140SecondaryAirMigration } from '@/lib/migrations/20260903_611_new_holland_t5_130_140_secondary_air';
 import { newHollandT5130140BrakeReservoirFilterMigration } from '@/lib/migrations/20260903_612_new_holland_t5_130_140_brake_reservoir_filter';
+import { newHollandT5130140PrimaryAirMigration } from '@/lib/migrations/20260903_613_new_holland_t5_130_140_primary_air';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -155,4 +156,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandT5130140CabFiltersMigration,
   newHollandT5130140SecondaryAirMigration,
   newHollandT5130140BrakeReservoirFilterMigration,
+  newHollandT5130140PrimaryAirMigration,
 ];
