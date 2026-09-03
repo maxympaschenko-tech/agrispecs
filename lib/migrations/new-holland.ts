@@ -65,6 +65,7 @@ import { newHollandPowerStarStageVCoreFiltersMigration } from '@/lib/migrations/
 import { newHollandPowerStarStageV48195967Migration } from '@/lib/migrations/20260903_599_new_holland_powerstar_stagev_48195967';
 import { newHollandPowerStarStageVCabFilterMigration } from '@/lib/migrations/20260903_600_new_holland_powerstar_stagev_cab_filter';
 import { newHollandPowerStarFuelLegacyMigration } from '@/lib/migrations/20260903_601_new_holland_powerstar_fuel_legacy';
+import { newHollandPowerStarMy25PowerShuttleFiltersMigration } from '@/lib/migrations/20260903_602_new_holland_powerstar_my25_powershuttle_filters';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -133,4 +134,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarStageV48195967Migration,
   newHollandPowerStarStageVCabFilterMigration,
   newHollandPowerStarFuelLegacyMigration,
+  newHollandPowerStarMy25PowerShuttleFiltersMigration,
 ];
