@@ -73,6 +73,7 @@ import { newHollandT5EcStageV48195967Migration } from '@/lib/migrations/20260903
 import { newHollandT5EcStageVCoreFiltersMigration } from '@/lib/migrations/20260903_607_new_holland_t5_ec_stagev_core_filters';
 import { newHollandT5FuelLegacyMigration } from '@/lib/migrations/20260903_608_new_holland_t5_fuel_legacy';
 import { newHollandT5130140HydraulicMigration } from '@/lib/migrations/20260903_609_new_holland_t5_130_140_hydraulic';
+import { newHollandT5130140CabFiltersMigration } from '@/lib/migrations/20260903_610_new_holland_t5_130_140_cab_filters';
 
 export const newHollandMigrations: DbMigration[] = [
   newHollandPowerStarCurrentSpecsMigration,
@@ -149,4 +150,5 @@ export const newHollandMigrations: DbMigration[] = [
   newHollandT5EcStageVCoreFiltersMigration,
   newHollandT5FuelLegacyMigration,
   newHollandT5130140HydraulicMigration,
+  newHollandT5130140CabFiltersMigration,
 ];
