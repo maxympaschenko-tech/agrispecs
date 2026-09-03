@@ -76,7 +76,7 @@ export const newHollandPowerStarCurrentTransitionMigration: DbMigration = {
       ['Engine', 'engine.cylinders', 'Cylinders', 'integer', null, 4],
       ['Engine', 'engine.displacement', 'Engine displacement', 'decimal', 'L', 20],
       ['Engine', 'engine.gross_power', 'Gross engine power', 'decimal', 'hp', 10],
-      ['Transmission', 'transmission.standard', 'Transmission options', 'text', null, 10],
+      ['Transmission', 'transmission.standard', 'Standard transmission', 'text', null, 10],
       ['PTO', 'pto.rated_power', 'PTO power', 'decimal', 'hp', 10],
     ];
     for (const def of specDefs) {
