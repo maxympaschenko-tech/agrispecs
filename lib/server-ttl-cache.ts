@@ -6,7 +6,10 @@ type CacheEntry = {
 type ServerCacheState = {
   values: Map<string, CacheEntry>;
   inFlight: Map<string, Promise<unknown>>;
+  lastSweepAt?: number;
 };
+
+const CACHE_SWEEP_INTERVAL_MS = 60 * 1000;
 
 const globalCache = globalThis as typeof globalThis & {
   __farmMachineSpecsServerCache?: ServerCacheState;
@@ -15,9 +18,20 @@ const globalCache = globalThis as typeof globalThis & {
 const state = globalCache.__farmMachineSpecsServerCache ?? {
   values: new Map<string, CacheEntry>(),
   inFlight: new Map<string, Promise<unknown>>(),
+  lastSweepAt: 0,
 };
 
 globalCache.__farmMachineSpecsServerCache = state;
+
+function pruneExpiredEntries(now: number) {
+  if (now - (state.lastSweepAt ?? 0) < CACHE_SWEEP_INTERVAL_MS) return;
+
+  for (const [cacheKey, entry] of state.values) {
+    if (entry.expiresAt <= now) state.values.delete(cacheKey);
+  }
+
+  state.lastSweepAt = now;
+}
 
 export async function withServerTtlCache<T>(
   key: string,
@@ -28,6 +42,8 @@ export async function withServerTtlCache<T>(
   if (!Number.isFinite(ttlMs) || ttlMs <= 0) return loader();
 
   const now = Date.now();
+  pruneExpiredEntries(now);
+
   const cached = state.values.get(key);
   if (cached) {
     if (cached.expiresAt > now) return cached.value as T;
