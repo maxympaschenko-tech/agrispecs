@@ -68,6 +68,13 @@ function sourceProvenanceLabel(source: SourceProvenance | undefined) {
   return `${source.sourceName} · ${source.sourceType} reference`;
 }
 
+function maintenanceConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low') {
+  if (value === 'official') return 'Official source';
+  if (value === 'high') return 'High-confidence source-backed interval';
+  if (value === 'medium') return 'Medium-confidence reference';
+  return 'Low-confidence reference — verify before service';
+}
+
 function trimNumber(value: number, digits = 1) {
   const rounded = Number(value.toFixed(digits));
   return String(rounded);
@@ -315,7 +322,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
                 <h2>Maintenance schedule</h2>
-                <p className="section-note">Intervals are tied to the cited maintenance source and, when available, to a specific machine version. Operating conditions and serial-number ranges can change the required service.</p>
+                <p className="section-note">Intervals are tied to the cited maintenance source and, when available, to a specific machine version. Each task shows its evidence confidence. Operating conditions and serial-number ranges can change the required service.</p>
                 <div className="maintenance-list">
                   {maintenance.map((task) => {
                     const context = versionContext(task);
@@ -328,6 +335,7 @@ export default async function TractorModelPage({ params }: PageProps) {
                             <Link href={`/parts/${task.partNumber.toLowerCase()}`}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
                           )}
                           {context && <small><strong>Applies to:</strong> {context}</small>}
+                          <small><strong>Evidence:</strong> {maintenanceConfidenceLabel(task.confidence)}</small>
                           {task.notes && <small>{task.notes}</small>}
                         </div>
                         <div>
