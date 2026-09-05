@@ -203,9 +203,12 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
 
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const verifiedParts = machineParts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
-  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
-    verifiedParts.map((part) => part.normalizedPartNumber),
-  );
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers([
+    ...verifiedParts.map((part) => part.normalizedPartNumber),
+    ...maintenance
+      .map((task) => task.partNormalizedPartNumber)
+      .filter((value): value is string => Boolean(value)),
+  ]);
 
   const specsBySection = new Map<string, MachineSpec[]>();
   for (const spec of specs) {
@@ -393,13 +396,20 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
                 <div className="maintenance-list">
                   {maintenance.map((task) => {
                     const context = versionContext(task);
+                    const maintenancePartHref = task.partNumber && task.partNormalizedPartNumber
+                      ? getPartReferenceHref(
+                          task.partNormalizedPartNumber,
+                          task.partManufacturerSlug,
+                          ambiguousPartNumbers,
+                        )
+                      : null;
                     return (
                       <div className="maintenance-row" key={task.id}>
                         <div>
                           <span className="maintenance-section">{task.section}</span>
                           <strong>{task.action} {task.title.toLowerCase()}</strong>
-                          {task.partNumber && (
-                            <Link href={`/parts/${task.partNumber.toLowerCase()}`}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
+                          {task.partNumber && maintenancePartHref && (
+                            <Link href={maintenancePartHref}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
                           )}
                           {context && <small><strong>Applies to:</strong> {context}</small>}
                           <small><strong>Evidence:</strong> {maintenanceConfidenceLabel(task.confidence)}</small>
