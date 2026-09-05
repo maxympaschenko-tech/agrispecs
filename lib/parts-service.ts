@@ -250,16 +250,26 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
   }
 }
 
-export async function getPart(partNumberOrSlug: string): Promise<PartDetail | undefined> {
-  const normalized = decodeURIComponent(partNumberOrSlug).trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+export async function getPart(partNumberOrSlug: string, manufacturerSlug?: string): Promise<PartDetail | undefined> {
+  let normalized = '';
+  let normalizedManufacturerSlug = '';
+  try {
+    normalized = decodeURIComponent(partNumberOrSlug).trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    normalizedManufacturerSlug = manufacturerSlug ? decodeURIComponent(manufacturerSlug).trim().toLowerCase() : '';
+  } catch {
+    return undefined;
+  }
   if (!normalized) return undefined;
 
   try {
     const db = await getDbReady();
+    const manufacturerFilter = normalizedManufacturerSlug ? 'AND mf.slug = ?' : '';
+    const partParams = normalizedManufacturerSlug ? [normalized, normalizedManufacturerSlug] : [normalized];
     const [rows] = await db.query<PartRow[]>(`${partSelect}
       WHERE p.normalized_part_number = ?
+        ${manufacturerFilter}
       LIMIT 1
-    `, [normalized]);
+    `, partParams);
 
     if (!rows[0]) return undefined;
     const base = rowToPart(rows[0]);
