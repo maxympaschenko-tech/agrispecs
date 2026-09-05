@@ -52,13 +52,7 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
     {
       '@type': 'ListItem',
       position: 3,
-      name: part.manufacturerName || part.manufacturerSlug,
-      item: `${baseUrl}/brands/${part.manufacturerSlug}`,
-    },
-    {
-      '@type': 'ListItem',
-      position: 4,
-      name: part.partNumber,
+      name: `${part.manufacturerName || 'OEM'} ${part.partNumber}`,
       item: canonicalUrl,
     },
   ];
