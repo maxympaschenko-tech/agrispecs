@@ -184,6 +184,7 @@ const partSelect = `
       FROM machine_parts mp_count
       INNER JOIN machines m_count ON m_count.id = mp_count.machine_id
         AND m_count.data_status IN ('partial','verified')
+      INNER JOIN source_records source_count ON source_count.id=mp_count.source_record_id
       WHERE mp_count.part_id = p.id
     ) AS fitment_count
   FROM parts p
@@ -310,7 +311,7 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
       INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
       INNER JOIN equipment_types et ON et.id = m.equipment_type_id
       LEFT JOIN machine_versions mv ON mv.id = mp.machine_version_id
-      LEFT JOIN source_records sr ON sr.id = mp.source_record_id
+      INNER JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.part_id = ?
       ORDER BY mf.name ASC, m.model_name ASC,
                CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
@@ -443,10 +444,12 @@ export async function getMachineParts(machineId: string, machineVersionId?: numb
           FROM machine_parts mp_count
           INNER JOIN machines m_count ON m_count.id = mp_count.machine_id
             AND m_count.data_status IN ('partial','verified')
+          INNER JOIN source_records source_count ON source_count.id=mp_count.source_record_id
           WHERE mp_count.part_id = p.id
         ) AS fitment_count
       FROM machine_parts mp
       INNER JOIN parts p ON p.id = mp.part_id
+      INNER JOIN source_records mp_source ON mp_source.id=mp.source_record_id
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
       WHERE mp.machine_id = ?
