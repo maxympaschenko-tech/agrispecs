@@ -5,6 +5,8 @@ import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-servic
 import { getReplacementChain } from '@/lib/replacement-chain-service';
 import { getReplacementSetMembershipsForPart, getReplacementSetsForLegacyPart } from '@/lib/replacement-set-service';
 import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -121,6 +123,15 @@ export default async function PartPage({ params }: PageProps) {
     getReplacementSetsForLegacyPart(part.id),
     getReplacementSetMembershipsForPart(part.id),
   ]);
+  const relatedPartNumbers = [
+    ...replacementChain.nodes.map((node) => node.normalizedPartNumber),
+    ...replacementSets.flatMap((set) => set.items.map((item) => item.normalizedPartNumber)),
+    ...replacementMemberships.map((membership) => membership.legacyNormalizedPartNumber),
+    ...part.components.map((component) => component.normalizedPartNumber),
+    ...part.includedInKits.map((kit) => kit.normalizedPartNumber),
+    ...part.relations.map((relation) => relation.normalizedPartNumber),
+  ];
+  const ambiguousRelatedPartNumbers = await getAmbiguousPublishedPartNumbers(relatedPartNumbers);
   const sourceEntries = [
     ...part.fitments
       .filter((fitment) => fitment.sourceUrl)
@@ -195,7 +206,11 @@ export default async function PartPage({ params }: PageProps) {
           {finalReplacement && (
             <div className="replacement-summary">
               <strong>Current replacement chain ends at:</strong>{' '}
-              <Link href={`/parts/${finalReplacement.normalizedPartNumber.toLowerCase()}`}>{finalReplacement.partNumber}</Link>
+              <Link href={getPartReferenceHref(
+                finalReplacement.normalizedPartNumber,
+                finalReplacement.manufacturerSlug,
+                ambiguousRelatedPartNumbers,
+              )}>{finalReplacement.partNumber}</Link>
             </div>
           )}
           {replacementSets.length > 0 && (
@@ -256,7 +271,11 @@ export default async function PartPage({ params }: PageProps) {
                     {set.items.map((item) => (
                       <div className="placeholder-row" key={`${set.id}-${item.normalizedPartNumber}`}>
                         <span>
-                          <Link href={`/parts/${item.normalizedPartNumber.toLowerCase()}`}>{item.partNumber}</Link>
+                          <Link href={getPartReferenceHref(
+                            item.normalizedPartNumber,
+                            item.manufacturerSlug,
+                            ambiguousRelatedPartNumbers,
+                          )}>{item.partNumber}</Link>
                         </span>
                         <span>
                           {item.role || item.name || 'Replacement component'}
@@ -277,7 +296,11 @@ export default async function PartPage({ params }: PageProps) {
                 {replacementMemberships.map((membership) => (
                   <div className="placeholder-row" key={`${membership.id}-${membership.legacyNormalizedPartNumber}`}>
                     <span>
-                      <Link href={`/parts/${membership.legacyNormalizedPartNumber.toLowerCase()}`}>{membership.legacyPartNumber}</Link>
+                      <Link href={getPartReferenceHref(
+                        membership.legacyNormalizedPartNumber,
+                        membership.legacyManufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{membership.legacyPartNumber}</Link>
                     </span>
                     <span>
                       {membership.role || 'Replacement component'}
@@ -296,7 +319,11 @@ export default async function PartPage({ params }: PageProps) {
                 {part.components.map((component) => (
                   <div className="placeholder-row" key={component.normalizedPartNumber}>
                     <span>
-                      <Link href={`/parts/${component.normalizedPartNumber.toLowerCase()}`}>{component.partNumber}</Link>
+                      <Link href={getPartReferenceHref(
+                        component.normalizedPartNumber,
+                        component.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{component.partNumber}</Link>
                     </span>
                     <span>
                       {component.name || 'OEM component'}
@@ -314,7 +341,11 @@ export default async function PartPage({ params }: PageProps) {
                 {part.includedInKits.map((kit) => (
                   <div className="placeholder-row" key={kit.normalizedPartNumber}>
                     <span>
-                      <Link href={`/parts/${kit.normalizedPartNumber.toLowerCase()}`}>{kit.partNumber}</Link>
+                      <Link href={getPartReferenceHref(
+                        kit.normalizedPartNumber,
+                        kit.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{kit.partNumber}</Link>
                     </span>
                     <span>{kit.name || 'Filter Pak'}</span>
                   </div>
@@ -334,7 +365,11 @@ export default async function PartPage({ params }: PageProps) {
                       {replacementChain.nodes.map((node) => (
                         <span key={node.id}>
                           <b>→</b>
-                          <Link href={`/parts/${node.normalizedPartNumber.toLowerCase()}`}>{node.partNumber}</Link>
+                          <Link href={getPartReferenceHref(
+                            node.normalizedPartNumber,
+                            node.manufacturerSlug,
+                            ambiguousRelatedPartNumbers,
+                          )}>{node.partNumber}</Link>
                         </span>
                       ))}
                     </div>
@@ -347,7 +382,11 @@ export default async function PartPage({ params }: PageProps) {
                   <div className="placeholder-row" key={`${relation.direction}-${relation.relationType}-${relation.normalizedPartNumber}-${index}`}>
                     <span>{relationLabel(relation)}</span>
                     <span>
-                      <Link href={`/parts/${relation.normalizedPartNumber.toLowerCase()}`}>
+                      <Link href={getPartReferenceHref(
+                        relation.normalizedPartNumber,
+                        relation.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>
                         {relation.partNumber}{relation.name ? ` · ${relation.name}` : ''}
                       </Link>
                     </span>
