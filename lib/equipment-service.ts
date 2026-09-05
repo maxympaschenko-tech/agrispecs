@@ -127,9 +127,16 @@ export async function getEquipmentMachine(
 export async function searchNonTractorEquipment(term: string): Promise<EquipmentMachine[]> {
   const normalized = term.trim();
   if (!normalized) return [];
+
+  const compactKey = normalized.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const like = `%${normalized}%`;
+  const keyLike = compactKey ? `%${compactKey}%` : '__NO_COMPACT_SEARCH_KEY__';
+  const modelKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,m.model_name),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const typeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(et.name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+
   try {
     const db = await getDbReady();
-    const like = `%${normalized}%`;
     const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
         AND (
@@ -137,10 +144,37 @@ export async function searchNonTractorEquipment(term: string): Promise<Equipment
           OR mf.name LIKE ?
           OR et.name LIKE ?
           OR CONCAT(mf.name, ' ', m.model_name) LIKE ?
+          OR ${modelKeySql} LIKE ?
+          OR ${fullKeySql} LIKE ?
+          OR ${typeKeySql} LIKE ?
         )
-      ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
+      ORDER BY
+        CASE
+          WHEN ${modelKeySql} = ? THEN 0
+          WHEN ${fullKeySql} = ? THEN 1
+          WHEN m.model_name LIKE ? THEN 2
+          WHEN CONCAT(mf.name, ' ', m.model_name) LIKE ? THEN 3
+          WHEN et.name LIKE ? THEN 4
+          ELSE 5
+        END,
+        et.name ASC,
+        mf.name ASC,
+        m.model_name ASC
       LIMIT 50
-    `, [like, like, like, like]);
+    `, [
+      like,
+      like,
+      like,
+      like,
+      keyLike,
+      keyLike,
+      keyLike,
+      compactKey,
+      compactKey,
+      like,
+      like,
+      like,
+    ]);
     return rows.map(rowToEquipment);
   } catch (error) {
     console.error('Unable to search non-tractor equipment:', error);
