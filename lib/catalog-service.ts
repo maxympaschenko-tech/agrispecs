@@ -194,8 +194,33 @@ export async function getBrands(): Promise<Array<{ slug: string; name: string }>
 }
 
 export async function getMachinesByBrand(brandSlug: string): Promise<Machine[]> {
-  const machines = await getMachines();
-  return machines.filter((machine) => machine.brandSlug === brandSlug);
+  const normalized = brandSlug.trim().toLowerCase();
+  if (!normalized) return [];
+
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<MachineRow[]>(`
+      SELECT
+        m.id,
+        m.model_name,
+        m.slug AS model_slug,
+        m.data_status,
+        mf.name AS manufacturer_name,
+        mf.slug AS manufacturer_slug
+      FROM machines m
+      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+      WHERE et.slug = 'tractor'
+        AND mf.slug = ?
+        AND m.data_status IN ('partial','verified','review')
+      ORDER BY m.model_name ASC
+    `, [normalized]);
+
+    return rows.map(rowToMachine);
+  } catch (error) {
+    console.error('Unable to load tractor machines by brand:', error);
+    return [];
+  }
 }
 
 export async function searchMachines(term: string): Promise<Machine[]> {
