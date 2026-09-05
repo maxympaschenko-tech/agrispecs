@@ -1,6 +1,9 @@
 import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const PART_DETAIL_TTL_MS = 5 * 60 * 1000;
 
 export type PartSummary = {
   id: number;
@@ -289,162 +292,169 @@ async function loadPart(partNumberOrSlug: string, manufacturerSlug?: string): Pr
   }
   if (!normalized) return undefined;
 
-  try {
-    const db = await getDbReady();
-    const manufacturerFilter = normalizedManufacturerSlug ? 'AND mf.slug = ?' : '';
-    const partParams = normalizedManufacturerSlug ? [normalized, normalizedManufacturerSlug] : [normalized];
-    const [rows] = await db.query<PartRow[]>(`${partDetailSelect}
-      WHERE p.normalized_part_number = ?
-        AND p.data_status IN ('partial','verified','review')
-        ${manufacturerFilter}
-      ORDER BY
-        CASE WHEN p.data_status IN ('partial','verified') THEN 0 ELSE 1 END,
-        p.id ASC
-      LIMIT 1
-    `, partParams);
+  return withServerTtlCache(
+    `parts:detail:${normalized}:${normalizedManufacturerSlug}`,
+    PART_DETAIL_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const manufacturerFilter = normalizedManufacturerSlug ? 'AND mf.slug = ?' : '';
+        const partParams = normalizedManufacturerSlug ? [normalized, normalizedManufacturerSlug] : [normalized];
+        const [rows] = await db.query<PartRow[]>(`${partDetailSelect}
+          WHERE p.normalized_part_number = ?
+            AND p.data_status IN ('partial','verified','review')
+            ${manufacturerFilter}
+          ORDER BY
+            CASE WHEN p.data_status IN ('partial','verified') THEN 0 ELSE 1 END,
+            p.id ASC
+          LIMIT 1
+        `, partParams);
 
-    if (!rows[0]) return undefined;
-    const base = rowToPart(rows[0]);
+        if (!rows[0]) return undefined;
+        const base = rowToPart(rows[0]);
 
-    const [fitmentRows] = await db.query<FitmentRow[]>(`
-      SELECT
-        m.id AS machine_id,
-        mf.name AS brand,
-        mf.slug AS brand_slug,
-        m.model_name AS model,
-        m.slug AS model_slug,
-        et.name AS equipment_type,
-        et.slug AS equipment_type_slug,
-        mp.fitment_note,
-        mp.quantity,
-        mp.serial_prefix,
-        mp.serial_from,
-        mp.serial_to,
-        mp.configuration_note,
-        mp.fitment_confidence,
-        mp.machine_version_id,
-        mv.market_name AS version_market_name,
-        mv.model_year_start AS version_model_year_start,
-        mv.model_year_end AS version_model_year_end,
-        mv.configuration AS version_configuration,
-        mv.is_current AS version_is_current,
-        sr.title AS source_title,
-        sr.url AS source_url,
-        DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
-      FROM machine_parts mp
-      INNER JOIN machines m ON m.id = mp.machine_id
-        AND m.data_status IN ('partial','verified')
-      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
-      LEFT JOIN machine_versions mv ON mv.id = mp.machine_version_id
-      INNER JOIN source_records sr ON sr.id = mp.source_record_id
-      WHERE mp.part_id = ?
-      ORDER BY mf.name ASC, m.model_name ASC,
-               CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
-               CASE WHEN mp.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
-               mp.fitment_note ASC
-    `, [base.id]);
+        const [fitmentRows] = await db.query<FitmentRow[]>(`
+          SELECT
+            m.id AS machine_id,
+            mf.name AS brand,
+            mf.slug AS brand_slug,
+            m.model_name AS model,
+            m.slug AS model_slug,
+            et.name AS equipment_type,
+            et.slug AS equipment_type_slug,
+            mp.fitment_note,
+            mp.quantity,
+            mp.serial_prefix,
+            mp.serial_from,
+            mp.serial_to,
+            mp.configuration_note,
+            mp.fitment_confidence,
+            mp.machine_version_id,
+            mv.market_name AS version_market_name,
+            mv.model_year_start AS version_model_year_start,
+            mv.model_year_end AS version_model_year_end,
+            mv.configuration AS version_configuration,
+            mv.is_current AS version_is_current,
+            sr.title AS source_title,
+            sr.url AS source_url,
+            DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
+          FROM machine_parts mp
+          INNER JOIN machines m ON m.id = mp.machine_id
+            AND m.data_status IN ('partial','verified')
+          INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+          INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+          LEFT JOIN machine_versions mv ON mv.id = mp.machine_version_id
+          INNER JOIN source_records sr ON sr.id = mp.source_record_id
+          WHERE mp.part_id = ?
+          ORDER BY mf.name ASC, m.model_name ASC,
+                   CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
+                   CASE WHEN mp.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
+                   mp.fitment_note ASC
+        `, [base.id]);
 
-    const [relationRows] = await db.query<RelationRow[]>(`
-      SELECT 'outgoing' AS direction, pcr.relation_type, p2.part_number, p2.normalized_part_number,
-             p2.name, mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
-             sr.title AS source_title, sr.url AS source_url
-      FROM part_cross_references pcr
-      JOIN parts p2 ON p2.id=pcr.cross_part_id
-        AND p2.data_status IN ('partial','verified')
-      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      INNER JOIN source_records sr ON sr.id=pcr.source_record_id
-      WHERE pcr.part_id=?
-      UNION ALL
-      SELECT 'incoming' AS direction, pcr.relation_type, p1.part_number, p1.normalized_part_number,
-             p1.name, mf1.name AS manufacturer_name, mf1.slug AS manufacturer_slug,
-             sr.title AS source_title, sr.url AS source_url
-      FROM part_cross_references pcr
-      JOIN parts p1 ON p1.id=pcr.part_id
-        AND p1.data_status IN ('partial','verified')
-      LEFT JOIN manufacturers mf1 ON mf1.id=p1.manufacturer_id
-      INNER JOIN source_records sr ON sr.id=pcr.source_record_id
-      WHERE pcr.cross_part_id=?
-      ORDER BY part_number ASC
-    `, [base.id, base.id]);
+        const [relationRows] = await db.query<RelationRow[]>(`
+          SELECT 'outgoing' AS direction, pcr.relation_type, p2.part_number, p2.normalized_part_number,
+                 p2.name, mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+                 sr.title AS source_title, sr.url AS source_url
+          FROM part_cross_references pcr
+          JOIN parts p2 ON p2.id=pcr.cross_part_id
+            AND p2.data_status IN ('partial','verified')
+          LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+          INNER JOIN source_records sr ON sr.id=pcr.source_record_id
+          WHERE pcr.part_id=?
+          UNION ALL
+          SELECT 'incoming' AS direction, pcr.relation_type, p1.part_number, p1.normalized_part_number,
+                 p1.name, mf1.name AS manufacturer_name, mf1.slug AS manufacturer_slug,
+                 sr.title AS source_title, sr.url AS source_url
+          FROM part_cross_references pcr
+          JOIN parts p1 ON p1.id=pcr.part_id
+            AND p1.data_status IN ('partial','verified')
+          LEFT JOIN manufacturers mf1 ON mf1.id=p1.manufacturer_id
+          INNER JOIN source_records sr ON sr.id=pcr.source_record_id
+          WHERE pcr.cross_part_id=?
+          ORDER BY part_number ASC
+        `, [base.id, base.id]);
 
-    const [componentRows] = await db.query<ComponentRow[]>(`
-      SELECT p2.part_number, p2.normalized_part_number, p2.name,
-             mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
-             pc.quantity, pc.notes,
-             sr.title AS source_title, sr.url AS source_url
-      FROM part_components pc
-      JOIN parts p2 ON p2.id=pc.component_part_id
-        AND p2.data_status IN ('partial','verified')
-      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      INNER JOIN source_records sr ON sr.id=pc.source_record_id
-      WHERE pc.parent_part_id=?
-      ORDER BY p2.part_number ASC
-    `, [base.id]);
+        const [componentRows] = await db.query<ComponentRow[]>(`
+          SELECT p2.part_number, p2.normalized_part_number, p2.name,
+                 mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+                 pc.quantity, pc.notes,
+                 sr.title AS source_title, sr.url AS source_url
+          FROM part_components pc
+          JOIN parts p2 ON p2.id=pc.component_part_id
+            AND p2.data_status IN ('partial','verified')
+          LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+          INNER JOIN source_records sr ON sr.id=pc.source_record_id
+          WHERE pc.parent_part_id=?
+          ORDER BY p2.part_number ASC
+        `, [base.id]);
 
-    const [kitRows] = await db.query<ComponentRow[]>(`
-      SELECT p2.part_number, p2.normalized_part_number, p2.name,
-             mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
-             pc.quantity, pc.notes,
-             sr.title AS source_title, sr.url AS source_url
-      FROM part_components pc
-      JOIN parts p2 ON p2.id=pc.parent_part_id
-        AND p2.data_status IN ('partial','verified')
-      LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      INNER JOIN source_records sr ON sr.id=pc.source_record_id
-      WHERE pc.component_part_id=?
-      ORDER BY p2.part_number ASC
-    `, [base.id]);
+        const [kitRows] = await db.query<ComponentRow[]>(`
+          SELECT p2.part_number, p2.normalized_part_number, p2.name,
+                 mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+                 pc.quantity, pc.notes,
+                 sr.title AS source_title, sr.url AS source_url
+          FROM part_components pc
+          JOIN parts p2 ON p2.id=pc.parent_part_id
+            AND p2.data_status IN ('partial','verified')
+          LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
+          INNER JOIN source_records sr ON sr.id=pc.source_record_id
+          WHERE pc.component_part_id=?
+          ORDER BY p2.part_number ASC
+        `, [base.id]);
 
-    const fitmentCount = new Set(fitmentRows.map((row) => Number(row.machine_id))).size;
+        const fitmentCount = new Set(fitmentRows.map((row) => Number(row.machine_id))).size;
 
-    return {
-      ...base,
-      fitmentCount,
-      description: rows[0].description,
-      fitments: fitmentRows.map((row) => ({
-        machineId: Number(row.machine_id),
-        brand: row.brand,
-        brandSlug: row.brand_slug,
-        model: row.model,
-        modelSlug: row.model_slug,
-        equipmentType: row.equipment_type,
-        equipmentTypeSlug: row.equipment_type_slug,
-        fitmentNote: row.fitment_note,
-        quantity: row.quantity === null ? null : Number(row.quantity),
-        serialPrefix: row.serial_prefix,
-        serialFrom: row.serial_from,
-        serialTo: row.serial_to,
-        configurationNote: row.configuration_note,
-        fitmentConfidence: row.fitment_confidence,
-        machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
-        versionMarketName: row.version_market_name,
-        versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
-        versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
-        versionConfiguration: row.version_configuration,
-        versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
-        sourceTitle: row.source_title,
-        sourceUrl: row.source_url,
-        sourcePublishedDate: row.source_published_date,
-      })),
-      relations: relationRows.map((row) => ({
-        direction: row.direction,
-        relationType: row.relation_type,
-        partNumber: row.part_number,
-        normalizedPartNumber: row.normalized_part_number,
-        name: row.name,
-        manufacturerName: row.manufacturer_name,
-        manufacturerSlug: row.manufacturer_slug,
-        sourceTitle: row.source_title,
-        sourceUrl: row.source_url,
-      })),
-      components: componentRows.map(rowToComponent),
-      includedInKits: kitRows.map(rowToComponent),
-    };
-  } catch (error) {
-    console.error('Unable to load part:', error);
-    return undefined;
-  }
+        return {
+          ...base,
+          fitmentCount,
+          description: rows[0].description,
+          fitments: fitmentRows.map((row) => ({
+            machineId: Number(row.machine_id),
+            brand: row.brand,
+            brandSlug: row.brand_slug,
+            model: row.model,
+            modelSlug: row.model_slug,
+            equipmentType: row.equipment_type,
+            equipmentTypeSlug: row.equipment_type_slug,
+            fitmentNote: row.fitment_note,
+            quantity: row.quantity === null ? null : Number(row.quantity),
+            serialPrefix: row.serial_prefix,
+            serialFrom: row.serial_from,
+            serialTo: row.serial_to,
+            configurationNote: row.configuration_note,
+            fitmentConfidence: row.fitment_confidence,
+            machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
+            versionMarketName: row.version_market_name,
+            versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
+            versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
+            versionConfiguration: row.version_configuration,
+            versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
+            sourceTitle: row.source_title,
+            sourceUrl: row.source_url,
+            sourcePublishedDate: row.source_published_date,
+          })),
+          relations: relationRows.map((row) => ({
+            direction: row.direction,
+            relationType: row.relation_type,
+            partNumber: row.part_number,
+            normalizedPartNumber: row.normalized_part_number,
+            name: row.name,
+            manufacturerName: row.manufacturer_name,
+            manufacturerSlug: row.manufacturer_slug,
+            sourceTitle: row.source_title,
+            sourceUrl: row.source_url,
+          })),
+          components: componentRows.map(rowToComponent),
+          includedInKits: kitRows.map(rowToComponent),
+        };
+      } catch (error) {
+        console.error('Unable to load part:', error);
+        return undefined;
+      }
+    },
+    (part) => part !== undefined,
+  );
 }
 
 export const getPart = cache(loadPart);
