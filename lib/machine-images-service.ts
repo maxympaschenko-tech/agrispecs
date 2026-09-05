@@ -29,19 +29,16 @@ export type MachineImage = {
   imageKind: 'exact' | 'family' | 'representative' | 'fallback';
 };
 
-type MachineImageRow = RowDataPacket & {
-  id: number;
-  image_url: string;
-  source_page_url: string;
+type MachineImageIdentityRow = RowDataPacket & {
+  image_id: number | null;
+  image_url: string | null;
+  source_page_url: string | null;
   author: string | null;
   license_name: string | null;
   license_url: string | null;
   caption: string | null;
   alt_text: string | null;
-  is_primary: number;
-};
-
-type MachineIdentityRow = RowDataPacket & {
+  is_primary: number | null;
   brand_slug: string;
   model_slug: string;
   equipment_type_slug: string;
@@ -114,9 +111,10 @@ function manifestToImage(image: ManifestImage, id = -1): MachineImage {
   };
 }
 
-function rowToImage(row: MachineImageRow): MachineImage {
+function rowToImage(row: MachineImageIdentityRow): MachineImage | null {
+  if (row.image_id === null || !row.image_url || !row.source_page_url) return null;
   return {
-    id: Number(row.id),
+    id: Number(row.image_id),
     imageUrl: row.image_url,
     sourcePageUrl: row.source_page_url,
     author: row.author,
@@ -147,26 +145,34 @@ async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
 
   try {
     const db = await getDbReady();
-    const [rows] = await db.query<MachineImageRow[]>(`
-      SELECT id,image_url,source_page_url,author,license_name,license_url,caption,alt_text,is_primary
-      FROM machine_images
-      WHERE machine_id=?
-      ORDER BY is_primary DESC,display_order ASC,id ASC
-    `,[Number(machineId)]);
-
-    const images = rows.map(rowToImage);
-
-    const [identityRows] = await db.query<MachineIdentityRow[]>(`
-      SELECT mf.slug AS brand_slug,m.slug AS model_slug,et.slug AS equipment_type_slug
+    const [rows] = await db.query<MachineImageIdentityRow[]>(`
+      SELECT
+        mi.id AS image_id,
+        mi.image_url,
+        mi.source_page_url,
+        mi.author,
+        mi.license_name,
+        mi.license_url,
+        mi.caption,
+        mi.alt_text,
+        mi.is_primary,
+        mf.slug AS brand_slug,
+        m.slug AS model_slug,
+        et.slug AS equipment_type_slug
       FROM machines m
       INNER JOIN manufacturers mf ON mf.id=m.manufacturer_id
       INNER JOIN equipment_types et ON et.id=m.equipment_type_id
+      LEFT JOIN machine_images mi ON mi.machine_id=m.id
       WHERE m.id=?
-      LIMIT 1
+      ORDER BY mi.is_primary DESC,mi.display_order ASC,mi.id ASC
     `,[Number(machineId)]);
 
-    const identity = identityRows[0];
-    if (!identity) return images.length > 0 ? images : [fallbackImage()];
+    const identity = rows[0];
+    if (!identity) return [fallbackImage()];
+
+    const images = rows
+      .map(rowToImage)
+      .filter((image): image is MachineImage => Boolean(image));
 
     const localImages = manifest.filter(
       (image) => image.brandSlug === identity.brand_slug
