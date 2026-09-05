@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getAttachment, type AttachmentCompatibleMachine } from '@/lib/attachments-service';
+import { groupMachineEvidence, uniqueEvidenceValues } from '@/lib/attachment-evidence';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -62,13 +63,14 @@ export default async function AttachmentPage({ params }: PageProps) {
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const isLoader = item.attachmentType === 'front-loader';
   const isBackhoe = item.attachmentType === 'backhoe';
+  const machineEvidenceGroups = groupMachineEvidence(item.compatibleMachines);
   const documentedFitmentCount = item.compatibleMachineCount;
   const documentedFitmentRecordCount = item.compatibleMachines.length;
   const conditionalFitmentRecordCount = item.compatibleMachines.filter((machine) => hasConfigurationCondition(machine.compatibilityNote)).length;
   const performanceFitmentRecordCount = item.compatibleMachines.filter(
     (machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText,
   ).length;
-  const firstCompatibleMachine = item.compatibleMachines[0];
+  const firstCompatibleMachine = machineEvidenceGroups[0]?.records[0] || item.compatibleMachines[0];
   const tractorFitmentCount = new Set(
     item.compatibleMachines
       .filter((machine) => machine.equipmentTypeSlug === 'tractor')
@@ -95,7 +97,7 @@ export default async function AttachmentPage({ params }: PageProps) {
           </div>
 
           {documentedFitmentRecordCount > documentedFitmentCount && (
-            <p className="section-note">Some compatible machines have multiple cited fitment records, so the detailed evidence list below can contain more records than the unique-machine count above.</p>
+            <p className="section-note">Some compatible machines have multiple cited fitment records. Those records are grouped into one machine card below while retaining each distinct note, performance value and source.</p>
           )}
 
           {equipmentTypes.length > 0 && (
@@ -138,30 +140,49 @@ export default async function AttachmentPage({ params }: PageProps) {
 
           <section className="data-section">
             <h2>Documented machine fitment</h2>
-            <p className="section-note">A listed machine is not automatically compatible in every configuration. Check each fitment note and its cited source for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
-            {item.compatibleMachines.map((machine) => {
-              const conditional = hasConfigurationCondition(machine.compatibilityNote);
+            <p className="section-note">A listed machine is not automatically compatible in every configuration. Multiple cited records for the same machine are grouped together; check every fitment note and source for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
+            {machineEvidenceGroups.map(({ machineId, records }) => {
+              const machine = records[0];
+              if (!machine) return null;
+              const notes = uniqueEvidenceValues(records.map((record) => record.compatibilityNote));
+              const capacities = uniqueEvidenceValues(records.map((record) => record.performanceCapacityText));
+              const heights = uniqueEvidenceValues(records.map((record) => record.performanceHeightText));
+              const configurations = uniqueEvidenceValues(records.map((record) => record.performanceConfigurationText));
+              const conditional = notes.some((note) => hasConfigurationCondition(note));
+              const evidenceSources = Array.from(
+                new Map(
+                  records
+                    .filter((record) => record.sourceUrl)
+                    .map((record) => [record.sourceUrl as string, {
+                      url: record.sourceUrl as string,
+                      title: record.sourceTitle || 'Manufacturer source',
+                    }]),
+                ).values(),
+              );
               const href = machineHref(machine);
               return (
-                <div className="part-fitment" key={machine.relationId}>
+                <div className="part-fitment" key={machineId}>
                   <div>
                     <Link className="part-fitment-machine" href={href}>
                       {machine.brand} {machine.model}
                     </Link>
                     <p><strong>Equipment type:</strong> {machine.equipmentType}</p>
+                    {records.length > 1 && <p><strong>Evidence records:</strong> {records.length} cited fitment records grouped for this machine.</p>}
                     {conditional && <p><strong>Conditional fitment:</strong> configuration requirements apply.</p>}
-                    {machine.performanceCapacityText && <p><strong>Performance:</strong> {machine.performanceCapacityText}</p>}
-                    {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
-                    {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
-                    {machine.compatibilityNote && <p><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {machine.compatibilityNote}</p>}
-                    {machine.sourceUrl && (
-                      <p>
-                        <strong>Fitment source:</strong>{' '}
-                        <a href={machine.sourceUrl} target="_blank" rel="noopener noreferrer">
-                          {machine.sourceTitle || 'Manufacturer source'}
+                    {capacities.map((value) => <p key={`capacity-${value}`}><strong>Performance:</strong> {value}</p>)}
+                    {heights.map((value) => <p key={`height-${value}`}><strong>Working height:</strong> {value}</p>)}
+                    {configurations.map((value) => <p key={`configuration-${value}`}><strong>Configuration:</strong> {value}</p>)}
+                    {notes.map((note) => (
+                      <p key={`note-${note}`}><strong>{hasConfigurationCondition(note) ? 'Requirement' : 'Fitment note'}:</strong> {note}</p>
+                    ))}
+                    {evidenceSources.map((source, index) => (
+                      <p key={source.url}>
+                        <strong>Fitment source{evidenceSources.length > 1 ? ` ${index + 1}` : ''}:</strong>{' '}
+                        <a href={source.url} target="_blank" rel="noopener noreferrer">
+                          {source.title}
                         </a>
                       </p>
-                    )}
+                    ))}
                     <p>
                       <Link href={href}>View machine specs →</Link>{' '}
                       {machine.equipmentTypeSlug === 'tractor' && <Link href={`/compare?m1=${machine.machineId}`}>Compare this tractor →</Link>}
