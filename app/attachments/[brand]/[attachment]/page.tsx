@@ -139,11 +139,11 @@ export default async function AttachmentPage({ params }: PageProps) {
           <section className="data-section">
             <h2>Documented machine fitment</h2>
             <p className="section-note">A listed machine is not automatically compatible in every configuration. Check each fitment note and its cited source for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
-            {item.compatibleMachines.map((machine, recordIndex) => {
+            {item.compatibleMachines.map((machine) => {
               const conditional = hasConfigurationCondition(machine.compatibilityNote);
               const href = machineHref(machine);
               return (
-                <div className="part-fitment" key={`${machine.machineId}-${recordIndex}`}>
+                <div className="part-fitment" key={machine.relationId}>
                   <div>
                     <Link className="part-fitment-machine" href={href}>
                       {machine.brand} {machine.model}
