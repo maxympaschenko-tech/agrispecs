@@ -322,7 +322,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
                 <h2>Maintenance schedule</h2>
-                <p className="section-note">Intervals are tied to the cited maintenance source and, when available, to a specific machine version. Each task shows its evidence confidence. Operating conditions and serial-number ranges can change the required service.</p>
+                <p className="section-note">Tasks are ordered by service interval within each machine-version context. Intervals are tied to the cited maintenance source, and each task shows its evidence confidence. Operating conditions and serial-number ranges can change the required service.</p>
                 <div className="maintenance-list">
                   {maintenance.map((task) => {
                     const context = versionContext(task);
@@ -336,6 +336,12 @@ export default async function TractorModelPage({ params }: PageProps) {
                           )}
                           {context && <small><strong>Applies to:</strong> {context}</small>}
                           <small><strong>Evidence:</strong> {maintenanceConfidenceLabel(task.confidence)}</small>
+                          {task.sourceUrl && (
+                            <small>
+                              <strong>Source:</strong>{' '}
+                              <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer">{task.sourceTitle || 'Maintenance source'} →</a>
+                            </small>
+                          )}
                           {task.notes && <small>{task.notes}</small>}
                         </div>
                         <div>
