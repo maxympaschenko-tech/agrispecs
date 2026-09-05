@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SiteNavigation } from '@/components/site-navigation';
 import './globals.css';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
@@ -66,15 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 style={{ display: 'block', width: 'auto', height: 42, maxWidth: '100%' }}
               />
             </Link>
-            <nav className="nav" aria-label="Main navigation">
-              <Link href="/tractors">Tractors</Link>
-              <Link href="/equipment">Equipment</Link>
-              <Link href="/parts">Parts</Link>
-              <Link href="/attachments">Attachments</Link>
-              <Link href="/fitment-checker">Fitment Checker</Link>
-              <Link href="/brands">Brands</Link>
-              <Link href="/compare">Compare</Link>
-            </nav>
+            <SiteNavigation />
           </div>
         </header>
         {children}
