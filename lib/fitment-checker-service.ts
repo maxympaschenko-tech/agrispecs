@@ -3,9 +3,19 @@ import { getDbReady } from '@/lib/db-migrations';
 
 type FitmentConfidence = 'official' | 'high' | 'medium' | 'low';
 
+type PartLookupRow = RowDataPacket & {
+  id: number;
+  part_number: string;
+  part_name: string | null;
+  manufacturer_name: string | null;
+  manufacturer_slug: string | null;
+};
+
 type FitmentRow = RowDataPacket & {
   part_number: string;
   part_name: string | null;
+  part_manufacturer_name: string | null;
+  part_manufacturer_slug: string | null;
   brand: string;
   brand_slug: string;
   model: string;
@@ -23,10 +33,12 @@ type FitmentRow = RowDataPacket & {
 };
 
 export type FitmentCheckResult = {
-  status: 'part-not-found' | 'machine-not-found' | 'no-fitment' | 'fitment-known' | 'serial-unverified' | 'fits' | 'outside-range' | 'invalid-serial';
+  status: 'part-not-found' | 'part-ambiguous' | 'machine-not-found' | 'no-fitment' | 'fitment-known' | 'serial-unverified' | 'fits' | 'outside-range' | 'invalid-serial';
   message: string;
   partNumber?: string;
   partName?: string | null;
+  partManufacturerName?: string | null;
+  partManufacturerSlug?: string | null;
   brand?: string;
   brandSlug?: string;
   model?: string;
@@ -63,6 +75,8 @@ function resultBase(row: FitmentRow) {
   return {
     partNumber: row.part_number,
     partName: row.part_name,
+    partManufacturerName: row.part_manufacturer_name,
+    partManufacturerSlug: row.part_manufacturer_slug,
     brand: row.brand,
     brandSlug: row.brand_slug,
     model: row.model,
@@ -106,22 +120,55 @@ function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' |
   return (from === null || value >= from) && (to === null || value <= to) ? 'fits' : 'outside';
 }
 
-export async function checkPartFitment(partInput: string, modelInput: string, serialInput?: string): Promise<FitmentCheckResult> {
+export async function checkPartFitment(
+  partInput: string,
+  modelInput: string,
+  serialInput?: string,
+  manufacturerSlugInput?: string,
+): Promise<FitmentCheckResult> {
   const part = normalizePart(partInput);
   const model = normalizeModel(modelInput);
+  const manufacturerSlug = (manufacturerSlugInput || '').trim().toLowerCase();
   if (!part) return { status: 'part-not-found', message: 'Enter a part number.' };
   if (!model) return { status: 'machine-not-found', message: 'Enter a machine model.' };
 
   const db = await getDbReady();
-  const [partRows] = await db.query<RowDataPacket[]>(`
-    SELECT id
-    FROM parts
-    WHERE normalized_part_number=?
-      AND data_status IN ('partial','verified')
-    ORDER BY id
-    LIMIT 1
-  `, [part]);
-  if (!partRows[0]) return { status: 'part-not-found', message: `Part ${partInput} is not in the published source-backed catalog yet.` };
+  const manufacturerFilter = manufacturerSlug ? 'AND pmf.slug=?' : '';
+  const partParams = manufacturerSlug ? [part, manufacturerSlug] : [part];
+  const [partRows] = await db.query<PartLookupRow[]>(`
+    SELECT
+      p.id,
+      p.part_number,
+      p.name AS part_name,
+      pmf.name AS manufacturer_name,
+      pmf.slug AS manufacturer_slug
+    FROM parts p
+    LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
+    WHERE p.normalized_part_number=?
+      AND p.data_status IN ('partial','verified')
+      ${manufacturerFilter}
+    ORDER BY p.id
+    LIMIT 2
+  `, partParams);
+
+  if (!partRows[0]) {
+    return {
+      status: 'part-not-found',
+      message: manufacturerSlug
+        ? `Part ${partInput} is not published for the selected manufacturer.`
+        : `Part ${partInput} is not in the published source-backed catalog yet.`,
+    };
+  }
+
+  if (!manufacturerSlug && partRows.length > 1) {
+    return {
+      status: 'part-ambiguous',
+      message: `Part number ${partInput} exists for more than one published manufacturer. Choose the manufacturer before checking fitment.`,
+    };
+  }
+
+  const selectedPart = partRows[0];
+  const partId = Number(selectedPart.id);
 
   const [machineRows] = await db.query<RowDataPacket[]>(`
     SELECT m.id
@@ -134,37 +181,67 @@ export async function checkPartFitment(partInput: string, modelInput: string, se
     ORDER BY EXISTS(
       SELECT 1
       FROM machine_parts mp
-      JOIN parts p ON p.id=mp.part_id
       WHERE mp.machine_id=m.id
-        AND p.normalized_part_number=?
-        AND p.data_status IN ('partial','verified')
+        AND mp.part_id=?
     ) DESC, m.id ASC
     LIMIT 1
-  `, [model, model, part]);
-  if (!machineRows[0]) return { status: 'machine-not-found', message: `Machine model ${modelInput} is not in the published catalog yet.` };
+  `, [model, model, partId]);
+  if (!machineRows[0]) {
+    return {
+      status: 'machine-not-found',
+      message: `Machine model ${modelInput} is not in the published catalog yet.`,
+      partNumber: selectedPart.part_number,
+      partName: selectedPart.part_name,
+      partManufacturerName: selectedPart.manufacturer_name,
+      partManufacturerSlug: selectedPart.manufacturer_slug,
+    };
+  }
 
   const [rows] = await db.query<FitmentRow[]>(`
-    SELECT p.part_number, p.name AS part_name, mf.name AS brand, mf.slug AS brand_slug,
-           m.model_name AS model, m.slug AS model_slug,
-           et.name AS equipment_type, et.slug AS equipment_type_slug,
-           mp.fitment_confidence, mp.fitment_note,
-           mp.serial_prefix, mp.serial_from, mp.serial_to, mp.configuration_note,
-           sr.title AS source_title, sr.url AS source_url
+    SELECT
+      p.part_number,
+      p.name AS part_name,
+      pmf.name AS part_manufacturer_name,
+      pmf.slug AS part_manufacturer_slug,
+      mf.name AS brand,
+      mf.slug AS brand_slug,
+      m.model_name AS model,
+      m.slug AS model_slug,
+      et.name AS equipment_type,
+      et.slug AS equipment_type_slug,
+      mp.fitment_confidence,
+      mp.fitment_note,
+      mp.serial_prefix,
+      mp.serial_from,
+      mp.serial_to,
+      mp.configuration_note,
+      sr.title AS source_title,
+      sr.url AS source_url
     FROM machine_parts mp
     JOIN parts p ON p.id=mp.part_id
       AND p.data_status IN ('partial','verified')
+    LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
     JOIN machines m ON m.id=mp.machine_id
       AND m.data_status IN ('partial','verified')
     JOIN manufacturers mf ON mf.id=m.manufacturer_id
     JOIN equipment_types et ON et.id=m.equipment_type_id
     LEFT JOIN source_records sr ON sr.id=mp.source_record_id
-    WHERE p.normalized_part_number=? AND m.id=?
+    WHERE p.id=? AND m.id=?
     ORDER BY (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL) DESC,
              CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
              mp.id ASC
-  `, [part, Number(machineRows[0].id)]);
+  `, [partId, Number(machineRows[0].id)]);
 
-  if (rows.length === 0) return { status: 'no-fitment', message: `No documented direct fitment is recorded for ${partInput} on ${modelInput}. This is not proof that the part does not fit.` };
+  if (rows.length === 0) {
+    return {
+      status: 'no-fitment',
+      message: `No documented direct fitment is recorded for ${selectedPart.part_number} on ${modelInput}. This is not proof that the part does not fit.`,
+      partNumber: selectedPart.part_number,
+      partName: selectedPart.part_name,
+      partManufacturerName: selectedPart.manufacturer_name,
+      partManufacturerSlug: selectedPart.manufacturer_slug,
+    };
+  }
 
   const constrainedRows = rows.filter(hasSerialRule);
   const unconstrainedRows = rows.filter((row) => !hasSerialRule(row));
