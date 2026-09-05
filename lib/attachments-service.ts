@@ -36,6 +36,8 @@ export type AttachmentCompatibleMachine = {
   performanceCapacityText: string | null;
   performanceHeightText: string | null;
   performanceConfigurationText: string | null;
+  sourceTitle: string | null;
+  sourceUrl: string | null;
 };
 
 export type AttachmentDetail = AttachmentCatalogItem & {
@@ -158,6 +160,8 @@ export async function getAttachmentCatalog(): Promise<AttachmentCatalogItem[]> {
       FROM attachments a
       JOIN manufacturers mf ON mf.id=a.manufacturer_id
       JOIN machine_attachments ma ON ma.attachment_id=a.id
+      JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
+        AND fitment_machine.data_status IN ('partial','verified')
       WHERE a.data_status IN ('partial','verified')
       GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
       HAVING COUNT(DISTINCT ma.machine_id) > 0
@@ -198,6 +202,8 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
       FROM attachments a
       JOIN manufacturers mf ON mf.id=a.manufacturer_id
       JOIN machine_attachments ma ON ma.attachment_id=a.id
+      JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
+        AND fitment_machine.data_status IN ('partial','verified')
       WHERE a.data_status IN ('partial','verified')
         AND (
           a.model_name LIKE ?
@@ -271,7 +277,13 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         a.lift_capacity_text,
         a.lift_height_text,
         a.configuration_text,
-        (SELECT COUNT(DISTINCT ma.machine_id) FROM machine_attachments ma WHERE ma.attachment_id=a.id) AS compatible_machine_count
+        (
+          SELECT COUNT(DISTINCT ma_count.machine_id)
+          FROM machine_attachments ma_count
+          JOIN machines m_count ON m_count.id=ma_count.machine_id
+            AND m_count.data_status IN ('partial','verified')
+          WHERE ma_count.attachment_id=a.id
+        ) AS compatible_machine_count
       FROM attachments a
       JOIN manufacturers mf ON mf.id=a.manufacturer_id
       WHERE mf.slug=? AND a.slug=? AND a.data_status IN ('partial','verified')
@@ -330,6 +342,8 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         performanceCapacityText: row.performance_capacity_text,
         performanceHeightText: row.performance_height_text,
         performanceConfigurationText: row.performance_configuration_text,
+        sourceTitle: row.source_title,
+        sourceUrl: row.source_url,
       })),
       sourceTitle: firstSource?.source_title ?? null,
       sourceUrl: firstSource?.source_url ?? null,
