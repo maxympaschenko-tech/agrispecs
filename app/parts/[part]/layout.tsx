@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { getPart } from '@/lib/parts-service';
 import { hasAmbiguousPublishedPartNumber } from '@/lib/part-identity-service';
 import { getPartImages } from '@/lib/part-images-service';
@@ -20,7 +20,9 @@ function needsVisibleAttribution(licenseName: string | null) {
 
 export default async function PartLayout({ children, params }: LayoutProps) {
   const { part: slug } = await params;
-  if (await hasAmbiguousPublishedPartNumber(slug)) notFound();
+  if (await hasAmbiguousPublishedPartNumber(slug)) {
+    redirect(`/parts/resolve/${encodeURIComponent(slug)}`);
+  }
 
   const part = await getPart(slug);
 
