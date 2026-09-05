@@ -11,6 +11,7 @@ import { newHollandT5130140AutoCommandFuelFilterMigration } from '@/lib/migratio
 import { newHollandT5130140My23FuelFilterMigration } from '@/lib/migrations/20260905_624_new_holland_t5_130_140_my23_fuel_filter';
 import { newHollandT5StageV84278636FuelFilterMigration } from '@/lib/migrations/20260905_625_new_holland_t5_stagev_84278636_fuel_filter';
 import { newHollandT5StageV84412164SecondaryFuelFilterMigration } from '@/lib/migrations/20260905_626_new_holland_t5_stagev_84412164_secondary_fuel_filter';
+import { newHollandT5StageV84526251FuelPrefilterMigration } from '@/lib/migrations/20260905_627_new_holland_t5_stagev_84526251_fuel_prefilter';
 
 export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120SecondaryAirMigration,
@@ -25,4 +26,5 @@ export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5130140My23FuelFilterMigration,
   newHollandT5StageV84278636FuelFilterMigration,
   newHollandT5StageV84412164SecondaryFuelFilterMigration,
+  newHollandT5StageV84526251FuelPrefilterMigration,
 ];
