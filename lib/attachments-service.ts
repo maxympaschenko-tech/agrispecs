@@ -295,11 +295,13 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
         ) AS compatible_machine_count
       FROM attachments a
       JOIN manufacturers mf ON mf.id=a.manufacturer_id
-      WHERE mf.slug=? AND a.slug=? AND a.data_status IN ('partial','verified')
-      LIMIT 1
-    `, [brandSlug, attachmentSlug]);
+      WHERE a.slug=? AND a.data_status IN ('partial','verified')
+      ORDER BY CASE WHEN mf.slug=? THEN 0 ELSE 1 END, mf.slug ASC
+      LIMIT 2
+    `, [attachmentSlug, brandSlug]);
 
-    const attachment = attachmentRows[0];
+    const exactAttachment = attachmentRows.find((row) => row.manufacturer_slug === brandSlug);
+    const attachment = exactAttachment || (attachmentRows.length === 1 ? attachmentRows[0] : undefined);
     if (!attachment) return null;
 
     const [machineRows] = await db.query<CompatibleMachineRow[]>(`
