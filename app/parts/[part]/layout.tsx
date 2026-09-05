@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPart } from '@/lib/parts-service';
 import { hasAmbiguousPublishedPartNumber } from '@/lib/part-identity-service';
@@ -37,6 +38,13 @@ export default async function PartLayout({ children, params }: LayoutProps) {
     ? `${baseUrl}${primaryImage.imageUrl}`
     : undefined;
   const productId = `${canonicalUrl}#product`;
+  const hasManufacturerCatalogContext = part.fitmentCount > 0
+    || part.relations.length > 0
+    || part.components.length > 0
+    || part.includedInKits.length > 0;
+  const manufacturerHubHref = part.manufacturerSlug && hasManufacturerCatalogContext
+    ? `/parts/manufacturer/${part.manufacturerSlug}`
+    : null;
   const breadcrumbItems = [
     {
       '@type': 'ListItem',
@@ -51,6 +59,15 @@ export default async function PartLayout({ children, params }: LayoutProps) {
       item: `${baseUrl}/parts`,
     },
   ];
+
+  if (manufacturerHubHref && part.manufacturerName) {
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: `${part.manufacturerName} parts`,
+      item: `${baseUrl}${manufacturerHubHref}`,
+    });
+  }
 
   if (part.categorySlug && part.categoryName) {
     breadcrumbItems.push({
@@ -162,6 +179,13 @@ export default async function PartLayout({ children, params }: LayoutProps) {
             </figure>
           </div>
         </section>
+      )}
+      {manufacturerHubHref && part.manufacturerName && (
+        <div className="container" style={{ paddingTop: 12 }}>
+          <p className="section-note">
+            Manufacturer catalog: <Link href={manufacturerHubHref}>browse all source-backed {part.manufacturerName} parts →</Link>
+          </p>
+        </div>
       )}
       {children}
     </>
