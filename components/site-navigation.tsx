@@ -6,6 +6,7 @@ const navigationLinks = [
   { href: '/equipment', label: 'Equipment' },
   { href: '/parts', label: 'Parts' },
   { href: '/attachments', label: 'Attachments' },
+  { href: '/search', label: 'Search' },
   { href: '/fitment-checker', label: 'Fitment Checker' },
   { href: '/brands', label: 'Brands' },
   { href: '/compare', label: 'Compare' },
