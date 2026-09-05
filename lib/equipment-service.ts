@@ -64,6 +64,7 @@ export async function getNonTractorEquipment(): Promise<EquipmentMachine[]> {
     const db = await getDbReady();
     const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
+        AND m.data_status IN ('partial','verified')
       ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
     `);
     return rows.map(rowToEquipment);
@@ -95,6 +96,7 @@ export async function getNonTractorEquipmentByBrand(brandSlug: string): Promise<
     const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
         AND mf.slug = ?
+        AND m.data_status IN ('partial','verified')
       ORDER BY et.name ASC, m.model_name ASC
     `, [brandSlug]);
     return rows.map(rowToEquipment);
@@ -139,6 +141,7 @@ export async function searchNonTractorEquipment(term: string): Promise<Equipment
     const db = await getDbReady();
     const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
+        AND m.data_status IN ('partial','verified')
         AND (
           m.model_name LIKE ?
           OR mf.name LIKE ?
