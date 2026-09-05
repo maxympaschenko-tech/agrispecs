@@ -197,9 +197,10 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
   const normalizedTerm = term.trim();
   if (!normalizedTerm) return [];
 
-  const normalizedNumber = normalizedTerm.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const compactKey = normalizedTerm.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   const like = `%${normalizedTerm}%`;
-  const numberLike = `%${normalizedNumber}%`;
+  const numberLike = compactKey ? `%${compactKey}%` : '__NO_COMPACT_SEARCH_KEY__';
+  const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(COALESCE(mf.name,''),p.part_number),' ',''),'-',''),'/',''),'.',''),'_',''))`;
 
   try {
     const db = await getDbReady();
@@ -208,11 +209,34 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
          OR p.part_number LIKE ?
          OR p.name LIKE ?
          OR pc.name LIKE ?
+         OR mf.name LIKE ?
+         OR CONCAT(COALESCE(mf.name,''), ' ', p.part_number) LIKE ?
+         OR ${fullKeySql} LIKE ?
       ORDER BY
-        CASE WHEN p.normalized_part_number = ? THEN 0 ELSE 1 END,
+        CASE
+          WHEN p.normalized_part_number = ? THEN 0
+          WHEN ${fullKeySql} = ? THEN 1
+          WHEN p.part_number LIKE ? THEN 2
+          WHEN CONCAT(COALESCE(mf.name,''), ' ', p.part_number) LIKE ? THEN 3
+          WHEN p.name LIKE ? THEN 4
+          ELSE 5
+        END,
         p.part_number ASC
       LIMIT 50
-    `, [numberLike, like, like, like, normalizedNumber]);
+    `, [
+      numberLike,
+      like,
+      like,
+      like,
+      like,
+      like,
+      numberLike,
+      compactKey,
+      compactKey,
+      like,
+      like,
+      like,
+    ]);
     return rows.map(rowToPart);
   } catch (error) {
     console.error('Unable to search parts:', error);
