@@ -2,6 +2,9 @@ import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import { getPublishedPartNumberMatches } from '@/lib/part-identity-service';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const FITMENT_PAIR_TTL_MS = 5 * 60 * 1000;
 
 type FitmentConfidence = 'official' | 'high' | 'medium' | 'low';
 
@@ -188,6 +191,51 @@ async function loadPublishedMachineMatches(modelInput: string): Promise<Publishe
 
 export const getPublishedMachineMatches = cache(loadPublishedMachineMatches);
 
+async function getPublishedFitmentRows(partId: number, machineId: number): Promise<FitmentRow[]> {
+  return withServerTtlCache(
+    `fitment-checker:pair:${partId}:${machineId}`,
+    FITMENT_PAIR_TTL_MS,
+    async () => {
+      const db = await getDbReady();
+      const [rows] = await db.query<FitmentRow[]>(`
+        SELECT
+          p.part_number,
+          p.name AS part_name,
+          pmf.name AS part_manufacturer_name,
+          pmf.slug AS part_manufacturer_slug,
+          mf.name AS brand,
+          mf.slug AS brand_slug,
+          m.model_name AS model,
+          m.slug AS model_slug,
+          et.name AS equipment_type,
+          et.slug AS equipment_type_slug,
+          mp.fitment_confidence,
+          mp.fitment_note,
+          mp.serial_prefix,
+          mp.serial_from,
+          mp.serial_to,
+          mp.configuration_note,
+          sr.title AS source_title,
+          sr.url AS source_url
+        FROM machine_parts mp
+        JOIN parts p ON p.id=mp.part_id
+          AND p.data_status IN ('partial','verified')
+        LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
+        JOIN machines m ON m.id=mp.machine_id
+          AND m.data_status IN ('partial','verified')
+        JOIN manufacturers mf ON mf.id=m.manufacturer_id
+        JOIN equipment_types et ON et.id=m.equipment_type_id
+        INNER JOIN source_records sr ON sr.id=mp.source_record_id
+        WHERE p.id=? AND m.id=?
+        ORDER BY (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL) DESC,
+                 CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
+                 mp.id ASC
+      `, [partId, machineId]);
+      return rows;
+    },
+  );
+}
+
 export async function checkPartFitment(
   partInput: string,
   modelInput: string,
@@ -259,41 +307,7 @@ export async function checkPartFitment(
   }
 
   const machineId = Number(selectedMachine.id);
-  const db = await getDbReady();
-  const [rows] = await db.query<FitmentRow[]>(`
-    SELECT
-      p.part_number,
-      p.name AS part_name,
-      pmf.name AS part_manufacturer_name,
-      pmf.slug AS part_manufacturer_slug,
-      mf.name AS brand,
-      mf.slug AS brand_slug,
-      m.model_name AS model,
-      m.slug AS model_slug,
-      et.name AS equipment_type,
-      et.slug AS equipment_type_slug,
-      mp.fitment_confidence,
-      mp.fitment_note,
-      mp.serial_prefix,
-      mp.serial_from,
-      mp.serial_to,
-      mp.configuration_note,
-      sr.title AS source_title,
-      sr.url AS source_url
-    FROM machine_parts mp
-    JOIN parts p ON p.id=mp.part_id
-      AND p.data_status IN ('partial','verified')
-    LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
-    JOIN machines m ON m.id=mp.machine_id
-      AND m.data_status IN ('partial','verified')
-    JOIN manufacturers mf ON mf.id=m.manufacturer_id
-    JOIN equipment_types et ON et.id=m.equipment_type_id
-    INNER JOIN source_records sr ON sr.id=mp.source_record_id
-    WHERE p.id=? AND m.id=?
-    ORDER BY (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL) DESC,
-             CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
-             mp.id ASC
-  `, [partId, machineId]);
+  const rows = await getPublishedFitmentRows(partId, machineId);
 
   if (rows.length === 0) {
     return {
