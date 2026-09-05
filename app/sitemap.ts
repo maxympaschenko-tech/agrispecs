@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
 import { getNonTractorEquipment, getNonTractorEquipmentTypes } from '@/lib/equipment-service';
 import { getCachedPartCategories } from '@/lib/parts-catalog-cache';
+import { getPartManufacturerSummaries } from '@/lib/parts-catalog-service';
 import { getIndexableManufacturerPartRoutes, getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
@@ -27,13 +28,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/editorial-policy',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
-  const [machines, equipment, equipmentTypes, partNumbers, manufacturerPartRoutes, categories, attachments] = await Promise.all([
+  const [machines, equipment, equipmentTypes, partNumbers, manufacturerPartRoutes, categories, partManufacturers, attachments] = await Promise.all([
     getMachines(),
     getNonTractorEquipment(),
     getNonTractorEquipmentTypes(),
     getIndexablePartNumbers(),
     getIndexableManufacturerPartRoutes(),
     getCachedPartCategories(),
+    getPartManufacturerSummaries(),
     getAttachmentCatalog(),
   ]);
 
@@ -85,6 +87,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/parts/category/${category.slug}`,
     }));
 
+  const partManufacturerPages: MetadataRoute.Sitemap = partManufacturers
+    .filter((manufacturer) => manufacturer.partCount >= 2)
+    .map((manufacturer) => ({
+      url: `${baseUrl}/parts/manufacturer/${manufacturer.slug}`,
+    }));
+
   const partPages: MetadataRoute.Sitemap = partNumbers.map((partNumber) => ({
     url: `${baseUrl}/parts/${partNumber.toLowerCase()}`,
   }));
@@ -112,6 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...equipmentPages,
     ...comparisonPages,
     ...categoryPages,
+    ...partManufacturerPages,
     ...partPages,
     ...manufacturerPartPages,
     ...attachmentTypePages,
