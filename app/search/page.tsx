@@ -61,25 +61,51 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const publishableMachines = machines.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const publishableEquipment = equipment.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const verifiedParts = parts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
+  const totalResults = publishableMachines.length + publishableEquipment.length + verifiedParts.length + attachments.length;
+  const resultGroupCount = [
+    publishableMachines.length,
+    publishableEquipment.length,
+    attachments.length,
+    verifiedParts.length,
+  ].filter((count) => count > 0).length;
 
   return (
     <main className="section">
       <div className="container">
         <span className="eyebrow">Catalog search</span>
-        <h1>Search</h1>
+        <h1>{term ? `Search results for “${term}”` : 'Search the farm equipment catalog'}</h1>
+        <p className="section-lead">
+          Search tractors, farm equipment, attachments and OEM part numbers. Model and part codes can be entered with or without spaces, hyphens, slashes or dots.
+        </p>
         <form className="search-shell" action="/search">
-          <input name="q" defaultValue={q} aria-label="Search equipment, attachment or part number" placeholder="Try: Kubota SCL1000, SSG2024 or RE519626" />
+          <input name="q" defaultValue={q} aria-label="Search equipment, attachment or part number" placeholder="Try: S7 600, Kubota SCL1000, 120R or RE-519626" />
           <button type="submit">Search</button>
         </form>
 
         <div style={{ marginTop: 28 }}>
-          {term && publishableMachines.length === 0 && publishableEquipment.length === 0 && verifiedParts.length === 0 && attachments.length === 0 && (
-            <p>No matching source-backed equipment, attachment or part records yet.</p>
+          {!term && (
+            <div className="notice">
+              <strong>Search examples:</strong> manufacturer + model, model number only, equipment type, attachment model or OEM part number. Exact model and part-number matches are ranked first.
+            </div>
+          )}
+
+          {term && totalResults > 0 && (
+            <div className="notice">
+              <strong>{totalResults.toLocaleString('en-US')} source-backed result{totalResults === 1 ? '' : 's'}</strong>
+              {' '}across {resultGroupCount} catalog section{resultGroupCount === 1 ? '' : 's'}.
+            </div>
+          )}
+
+          {term && totalResults === 0 && (
+            <div className="notice">
+              <strong>No matching source-backed records yet.</strong>{' '}
+              Try a shorter model number, the manufacturer name, an equipment type or the OEM part number without extra words.
+            </div>
           )}
 
           {publishableMachines.length > 0 && (
             <section className="search-group">
-              <h2>Tractors</h2>
+              <h2>Tractors <small>({publishableMachines.length})</small></h2>
               <div className="grid">
                 {publishableMachines.map((machine) => {
                   const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug);
@@ -98,7 +124,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
           {publishableEquipment.length > 0 && (
             <section className="search-group">
-              <h2>Farm equipment</h2>
+              <h2>Farm equipment <small>({publishableEquipment.length})</small></h2>
               <div className="grid">
                 {publishableEquipment.map((machine) => {
                   const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug);
@@ -117,7 +143,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
           {attachments.length > 0 && (
             <section className="search-group">
-              <h2>Attachments</h2>
+              <h2>Attachments <small>({attachments.length})</small></h2>
               <div className="grid">
                 {attachments.map((attachment) => (
                   <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
@@ -133,7 +159,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
           {verifiedParts.length > 0 && (
             <section className="search-group">
-              <h2>Parts</h2>
+              <h2>Parts <small>({verifiedParts.length})</small></h2>
               <div className="grid">
                 {verifiedParts.map((part) => {
                   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
@@ -146,7 +172,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                         {image.imageKind === 'fallback' ? ' · Photo pending' : ''}
                       </span>
                       <h3>{part.partNumber}</h3>
-                      <p>{part.name || 'OEM part'}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
+                      <p>{part.name || 'OEM part'}{part.manufacturerName ? ` · ${part.manufacturerName}` : ''}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
                     </Link>
                   );
                 })}
