@@ -77,7 +77,6 @@ export default async function BrandPage({ params }: PageProps) {
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
   const publishedMachines = [...publishedTractors, ...publishedEquipment];
-  const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
   const researchTractors = brandTractors.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
@@ -106,8 +105,8 @@ export default async function BrandPage({ params }: PageProps) {
               <span>Models with published data</span>
             </div>
             <div>
-              <strong>{verifiedCount.toLocaleString('en-US')}</strong>
-              <span>Verified model records</span>
+              <strong>{publishedTractors.length.toLocaleString('en-US')}</strong>
+              <span>Published tractor models</span>
             </div>
             <div>
               <strong>{(publishedTractors.length > 0 ? 1 : 0) + equipmentTypeCount}</strong>
