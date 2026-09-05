@@ -1,6 +1,9 @@
 import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const ATTACHMENT_CATALOG_TTL_MS = 5 * 60 * 1000;
 
 export type MachineAttachment = {
   id: number;
@@ -156,34 +159,41 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
 }
 
 export async function getAttachmentCatalog(): Promise<AttachmentCatalogItem[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<AttachmentCatalogRow[]>(`
-      SELECT
-        a.id,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        a.model_name,
-        a.slug,
-        a.attachment_type,
-        COUNT(DISTINCT ma.machine_id) AS compatible_machine_count
-      FROM attachments a
-      JOIN manufacturers mf ON mf.id=a.manufacturer_id
-      JOIN machine_attachments ma ON ma.attachment_id=a.id
-      JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
-        AND fitment_machine.data_status IN ('partial','verified')
-      JOIN source_records fitment_source ON fitment_source.id=ma.source_record_id
-      WHERE a.data_status IN ('partial','verified')
-      GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
-      HAVING COUNT(DISTINCT ma.machine_id) > 0
-      ORDER BY mf.name,a.attachment_type,a.model_name
-    `);
+  return withServerTtlCache(
+    'attachments:catalog',
+    ATTACHMENT_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<AttachmentCatalogRow[]>(`
+          SELECT
+            a.id,
+            mf.name AS manufacturer_name,
+            mf.slug AS manufacturer_slug,
+            a.model_name,
+            a.slug,
+            a.attachment_type,
+            COUNT(DISTINCT ma.machine_id) AS compatible_machine_count
+          FROM attachments a
+          JOIN manufacturers mf ON mf.id=a.manufacturer_id
+          JOIN machine_attachments ma ON ma.attachment_id=a.id
+          JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
+            AND fitment_machine.data_status IN ('partial','verified')
+          JOIN source_records fitment_source ON fitment_source.id=ma.source_record_id
+          WHERE a.data_status IN ('partial','verified')
+          GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
+          HAVING COUNT(DISTINCT ma.machine_id) > 0
+          ORDER BY mf.name,a.attachment_type,a.model_name
+        `);
 
-    return rows.map(rowToCatalogItem);
-  } catch (error) {
-    console.error('Unable to load attachment catalog:', error);
-    return [];
-  }
+        return rows.map(rowToCatalogItem);
+      } catch (error) {
+        console.error('Unable to load attachment catalog:', error);
+        return [];
+      }
+    },
+    (attachments) => attachments.length > 0,
+  );
 }
 
 export async function searchAttachments(term: string): Promise<AttachmentCatalogItem[]> {
