@@ -95,8 +95,9 @@ export async function getMachineMaintenance(machineId: string, machineVersionId?
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM maintenance_tasks mt
       LEFT JOIN parts p ON p.id = mt.part_id
+        AND p.data_status IN ('partial','verified')
       LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
-      LEFT JOIN source_records sr ON sr.id = mt.source_record_id
+      INNER JOIN source_records sr ON sr.id = mt.source_record_id
       WHERE mt.machine_id = ?
         ${versionFilter}
       ORDER BY
