@@ -181,6 +181,8 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
   const modelKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(a.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
   const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,a.model_name),' ',''),'-',''),'/',''),'.',''),'_',''))`;
   const typeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(a.attachment_type,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const modelGenericTypeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(a.model_name,SUBSTRING_INDEX(a.attachment_type,'-',-1)),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const fullGenericTypeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,a.model_name,SUBSTRING_INDEX(a.attachment_type,'-',-1)),' ',''),'-',''),'/',''),'.',''),'_',''))`;
 
   try {
     const db = await getDbReady();
@@ -207,6 +209,8 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
           OR ${modelKeySql} LIKE ?
           OR ${fullKeySql} LIKE ?
           OR ${typeKeySql} LIKE ?
+          OR ${modelGenericTypeKeySql} LIKE ?
+          OR ${fullGenericTypeKeySql} LIKE ?
         )
       GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
       HAVING COUNT(DISTINCT ma.machine_id) > 0
@@ -214,10 +218,12 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
         CASE
           WHEN ${modelKeySql} = ? THEN 0
           WHEN ${fullKeySql} = ? THEN 1
-          WHEN a.model_name LIKE ? THEN 2
-          WHEN CONCAT(mf.name,' ',a.model_name) LIKE ? THEN 3
-          WHEN REPLACE(a.attachment_type,'-',' ') LIKE ? THEN 4
-          ELSE 5
+          WHEN ${modelGenericTypeKeySql} = ? THEN 2
+          WHEN ${fullGenericTypeKeySql} = ? THEN 3
+          WHEN a.model_name LIKE ? THEN 4
+          WHEN CONCAT(mf.name,' ',a.model_name) LIKE ? THEN 5
+          WHEN REPLACE(a.attachment_type,'-',' ') LIKE ? THEN 6
+          ELSE 7
         END,
         mf.name ASC,
         a.attachment_type ASC,
@@ -233,6 +239,10 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
       keyLike,
       keyLike,
       keyLike,
+      keyLike,
+      keyLike,
+      compactKey,
+      compactKey,
       compactKey,
       compactKey,
       like,
