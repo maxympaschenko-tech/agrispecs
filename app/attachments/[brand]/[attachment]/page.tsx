@@ -62,13 +62,18 @@ export default async function AttachmentPage({ params }: PageProps) {
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const isLoader = item.attachmentType === 'front-loader';
   const isBackhoe = item.attachmentType === 'backhoe';
-  const documentedFitmentCount = item.compatibleMachines.length;
-  const conditionalFitmentCount = item.compatibleMachines.filter((machine) => hasConfigurationCondition(machine.compatibilityNote)).length;
-  const performanceFitmentCount = item.compatibleMachines.filter(
+  const documentedFitmentCount = item.compatibleMachineCount;
+  const documentedFitmentRecordCount = item.compatibleMachines.length;
+  const conditionalFitmentRecordCount = item.compatibleMachines.filter((machine) => hasConfigurationCondition(machine.compatibilityNote)).length;
+  const performanceFitmentRecordCount = item.compatibleMachines.filter(
     (machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText,
   ).length;
   const firstCompatibleMachine = item.compatibleMachines[0];
-  const tractorFitmentCount = item.compatibleMachines.filter((machine) => machine.equipmentTypeSlug === 'tractor').length;
+  const tractorFitmentCount = new Set(
+    item.compatibleMachines
+      .filter((machine) => machine.equipmentTypeSlug === 'tractor')
+      .map((machine) => machine.machineId),
+  ).size;
   const equipmentTypes = Array.from(new Set(item.compatibleMachines.map((machine) => machine.equipmentType)));
 
   return (
@@ -85,9 +90,13 @@ export default async function AttachmentPage({ params }: PageProps) {
 
           <div className="parts-stats">
             <div><strong>{documentedFitmentCount}</strong><span>documented compatible machine{documentedFitmentCount === 1 ? '' : 's'}</span></div>
-            <div><strong>{conditionalFitmentCount}</strong><span>fitment{conditionalFitmentCount === 1 ? '' : 's'} with configuration requirements</span></div>
-            <div><strong>{performanceFitmentCount}</strong><span>machine-specific performance record{performanceFitmentCount === 1 ? '' : 's'}</span></div>
+            <div><strong>{conditionalFitmentRecordCount}</strong><span>fitment record{conditionalFitmentRecordCount === 1 ? '' : 's'} with configuration requirements</span></div>
+            <div><strong>{performanceFitmentRecordCount}</strong><span>machine-specific performance record{performanceFitmentRecordCount === 1 ? '' : 's'}</span></div>
           </div>
+
+          {documentedFitmentRecordCount > documentedFitmentCount && (
+            <p className="section-note">Some compatible machines have multiple cited fitment records, so the detailed evidence list below can contain more records than the unique-machine count above.</p>
+          )}
 
           {equipmentTypes.length > 0 && (
             <p className="section-note">Published fitment currently covers: {equipmentTypes.join(', ')}.</p>
@@ -119,7 +128,7 @@ export default async function AttachmentPage({ params }: PageProps) {
                 <span>{item.configurationText}</span>
               </div>
             )}
-            {performanceFitmentCount > 0 && (
+            {performanceFitmentRecordCount > 0 && (
               <p className="section-note">Published performance can vary by machine, tire, hydraulic or mounting configuration. Machine-specific values are shown below when the cited source provides them.</p>
             )}
             {!item.liftCapacityText && !item.liftHeightText && !item.configurationText && (
@@ -130,11 +139,11 @@ export default async function AttachmentPage({ params }: PageProps) {
           <section className="data-section">
             <h2>Documented machine fitment</h2>
             <p className="section-note">A listed machine is not automatically compatible in every configuration. Check each fitment note and its cited source for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
-            {item.compatibleMachines.map((machine) => {
+            {item.compatibleMachines.map((machine, recordIndex) => {
               const conditional = hasConfigurationCondition(machine.compatibilityNote);
               const href = machineHref(machine);
               return (
-                <div className="part-fitment" key={machine.machineId}>
+                <div className="part-fitment" key={`${machine.machineId}-${recordIndex}`}>
                   <div>
                     <Link className="part-fitment-machine" href={href}>
                       {machine.brand} {machine.model}
