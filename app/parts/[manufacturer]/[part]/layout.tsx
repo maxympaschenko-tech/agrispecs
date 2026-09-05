@@ -91,7 +91,7 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
           : undefined,
         additionalProperty: [
           part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
-          { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(part.fitments.length) },
+          { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(part.fitmentCount) },
           matchCount > 1 ? { '@type': 'PropertyValue', name: 'Part-number identity', value: 'Manufacturer-qualified due to cross-brand number collision' } : null,
         ].filter(Boolean),
       },
