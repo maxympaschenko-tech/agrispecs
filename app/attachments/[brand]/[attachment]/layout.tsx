@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { getAttachment } from '@/lib/attachments-service';
 
 type LayoutProps = {
@@ -30,6 +31,12 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
   const canonicalUrl = `${baseUrl}/attachments/${item.manufacturerSlug}/${item.slug}`;
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const equipmentTypes = Array.from(new Set(item.compatibleMachines.map((machine) => machine.equipmentType)));
+  const typeHubHref = item.compatibleMachineCount > 0
+    ? `/attachments/type/${item.attachmentType}`
+    : null;
+  const brandHubHref = item.compatibleMachines.some((machine) => machine.brandSlug === item.manufacturerSlug)
+    ? `/brands/${item.manufacturerSlug}`
+    : null;
   const localImageUrl = '/media/fallbacks/attachment.svg';
   const productId = `${canonicalUrl}#product`;
   const productProperties = [
@@ -40,6 +47,45 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
       ? { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(item.compatibleMachineCount) }
       : null,
   ].filter(Boolean);
+  const breadcrumbItems = [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: baseUrl,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Attachments',
+      item: `${baseUrl}/attachments`,
+    },
+  ];
+
+  if (typeHubHref) {
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: `${typeLabel} attachments`,
+      item: `${baseUrl}${typeHubHref}`,
+    });
+  }
+
+  if (brandHubHref) {
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: item.manufacturerName,
+      item: `${baseUrl}${brandHubHref}`,
+    });
+  }
+
+  breadcrumbItems.push({
+    '@type': 'ListItem',
+    position: breadcrumbItems.length + 1,
+    name: `${item.manufacturerName} ${item.modelName}`,
+    item: canonicalUrl,
+  });
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -80,26 +126,7 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
       {
         '@type': 'BreadcrumbList',
         '@id': `${canonicalUrl}#breadcrumb`,
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'Home',
-            item: baseUrl,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Attachments',
-            item: `${baseUrl}/attachments`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 3,
-            name: `${item.manufacturerName} ${item.modelName}`,
-            item: canonicalUrl,
-          },
-        ],
+        itemListElement: breadcrumbItems,
       },
     ],
   };
@@ -122,6 +149,16 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
           </figure>
         </div>
       </section>
+      {(typeHubHref || brandHubHref) && (
+        <div className="container" style={{ paddingTop: 12 }}>
+          <p className="section-note">
+            Browse related catalogs:{' '}
+            {typeHubHref && <Link href={typeHubHref}>{typeLabel} attachments</Link>}
+            {typeHubHref && brandHubHref ? ' · ' : ''}
+            {brandHubHref && <Link href={brandHubHref}>{item.manufacturerName} equipment</Link>}
+          </p>
+        </div>
+      )}
       {children}
     </>
   );
