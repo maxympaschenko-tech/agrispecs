@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { getPart } from '@/lib/parts-service';
 import { getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
 import { getPartImages } from '@/lib/part-images-service';
@@ -35,6 +36,13 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
     ? `${baseUrl}${primaryImage.imageUrl}`
     : undefined;
   const productId = `${canonicalUrl}#product`;
+  const hasManufacturerCatalogContext = part.fitmentCount > 0
+    || part.relations.length > 0
+    || part.components.length > 0
+    || part.includedInKits.length > 0;
+  const manufacturerHubHref = hasManufacturerCatalogContext
+    ? `/parts/manufacturer/${part.manufacturerSlug}`
+    : null;
 
   const breadcrumbItems = [
     {
@@ -49,13 +57,32 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
       name: 'Parts',
       item: `${baseUrl}/parts`,
     },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: `${part.manufacturerName || 'OEM'} ${part.partNumber}`,
-      item: canonicalUrl,
-    },
   ];
+
+  if (manufacturerHubHref && part.manufacturerName) {
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: `${part.manufacturerName} parts`,
+      item: `${baseUrl}${manufacturerHubHref}`,
+    });
+  }
+
+  if (part.categorySlug && part.categoryName) {
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: part.categoryName,
+      item: `${baseUrl}/parts/category/${part.categorySlug}`,
+    });
+  }
+
+  breadcrumbItems.push({
+    '@type': 'ListItem',
+    position: breadcrumbItems.length + 1,
+    name: `${part.manufacturerName || 'OEM'} ${part.partNumber}`,
+    item: canonicalUrl,
+  });
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -137,6 +164,13 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
             </figure>
           </div>
         </section>
+      )}
+      {manufacturerHubHref && part.manufacturerName && (
+        <div className="container" style={{ paddingTop: 12 }}>
+          <p className="section-note">
+            Manufacturer catalog: <Link href={manufacturerHubHref}>browse all source-backed {part.manufacturerName} parts →</Link>
+          </p>
+        </div>
       )}
       {children}
     </>
