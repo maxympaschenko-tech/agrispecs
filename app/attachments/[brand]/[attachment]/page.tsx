@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getAttachment, type AttachmentCompatibleMachine } from '@/lib/attachments-service';
 
 export const dynamic = 'force-dynamic';
@@ -57,6 +57,7 @@ export default async function AttachmentPage({ params }: PageProps) {
   const { brand, attachment: slug } = await params;
   const item = await getAttachment(brand, slug);
   if (!item) notFound();
+  if (brand !== item.manufacturerSlug) redirect(`/attachments/${item.manufacturerSlug}/${item.slug}`);
 
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const isLoader = item.attachmentType === 'front-loader';
