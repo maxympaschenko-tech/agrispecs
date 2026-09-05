@@ -19,6 +19,7 @@ import { newHollandT5StageVDefFiltersMigration } from '@/lib/migrations/20260905
 import { newHollandT5AutoCommandMaintenanceCompletionMigration } from '@/lib/migrations/20260905_634_new_holland_t5_autocommand_maintenance_completion';
 import { newHollandT5110120HistoricalFitmentContextMigration } from '@/lib/migrations/20260905_635_new_holland_t5_110_120_historical_fitment_context';
 import { newHollandT5130140CurrentSpecsEnrichmentMigration } from '@/lib/migrations/20260905_636_new_holland_t5_130_140_current_specs';
+import { newHollandT5110120CurrentEngineMigration } from '@/lib/migrations/20260905_637_new_holland_t5_110_120_current_engine';
 
 export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120SecondaryAirMigration,
@@ -41,4 +42,5 @@ export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5AutoCommandMaintenanceCompletionMigration,
   newHollandT5110120HistoricalFitmentContextMigration,
   newHollandT5130140CurrentSpecsEnrichmentMigration,
+  newHollandT5110120CurrentEngineMigration,
 ];
