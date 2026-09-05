@@ -61,6 +61,7 @@ export default async function AttachmentPage({ params }: PageProps) {
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const isLoader = item.attachmentType === 'front-loader';
   const isBackhoe = item.attachmentType === 'backhoe';
+  const documentedFitmentCount = item.compatibleMachines.length;
   const conditionalFitmentCount = item.compatibleMachines.filter((machine) => hasConfigurationCondition(machine.compatibilityNote)).length;
   const performanceFitmentCount = item.compatibleMachines.filter(
     (machine) => machine.performanceCapacityText || machine.performanceHeightText || machine.performanceConfigurationText,
@@ -78,11 +79,11 @@ export default async function AttachmentPage({ params }: PageProps) {
       <section className="section" style={{ paddingTop: 18 }}>
         <div className="container">
           <span className="eyebrow">{typeLabel} compatibility</span>
-          <h1>{item.manufacturerName} {item.modelName}</h1>
-          <p className="section-lead">Verified machine fitment and published {typeLabel.toLowerCase()} information from cited manufacturer sources. Some fitments apply only to specific machine, hydraulic, hitch or mounting configurations.</p>
+          <h1>{item.manufacturerName} {item.modelName} {typeLabel}</h1>
+          <p className="section-lead">Source-backed machine fitment and published {typeLabel.toLowerCase()} information from cited manufacturer records. Some fitments apply only to specific machine, hydraulic, hitch or mounting configurations.</p>
 
           <div className="parts-stats">
-            <div><strong>{item.compatibleMachineCount}</strong><span>verified compatible machine{item.compatibleMachineCount === 1 ? '' : 's'}</span></div>
+            <div><strong>{documentedFitmentCount}</strong><span>documented compatible machine{documentedFitmentCount === 1 ? '' : 's'}</span></div>
             <div><strong>{conditionalFitmentCount}</strong><span>fitment{conditionalFitmentCount === 1 ? '' : 's'} with configuration requirements</span></div>
             <div><strong>{performanceFitmentCount}</strong><span>machine-specific performance record{performanceFitmentCount === 1 ? '' : 's'}</span></div>
           </div>
@@ -94,7 +95,7 @@ export default async function AttachmentPage({ params }: PageProps) {
           <div className="parts-tool-callout">
             <div>
               <strong>Planning this attachment for a machine?</strong>
-              <span>Open the compatible machine record to review specifications, source notes and other matched equipment before relying on the fitment record.</span>
+              <span>Open the compatible machine record and the cited fitment source before relying on compatibility for ordering or installation.</span>
             </div>
             <div>
               <Link className="tool-link" href="/attachments">Browse attachments →</Link>
@@ -120,11 +121,14 @@ export default async function AttachmentPage({ params }: PageProps) {
             {performanceFitmentCount > 0 && (
               <p className="section-note">Published performance can vary by machine, tire, hydraulic or mounting configuration. Machine-specific values are shown below when the cited source provides them.</p>
             )}
+            {!item.liftCapacityText && !item.liftHeightText && !item.configurationText && (
+              <p className="section-note">No attachment-level performance specification is published yet. Machine-specific fitment and performance values are shown below when supported by a source.</p>
+            )}
           </section>
 
           <section className="data-section">
-            <h2>Verified machine fitment</h2>
-            <p className="section-note">A listed machine is not automatically compatible in every configuration. Check each fitment note for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
+            <h2>Documented machine fitment</h2>
+            <p className="section-note">A listed machine is not automatically compatible in every configuration. Check each fitment note and its cited source for hydraulic flow, hitch, carrier, axle, driveline, transmission or equipment requirements before ordering or installing the attachment.</p>
             {item.compatibleMachines.map((machine) => {
               const conditional = hasConfigurationCondition(machine.compatibilityNote);
               const href = machineHref(machine);
@@ -140,6 +144,14 @@ export default async function AttachmentPage({ params }: PageProps) {
                     {machine.performanceHeightText && <p><strong>Working height:</strong> {machine.performanceHeightText}</p>}
                     {machine.performanceConfigurationText && <p><strong>Configuration:</strong> {machine.performanceConfigurationText}</p>}
                     {machine.compatibilityNote && <p><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {machine.compatibilityNote}</p>}
+                    {machine.sourceUrl && (
+                      <p>
+                        <strong>Fitment source:</strong>{' '}
+                        <a href={machine.sourceUrl} target="_blank" rel="noopener noreferrer">
+                          {machine.sourceTitle || 'Manufacturer source'}
+                        </a>
+                      </p>
+                    )}
                     <p>
                       <Link href={href}>View machine specs →</Link>{' '}
                       {machine.equipmentTypeSlug === 'tractor' && <Link href={`/compare?m1=${machine.machineId}`}>Compare this tractor →</Link>}
@@ -150,21 +162,11 @@ export default async function AttachmentPage({ params }: PageProps) {
             })}
           </section>
 
-          {item.sourceUrl && (
-            <section className="data-section">
-              <h2>Source</h2>
-              <div className="placeholder-row">
-                <span>Compatibility source</span>
-                <span><a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{item.sourceTitle || `${item.manufacturerName} ${typeLabel.toLowerCase()} compatibility source`}</a></span>
-              </div>
-            </section>
-          )}
-
           <div className="notice">
             Attachment fitment is published only when a cited source supports the relationship. Missing machines are not automatically incompatible, and listed machines may still require a specific hydraulic, hitch, axle, transmission or mounting configuration. See our <Link href="/methodology">data methodology</Link> for publication rules.
           </div>
 
-          {tractorFitmentCount > 0 && tractorFitmentCount < item.compatibleMachineCount && (
+          {tractorFitmentCount > 0 && tractorFitmentCount < documentedFitmentCount && (
             <p className="section-note">This attachment has both tractor and non-tractor equipment fitment records; links above route each machine to the correct catalog section.</p>
           )}
         </div>

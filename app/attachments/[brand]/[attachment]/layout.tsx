@@ -31,7 +31,15 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
   const typeLabel = attachmentTypeLabel(item.attachmentType);
   const equipmentTypes = Array.from(new Set(item.compatibleMachines.map((machine) => machine.equipmentType)));
   const localImageUrl = '/media/fallbacks/attachment.svg';
-  const absoluteImageUrl = `${baseUrl}${localImageUrl}`;
+  const productId = `${canonicalUrl}#product`;
+  const productProperties = [
+    item.liftCapacityText ? { '@type': 'PropertyValue', name: 'Capacity', value: item.liftCapacityText } : null,
+    item.liftHeightText ? { '@type': 'PropertyValue', name: 'Working height', value: item.liftHeightText } : null,
+    item.configurationText ? { '@type': 'PropertyValue', name: 'Configuration', value: item.configurationText } : null,
+    item.compatibleMachineCount > 0
+      ? { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(item.compatibleMachineCount) }
+      : null,
+  ].filter(Boolean);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -42,7 +50,6 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
         url: canonicalUrl,
         name: `${item.manufacturerName} ${item.modelName} ${typeLabel} compatibility`,
         description: `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} compatibility, published specifications and source-backed machine fitment${equipmentTypes.length ? ` for ${equipmentTypes.join(', ')}` : ''}.`,
-        image: absoluteImageUrl,
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
@@ -52,12 +59,23 @@ export default async function AttachmentLayout({ children, params }: LayoutProps
         breadcrumb: {
           '@id': `${canonicalUrl}#breadcrumb`,
         },
-        about: {
-          '@type': 'Thing',
-          name: `${item.manufacturerName} ${item.modelName}`,
-          additionalType: typeLabel,
-          image: absoluteImageUrl,
+        mainEntity: {
+          '@id': productId,
         },
+      },
+      {
+        '@type': 'Product',
+        '@id': productId,
+        url: canonicalUrl,
+        name: `${item.manufacturerName} ${item.modelName}`,
+        model: item.modelName,
+        category: `${typeLabel} farm equipment attachment`,
+        description: `${item.manufacturerName} ${item.modelName} ${typeLabel.toLowerCase()} with source-backed compatibility and published configuration data.`,
+        brand: {
+          '@type': 'Brand',
+          name: item.manufacturerName,
+        },
+        additionalProperty: productProperties,
       },
       {
         '@type': 'BreadcrumbList',
