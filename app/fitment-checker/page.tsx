@@ -5,15 +5,21 @@ import { checkPartFitment } from '@/lib/fitment-checker-service';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export const metadata: Metadata = {
-  title: 'Farm Equipment Part Fitment and Serial Number Checker',
-  description: 'Check source-backed farm equipment part fitment by part number, machine model and documented serial-number range.',
-  alternates: { canonical: '/fitment-checker' },
-};
-
 type PageProps = {
   searchParams: Promise<{ part?: string; model?: string; serial?: string }>;
 };
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const hasQueryState = Boolean(params.part || params.model || params.serial);
+
+  return {
+    title: 'Farm Equipment Part Fitment and Serial Number Checker',
+    description: 'Check source-backed farm equipment part fitment by part number, machine model and documented serial-number range.',
+    alternates: { canonical: '/fitment-checker' },
+    robots: hasQueryState ? { index: false, follow: true } : { index: true, follow: true },
+  };
+}
 
 function resultHeading(status: string) {
   if (status === 'fits') return 'Fits documented serial range';
