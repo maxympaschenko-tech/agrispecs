@@ -60,13 +60,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     : [[], [], [], []];
   const publishableMachines = machines.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const publishableEquipment = equipment.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
-  const verifiedParts = parts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
-  const totalResults = publishableMachines.length + publishableEquipment.length + verifiedParts.length + attachments.length;
+  const publishedParts = parts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
+  const totalResults = publishableMachines.length + publishableEquipment.length + publishedParts.length + attachments.length;
   const resultGroupCount = [
     publishableMachines.length,
     publishableEquipment.length,
     attachments.length,
-    verifiedParts.length,
+    publishedParts.length,
   ].filter((count) => count > 0).length;
 
   return (
@@ -112,7 +112,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   return (
                     <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                       {cardImage(image.imageUrl, image.altText || machine.title)}
-                      <span className="eyebrow">Tractor{image.imageKind === 'fallback' ? ' · Photo pending' : ''}</span>
+                      <span className="eyebrow">
+                        Tractor
+                        {image.imageKind === 'family' ? ' · Family image' : ''}
+                        {image.imageKind === 'representative' ? ' · Representative image' : ''}
+                        {image.imageKind === 'fallback' ? ' · Photo pending' : ''}
+                      </span>
                       <h3>{machine.title}</h3>
                       <p>Specifications, maintenance and compatible parts</p>
                     </Link>
@@ -131,9 +136,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   return (
                     <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
                       {cardImage(image.imageUrl, image.altText || machine.title)}
-                      <span className="eyebrow">{machine.equipmentType}{image.imageKind === 'fallback' ? ' · Photo pending' : ''}</span>
+                      <span className="eyebrow">
+                        {machine.equipmentType}
+                        {image.imageKind === 'family' ? ' · Family image' : ''}
+                        {image.imageKind === 'representative' ? ' · Representative image' : ''}
+                        {image.imageKind === 'fallback' ? ' · Photo pending' : ''}
+                      </span>
                       <h3>{machine.title}</h3>
-                      <p>Source-backed specifications and current market configuration</p>
+                      <p>Source-backed specifications and published market/configuration reference</p>
                     </Link>
                   );
                 })}
@@ -147,21 +157,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="grid">
                 {attachments.map((attachment) => (
                   <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
-                    <img src="/media/fallbacks/attachment.svg" alt={`${attachment.manufacturerName} ${attachment.modelName} attachment image pending`} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }} />
-                    <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)} · Photo pending</span>
+                    <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)}</span>
                     <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
-                    <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
+                    <p>{attachment.compatibleMachineCount} documented machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
                   </Link>
                 ))}
               </div>
             </section>
           )}
 
-          {verifiedParts.length > 0 && (
+          {publishedParts.length > 0 && (
             <section className="search-group">
-              <h2>Parts <small>({verifiedParts.length})</small></h2>
+              <h2>Parts <small>({publishedParts.length})</small></h2>
               <div className="grid">
-                {verifiedParts.map((part) => {
+                {publishedParts.map((part) => {
                   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
                   return (
                     <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
@@ -172,7 +181,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                         {image.imageKind === 'fallback' ? ' · Photo pending' : ''}
                       </span>
                       <h3>{part.partNumber}</h3>
-                      <p>{part.name || 'OEM part'}{part.manufacturerName ? ` · ${part.manufacturerName}` : ''}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
+                      <p>{part.name || 'OEM part'}{part.manufacturerName ? ` · ${part.manufacturerName}` : ''}{part.fitmentCount > 0 ? ` · ${part.fitmentCount} documented fitment${part.fitmentCount === 1 ? '' : 's'}` : ''}</p>
                     </Link>
                   );
                 })}
