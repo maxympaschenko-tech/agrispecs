@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
 import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
+import { getPartCatalogPage } from '@/lib/parts-catalog-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 import { getMachineDisplayModel, getMachineDisplayTitle, getMachineGenerationLabel } from '@/lib/machine-display';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from './brand-page.module.css';
@@ -14,6 +17,7 @@ export const revalidate = 0;
 const TRACTOR_CARD_LIMIT = 12;
 const EQUIPMENT_CARD_LIMIT = 6;
 const ATTACHMENT_CARD_LIMIT = 6;
+const PART_CARD_LIMIT = 6;
 
 type PageProps = { params: Promise<{ brand: string }> };
 
@@ -77,11 +81,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BrandPage({ params }: PageProps) {
   const { brand } = await params;
-  const [brands, brandTractors, brandEquipment, attachmentCatalog] = await Promise.all([
+  const [brands, brandTractors, brandEquipment, attachmentCatalog, brandPartCatalog] = await Promise.all([
     getBrands(),
     getMachinesByBrand(brand),
     getNonTractorEquipmentByBrand(brand),
     getAttachmentCatalog(),
+    getPartCatalogPage({ manufacturerSlug: brand, page: 1, pageSize: PART_CARD_LIMIT }),
   ]);
   const tractorBrand = brands.find((item) => item.slug === brand);
   const equipmentBrand = brandEquipment[0] ? { slug: brandEquipment[0].brandSlug, name: brandEquipment[0].brand } : undefined;
@@ -100,6 +105,9 @@ export default async function BrandPage({ params }: PageProps) {
   const equipmentTypeCount = new Set(publishedEquipment.map((machine) => machine.equipmentTypeSlug)).size;
   const brandAttachments = attachmentCatalog.filter(
     (attachment) => attachment.manufacturerSlug === info.slug,
+  );
+  const ambiguousBrandPartNumbers = await getAmbiguousPublishedPartNumbers(
+    brandPartCatalog.items.map((part) => part.normalizedPartNumber),
   );
 
   const displayTractors = [...publishedTractors].sort((a, b) => {
@@ -172,11 +180,13 @@ export default async function BrandPage({ params }: PageProps) {
                 <span className="tool-link">Open equipment catalog</span>
               </Link>
             )}
-            <Link className="card" href="/parts">
+            <Link className="card" href={brandPartCatalog.total > 0 ? '#brand-parts' : '/parts'}>
               <span className="eyebrow">Parts reference</span>
-              <h3>Search OEM parts</h3>
-              <p>Search part numbers, replacement references and documented machine fitment records.</p>
-              <span className="tool-link">Browse parts</span>
+              <h3>{brandPartCatalog.total > 0 ? `${info.name} parts` : 'Search OEM parts'}</h3>
+              <p>{brandPartCatalog.total > 0
+                ? `${brandPartCatalog.total.toLocaleString('en-US')} source-backed part page${brandPartCatalog.total === 1 ? '' : 's'} with documented fitment or relationship data.`
+                : 'Search part numbers, replacement references and documented machine fitment records.'}</p>
+              <span className="tool-link">{brandPartCatalog.total > 0 ? 'View brand parts' : 'Browse parts'}</span>
             </Link>
             <Link className="card" href={brandAttachments.length > 0 ? '#brand-attachments' : '/attachments'}>
               <span className="eyebrow">Attachments</span>
@@ -269,6 +279,41 @@ export default async function BrandPage({ params }: PageProps) {
                   </div>
                 );
               })}
+            </section>
+          )}
+
+          {brandPartCatalog.total > 0 && (
+            <section className="catalog-group" id="brand-parts">
+              <h2>{info.name} parts with source-backed data</h2>
+              <p className="section-note">
+                A small sample is shown here. The dedicated manufacturer parts hub contains all {brandPartCatalog.total.toLocaleString('en-US')} published part pages for {info.name}, with documented fitment, replacement or kit relationships.
+              </p>
+              <div className="grid">
+                {brandPartCatalog.items.map((part) => (
+                  <Link
+                    className="card"
+                    key={part.id}
+                    href={getPartReferenceHref(
+                      part.normalizedPartNumber,
+                      part.manufacturerSlug,
+                      ambiguousBrandPartNumbers,
+                    )}
+                  >
+                    <span className="eyebrow">{part.categoryName || 'Part'} · {info.name}</span>
+                    <h3>{part.partNumber}</h3>
+                    <p>{part.name || 'Farm equipment part'}</p>
+                    <p>
+                      {[
+                        part.fitmentCount > 0 ? `${part.fitmentCount} fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
+                        part.relationCount > 0 ? `${part.relationCount} replacement/cross-reference link${part.relationCount === 1 ? '' : 's'}` : null,
+                        part.componentCount > 0 ? `${part.componentCount} kit component${part.componentCount === 1 ? '' : 's'}` : null,
+                      ].filter(Boolean).join(' · ')}
+                    </p>
+                    <span className="tool-link">View part reference →</span>
+                  </Link>
+                ))}
+              </div>
+              <p><Link className="tool-link" href={`/parts/manufacturer/${info.slug}`}>Browse all {info.name} parts →</Link></p>
             </section>
           )}
 
