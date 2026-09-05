@@ -145,20 +145,19 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     ...sectionOrder.filter((section) => specsBySection.has(section)),
     ...Array.from(specsBySection.keys()).filter((section) => !sectionOrder.includes(section)),
   ];
-  const sources = Array.from(
-    new Map(
-      specs
-        .filter((spec) => spec.sourceUrl)
-        .map((spec) => [
-          spec.sourceUrl as string,
-          {
-            url: spec.sourceUrl as string,
-            title: spec.sourceTitle || 'Manufacturer source',
-            publishedDate: spec.sourcePublishedDate,
-          },
-        ]),
-    ).values(),
-  );
+  const sourceEntries = [
+    ...specs.filter((spec) => spec.sourceUrl).map((spec) => ({
+      url: spec.sourceUrl as string,
+      title: spec.sourceTitle || 'Manufacturer source',
+      publishedDate: spec.sourcePublishedDate,
+    })),
+    ...attachments.filter((attachment) => attachment.sourceUrl).map((attachment) => ({
+      url: attachment.sourceUrl as string,
+      title: attachment.sourceTitle || 'Attachment compatibility source',
+      publishedDate: null,
+    })),
+  ];
+  const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
   const relatedModels = brandEquipment
     .filter((item) =>
       item.id !== machine.id
@@ -339,7 +338,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {sources.length > 0 && (
               <section className="data-section" id="sources">
                 <h2>Sources</h2>
-                <p className="section-note">Specifications on this page are tied to the cited source records and the selected market/configuration version.</p>
+                <p className="section-note">Specifications and attachment fitment on this page are tied to cited source records. Specification values use the selected market/configuration version; attachment evidence is listed separately when published.</p>
                 <div className="parts-list">
                   {sources.map((source) => (
                     <a className="part-row" key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">
