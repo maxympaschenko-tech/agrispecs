@@ -109,7 +109,12 @@ export async function getPartCategories(): Promise<PartCategorySummary[]> {
 }
 
 export async function getPartCategory(slug: string): Promise<PartCategorySummary | undefined> {
-  const normalized = decodeURIComponent(slug).trim().toLowerCase();
+  let normalized = '';
+  try {
+    normalized = decodeURIComponent(slug).trim().toLowerCase();
+  } catch {
+    return undefined;
+  }
   if (!normalized) return undefined;
 
   try {
