@@ -57,11 +57,15 @@ type MaintenanceRow = RowDataPacket & {
   source_published_date: string | null;
 };
 
-export async function getMachineMaintenance(machineId: string): Promise<MaintenanceTask[]> {
+export async function getMachineMaintenance(machineId: string, machineVersionId?: number): Promise<MaintenanceTask[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
     const db = await getDbReady();
+    const versionFilter = machineVersionId ? 'AND (mt.machine_version_id IS NULL OR mt.machine_version_id = ?)' : '';
+    const params: number[] = [Number(machineId)];
+    if (machineVersionId) params.push(machineVersionId);
+
     const [rows] = await db.query<MaintenanceRow[]>(`
       SELECT
         mt.id,
@@ -94,6 +98,7 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
       LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
       LEFT JOIN source_records sr ON sr.id = mt.source_record_id
       WHERE mt.machine_id = ?
+        ${versionFilter}
       ORDER BY
         CASE WHEN mt.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
         COALESCE(mt.interval_hours, 999999),
@@ -108,7 +113,7 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
           ELSE 90
         END,
         mt.title ASC
-    `, [Number(machineId)]);
+    `, params);
 
     return rows.map((row) => ({
       id: Number(row.id),
