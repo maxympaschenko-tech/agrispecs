@@ -274,6 +274,7 @@ export async function searchMachines(term: string): Promise<Machine[]> {
       INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
       INNER JOIN equipment_types et ON et.id = m.equipment_type_id
       WHERE et.slug = 'tractor'
+        AND m.data_status IN ('partial','verified')
         AND (
           m.model_name LIKE ?
           OR mf.name LIKE ?
@@ -294,17 +295,11 @@ export async function searchMachines(term: string): Promise<Machine[]> {
       LIMIT 50
     `, [like, like, like, keyLike, keyLike, compactKey, compactKey, like, like]);
 
-    if (rows.length > 0) return rows.map(rowToMachine);
+    return rows.map(rowToMachine);
   } catch (error) {
-    console.error('Falling back to seed search:', error);
+    console.error('Unable to search tractors:', error);
+    return [];
   }
-
-  const lower = normalized.toLowerCase();
-  return seedMachines.filter((machine) => {
-    const text = `${machine.brand} ${machine.model}`;
-    const key = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    return text.toLowerCase().includes(lower) || (compactKey.length > 0 && key.includes(compactKey));
-  });
 }
 
 async function loadMachineVersions(machineId: string): Promise<MachineVersion[]> {
