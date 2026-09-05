@@ -13,7 +13,7 @@ function jsonLd(value: unknown) {
 }
 
 export default function AboutPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/about`;
   const structuredData = {
     '@context': 'https://schema.org',
@@ -27,6 +27,7 @@ export default function AboutPage() {
           'About the independent Farm Machine Specs equipment specifications, parts and fitment reference.',
         isPartOf: { '@id': `${baseUrl}/#website` },
         breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${baseUrl}/#organization` },
       },
       {
         '@type': 'BreadcrumbList',
