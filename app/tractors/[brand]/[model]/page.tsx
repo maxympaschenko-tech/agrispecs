@@ -7,6 +7,7 @@ import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
 import { getMachineCapacities } from '@/lib/capacities-service';
 import { getMachineAttachments } from '@/lib/attachments-service';
+import { groupAttachmentEvidence, uniqueEvidenceValues } from '@/lib/attachment-evidence';
 import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
 import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
 import { getPartReferenceHref } from '@/lib/part-url';
@@ -200,6 +201,7 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
     getMachineAttachments(machine.id),
     selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
   ]);
+  const attachmentGroups = groupAttachmentEvidence(attachments);
 
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const verifiedParts = machineParts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
@@ -346,7 +348,7 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
             {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
             {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {verifiedParts.length > 0 && <a href="#parts">Parts & kits</a>}
-            {attachments.length > 0 && <a href="#attachments">Attachment fitment</a>}
+            {attachmentGroups.length > 0 && <a href="#attachments">Attachment fitment</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
           </aside>
 
@@ -470,26 +472,53 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
               </section>
             )}
 
-            {attachments.length > 0 && (
+            {attachmentGroups.length > 0 && (
               <section className="data-section" id="attachments">
                 <h2>Documented attachment fitment</h2>
-                <p className="section-note">Attachment fitment is stored separately from the specification/parts version selector. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration; verify the requirement below before ordering or installing.</p>
+                <p className="section-note">Attachment fitment is stored separately from the specification/parts version selector. Multiple cited records for the same attachment are grouped below rather than shown as duplicate attachments. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration.</p>
                 <div className="maintenance-list">
-                  {attachments.map((attachment) => {
+                  {attachmentGroups.map(({ attachmentId, records }) => {
+                    const attachment = records[0];
+                    if (!attachment) return null;
                     const typeLabel = attachmentTypeLabel(attachment.attachmentType);
                     const isLoader = attachment.attachmentType === 'front-loader';
-                    const conditional = hasConfigurationCondition(attachment.compatibilityNote);
+                    const notes = uniqueEvidenceValues(records.map((record) => record.compatibilityNote));
+                    const configurations = uniqueEvidenceValues(records.map((record) => record.configurationText));
+                    const capacities = uniqueEvidenceValues(records.map((record) => record.liftCapacityText));
+                    const heights = uniqueEvidenceValues(records.map((record) => record.liftHeightText));
+                    const conditional = notes.some((note) => hasConfigurationCondition(note));
+                    const evidenceSources = Array.from(
+                      new Map(
+                        records
+                          .filter((record) => record.sourceUrl)
+                          .map((record) => [record.sourceUrl as string, {
+                            url: record.sourceUrl as string,
+                            title: record.sourceTitle || 'Attachment compatibility source',
+                          }]),
+                      ).values(),
+                    );
                     return (
-                      <div className="maintenance-row" key={attachment.id}>
+                      <div className="maintenance-row" key={attachmentId}>
                         <div>
                           <span className="maintenance-section">{typeLabel}{conditional ? ' · Conditional fitment' : ''}</span>
                           <strong><Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>{attachment.manufacturerName} {attachment.modelName}</Link></strong>
-                          {attachment.compatibilityNote && <small><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {attachment.compatibilityNote}</small>}
-                          {attachment.configurationText && <small><strong>{typeLabel} details:</strong> {attachment.configurationText}</small>}
+                          {records.length > 1 && <small>{records.length} cited fitment records grouped for this attachment</small>}
+                          {notes.map((note) => (
+                            <small key={`note-${note}`}><strong>{hasConfigurationCondition(note) ? 'Requirement' : 'Fitment note'}:</strong> {note}</small>
+                          ))}
+                          {configurations.map((value) => (
+                            <small key={`configuration-${value}`}><strong>{typeLabel} details:</strong> {value}</small>
+                          ))}
+                          {evidenceSources.map((source, index) => (
+                            <small key={source.url}>
+                              <strong>Fitment source{evidenceSources.length > 1 ? ` ${index + 1}` : ''}:</strong>{' '}
+                              <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} →</a>
+                            </small>
+                          ))}
                         </div>
                         <div>
-                          {attachment.liftCapacityText && <strong>{attachment.liftCapacityText}</strong>}
-                          {attachment.liftHeightText && <span>{isLoader ? 'Lift height' : 'Working height'}: {attachment.liftHeightText}</span>}
+                          {capacities.map((value) => <strong key={`capacity-${value}`}>{value}</strong>)}
+                          {heights.map((value) => <span key={`height-${value}`}>{isLoader ? 'Lift height' : 'Working height'}: {value}</span>)}
                         </div>
                       </div>
                     );
