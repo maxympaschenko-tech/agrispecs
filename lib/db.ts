@@ -22,7 +22,11 @@ export function getDb() {
     database,
     waitForConnections: true,
     connectionLimit: 10,
+    maxIdle: 2,
+    idleTimeout: 30_000,
     queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
     charset: 'utf8mb4',
   });
 
