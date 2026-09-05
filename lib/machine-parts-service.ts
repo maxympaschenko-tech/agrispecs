@@ -18,6 +18,7 @@ type MachinePartRow = RowDataPacket & {
   manufacturer_slug: string | null;
   fitment_count: number;
   configuration_notes: string | null;
+  replacement_numbers: string | null;
 };
 
 export async function getMachinePartsWithConfigurations(
@@ -52,7 +53,14 @@ export async function getMachinePartsWithConfigurations(
           DISTINCT NULLIF(TRIM(mp.configuration_note), '')
           ORDER BY mp.configuration_note
           SEPARATOR ' || '
-        ) AS configuration_notes
+        ) AS configuration_notes,
+        (
+          SELECT GROUP_CONCAT(DISTINCT replacement.part_number ORDER BY replacement.part_number SEPARATOR ' || ')
+          FROM part_cross_references pcr
+          INNER JOIN parts replacement ON replacement.id = pcr.cross_part_id
+          WHERE pcr.part_id = p.id
+            AND pcr.relation_type IN ('replaces','supersedes')
+        ) AS replacement_numbers
       FROM machine_parts mp
       INNER JOIN parts p ON p.id = mp.part_id
       LEFT JOIN part_categories pc ON pc.id = p.category_id
@@ -64,21 +72,30 @@ export async function getMachinePartsWithConfigurations(
       ORDER BY pc.name ASC, p.part_number ASC
     `, params);
 
-    return rows.map((row) => ({
-      id: Number(row.id),
-      partNumber: row.part_number,
-      normalizedPartNumber: row.normalized_part_number,
-      name: row.name,
-      categoryName: row.category_name,
-      categorySlug: row.category_slug,
-      manufacturerName: row.manufacturer_name,
-      manufacturerSlug: row.manufacturer_slug,
-      dataStatus: row.data_status,
-      fitmentCount: Number(row.fitment_count || 0),
-      configurationNotes: row.configuration_notes
-        ? row.configuration_notes.split(' || ').map((note) => note.trim()).filter(Boolean)
-        : [],
-    }));
+    return rows.map((row) => {
+      const replacementNumbers = row.replacement_numbers
+        ? row.replacement_numbers.split(' || ').map((number) => number.trim()).filter(Boolean)
+        : [];
+      const baseName = row.name || row.category_name || 'OEM part';
+
+      return {
+        id: Number(row.id),
+        partNumber: row.part_number,
+        normalizedPartNumber: row.normalized_part_number,
+        name: replacementNumbers.length > 0
+          ? `${baseName} · Legacy number — replaced by ${replacementNumbers.join(', ')}`
+          : row.name,
+        categoryName: row.category_name,
+        categorySlug: row.category_slug,
+        manufacturerName: row.manufacturer_name,
+        manufacturerSlug: row.manufacturer_slug,
+        dataStatus: row.data_status,
+        fitmentCount: Number(row.fitment_count || 0),
+        configurationNotes: row.configuration_notes
+          ? row.configuration_notes.split(' || ').map((note) => note.trim()).filter(Boolean)
+          : [],
+      };
+    });
   } catch (error) {
     console.error('Unable to load machine parts with configuration context:', error);
     return [];
