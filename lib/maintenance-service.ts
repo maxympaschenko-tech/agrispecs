@@ -8,7 +8,9 @@ export type MaintenanceTask = {
   action: string;
   title: string;
   partNumber: string | null;
+  partNormalizedPartNumber: string | null;
   partName: string | null;
+  partManufacturerSlug: string | null;
   intervalHours: number | null;
   intervalMonths: number | null;
   initialIntervalHours: number | null;
@@ -36,7 +38,9 @@ type MaintenanceRow = RowDataPacket & {
   action: string;
   title: string;
   part_number: string | null;
+  part_normalized_part_number: string | null;
   part_name: string | null;
+  part_manufacturer_slug: string | null;
   interval_hours: number | null;
   interval_months: number | null;
   initial_interval_hours: number | null;
@@ -74,7 +78,9 @@ export async function getMachineMaintenance(machineId: string, machineVersionId?
         mt.action,
         mt.title,
         p.part_number,
+        p.normalized_part_number AS part_normalized_part_number,
         p.name AS part_name,
+        pmf.slug AS part_manufacturer_slug,
         mt.interval_hours,
         mt.interval_months,
         mt.initial_interval_hours,
@@ -96,6 +102,7 @@ export async function getMachineMaintenance(machineId: string, machineVersionId?
       FROM maintenance_tasks mt
       LEFT JOIN parts p ON p.id = mt.part_id
         AND p.data_status IN ('partial','verified')
+      LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
       LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
       INNER JOIN source_records sr ON sr.id = mt.source_record_id
       WHERE mt.machine_id = ?
@@ -123,7 +130,9 @@ export async function getMachineMaintenance(machineId: string, machineVersionId?
       action: row.action,
       title: row.title,
       partNumber: row.part_number,
+      partNormalizedPartNumber: row.part_normalized_part_number,
       partName: row.part_name,
+      partManufacturerSlug: row.part_manufacturer_slug,
       intervalHours: row.interval_hours === null ? null : Number(row.interval_hours),
       intervalMonths: row.interval_months === null ? null : Number(row.interval_months),
       initialIntervalHours: row.initial_interval_hours === null ? null : Number(row.initial_interval_hours),
