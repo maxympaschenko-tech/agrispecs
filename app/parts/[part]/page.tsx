@@ -54,6 +54,18 @@ function fitmentConfidenceLabel(fitment: PartFitment) {
   return 'Low-confidence reference';
 }
 
+function fitmentSortRank(fitment: PartFitment) {
+  const confidenceRank = fitment.fitmentConfidence === 'official'
+    ? 0
+    : fitment.fitmentConfidence === 'high'
+      ? 1
+      : fitment.fitmentConfidence === 'medium'
+        ? 2
+        : 3;
+  const versionRank = fitment.versionIsCurrent ? 0 : fitment.machineVersionId === null ? 1 : 2;
+  return confidenceRank * 10 + versionRank;
+}
+
 function sourceProvenanceLabel(source: SourceProvenance | undefined) {
   if (!source) return 'Source record';
   if (source.authorityLevel === 'official') {
@@ -153,6 +165,12 @@ export default async function PartPage({ params }: PageProps) {
   const checkerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}`;
   const finalReplacement = replacementChain.nodes.at(-1);
   const categoryHref = part.categorySlug ? `/parts/category/${part.categorySlug}` : null;
+  const orderedFitments = [...part.fitments].sort((a, b) => (
+    a.brand.localeCompare(b.brand)
+    || a.model.localeCompare(b.model, undefined, { numeric: true })
+    || fitmentSortRank(a) - fitmentSortRank(b)
+    || (a.configurationNote || '').localeCompare(b.configurationNote || '')
+  ));
 
   return (
     <main>
@@ -334,7 +352,7 @@ export default async function PartPage({ params }: PageProps) {
 
             <section className="data-section" id="fitment">
               <h2>Compatible equipment</h2>
-              {part.fitments.length > 0 ? part.fitments.map((fitment, index) => {
+              {orderedFitments.length > 0 ? orderedFitments.map((fitment, index) => {
                 const serialRange = serialRangeLabel(fitment);
                 const versionLabel = fitmentVersionLabel(fitment);
                 const modelCheckerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}&model=${encodeURIComponent(fitment.model)}`;
@@ -349,6 +367,14 @@ export default async function PartPage({ params }: PageProps) {
                       {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
                       {fitment.configurationNote && <p><strong>Configuration:</strong> {fitment.configurationNote}</p>}
                       {fitment.fitmentNote && <p>{fitment.fitmentNote}</p>}
+                      {fitment.sourceUrl && (
+                        <p>
+                          <strong>Source:</strong>{' '}
+                          <a href={fitment.sourceUrl} target="_blank" rel="noopener noreferrer">
+                            {fitment.sourceTitle || 'Fitment source'}{fitment.sourcePublishedDate ? ` · ${fitment.sourcePublishedDate}` : ''}
+                          </a>
+                        </p>
+                      )}
                       <p><Link href={modelCheckerHref}>Check a serial number for this model →</Link></p>
                     </div>
                     {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
