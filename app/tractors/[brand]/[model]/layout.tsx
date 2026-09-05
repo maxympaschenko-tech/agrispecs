@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { getMachine } from '@/lib/catalog-service';
+import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
+import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 type LayoutProps = {
   children: ReactNode;
@@ -10,6 +11,17 @@ type LayoutProps = {
 
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function absoluteUrl(baseUrl: string, value: string) {
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${baseUrl}${value.startsWith('/') ? '' : '/'}${value}`;
+}
+
+function structuredSpecValue(spec: MachineSpec) {
+  if (spec.valueText) return spec.valueText;
+  if (spec.valueNumber === null) return null;
+  return `${spec.valueNumber}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
 export default async function TractorModelLayout({ children, params }: LayoutProps) {
@@ -22,11 +34,44 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
       )
     : [];
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const versions = isPublished ? await getMachineVersions(machine.id) : [];
+  const selectedVersion = versions.find((version) => version.isCurrent)
+    || versions.find((version) => version.specCount > 0)
+    || versions[0];
+  const specs = isPublished && selectedVersion
+    ? await getMachineSpecs(machine.id, selectedVersion.id)
+    : [];
+
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = machine
     ? `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`
     : null;
-  const structuredData = machine && canonicalUrl
+  const primaryImage = machine
+    ? getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug)
+    : null;
+  const versionYears = selectedVersion?.modelYearStart && selectedVersion?.modelYearEnd
+    ? `MY${selectedVersion.modelYearStart}-${selectedVersion.modelYearEnd}`
+    : selectedVersion?.modelYearStart
+      ? `MY${selectedVersion.modelYearStart}+`
+      : null;
+  const referenceContext = selectedVersion
+    ? [selectedVersion.marketName, versionYears, selectedVersion.configuration, selectedVersion.isCurrent ? 'Current' : null]
+        .filter(Boolean)
+        .join(' · ')
+    : null;
+  const additionalProperty = [
+    referenceContext
+      ? { '@type': 'PropertyValue', name: 'Reference context', value: referenceContext }
+      : null,
+    ...specs.map((spec) => {
+      const value = structuredSpecValue(spec);
+      return value
+        ? { '@type': 'PropertyValue', name: spec.label, value }
+        : null;
+    }),
+  ].filter(Boolean);
+
+  const structuredData = isPublished && machine && canonicalUrl
     ? {
         '@context': 'https://schema.org',
         '@graph': [
@@ -45,10 +90,8 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
             breadcrumb: {
               '@id': `${canonicalUrl}#breadcrumb`,
             },
-            about: {
-              '@type': 'Thing',
-              name: machine.title,
-              additionalType: 'Tractor',
+            mainEntity: {
+              '@id': `${canonicalUrl}#product`,
             },
           },
           {
@@ -76,10 +119,25 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
               {
                 '@type': 'ListItem',
                 position: 4,
-                name: machine.model,
+                name: machine.title,
                 item: canonicalUrl,
               },
             ],
+          },
+          {
+            '@type': 'Product',
+            '@id': `${canonicalUrl}#product`,
+            url: canonicalUrl,
+            name: machine.title,
+            model: machine.model,
+            category: 'Tractor',
+            description: `${machine.title} source-backed tractor specifications and reference data.`,
+            brand: {
+              '@type': 'Brand',
+              name: machine.brand,
+            },
+            ...(primaryImage ? { image: [absoluteUrl(baseUrl, primaryImage.imageUrl)] } : {}),
+            ...(additionalProperty.length > 0 ? { additionalProperty } : {}),
           },
         ],
       }
