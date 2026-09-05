@@ -3,11 +3,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
 import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
-import { getMachineDisplayTitle, getMachineGenerationLabel } from '@/lib/machine-display';
+import { getMachineDisplayModel, getMachineDisplayTitle, getMachineGenerationLabel } from '@/lib/machine-display';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
+import styles from './brand-page.module.css';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+const TRACTOR_CARD_LIMIT = 12;
+const EQUIPMENT_CARD_LIMIT = 6;
 
 type PageProps = { params: Promise<{ brand: string }> };
 
@@ -82,6 +86,23 @@ export default async function BrandPage({ params }: PageProps) {
   const researchEquipment = brandEquipment.filter((machine) => machine.dataStatus === 'review');
   const equipmentTypeCount = new Set(publishedEquipment.map((machine) => machine.equipmentTypeSlug)).size;
 
+  const displayTractors = [...publishedTractors].sort((a, b) => {
+    const aArchive = getMachineGenerationLabel(a.modelSlug) ? 1 : 0;
+    const bArchive = getMachineGenerationLabel(b.modelSlug) ? 1 : 0;
+    return aArchive - bArchive || a.model.localeCompare(b.model);
+  });
+  const featuredTractors = displayTractors.slice(0, TRACTOR_CARD_LIMIT);
+  const compactTractors = displayTractors.slice(TRACTOR_CARD_LIMIT);
+
+  const equipmentGroups = Array.from(
+    publishedEquipment.reduce<Map<string, typeof publishedEquipment>>((groups, machine) => {
+      const existing = groups.get(machine.equipmentTypeSlug) ?? [];
+      existing.push(machine);
+      groups.set(machine.equipmentTypeSlug, existing);
+      return groups;
+    }, new Map()),
+  );
+
   return (
     <main>
       <div className="container breadcrumbs">
@@ -144,9 +165,11 @@ export default async function BrandPage({ params }: PageProps) {
           {publishedTractors.length > 0 && (
             <section className="catalog-group">
               <h2>{info.name} tractors with published data</h2>
-              <p className="section-note">These tractor pages contain source-backed technical, maintenance, parts or compatibility data. Archived generations are labeled separately when a model name was reused.</p>
+              <p className="section-note">
+                Featured models use image cards below. Every additional published tractor remains directly linked in the compact model directory, with archived generations labeled separately when a model name was reused.
+              </p>
               <div className="grid">
-                {publishedTractors.map((machine) => {
+                {featuredTractors.map((machine) => {
                   const generationLabel = getMachineGenerationLabel(machine.modelSlug);
                   const displayTitle = getMachineDisplayTitle(machine);
                   return (
@@ -159,23 +182,67 @@ export default async function BrandPage({ params }: PageProps) {
                   );
                 })}
               </div>
+
+              {compactTractors.length > 0 && (
+                <>
+                  <h3 className={styles.directoryTitle}>More {info.name} tractor models</h3>
+                  <div className={styles.modelDirectory}>
+                    {compactTractors.map((machine) => {
+                      const generationLabel = getMachineGenerationLabel(machine.modelSlug);
+                      return (
+                        <Link className={styles.modelLink} key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                          <span>{getMachineDisplayModel(machine)}</span>
+                          <small>{generationLabel || (machine.dataStatus === 'verified' ? 'Verified' : 'Specs')}</small>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </section>
           )}
 
-          {publishedEquipment.length > 0 && (
+          {equipmentGroups.length > 0 && (
             <section className="catalog-group">
               <h2>{info.name} farm equipment with published data</h2>
-              <p className="section-note">Non-tractor machines stay in the equipment category used by the manufacturer and link to their dedicated catalog hierarchy.</p>
-              <div className="grid">
-                {publishedEquipment.map((machine) => (
-                  <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title, machine.equipmentTypeSlug)}
-                    <span className="eyebrow">{machine.equipmentType}</span>
-                    <h3>{machine.title}</h3>
-                    <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and current market reference.</p>
-                  </Link>
-                ))}
-              </div>
+              <p className="section-note">
+                Non-tractor machines stay in the manufacturer equipment category. Large categories use a small set of image cards followed by a complete compact model directory.
+              </p>
+
+              {equipmentGroups.map(([equipmentTypeSlug, machines]) => {
+                const equipmentType = machines[0]?.equipmentType || 'Farm equipment';
+                const featured = machines.slice(0, EQUIPMENT_CARD_LIMIT);
+                const compact = machines.slice(EQUIPMENT_CARD_LIMIT);
+                return (
+                  <div className={styles.equipmentGroup} key={equipmentTypeSlug}>
+                    <div className={styles.equipmentGroupHeader}>
+                      <h3>{equipmentType}</h3>
+                      <span>{machines.length.toLocaleString('en-US')} published model{machines.length === 1 ? '' : 's'}</span>
+                    </div>
+                    <div className="grid">
+                      {featured.map((machine) => (
+                        <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                          {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title, machine.equipmentTypeSlug)}
+                          <span className="eyebrow">{machine.equipmentType}</span>
+                          <h3>{machine.title}</h3>
+                          <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and current market reference.</p>
+                        </Link>
+                      ))}
+                    </div>
+
+                    {compact.length > 0 && (
+                      <div className={styles.modelDirectory} style={{ marginTop: 10 }}>
+                        {compact.map((machine) => (
+                          <Link className={styles.modelLink} key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                            <span>{machine.model}</span>
+                            <small>{machine.dataStatus === 'verified' ? 'Verified' : 'Specs'}</small>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </section>
           )}
 
