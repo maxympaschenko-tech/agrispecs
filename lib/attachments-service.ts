@@ -3,6 +3,8 @@ import { getDbReady } from '@/lib/db-migrations';
 
 export type MachineAttachment = {
   id: number;
+  manufacturerName: string;
+  manufacturerSlug: string;
   modelName: string;
   slug: string;
   attachmentType: string;
@@ -51,6 +53,8 @@ export type AttachmentDetail = AttachmentCatalogItem & {
 
 type AttachmentRow = RowDataPacket & {
   id: number;
+  manufacturer_name: string;
+  manufacturer_slug: string;
   model_name: string;
   slug: string;
   attachment_type: string;
@@ -111,6 +115,8 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
     const [rows] = await db.query<AttachmentRow[]>(`
       SELECT
         a.id,
+        amf.name AS manufacturer_name,
+        amf.slug AS manufacturer_slug,
         a.model_name,
         a.slug,
         a.attachment_type,
@@ -122,13 +128,16 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
         sr.url AS source_url
       FROM machine_attachments ma
       JOIN attachments a ON a.id=ma.attachment_id
+      JOIN manufacturers amf ON amf.id=a.manufacturer_id
       LEFT JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.machine_id=? AND a.data_status IN ('partial','verified')
-      ORDER BY a.attachment_type ASC, a.model_name ASC
+      ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC
     `, [Number(machineId)]);
 
     return rows.map((row) => ({
       id: Number(row.id),
+      manufacturerName: row.manufacturer_name,
+      manufacturerSlug: row.manufacturer_slug,
       modelName: row.model_name,
       slug: row.slug,
       attachmentType: row.attachment_type,
