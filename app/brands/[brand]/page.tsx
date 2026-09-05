@@ -78,12 +78,8 @@ export default async function BrandPage({ params }: PageProps) {
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
   const publishedMachines = [...publishedTractors, ...publishedEquipment];
-  const researchTractors = brandTractors.filter(
-    (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
-  );
-  const researchEquipment = brandEquipment.filter(
-    (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
-  );
+  const researchTractors = brandTractors.filter((machine) => machine.dataStatus === 'review');
+  const researchEquipment = brandEquipment.filter((machine) => machine.dataStatus === 'review');
   const equipmentTypeCount = new Set(publishedEquipment.map((machine) => machine.equipmentTypeSlug)).size;
 
   return (
@@ -186,7 +182,7 @@ export default async function BrandPage({ params }: PageProps) {
           {(researchTractors.length > 0 || researchEquipment.length > 0) && (
             <section className="catalog-group">
               <h2>Models being researched</h2>
-              <p className="section-note">These records are present in the catalog, but specifications are not treated as published until source verification reaches the publication threshold.</p>
+              <p className="section-note">Only models placed in editorial review are exposed here. Internal seed placeholders stay out of public navigation until source verification begins.</p>
               <div className="grid">
                 {researchTractors.map((machine) => (
                   <Link className="card" key={`tractor-${machine.id}`} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
