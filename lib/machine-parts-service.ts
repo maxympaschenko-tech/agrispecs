@@ -1,9 +1,16 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
-import type { PartSummary } from '@/lib/parts-service';
+import type { FitmentConfidence, PartSummary } from '@/lib/parts-service';
+
+export type MachinePartEvidence = {
+  confidence: FitmentConfidence;
+  sourceTitle: string;
+  sourceUrl: string | null;
+};
 
 export type MachinePartSummary = PartSummary & {
   configurationNotes: string[];
+  fitmentEvidence: MachinePartEvidence[];
 };
 
 type MachinePartRow = RowDataPacket & {
@@ -19,7 +26,15 @@ type MachinePartRow = RowDataPacket & {
   fitment_count: number;
   configuration_notes: string | null;
   replacement_numbers: string | null;
+  fitment_evidence: string | null;
 };
+
+function evidenceRank(confidence: FitmentConfidence) {
+  if (confidence === 'official') return 0;
+  if (confidence === 'high') return 1;
+  if (confidence === 'medium') return 2;
+  return 3;
+}
 
 export async function getMachinePartsWithConfigurations(
   machineId: string,
@@ -54,6 +69,24 @@ export async function getMachinePartsWithConfigurations(
           ORDER BY mp.configuration_note
           SEPARATOR ' || '
         ) AS configuration_notes,
+        GROUP_CONCAT(
+          DISTINCT CONCAT(
+            mp.fitment_confidence,
+            ' ~~ ',
+            COALESCE(NULLIF(TRIM(sr.title), ''), 'Fitment source'),
+            ' ~~ ',
+            COALESCE(sr.url, '')
+          )
+          ORDER BY
+            CASE mp.fitment_confidence
+              WHEN 'official' THEN 0
+              WHEN 'high' THEN 1
+              WHEN 'medium' THEN 2
+              ELSE 3
+            END,
+            sr.title
+          SEPARATOR ' || '
+        ) AS fitment_evidence,
         (
           SELECT GROUP_CONCAT(DISTINCT replacement.part_number ORDER BY replacement.part_number SEPARATOR ' || ')
           FROM part_cross_references pcr
@@ -65,6 +98,7 @@ export async function getMachinePartsWithConfigurations(
       INNER JOIN parts p ON p.id = mp.part_id
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
+      LEFT JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.machine_id = ?
         ${versionFilter}
       GROUP BY p.id, p.part_number, p.normalized_part_number, p.name, p.data_status,
@@ -77,6 +111,22 @@ export async function getMachinePartsWithConfigurations(
         ? row.replacement_numbers.split(' || ').map((number) => number.trim()).filter(Boolean)
         : [];
       const baseName = row.name || row.category_name || 'OEM part';
+      const fitmentEvidence = row.fitment_evidence
+        ? row.fitment_evidence
+            .split(' || ')
+            .map((entry) => {
+              const [confidenceRaw, sourceTitleRaw, sourceUrlRaw] = entry.split(' ~~ ');
+              const confidence: FitmentConfidence = confidenceRaw === 'official' || confidenceRaw === 'high' || confidenceRaw === 'medium'
+                ? confidenceRaw
+                : 'low';
+              return {
+                confidence,
+                sourceTitle: sourceTitleRaw?.trim() || 'Fitment source',
+                sourceUrl: sourceUrlRaw?.trim() || null,
+              };
+            })
+            .sort((a, b) => evidenceRank(a.confidence) - evidenceRank(b.confidence) || a.sourceTitle.localeCompare(b.sourceTitle))
+        : [];
 
       return {
         id: Number(row.id),
@@ -94,6 +144,7 @@ export async function getMachinePartsWithConfigurations(
         configurationNotes: row.configuration_notes
           ? row.configuration_notes.split(' || ').map((note) => note.trim()).filter(Boolean)
           : [],
+        fitmentEvidence,
       };
     });
   } catch (error) {
