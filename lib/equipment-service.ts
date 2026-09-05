@@ -96,7 +96,7 @@ export async function getNonTractorEquipmentByBrand(brandSlug: string): Promise<
     const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
       WHERE et.slug <> 'tractor'
         AND mf.slug = ?
-        AND m.data_status IN ('partial','verified')
+        AND m.data_status IN ('partial','verified','review')
       ORDER BY et.name ASC, m.model_name ASC
     `, [brandSlug]);
     return rows.map(rowToEquipment);
