@@ -64,6 +64,7 @@ export async function getMachinePartsWithConfigurations(
           FROM machine_parts mp_count
           INNER JOIN machines m_count ON m_count.id=mp_count.machine_id
             AND m_count.data_status IN ('partial','verified')
+          INNER JOIN source_records source_count ON source_count.id=mp_count.source_record_id
           WHERE mp_count.part_id = p.id
         ) AS fitment_count,
         GROUP_CONCAT(
@@ -94,6 +95,7 @@ export async function getMachinePartsWithConfigurations(
           FROM part_cross_references pcr
           INNER JOIN parts replacement ON replacement.id = pcr.cross_part_id
             AND replacement.data_status IN ('partial','verified')
+          INNER JOIN source_records replacement_source ON replacement_source.id=pcr.source_record_id
           WHERE pcr.part_id = p.id
             AND pcr.relation_type IN ('replaces','supersedes')
         ) AS replacement_numbers
@@ -102,7 +104,7 @@ export async function getMachinePartsWithConfigurations(
         AND p.data_status IN ('partial','verified')
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id = mp.source_record_id
+      INNER JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.machine_id = ?
         ${versionFilter}
       GROUP BY p.id, p.part_number, p.normalized_part_number, p.name, p.data_status,
