@@ -11,7 +11,13 @@ export async function getIndexablePartNumbers(): Promise<string[]> {
       FROM parts p
       WHERE p.data_status IN ('partial','verified')
         AND (
-          EXISTS (SELECT 1 FROM machine_parts mp WHERE mp.part_id=p.id)
+          EXISTS (
+            SELECT 1
+            FROM machine_parts mp
+            JOIN machines m ON m.id=mp.machine_id
+              AND m.data_status IN ('partial','verified')
+            WHERE mp.part_id=p.id
+          )
           OR EXISTS (SELECT 1 FROM part_cross_references pcr WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id)
           OR EXISTS (SELECT 1 FROM part_components pc WHERE pc.parent_part_id=p.id OR pc.component_part_id=p.id)
         )
