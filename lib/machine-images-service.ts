@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { RowDataPacket } from 'mysql2';
@@ -141,7 +142,7 @@ export function getManifestMachinePrimaryImage(
   return image ? manifestToImage(image) : fallbackImage(equipmentTypeSlug, `${brandSlug} ${modelSlug}`.replace(/-/g, ' '));
 }
 
-export async function getMachineImages(machineId: string): Promise<MachineImage[]> {
+async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
   if (!/^\d+$/.test(machineId)) return [fallbackImage()];
 
   try {
@@ -195,3 +196,5 @@ export async function getMachineImages(machineId: string): Promise<MachineImage[
     return [fallbackImage()];
   }
 }
+
+export const getMachineImages = cache(loadMachineImages);
