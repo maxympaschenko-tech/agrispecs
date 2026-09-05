@@ -64,10 +64,41 @@ const indexablePartCondition = `
       FROM machine_parts mp
       JOIN machines m ON m.id=mp.machine_id
         AND m.data_status IN ('partial','verified')
+      JOIN source_records fitment_source ON fitment_source.id=mp.source_record_id
       WHERE mp.part_id=p.id
     )
-    OR EXISTS (SELECT 1 FROM part_cross_references pcr WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id)
-    OR EXISTS (SELECT 1 FROM part_components pcomp WHERE pcomp.parent_part_id=p.id OR pcomp.component_part_id=p.id)
+    OR EXISTS (
+      SELECT 1
+      FROM part_cross_references pcr_out
+      JOIN parts related_out ON related_out.id=pcr_out.cross_part_id
+        AND related_out.data_status IN ('partial','verified')
+      JOIN source_records relation_source_out ON relation_source_out.id=pcr_out.source_record_id
+      WHERE pcr_out.part_id=p.id
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM part_cross_references pcr_in
+      JOIN parts related_in ON related_in.id=pcr_in.part_id
+        AND related_in.data_status IN ('partial','verified')
+      JOIN source_records relation_source_in ON relation_source_in.id=pcr_in.source_record_id
+      WHERE pcr_in.cross_part_id=p.id
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM part_components component_out
+      JOIN parts related_component ON related_component.id=component_out.component_part_id
+        AND related_component.data_status IN ('partial','verified')
+      JOIN source_records component_source_out ON component_source_out.id=component_out.source_record_id
+      WHERE component_out.parent_part_id=p.id
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM part_components component_in
+      JOIN parts related_kit ON related_kit.id=component_in.parent_part_id
+        AND related_kit.data_status IN ('partial','verified')
+      JOIN source_records component_source_in ON component_source_in.id=component_in.source_record_id
+      WHERE component_in.component_part_id=p.id
+    )
   )
 `;
 
@@ -144,14 +175,39 @@ export async function getPartCatalogPage(options: {
           FROM machine_parts mp
           JOIN machines m_fitment ON m_fitment.id=mp.machine_id
             AND m_fitment.data_status IN ('partial','verified')
+          JOIN source_records fitment_source ON fitment_source.id=mp.source_record_id
           WHERE mp.part_id=p.id
         ) AS fitment_count,
         (
-          (SELECT COUNT(*) FROM part_cross_references pcr1 WHERE pcr1.part_id=p.id) +
-          (SELECT COUNT(*) FROM part_cross_references pcr2 WHERE pcr2.cross_part_id=p.id)
+          (SELECT COUNT(*)
+           FROM part_cross_references pcr1
+           JOIN parts related1 ON related1.id=pcr1.cross_part_id
+             AND related1.data_status IN ('partial','verified')
+           JOIN source_records source1 ON source1.id=pcr1.source_record_id
+           WHERE pcr1.part_id=p.id) +
+          (SELECT COUNT(*)
+           FROM part_cross_references pcr2
+           JOIN parts related2 ON related2.id=pcr2.part_id
+             AND related2.data_status IN ('partial','verified')
+           JOIN source_records source2 ON source2.id=pcr2.source_record_id
+           WHERE pcr2.cross_part_id=p.id)
         ) AS relation_count,
-        (SELECT COUNT(*) FROM part_components pco WHERE pco.parent_part_id=p.id) AS component_count,
-        (SELECT COUNT(*) FROM part_components pci WHERE pci.component_part_id=p.id) AS kit_membership_count
+        (
+          SELECT COUNT(*)
+          FROM part_components pco
+          JOIN parts component_part ON component_part.id=pco.component_part_id
+            AND component_part.data_status IN ('partial','verified')
+          JOIN source_records component_source ON component_source.id=pco.source_record_id
+          WHERE pco.parent_part_id=p.id
+        ) AS component_count,
+        (
+          SELECT COUNT(*)
+          FROM part_components pci
+          JOIN parts parent_part ON parent_part.id=pci.parent_part_id
+            AND parent_part.data_status IN ('partial','verified')
+          JOIN source_records kit_source ON kit_source.id=pci.source_record_id
+          WHERE pci.component_part_id=p.id
+        ) AS kit_membership_count
       FROM parts p
       LEFT JOIN part_categories pc ON pc.id=p.category_id
       LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
@@ -188,14 +244,42 @@ export async function getPartCatalogStats(categorySlug?: string): Promise<PartCa
     const [rows] = await db.query<StatsRow[]>(`
       SELECT
         COUNT(*) AS total,
-        SUM(CASE WHEN EXISTS (
-          SELECT 1 FROM part_cross_references pcr
-          WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id
-        ) THEN 1 ELSE 0 END) AS replacement_linked,
-        SUM(CASE WHEN EXISTS (
-          SELECT 1 FROM part_components pco
-          WHERE pco.parent_part_id=p.id OR pco.component_part_id=p.id
-        ) THEN 1 ELSE 0 END) AS kit_linked,
+        SUM(CASE WHEN
+          EXISTS (
+            SELECT 1
+            FROM part_cross_references pcr_out
+            JOIN parts related_out ON related_out.id=pcr_out.cross_part_id
+              AND related_out.data_status IN ('partial','verified')
+            JOIN source_records source_out ON source_out.id=pcr_out.source_record_id
+            WHERE pcr_out.part_id=p.id
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM part_cross_references pcr_in
+            JOIN parts related_in ON related_in.id=pcr_in.part_id
+              AND related_in.data_status IN ('partial','verified')
+            JOIN source_records source_in ON source_in.id=pcr_in.source_record_id
+            WHERE pcr_in.cross_part_id=p.id
+          )
+        THEN 1 ELSE 0 END) AS replacement_linked,
+        SUM(CASE WHEN
+          EXISTS (
+            SELECT 1
+            FROM part_components pco
+            JOIN parts component_part ON component_part.id=pco.component_part_id
+              AND component_part.data_status IN ('partial','verified')
+            JOIN source_records component_source ON component_source.id=pco.source_record_id
+            WHERE pco.parent_part_id=p.id
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM part_components pci
+            JOIN parts parent_part ON parent_part.id=pci.parent_part_id
+              AND parent_part.data_status IN ('partial','verified')
+            JOIN source_records kit_source ON kit_source.id=pci.source_record_id
+            WHERE pci.component_part_id=p.id
+          )
+        THEN 1 ELSE 0 END) AS kit_linked,
         SUM(CASE WHEN mf.slug IS NOT NULL AND mf.slug <> 'john-deere' THEN 1 ELSE 0 END) AS aftermarket
       FROM parts p
       LEFT JOIN part_categories pc ON pc.id=p.category_id
