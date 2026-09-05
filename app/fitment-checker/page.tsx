@@ -102,6 +102,7 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
   const resultMachineHref = result ? machineHref(result) : null;
   const resultConfidence = result ? confidenceLabel(result.fitmentConfidence) : null;
   const resultPartHref = result ? partReferenceHref(result, partMatches.length) : null;
+  const checkerFormClass = partMatches.length > 1 ? 'checker-form checker-form--manufacturer' : 'checker-form';
 
   return (
     <main className="section">
@@ -110,7 +111,7 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
         <h1>Part fitment and serial number checker</h1>
         <p className="section-lead">Check a part number against a published farm machine model and, when the cited manufacturer or technical source publishes a structured serial range, test the entered serial number against that documented rule.</p>
 
-        <form className="checker-form" action="/fitment-checker">
+        <form className={checkerFormClass} action="/fitment-checker">
           <label>
             <span>Part number</span>
             <input name="part" defaultValue={part} placeholder="e.g. RE519626" required />
