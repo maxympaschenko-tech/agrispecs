@@ -38,9 +38,7 @@ export default async function TractorsPage() {
   const publishedMachines = machines.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
-  const researchMachines = machines.filter(
-    (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
-  );
+  const researchMachines = machines.filter((machine) => machine.dataStatus === 'review');
   const brandGroups = Array.from(
     publishedMachines.reduce<Map<string, typeof publishedMachines>>((groups, machine) => {
       const existing = groups.get(machine.brand) ?? [];
@@ -67,8 +65,8 @@ export default async function TractorsPage() {
             <span>Manufacturers represented</span>
           </div>
           <div>
-            <strong>{researchMachines.length.toLocaleString('en-US')}</strong>
-            <span>Models in research queue</span>
+            <strong>Official</strong>
+            <span>Manufacturer-first source policy</span>
           </div>
         </div>
 
@@ -135,7 +133,7 @@ export default async function TractorsPage() {
         {researchMachines.length > 0 && (
           <section className="catalog-group">
             <h2>Models being researched</h2>
-            <p className="section-note">Model records are available for navigation, but numerical specifications stay unpublished until sources are verified.</p>
+            <p className="section-note">Only models placed in editorial review are exposed here. Internal seed placeholders stay out of public navigation until source verification begins.</p>
             <div className="grid">
               {researchMachines.map((machine) => (
                 <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
