@@ -39,24 +39,8 @@ async function addIndexIfMissing(
 
 export const readPathIndexesMigration: DbMigration = {
   id: '20260905_010_read_path_indexes',
-  description: 'Add non-duplicate indexes for frequent machine, part, attachment and source read paths',
+  description: 'Add missing attachment-slug and source-URL indexes for frequent catalog read paths',
   async apply(connection) {
-    await addIndexIfMissing(
-      connection,
-      'machines',
-      'idx_machines_type_brand_slug_status',
-      ['equipment_type_id', 'manufacturer_id', 'slug', 'data_status'],
-      '`equipment_type_id`,`manufacturer_id`,`slug`,`data_status`,`id`',
-    );
-
-    await addIndexIfMissing(
-      connection,
-      'parts',
-      'idx_parts_number_status_manufacturer',
-      ['normalized_part_number', 'data_status'],
-      '`normalized_part_number`,`data_status`,`manufacturer_id`,`id`',
-    );
-
     await addIndexIfMissing(
       connection,
       'attachments',
