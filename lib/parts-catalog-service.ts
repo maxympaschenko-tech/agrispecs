@@ -59,7 +59,13 @@ type StatsRow = RowDataPacket & {
 const indexablePartCondition = `
   p.data_status IN ('partial','verified')
   AND (
-    EXISTS (SELECT 1 FROM machine_parts mp WHERE mp.part_id=p.id)
+    EXISTS (
+      SELECT 1
+      FROM machine_parts mp
+      JOIN machines m ON m.id=mp.machine_id
+        AND m.data_status IN ('partial','verified')
+      WHERE mp.part_id=p.id
+    )
     OR EXISTS (SELECT 1 FROM part_cross_references pcr WHERE pcr.part_id=p.id OR pcr.cross_part_id=p.id)
     OR EXISTS (SELECT 1 FROM part_components pcomp WHERE pcomp.parent_part_id=p.id OR pcomp.component_part_id=p.id)
   )
@@ -133,7 +139,13 @@ export async function getPartCatalogPage(options: {
         pc.slug AS category_slug,
         mf.name AS manufacturer_name,
         mf.slug AS manufacturer_slug,
-        (SELECT COUNT(DISTINCT mp.machine_id) FROM machine_parts mp WHERE mp.part_id=p.id) AS fitment_count,
+        (
+          SELECT COUNT(DISTINCT mp.machine_id)
+          FROM machine_parts mp
+          JOIN machines m_fitment ON m_fitment.id=mp.machine_id
+            AND m_fitment.data_status IN ('partial','verified')
+          WHERE mp.part_id=p.id
+        ) AS fitment_count,
         (
           (SELECT COUNT(*) FROM part_cross_references pcr1 WHERE pcr1.part_id=p.id) +
           (SELECT COUNT(*) FROM part_cross_references pcr2 WHERE pcr2.cross_part_id=p.id)

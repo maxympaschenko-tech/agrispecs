@@ -18,21 +18,21 @@ type PageProps = {
 };
 
 const descriptions: Record<string,string> = {
-  'engine-oil-filters': 'Source-backed engine oil filter part numbers, replacements, maintenance-kit relationships and verified farm equipment fitment.',
+  'engine-oil-filters': 'Source-backed engine oil filter part numbers, replacements, maintenance-kit relationships and documented farm equipment fitment.',
   'fuel-filters': 'Source-backed fuel filter, fuel-water separator and fuel filter element part numbers with compatible equipment and replacement relationships.',
-  'air-filters': 'Source-backed primary and secondary engine air filter part numbers with verified equipment fitment and maintenance-kit relationships.',
+  'air-filters': 'Source-backed primary and secondary engine air filter part numbers with documented equipment fitment and maintenance-kit relationships.',
   'hydraulic-filters': 'Source-backed hydraulic, transmission and hydrostatic filter part numbers with compatible equipment, replacements and kit membership data.',
-  'cab-air-filters': 'Source-backed cab fresh-air and recirculation filter part numbers for farm equipment, with verified model fitment where available.',
-  'maintenance-kits': 'John Deere Filter Pak and maintenance-kit part numbers with verified kit contents, replacement chains, compatible models and serial-number rules.',
+  'cab-air-filters': 'Source-backed cab fresh-air and recirculation filter part numbers for farm equipment, with documented model fitment where available.',
+  'maintenance-kits': 'John Deere Filter Pak and maintenance-kit part numbers with documented kit contents, replacement chains, compatible models and serial-number rules.',
   'engine-oils': 'Source-backed engine oil products referenced by official farm equipment maintenance guides and service schedules.',
-  'transmission-hydraulic-fluids': 'Source-backed transmission and hydraulic fluids referenced by official maintenance guides, including system capacities where verified.',
+  'transmission-hydraulic-fluids': 'Source-backed transmission and hydraulic fluids referenced by official maintenance guides, including system capacities where documented.',
   'fluids': 'Source-backed farm equipment fluids referenced by official maintenance and technical sources.',
-  'steering-parts': 'Source-backed tractor tie rods, steering ball joints and related steering parts with 2WD or MFWD configuration notes, replacement numbers and verified model fitment.',
-  'alternators': 'Source-backed tractor alternator part numbers with rated amperage, voltage and verified equipment fitment where published by the manufacturer.',
+  'steering-parts': 'Source-backed tractor tie rods, steering ball joints and related steering parts with 2WD or MFWD configuration notes, replacement numbers and documented model fitment.',
+  'alternators': 'Source-backed tractor alternator part numbers with rated amperage, voltage and documented equipment fitment where published by the manufacturer.',
   'batteries': 'Source-backed tractor battery part numbers and electrical-system fitment from official replacement-parts guides.',
-  'brake-parts': 'Source-backed tractor brake disk and brake-system replacement part numbers with verified compatible models.',
-  'drive-belts': 'Source-backed tractor fan and auxiliary drive belt part numbers with published length or configuration notes and verified model fitment.',
-  'clutch-parts': 'Source-backed PTO and transmission clutch part numbers with configuration notes and verified tractor fitment.',
+  'brake-parts': 'Source-backed tractor brake disk and brake-system replacement part numbers with documented compatible models.',
+  'drive-belts': 'Source-backed tractor fan and auxiliary drive belt part numbers with published length or configuration notes and documented model fitment.',
+  'clutch-parts': 'Source-backed PTO and transmission clutch part numbers with configuration notes and documented tractor fitment.',
 };
 
 function jsonLd(value: unknown) {
@@ -58,10 +58,10 @@ function canonicalForPage(categorySlug: string, page: number) {
 
 function PartCard({ part }: { part: PartCatalogItem }) {
   const details = [
-    part.fitmentCount > 0 ? `${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
+    part.fitmentCount > 0 ? `${part.fitmentCount} documented fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
     part.relationCount > 0 ? `${part.relationCount} replacement / cross-reference link${part.relationCount === 1 ? '' : 's'}` : null,
-    part.componentCount > 0 ? `${part.componentCount} verified kit component${part.componentCount === 1 ? '' : 's'}` : null,
-    part.kitMembershipCount > 0 ? `included in ${part.kitMembershipCount} verified kit${part.kitMembershipCount === 1 ? '' : 's'}` : null,
+    part.componentCount > 0 ? `${part.componentCount} documented kit component${part.componentCount === 1 ? '' : 's'}` : null,
+    part.kitMembershipCount > 0 ? `included in ${part.kitMembershipCount} documented kit${part.kitMembershipCount === 1 ? '' : 's'}` : null,
   ].filter(Boolean).join(' · ');
 
   return (
@@ -173,13 +173,13 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
           <div className="parts-stats">
             <div><strong>{stats.total}</strong><span>source-backed part pages</span></div>
             <div><strong>{stats.replacementLinked}</strong><span>with replacement or cross-reference data</span></div>
-            <div><strong>{stats.kitLinked}</strong><span>with verified kit relationships</span></div>
+            <div><strong>{stats.kitLinked}</strong><span>with documented kit relationships</span></div>
           </div>
 
           <div className="parts-tool-callout">
             <div>
-              <strong>Need to verify a part against a tractor?</strong>
-              <span>Use the model and serial-number checker for documented fitment ranges.</span>
+              <strong>Need to check a part against a machine?</strong>
+              <span>Use the model and serial-number checker for documented fitment ranges across published farm equipment.</span>
             </div>
             <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
           </div>
