@@ -40,7 +40,6 @@ export default async function TractorsPage() {
   const researchMachines = machines.filter(
     (machine) => machine.dataStatus !== 'partial' && machine.dataStatus !== 'verified',
   );
-  const verifiedCount = publishedMachines.filter((machine) => machine.dataStatus === 'verified').length;
   const brandGroups = Array.from(
     publishedMachines.reduce<Map<string, typeof publishedMachines>>((groups, machine) => {
       const existing = groups.get(machine.brand) ?? [];
@@ -67,8 +66,8 @@ export default async function TractorsPage() {
             <span>Manufacturers represented</span>
           </div>
           <div>
-            <strong>{verifiedCount.toLocaleString('en-US')}</strong>
-            <span>Models marked verified</span>
+            <strong>{researchMachines.length.toLocaleString('en-US')}</strong>
+            <span>Models in research queue</span>
           </div>
         </div>
 
