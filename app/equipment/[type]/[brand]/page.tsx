@@ -71,6 +71,7 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
   const typeName = machines[0].equipmentType;
   const featured = machines.slice(0, FEATURED_MODEL_LIMIT);
   const compact = machines.slice(FEATURED_MODEL_LIMIT);
+  const compareHref = `/equipment/compare?type=${type}&m1=${machines[0].id}&m2=${machines[1].id}`;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/equipment/${type}/${brand}`;
   const description = `Browse ${machines.length.toLocaleString('en-US')} published ${brandName} ${typeName.toLowerCase()} models with source-backed specifications and direct links to individual machine records.`;
@@ -134,8 +135,8 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
 
         <div className="notice">
           <strong>Need a side-by-side comparison?</strong>{' '}
-          Select two to four published {brandName} {typeName.toLowerCase()} models in the equipment comparison tool.{' '}
-          <Link className="tool-link" href={`/equipment/compare?type=${type}&brand=${brand}`}>Compare {brandName} models →</Link>
+          Start with the first two published {brandName} {typeName.toLowerCase()} models, then change the selection in the comparison tool.{' '}
+          <Link className="tool-link" href={compareHref}>Compare {brandName} models →</Link>
         </div>
 
         <section className="catalog-group">
