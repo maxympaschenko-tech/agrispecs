@@ -153,36 +153,43 @@ async function loadPublishedMachineMatches(modelInput: string): Promise<Publishe
   if (!model) return [];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<MachineLookupRow[]>(`
-      SELECT
-        m.id,
-        m.model_name,
-        m.slug AS model_slug,
-        mf.name AS brand,
-        mf.slug AS brand_slug,
-        et.name AS equipment_type,
-        et.slug AS equipment_type_slug
-      FROM machines m
-      JOIN manufacturers mf ON mf.id=m.manufacturer_id
-      JOIN equipment_types et ON et.id=m.equipment_type_id
-      WHERE m.data_status IN ('partial','verified')
-        AND (
-          LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))=?
-          OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.slug,' ',''),'-',''),'/',''),'.',''),'_',''))=?
-        )
-      ORDER BY mf.name ASC, et.name ASC, m.model_name ASC, m.id ASC
-    `, [model, model]);
+    return await withServerTtlCache(
+      `fitment-checker:machine-matches:${model}`,
+      FITMENT_PAIR_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<MachineLookupRow[]>(`
+          SELECT
+            m.id,
+            m.model_name,
+            m.slug AS model_slug,
+            mf.name AS brand,
+            mf.slug AS brand_slug,
+            et.name AS equipment_type,
+            et.slug AS equipment_type_slug
+          FROM machines m
+          JOIN manufacturers mf ON mf.id=m.manufacturer_id
+          JOIN equipment_types et ON et.id=m.equipment_type_id
+          WHERE m.data_status IN ('partial','verified')
+            AND (
+              LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))=?
+              OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.slug,' ',''),'-',''),'/',''),'.',''),'_',''))=?
+            )
+          ORDER BY mf.name ASC, et.name ASC, m.model_name ASC, m.id ASC
+        `, [model, model]);
 
-    return rows.map((row) => ({
-      id: Number(row.id),
-      model: row.model_name,
-      modelSlug: row.model_slug,
-      brand: row.brand,
-      brandSlug: row.brand_slug,
-      equipmentType: row.equipment_type,
-      equipmentTypeSlug: row.equipment_type_slug,
-    }));
+        return rows.map((row) => ({
+          id: Number(row.id),
+          model: row.model_name,
+          modelSlug: row.model_slug,
+          brand: row.brand,
+          brandSlug: row.brand_slug,
+          equipmentType: row.equipment_type,
+          equipmentTypeSlug: row.equipment_type_slug,
+        }));
+      },
+      (matches) => matches.length > 0,
+    );
   } catch (error) {
     console.error('Unable to load published machine identity matches:', error);
     return [];
