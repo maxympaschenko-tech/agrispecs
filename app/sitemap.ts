@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const staticPages: MetadataRoute.Sitemap = [
     '',
     '/tractors',
@@ -24,9 +24,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/methodology',
     '/about',
     '/editorial-policy',
-    '/contact',
-    '/privacy',
-    '/terms',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
   const [machines, equipment, equipmentTypes, partNumbers, categories, attachments] = await Promise.all([

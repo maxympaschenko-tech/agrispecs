@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SiteNavigation } from '@/components/site-navigation';
 import './globals.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
 const siteName = 'Farm Machine Specs';
 
 function jsonLd(value: unknown) {
@@ -41,12 +41,32 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': `${siteUrl}/#website`,
-    url: siteUrl,
-    name: siteName,
-    description: 'Independent source-backed farm equipment specifications, parts, compatibility and maintenance reference.',
-    inLanguage: 'en-US',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${siteUrl}/#organization`,
+        name: siteName,
+        url: siteUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${siteUrl}/favicon.svg`,
+          width: 64,
+          height: 64,
+        },
+        description: 'Independent source-backed farm equipment specifications, parts, fitment and maintenance reference.',
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${siteUrl}/#website`,
+        url: siteUrl,
+        name: siteName,
+        description: 'Independent source-backed farm equipment specifications, parts, compatibility and maintenance reference.',
+        inLanguage: 'en-US',
+        publisher: {
+          '@id': `${siteUrl}/#organization`,
+        },
+      },
+    ],
   };
 
   return (
