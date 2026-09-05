@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
+import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
 
 type LayoutProps = {
   children: ReactNode;
@@ -12,18 +13,39 @@ function jsonLd(value: unknown) {
 
 export default async function BrandLayout({ children, params }: LayoutProps) {
   const { brand } = await params;
-  const [brands, machines] = await Promise.all([
+  const [brands, tractors, equipment] = await Promise.all([
     getBrands(),
     getMachinesByBrand(brand),
+    getNonTractorEquipmentByBrand(brand),
   ]);
-  const info = brands.find((item) => item.slug === brand);
+  const tractorBrand = brands.find((item) => item.slug === brand);
+  const equipmentBrand = equipment[0]
+    ? { slug: equipment[0].brandSlug, name: equipment[0].brand }
+    : undefined;
+  const info = tractorBrand || equipmentBrand;
 
   if (!info) return children;
 
-  const publishedMachines = machines.filter(
+  const publishedTractors = tractors.filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const publishedEquipment = equipment.filter(
+    (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
+  );
+  const publishedItems = [
+    ...publishedTractors.map((machine) => ({
+      name: machine.title,
+      url: `/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+      category: 'Tractor',
+    })),
+    ...publishedEquipment.map((machine) => ({
+      name: machine.title,
+      url: `/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
+      category: machine.equipmentType,
+    })),
+  ];
+
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/brands/${info.slug}`;
 
   const graph: Record<string, unknown>[] = [
@@ -31,8 +53,8 @@ export default async function BrandLayout({ children, params }: LayoutProps) {
       '@type': 'CollectionPage',
       '@id': `${canonicalUrl}#webpage`,
       url: canonicalUrl,
-      name: `${info.name} tractor specs and model reference`,
-      description: `Source-backed ${info.name} tractor specifications, maintenance, parts, attachments and compatibility references.`,
+      name: `${info.name} farm equipment specs and model reference`,
+      description: `Source-backed ${info.name} tractor and agricultural equipment specifications, maintenance, parts, attachments and compatibility references.`,
       isPartOf: {
         '@type': 'WebSite',
         '@id': `${baseUrl}/#website`,
@@ -42,7 +64,11 @@ export default async function BrandLayout({ children, params }: LayoutProps) {
       breadcrumb: {
         '@id': `${canonicalUrl}#breadcrumb`,
       },
-      mainEntity: publishedMachines.length > 0
+      about: {
+        '@type': 'Brand',
+        name: info.name,
+      },
+      mainEntity: publishedItems.length > 0
         ? { '@id': `${canonicalUrl}#models` }
         : undefined,
     },
@@ -72,17 +98,18 @@ export default async function BrandLayout({ children, params }: LayoutProps) {
     },
   ];
 
-  if (publishedMachines.length > 0) {
+  if (publishedItems.length > 0) {
     graph.push({
       '@type': 'ItemList',
       '@id': `${canonicalUrl}#models`,
       name: `${info.name} models with published data`,
-      numberOfItems: publishedMachines.length,
-      itemListElement: publishedMachines.map((machine, index) => ({
+      numberOfItems: publishedItems.length,
+      itemListElement: publishedItems.map((item, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        name: machine.title,
-        url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+        name: item.name,
+        url: `${baseUrl}${item.url}`,
+        additionalType: item.category,
       })),
     });
   }
