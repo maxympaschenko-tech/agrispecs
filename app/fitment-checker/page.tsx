@@ -1,18 +1,31 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { checkPartFitment } from '@/lib/fitment-checker-service';
+import {
+  checkPartFitment,
+  getPublishedMachineMatches,
+  type PublishedMachineIdentity,
+} from '@/lib/fitment-checker-service';
 import { getPublishedPartNumberMatches } from '@/lib/part-identity-service';
+import { getMachineGenerationLabel } from '@/lib/machine-display';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 type PageProps = {
-  searchParams: Promise<{ part?: string; model?: string; serial?: string; manufacturer?: string }>;
+  searchParams: Promise<{
+    part?: string;
+    model?: string;
+    serial?: string;
+    manufacturer?: string;
+    machineId?: string;
+  }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const params = await searchParams;
-  const hasQueryState = Boolean(params.part || params.model || params.serial || params.manufacturer);
+  const hasQueryState = Boolean(
+    params.part || params.model || params.serial || params.manufacturer || params.machineId,
+  );
 
   return {
     title: 'Farm Equipment Part Fitment and Serial Number Checker',
@@ -29,16 +42,18 @@ function resultHeading(status: string) {
   if (status === 'fitment-known') return 'Documented model fitment found';
   if (status === 'no-fitment') return 'No documented direct fitment found';
   if (status === 'part-ambiguous') return 'Choose the part manufacturer';
+  if (status === 'machine-ambiguous') return 'Choose the exact machine';
   return 'Unable to verify';
 }
 
 function resultGuidance(status: string) {
-  if (status === 'fits') return 'The stored source-backed rule covers this exact part record, model and serial number entered.';
-  if (status === 'outside-range') return 'The entered serial number falls outside the documented range stored for this exact part/model relationship. Check for a replacement part, another machine generation or a configuration-specific rule before ordering.';
-  if (status === 'serial-unverified') return 'The model relationship is documented, but the stored source does not provide a structured serial-number rule that can be tested automatically.';
-  if (status === 'fitment-known') return 'The model relationship is documented. Add a serial number when available; some applications depend on serial break, market or configuration.';
-  if (status === 'no-fitment') return 'No direct source-backed relationship is stored for this exact manufacturer-specific part/model query. That is not proof of incompatibility.';
+  if (status === 'fits') return 'The stored source-backed rule covers this exact part record, machine record and serial number entered.';
+  if (status === 'outside-range') return 'The entered serial number falls outside the documented range stored for this exact part/machine relationship. Check for a replacement part, another machine generation or a configuration-specific rule before ordering.';
+  if (status === 'serial-unverified') return 'The machine relationship is documented, but the stored source does not provide a structured serial-number rule that can be tested automatically.';
+  if (status === 'fitment-known') return 'The machine relationship is documented. Add a serial number when available; some applications depend on serial break, market or configuration.';
+  if (status === 'no-fitment') return 'No direct source-backed relationship is stored for this exact manufacturer-specific part and machine record. That is not proof of incompatibility.';
   if (status === 'part-ambiguous') return 'Part numbers can be reused by different manufacturers. Select the OEM or supplier record so the checker never mixes fitment data from another manufacturer.';
+  if (status === 'machine-ambiguous') return 'Model designations can be reused across manufacturers, equipment types or generations. Select the exact published machine record before the checker makes any fitment assertion.';
   return 'The current catalog does not contain enough source-backed information to make a fitment assertion.';
 }
 
@@ -57,6 +72,21 @@ function machineHref(result: Awaited<ReturnType<typeof checkPartFitment>>) {
     : `/equipment/${result.equipmentTypeSlug}/${result.brandSlug}/${result.modelSlug}`;
 }
 
+function machineIdentityHref(machine: PublishedMachineIdentity) {
+  return machine.equipmentTypeSlug === 'tractor'
+    ? `/tractors/${machine.brandSlug}/${machine.modelSlug}`
+    : `/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`;
+}
+
+function machineIdentityLabel(machine: PublishedMachineIdentity) {
+  const generation = getMachineGenerationLabel(machine.modelSlug);
+  return [
+    `${machine.brand} ${machine.model}`,
+    generation,
+    machine.equipmentType,
+  ].filter(Boolean).join(' · ');
+}
+
 function normalizedPartPathSegment(partNumber: string) {
   return partNumber.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
@@ -73,14 +103,23 @@ function partReferenceHref(
   return `/parts/${number}`;
 }
 
-function manufacturerCheckHref(
-  part: string,
-  model: string,
-  serial: string,
-  manufacturerSlug: string,
-) {
-  const query = new URLSearchParams({ part, model, manufacturer: manufacturerSlug });
+function checkerQueryHref({
+  part,
+  model,
+  serial,
+  manufacturerSlug,
+  machineId,
+}: {
+  part: string;
+  model: string;
+  serial: string;
+  manufacturerSlug?: string;
+  machineId?: number;
+}) {
+  const query = new URLSearchParams({ part, model });
   if (serial) query.set('serial', serial);
+  if (manufacturerSlug) query.set('manufacturer', manufacturerSlug);
+  if (machineId) query.set('machineId', String(machineId));
   return `/fitment-checker?${query.toString()}`;
 }
 
@@ -90,26 +129,50 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
   const model = (params.model || '').trim();
   const serial = (params.serial || '').trim();
   const requestedManufacturer = (params.manufacturer || '').trim().toLowerCase();
-  const partMatches = part ? await getPublishedPartNumberMatches(part) : [];
+  const requestedMachineId = Number(params.machineId || 0);
+
+  const [partMatches, machineMatches] = await Promise.all([
+    part ? getPublishedPartNumberMatches(part) : Promise.resolve([]),
+    model ? getPublishedMachineMatches(model) : Promise.resolve([]),
+  ]);
+
   const selectedManufacturer = partMatches.length > 1
     && partMatches.some((match) => match.manufacturerSlug === requestedManufacturer)
     ? requestedManufacturer
     : '';
-  const submitted = Boolean(part || model || serial || requestedManufacturer);
+
+  const selectedMachine = machineMatches.length === 1
+    ? machineMatches[0]
+    : machineMatches.find((machine) => machine.id === requestedMachineId) || null;
+  const selectedMachineId = selectedMachine?.id;
+
+  const submitted = Boolean(part || model || serial || requestedManufacturer || params.machineId);
   const result = part && model
-    ? await checkPartFitment(part, model, serial, selectedManufacturer || undefined)
+    ? await checkPartFitment(
+        part,
+        model,
+        serial,
+        selectedManufacturer || undefined,
+        selectedMachineId,
+      )
     : null;
   const resultMachineHref = result ? machineHref(result) : null;
   const resultConfidence = result ? confidenceLabel(result.fitmentConfidence) : null;
   const resultPartHref = result ? partReferenceHref(result, partMatches.length) : null;
-  const checkerFormClass = partMatches.length > 1 ? 'checker-form checker-form--manufacturer' : 'checker-form';
+
+  const extraIdentityFields = Number(partMatches.length > 1) + Number(machineMatches.length > 1);
+  const checkerFormClass = extraIdentityFields > 1
+    ? 'checker-form checker-form--dual-identity'
+    : extraIdentityFields === 1
+      ? 'checker-form checker-form--manufacturer'
+      : 'checker-form';
 
   return (
     <main className="section">
       <div className="container">
         <span className="eyebrow">Compatibility tool</span>
         <h1>Part fitment and serial number checker</h1>
-        <p className="section-lead">Check a part number against a published farm machine model and, when the cited manufacturer or technical source publishes a structured serial range, test the entered serial number against that documented rule.</p>
+        <p className="section-lead">Check a part number against an exact published farm machine record and, when the cited manufacturer or technical source publishes a structured serial range, test the entered serial number against that documented rule.</p>
 
         <form className={checkerFormClass} action="/fitment-checker">
           <label>
@@ -135,6 +198,19 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
             <span>Machine model</span>
             <input name="model" defaultValue={model} placeholder="e.g. 5075M or S7 600" required />
           </label>
+          {machineMatches.length > 1 && (
+            <label>
+              <span>Exact machine</span>
+              <select name="machineId" defaultValue={selectedMachine ? String(selectedMachine.id) : ''} required>
+                <option value="" disabled>Choose machine</option>
+                {machineMatches.map((machine) => (
+                  <option value={String(machine.id)} key={machine.id}>
+                    {machineIdentityLabel(machine)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label>
             <span>Serial number</span>
             <input name="serial" defaultValue={serial} placeholder="e.g. 034280" />
@@ -143,8 +219,8 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
         </form>
 
         <div className="parts-stats">
-          <div><strong>Part + model</strong><span>required to test a stored fitment relationship</span></div>
-          <div><strong>Manufacturer-safe</strong><span>shared part numbers are disambiguated before any fitment claim is made</span></div>
+          <div><strong>Exact identity</strong><span>shared part numbers and reused model names are resolved before checking</span></div>
+          <div><strong>Part + machine</strong><span>both must resolve to published catalog records</span></div>
           <div><strong>Serial</strong><span>optional unless the application has a documented serial break</span></div>
         </div>
 
@@ -168,13 +244,41 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
                     <Link
                       className="card"
                       key={match.id}
-                      href={manufacturerCheckHref(part, model, serial, match.manufacturerSlug)}
+                      href={checkerQueryHref({
+                        part,
+                        model,
+                        serial,
+                        manufacturerSlug: match.manufacturerSlug,
+                        machineId: selectedMachineId,
+                      })}
                     >
                       <span className="eyebrow">Part manufacturer</span>
                       <h3>{match.manufacturerName || match.manufacturerSlug} {match.partNumber}</h3>
-                      <p>Check this exact manufacturer record against {model}.</p>
+                      <p>Use this exact manufacturer part record.</p>
                     </Link>
                   ) : null
+                ))}
+              </div>
+            )}
+
+            {result.status === 'machine-ambiguous' && machineMatches.length > 1 && (
+              <div className="grid" style={{ marginTop: 18 }}>
+                {machineMatches.map((machine) => (
+                  <Link
+                    className="card"
+                    key={machine.id}
+                    href={checkerQueryHref({
+                      part,
+                      model,
+                      serial,
+                      manufacturerSlug: selectedManufacturer || undefined,
+                      machineId: machine.id,
+                    })}
+                  >
+                    <span className="eyebrow">Exact machine record</span>
+                    <h3>{machineIdentityLabel(machine)}</h3>
+                    <p>Check fitment against this published machine record.</p>
+                  </Link>
                 ))}
               </div>
             )}
@@ -204,29 +308,35 @@ export default async function FitmentCheckerPage({ searchParams }: PageProps) {
           </section>
         )}
 
+        {machineMatches.length > 1 && selectedMachine && (
+          <div className="notice">
+            Selected machine: <Link href={machineIdentityHref(selectedMachine)}><strong>{machineIdentityLabel(selectedMachine)}</strong></Link>. Change the machine model field to reset this selection.
+          </div>
+        )}
+
         <section className="catalog-group">
           <h2>How to interpret a fitment result</h2>
           <div className="grid">
             <div className="card">
               <span className="eyebrow">Documented range</span>
               <h3>Fits documented serial range</h3>
-              <p>The stored cited rule supports the exact part record, model and entered serial. The fitment confidence shown in the result explains the evidence level.</p>
+              <p>The stored cited rule supports the exact part record, exact machine record and entered serial. The fitment confidence shown in the result explains the evidence level.</p>
             </div>
             <div className="card">
               <span className="eyebrow">Model-level evidence</span>
               <h3>Serial unverified</h3>
-              <p>The model fitment is documented, but a machine-specific serial rule is unavailable or cannot be tested from the current source.</p>
+              <p>The machine fitment is documented, but a machine-specific serial rule is unavailable or cannot be tested from the current source.</p>
             </div>
             <div className="card">
               <span className="eyebrow">No assertion</span>
               <h3>No documented direct fitment</h3>
-              <p>This means the published catalog lacks a direct cited relationship for the exact query. It does not mean the part is definitely incompatible.</p>
+              <p>This means the published catalog lacks a direct cited relationship for the exact selected records. It does not mean the part is definitely incompatible.</p>
             </div>
           </div>
         </section>
 
         <div className="notice">
-          This tool only evaluates rules already stored from cited sources for published parts and machines. Shared part numbers are separated by manufacturer before fitment is checked. A missing fitment or missing serial rule is not proof that a part is incompatible. Always verify the complete machine PIN, model year, market and configuration before ordering. See <Link href="/methodology">Data Sources &amp; Methodology</Link> for the publication rules used by this site.
+          This tool only evaluates rules already stored from cited sources for published parts and machines. Shared part numbers and reused machine model names are explicitly disambiguated before fitment is checked. A missing fitment or missing serial rule is not proof that a part is incompatible. Always verify the complete machine PIN, model year, market and configuration before ordering. See <Link href="/methodology">Data Sources &amp; Methodology</Link> for the publication rules used by this site.
         </div>
       </div>
     </main>

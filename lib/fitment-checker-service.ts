@@ -11,6 +11,16 @@ type PartLookupRow = RowDataPacket & {
   manufacturer_slug: string | null;
 };
 
+type MachineLookupRow = RowDataPacket & {
+  id: number;
+  model_name: string;
+  model_slug: string;
+  brand: string;
+  brand_slug: string;
+  equipment_type: string;
+  equipment_type_slug: string;
+};
+
 type FitmentRow = RowDataPacket & {
   part_number: string;
   part_name: string | null;
@@ -32,8 +42,18 @@ type FitmentRow = RowDataPacket & {
   source_url: string | null;
 };
 
+export type PublishedMachineIdentity = {
+  id: number;
+  model: string;
+  modelSlug: string;
+  brand: string;
+  brandSlug: string;
+  equipmentType: string;
+  equipmentTypeSlug: string;
+};
+
 export type FitmentCheckResult = {
-  status: 'part-not-found' | 'part-ambiguous' | 'machine-not-found' | 'no-fitment' | 'fitment-known' | 'serial-unverified' | 'fits' | 'outside-range' | 'invalid-serial';
+  status: 'part-not-found' | 'part-ambiguous' | 'machine-not-found' | 'machine-ambiguous' | 'no-fitment' | 'fitment-known' | 'serial-unverified' | 'fits' | 'outside-range' | 'invalid-serial';
   message: string;
   partNumber?: string;
   partName?: string | null;
@@ -69,6 +89,17 @@ function normalizeSerial(value: string) {
 
 function hasSerialRule(row: FitmentRow) {
   return Boolean(row.serial_prefix || row.serial_from || row.serial_to);
+}
+
+function machineBase(row: MachineLookupRow) {
+  return {
+    brand: row.brand,
+    brandSlug: row.brand_slug,
+    model: row.model_name,
+    modelSlug: row.model_slug,
+    equipmentType: row.equipment_type,
+    equipmentTypeSlug: row.equipment_type_slug,
+  };
 }
 
 function resultBase(row: FitmentRow) {
@@ -120,15 +151,60 @@ function serialMatchesRow(serial: string, row: FitmentRow): 'fits' | 'outside' |
   return (from === null || value >= from) && (to === null || value <= to) ? 'fits' : 'outside';
 }
 
+export async function getPublishedMachineMatches(modelInput: string): Promise<PublishedMachineIdentity[]> {
+  const model = normalizeModel(modelInput);
+  if (!model) return [];
+
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<MachineLookupRow[]>(`
+      SELECT
+        m.id,
+        m.model_name,
+        m.slug AS model_slug,
+        mf.name AS brand,
+        mf.slug AS brand_slug,
+        et.name AS equipment_type,
+        et.slug AS equipment_type_slug
+      FROM machines m
+      JOIN manufacturers mf ON mf.id=m.manufacturer_id
+      JOIN equipment_types et ON et.id=m.equipment_type_id
+      WHERE m.data_status IN ('partial','verified')
+        AND (
+          LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))=?
+          OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.slug,' ',''),'-',''),'/',''),'.',''),'_',''))=?
+        )
+      ORDER BY mf.name ASC, et.name ASC, m.model_name ASC, m.id ASC
+    `, [model, model]);
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      model: row.model_name,
+      modelSlug: row.model_slug,
+      brand: row.brand,
+      brandSlug: row.brand_slug,
+      equipmentType: row.equipment_type,
+      equipmentTypeSlug: row.equipment_type_slug,
+    }));
+  } catch (error) {
+    console.error('Unable to load published machine identity matches:', error);
+    return [];
+  }
+}
+
 export async function checkPartFitment(
   partInput: string,
   modelInput: string,
   serialInput?: string,
   manufacturerSlugInput?: string,
+  machineIdInput?: number,
 ): Promise<FitmentCheckResult> {
   const part = normalizePart(partInput);
   const model = normalizeModel(modelInput);
   const manufacturerSlug = (manufacturerSlugInput || '').trim().toLowerCase();
+  const requestedMachineId = Number.isSafeInteger(machineIdInput) && Number(machineIdInput) > 0
+    ? Number(machineIdInput)
+    : null;
   if (!part) return { status: 'part-not-found', message: 'Enter a part number.' };
   if (!model) return { status: 'machine-not-found', message: 'Enter a machine model.' };
 
@@ -169,33 +245,60 @@ export async function checkPartFitment(
 
   const selectedPart = partRows[0];
   const partId = Number(selectedPart.id);
+  const machineIdFilter = requestedMachineId ? 'AND m.id=?' : '';
+  const machineParams = requestedMachineId
+    ? [model, model, requestedMachineId]
+    : [model, model];
+  const machineLimit = requestedMachineId ? 1 : 2;
 
-  const [machineRows] = await db.query<RowDataPacket[]>(`
-    SELECT m.id
+  const [machineRows] = await db.query<MachineLookupRow[]>(`
+    SELECT
+      m.id,
+      m.model_name,
+      m.slug AS model_slug,
+      mf.name AS brand,
+      mf.slug AS brand_slug,
+      et.name AS equipment_type,
+      et.slug AS equipment_type_slug
     FROM machines m
+    JOIN manufacturers mf ON mf.id=m.manufacturer_id
+    JOIN equipment_types et ON et.id=m.equipment_type_id
     WHERE m.data_status IN ('partial','verified')
       AND (
         LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))=?
         OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.slug,' ',''),'-',''),'/',''),'.',''),'_',''))=?
       )
-    ORDER BY EXISTS(
-      SELECT 1
-      FROM machine_parts mp
-      WHERE mp.machine_id=m.id
-        AND mp.part_id=?
-    ) DESC, m.id ASC
-    LIMIT 1
-  `, [model, model, partId]);
+      ${machineIdFilter}
+    ORDER BY mf.name ASC, et.name ASC, m.model_name ASC, m.id ASC
+    LIMIT ${machineLimit}
+  `, machineParams);
+
   if (!machineRows[0]) {
     return {
       status: 'machine-not-found',
-      message: `Machine model ${modelInput} is not in the published catalog yet.`,
+      message: requestedMachineId
+        ? `The selected machine no longer matches published model ${modelInput}. Choose the machine again.`
+        : `Machine model ${modelInput} is not in the published catalog yet.`,
       partNumber: selectedPart.part_number,
       partName: selectedPart.part_name,
       partManufacturerName: selectedPart.manufacturer_name,
       partManufacturerSlug: selectedPart.manufacturer_slug,
     };
   }
+
+  if (!requestedMachineId && machineRows.length > 1) {
+    return {
+      status: 'machine-ambiguous',
+      message: `Machine model ${modelInput} exists in more than one published brand, equipment type or generation. Choose the exact machine before checking fitment.`,
+      partNumber: selectedPart.part_number,
+      partName: selectedPart.part_name,
+      partManufacturerName: selectedPart.manufacturer_name,
+      partManufacturerSlug: selectedPart.manufacturer_slug,
+    };
+  }
+
+  const selectedMachine = machineRows[0];
+  const machineId = Number(selectedMachine.id);
 
   const [rows] = await db.query<FitmentRow[]>(`
     SELECT
@@ -230,16 +333,17 @@ export async function checkPartFitment(
     ORDER BY (mp.serial_prefix IS NOT NULL OR mp.serial_from IS NOT NULL OR mp.serial_to IS NOT NULL) DESC,
              CASE WHEN mp.fitment_confidence='official' THEN 0 WHEN mp.fitment_confidence='high' THEN 1 WHEN mp.fitment_confidence='medium' THEN 2 ELSE 3 END,
              mp.id ASC
-  `, [partId, Number(machineRows[0].id)]);
+  `, [partId, machineId]);
 
   if (rows.length === 0) {
     return {
       status: 'no-fitment',
-      message: `No documented direct fitment is recorded for ${selectedPart.part_number} on ${modelInput}. This is not proof that the part does not fit.`,
+      message: `No documented direct fitment is recorded for ${selectedPart.part_number} on ${selectedMachine.brand} ${selectedMachine.model_name}. This is not proof that the part does not fit.`,
       partNumber: selectedPart.part_number,
       partName: selectedPart.part_name,
       partManufacturerName: selectedPart.manufacturer_name,
       partManufacturerSlug: selectedPart.manufacturer_slug,
+      ...machineBase(selectedMachine),
     };
   }
 
