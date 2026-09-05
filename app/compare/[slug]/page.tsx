@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getMachines, getMachineVersions, getMachineSpecs, type MachineSpec } from '@/lib/catalog-service';
 import { comparisonPresets, getComparisonPreset } from '@/lib/comparison-presets';
+import { getMachineGenerationLabel } from '@/lib/machine-display';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -36,6 +37,10 @@ type KeyDifference = {
   maxMachine: string;
   spreadScore: number;
 };
+
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
 
 function formatSpec(spec: MachineSpec | undefined) {
   if (!spec) return '—';
@@ -114,7 +119,10 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
   );
 
   const selected = preset.machines
-    .map((target) => machines.find((machine) => machine.brand === target.brand && machine.model === target.model))
+    .map((target) => {
+      const candidates = machines.filter((machine) => machine.brand === target.brand && machine.model === target.model);
+      return candidates.find((machine) => !getMachineGenerationLabel(machine.modelSlug)) ?? candidates[0];
+    })
     .filter((machine): machine is NonNullable<typeof machine> => Boolean(machine));
 
   if (selected.length !== preset.machines.length) notFound();
@@ -164,7 +172,7 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
     }, new Map());
 
   const interactiveHref = `/compare?${compared.map((machine, index) => `m${index + 1}=${encodeURIComponent(machine.id)}`).join('&')}`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const pageUrl = `${siteUrl}/compare/${preset.slug}`;
   const structuredData = {
     '@context': 'https://schema.org',
@@ -203,7 +211,7 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
 
   return (
     <main className="section">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <div className="breadcrumbs"><Link href="/">Home</Link> / <Link href="/compare">Compare</Link> / {preset.title}</div>
         <span className="eyebrow">Source-backed tractor comparison</span>
