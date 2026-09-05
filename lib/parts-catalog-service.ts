@@ -255,65 +255,75 @@ export async function getPartCatalogPage(options: {
 }
 
 export async function getPartCatalogStats(categorySlug?: string): Promise<PartCatalogStats> {
+  const normalizedCategorySlug = categorySlug?.trim().toLowerCase() || '';
+  const cacheKey = `parts:catalog-stats:${normalizedCategorySlug || 'all'}`;
+
   try {
-    const db = await getDbReady();
-    const params: unknown[] = [];
-    const categoryFilter = categorySlug ? 'AND pc.slug = ?' : '';
-    if (categorySlug) params.push(categorySlug);
+    return await withServerTtlCache(
+      cacheKey,
+      PARTS_COUNT_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const params: unknown[] = [];
+        const categoryFilter = normalizedCategorySlug ? 'AND pc.slug = ?' : '';
+        if (normalizedCategorySlug) params.push(normalizedCategorySlug);
 
-    const [rows] = await db.query<StatsRow[]>(`
-      SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN
-          EXISTS (
-            SELECT 1
-            FROM part_cross_references pcr_out
-            JOIN parts related_out ON related_out.id=pcr_out.cross_part_id
-              AND related_out.data_status IN ('partial','verified')
-            JOIN source_records source_out ON source_out.id=pcr_out.source_record_id
-            WHERE pcr_out.part_id=p.id
-          )
-          OR EXISTS (
-            SELECT 1
-            FROM part_cross_references pcr_in
-            JOIN parts related_in ON related_in.id=pcr_in.part_id
-              AND related_in.data_status IN ('partial','verified')
-            JOIN source_records source_in ON source_in.id=pcr_in.source_record_id
-            WHERE pcr_in.cross_part_id=p.id
-          )
-        THEN 1 ELSE 0 END) AS replacement_linked,
-        SUM(CASE WHEN
-          EXISTS (
-            SELECT 1
-            FROM part_components pco
-            JOIN parts component_part ON component_part.id=pco.component_part_id
-              AND component_part.data_status IN ('partial','verified')
-            JOIN source_records component_source ON component_source.id=pco.source_record_id
-            WHERE pco.parent_part_id=p.id
-          )
-          OR EXISTS (
-            SELECT 1
-            FROM part_components pci
-            JOIN parts parent_part ON parent_part.id=pci.parent_part_id
-              AND parent_part.data_status IN ('partial','verified')
-            JOIN source_records kit_source ON kit_source.id=pci.source_record_id
-            WHERE pci.component_part_id=p.id
-          )
-        THEN 1 ELSE 0 END) AS kit_linked,
-        SUM(CASE WHEN mf.slug IS NOT NULL AND mf.slug <> 'john-deere' THEN 1 ELSE 0 END) AS aftermarket
-      FROM parts p
-      LEFT JOIN part_categories pc ON pc.id=p.category_id
-      LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
-      WHERE ${indexablePartCondition}
-        ${categoryFilter}
-    `, params);
+        const [rows] = await db.query<StatsRow[]>(`
+          SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN
+              EXISTS (
+                SELECT 1
+                FROM part_cross_references pcr_out
+                JOIN parts related_out ON related_out.id=pcr_out.cross_part_id
+                  AND related_out.data_status IN ('partial','verified')
+                JOIN source_records source_out ON source_out.id=pcr_out.source_record_id
+                WHERE pcr_out.part_id=p.id
+              )
+              OR EXISTS (
+                SELECT 1
+                FROM part_cross_references pcr_in
+                JOIN parts related_in ON related_in.id=pcr_in.part_id
+                  AND related_in.data_status IN ('partial','verified')
+                JOIN source_records source_in ON source_in.id=pcr_in.source_record_id
+                WHERE pcr_in.cross_part_id=p.id
+              )
+            THEN 1 ELSE 0 END) AS replacement_linked,
+            SUM(CASE WHEN
+              EXISTS (
+                SELECT 1
+                FROM part_components pco
+                JOIN parts component_part ON component_part.id=pco.component_part_id
+                  AND component_part.data_status IN ('partial','verified')
+                JOIN source_records component_source ON component_source.id=pco.source_record_id
+                WHERE pco.parent_part_id=p.id
+              )
+              OR EXISTS (
+                SELECT 1
+                FROM part_components pci
+                JOIN parts parent_part ON parent_part.id=pci.parent_part_id
+                  AND parent_part.data_status IN ('partial','verified')
+                JOIN source_records kit_source ON kit_source.id=pci.source_record_id
+                WHERE pci.component_part_id=p.id
+              )
+            THEN 1 ELSE 0 END) AS kit_linked,
+            SUM(CASE WHEN mf.slug IS NOT NULL AND mf.slug <> 'john-deere' THEN 1 ELSE 0 END) AS aftermarket
+          FROM parts p
+          LEFT JOIN part_categories pc ON pc.id=p.category_id
+          LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
+          WHERE ${indexablePartCondition}
+            ${categoryFilter}
+        `, params);
 
-    return {
-      total: Number(rows[0]?.total || 0),
-      replacementLinked: Number(rows[0]?.replacement_linked || 0),
-      kitLinked: Number(rows[0]?.kit_linked || 0),
-      aftermarket: Number(rows[0]?.aftermarket || 0),
-    };
+        return {
+          total: Number(rows[0]?.total || 0),
+          replacementLinked: Number(rows[0]?.replacement_linked || 0),
+          kitLinked: Number(rows[0]?.kit_linked || 0),
+          aftermarket: Number(rows[0]?.aftermarket || 0),
+        };
+      },
+      (stats) => stats.total > 0,
+    );
   } catch (error) {
     console.error('Unable to load parts catalog stats:', error);
     return { total: 0, replacementLinked: 0, kitLinked: 0, aftermarket: 0 };
