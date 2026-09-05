@@ -313,7 +313,7 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
   }
 }
 
-async function loadAttachment(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
+async function loadAttachmentUncached(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
   try {
     const db = await getDbReady();
     const [attachmentRows] = await db.query<AttachmentDetailRow[]>(`
@@ -400,6 +400,17 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
     console.error('Unable to load attachment detail:', error);
     return null;
   }
+}
+
+async function loadAttachment(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
+  if (!brandSlug || !attachmentSlug) return null;
+
+  return withServerTtlCache(
+    `attachments:detail:${brandSlug}:${attachmentSlug}`,
+    ATTACHMENT_CATALOG_TTL_MS,
+    () => loadAttachmentUncached(brandSlug, attachmentSlug),
+    (attachment) => attachment !== null,
+  );
 }
 
 export const getAttachment = cache(loadAttachment);
