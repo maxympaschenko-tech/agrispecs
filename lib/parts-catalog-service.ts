@@ -1,7 +1,9 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
 
 export const PARTS_PAGE_SIZE = 36;
+const PARTS_COUNT_TTL_MS = 5 * 60 * 1000;
 
 export type PartCatalogItem = {
   id: number;
@@ -142,16 +144,24 @@ export async function getPartCatalogPage(options: {
     const params: unknown[] = [];
     const categoryFilter = options.categorySlug ? 'AND pc.slug = ?' : '';
     if (options.categorySlug) params.push(options.categorySlug);
+    const countCacheKey = `parts:catalog-count:${options.categorySlug?.trim().toLowerCase() || 'all'}`;
 
-    const [countRows] = await db.query<CountRow[]>(`
-      SELECT COUNT(*) AS total
-      FROM parts p
-      LEFT JOIN part_categories pc ON pc.id=p.category_id
-      WHERE ${indexablePartCondition}
-        ${categoryFilter}
-    `, params);
+    const total = await withServerTtlCache(
+      countCacheKey,
+      PARTS_COUNT_TTL_MS,
+      async () => {
+        const [countRows] = await db.query<CountRow[]>(`
+          SELECT COUNT(*) AS total
+          FROM parts p
+          LEFT JOIN part_categories pc ON pc.id=p.category_id
+          WHERE ${indexablePartCondition}
+            ${categoryFilter}
+        `, params);
+        return Number(countRows[0]?.total || 0);
+      },
+      (value) => value > 0,
+    );
 
-    const total = Number(countRows[0]?.total || 0);
     const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
     const offset = (requestedPage - 1) * pageSize;
 
