@@ -70,7 +70,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   const productProperties = [
     part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
-    { '@type': 'PropertyValue', name: 'Source-backed compatible machines', value: String(part.fitments.length) },
+    { '@type': 'PropertyValue', name: 'Source-backed compatible machines', value: String(part.fitmentCount) },
     part.components.length > 0
       ? { '@type': 'PropertyValue', name: 'Documented kit components', value: String(part.components.length) }
       : null,
