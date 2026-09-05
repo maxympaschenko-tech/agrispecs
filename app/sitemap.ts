@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
 import { getNonTractorEquipment, getNonTractorEquipmentTypes } from '@/lib/equipment-service';
-import { getPartCategories } from '@/lib/part-category-service';
+import { getCachedPartCategories } from '@/lib/parts-catalog-cache';
 import { getIndexableManufacturerPartRoutes, getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getNonTractorEquipmentTypes(),
     getIndexablePartNumbers(),
     getIndexableManufacturerPartRoutes(),
-    getPartCategories(),
+    getCachedPartCategories(),
     getAttachmentCatalog(),
   ]);
 

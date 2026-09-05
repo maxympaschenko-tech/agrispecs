@@ -1,8 +1,5 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
-import { withServerTtlCache } from '@/lib/server-ttl-cache';
-
-const PART_CATEGORY_TTL_MS = 5 * 60 * 1000;
 
 export type PartCategorySummary = {
   id: number;
@@ -80,42 +77,35 @@ function rowToCategory(row: CategoryRow): PartCategorySummary {
 }
 
 export async function getPartCategories(): Promise<PartCategorySummary[]> {
-  return withServerTtlCache(
-    'parts:categories',
-    PART_CATEGORY_TTL_MS,
-    async () => {
-      try {
-        const db = await getDbReady();
-        const [rows] = await db.query<CategoryRow[]>(`
-          SELECT
-            pc.id,
-            pc.name,
-            pc.slug,
-            parent.name AS parent_name,
-            parent.slug AS parent_slug,
-            (
-              SELECT COUNT(*)
-              FROM parts p
-              WHERE p.category_id=pc.id
-                AND ${indexablePartExists}
-            ) AS part_count
-          FROM part_categories pc
-          LEFT JOIN part_categories parent ON parent.id=pc.parent_id
-          HAVING part_count > 0
-          ORDER BY
-            CASE WHEN parent.name IS NULL THEN 0 ELSE 1 END,
-            COALESCE(parent.name,pc.name) ASC,
-            pc.name ASC
-        `);
+  try {
+    const db = await getDbReady();
+    const [rows] = await db.query<CategoryRow[]>(`
+      SELECT
+        pc.id,
+        pc.name,
+        pc.slug,
+        parent.name AS parent_name,
+        parent.slug AS parent_slug,
+        (
+          SELECT COUNT(*)
+          FROM parts p
+          WHERE p.category_id=pc.id
+            AND ${indexablePartExists}
+        ) AS part_count
+      FROM part_categories pc
+      LEFT JOIN part_categories parent ON parent.id=pc.parent_id
+      HAVING part_count > 0
+      ORDER BY
+        CASE WHEN parent.name IS NULL THEN 0 ELSE 1 END,
+        COALESCE(parent.name,pc.name) ASC,
+        pc.name ASC
+    `);
 
-        return rows.map(rowToCategory);
-      } catch (error) {
-        console.error('Unable to load part categories:', error);
-        return [];
-      }
-    },
-    (categories) => categories.length > 0,
-  );
+    return rows.map(rowToCategory);
+  } catch (error) {
+    console.error('Unable to load part categories:', error);
+    return [];
+  }
 }
 
 export async function getPartCategory(slug: string): Promise<PartCategorySummary | undefined> {
