@@ -56,10 +56,10 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 function PartCard({ part }: { part: PartCatalogItem }) {
   const details = [
-    part.fitmentCount > 0 ? `${part.fitmentCount} verified fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
+    part.fitmentCount > 0 ? `${part.fitmentCount} documented fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
     part.relationCount > 0 ? `${part.relationCount} replacement / cross-reference link${part.relationCount === 1 ? '' : 's'}` : null,
-    part.componentCount > 0 ? `${part.componentCount} verified kit component${part.componentCount === 1 ? '' : 's'}` : null,
-    part.kitMembershipCount > 0 ? `included in ${part.kitMembershipCount} verified kit${part.kitMembershipCount === 1 ? '' : 's'}` : null,
+    part.componentCount > 0 ? `${part.componentCount} documented kit component${part.componentCount === 1 ? '' : 's'}` : null,
+    part.kitMembershipCount > 0 ? `included in ${part.kitMembershipCount} documented kit${part.kitMembershipCount === 1 ? '' : 's'}` : null,
   ].filter(Boolean).join(' · ');
   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
 
@@ -180,13 +180,13 @@ export default async function PartsPage({ searchParams }: PageProps) {
         <div className="parts-stats">
           <div><strong>{stats.total}</strong><span>source-backed part pages</span></div>
           <div><strong>{stats.replacementLinked}</strong><span>with replacement or cross-reference data</span></div>
-          <div><strong>{stats.kitLinked}</strong><span>with verified kit component data</span></div>
+          <div><strong>{stats.kitLinked}</strong><span>with documented kit component data</span></div>
         </div>
 
         <div className="parts-tool-callout">
           <div>
-            <strong>Have a tractor model and serial number?</strong>
-            <span>Use the fitment checker to test documented fitment and serial-number ranges.</span>
+            <strong>Have a machine model and serial number?</strong>
+            <span>Use the fitment checker to test documented fitment and serial-number ranges across published farm equipment.</span>
           </div>
           <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
         </div>
@@ -219,7 +219,7 @@ export default async function PartsPage({ searchParams }: PageProps) {
           </section>
         ))}
 
-        {parts.length === 0 && page === 1 && <div className="notice">Verified part records are being added.</div>}
+        {parts.length === 0 && page === 1 && <div className="notice">Source-backed part records are being added.</div>}
 
         <CatalogPagination basePath="/parts" page={page} totalPages={catalog.totalPages} />
       </div>
