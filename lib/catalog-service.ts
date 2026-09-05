@@ -2,7 +2,6 @@ import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import {
   machines as seedMachines,
-  getBrands as getSeedBrands,
   type Machine,
 } from '@/lib/catalog';
 
@@ -163,17 +162,15 @@ export async function getMachine(brandSlug: string, modelSlug: string): Promise<
       WHERE et.slug = 'tractor'
         AND mf.slug = ?
         AND m.slug = ?
+        AND m.data_status IN ('partial','verified','review')
       LIMIT 1
     `, [brandSlug, modelSlug]);
 
-    if (rows[0]) return rowToMachine(rows[0]);
+    return rows[0] ? rowToMachine(rows[0]) : undefined;
   } catch (error) {
-    console.error('Falling back to seed machine:', error);
+    console.error('Unable to load tractor machine:', error);
+    return undefined;
   }
-
-  return seedMachines.find(
-    (machine) => machine.brandSlug === brandSlug && machine.modelSlug === modelSlug,
-  );
 }
 
 export async function getBrands(): Promise<Array<{ slug: string; name: string }>> {
@@ -185,15 +182,15 @@ export async function getBrands(): Promise<Array<{ slug: string; name: string }>
       INNER JOIN machines m ON m.manufacturer_id = mf.id
       INNER JOIN equipment_types et ON et.id = m.equipment_type_id
       WHERE et.slug = 'tractor'
+        AND m.data_status IN ('partial','verified','review')
       ORDER BY mf.name ASC
     `);
 
-    if (rows.length > 0) return rows.map((row) => ({ slug: row.slug, name: row.name }));
+    return rows.map((row) => ({ slug: row.slug, name: row.name }));
   } catch (error) {
-    console.error('Falling back to seed brands:', error);
+    console.error('Unable to load tractor brands:', error);
+    return [];
   }
-
-  return getSeedBrands();
 }
 
 export async function getMachinesByBrand(brandSlug: string): Promise<Machine[]> {
