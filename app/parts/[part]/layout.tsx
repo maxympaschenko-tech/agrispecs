@@ -26,7 +26,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   const part = await getPart(slug);
 
-  if (!part) return children;
+  if (!part || (part.dataStatus !== 'partial' && part.dataStatus !== 'verified')) return children;
 
   const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug);
   const primaryImage = images[0];
