@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
-import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
+import { getMachineGenerationLabel } from '@/lib/machine-display';
+import { getMachineImages } from '@/lib/machine-images-service';
 
 type LayoutProps = {
   children: ReactNode;
@@ -28,7 +29,8 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
   const { brand, model } = await params;
   const machine = await getMachine(brand, model);
   const isPublished = machine && (machine.dataStatus === 'partial' || machine.dataStatus === 'verified');
-  const relatedComparisons = isPublished
+  const isPreviousGeneration = machine ? Boolean(getMachineGenerationLabel(machine.modelSlug)) : false;
+  const relatedComparisons = isPublished && !isPreviousGeneration
     ? comparisonPresets.filter((preset) =>
         preset.machines.some((target) => target.brand === machine.brand && target.model === machine.model),
       )
@@ -41,14 +43,14 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
   const specs = isPublished && selectedVersion
     ? await getMachineSpecs(machine.id, selectedVersion.id)
     : [];
+  const images = isPublished ? await getMachineImages(machine.id) : [];
 
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = machine
     ? `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`
     : null;
-  const primaryImage = machine
-    ? getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug)
-    : null;
+  const primaryImage = images.find((image) => image.isPrimary) || images[0] || null;
+  const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : null;
   const versionYears = selectedVersion?.modelYearStart && selectedVersion?.modelYearEnd
     ? `MY${selectedVersion.modelYearStart}-${selectedVersion.modelYearEnd}`
     : selectedVersion?.modelYearStart
@@ -136,7 +138,7 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
               '@type': 'Brand',
               name: machine.brand,
             },
-            ...(primaryImage ? { image: [absoluteUrl(baseUrl, primaryImage.imageUrl)] } : {}),
+            ...(exactPrimaryImage ? { image: [absoluteUrl(baseUrl, exactPrimaryImage.imageUrl)] } : {}),
             ...(additionalProperty.length > 0 ? { additionalProperty } : {}),
           },
         ],
@@ -145,12 +147,6 @@ export default async function TractorModelLayout({ children, params }: LayoutPro
 
   return (
     <>
-      <style>{`
-        .machine-photo:has(img[src^="/media/machines/kubota/"]) figcaption,
-        .machine-photo:has(img[src^="/media/fallbacks/"]) figcaption {
-          display: none;
-        }
-      `}</style>
       {structuredData && (
         <script
           type="application/ld+json"
