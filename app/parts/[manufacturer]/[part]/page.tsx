@@ -45,6 +45,13 @@ function fitmentConfidenceLabel(fitment: PartFitment) {
   return 'Low-confidence reference';
 }
 
+function fitmentConfidenceRank(fitment: PartFitment) {
+  if (fitment.fitmentConfidence === 'official') return 0;
+  if (fitment.fitmentConfidence === 'high') return 1;
+  if (fitment.fitmentConfidence === 'medium') return 2;
+  return 3;
+}
+
 function fitmentMachineHref(fitment: PartFitment) {
   return fitment.equipmentTypeSlug === 'tractor'
     ? `/tractors/${fitment.brandSlug}/${fitment.modelSlug}`
@@ -89,7 +96,7 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
   const orderedFitments = [...part.fitments].sort((a, b) => (
     a.brand.localeCompare(b.brand)
     || a.model.localeCompare(b.model, undefined, { numeric: true })
-    || a.fitmentConfidence.localeCompare(b.fitmentConfidence)
+    || fitmentConfidenceRank(a) - fitmentConfidenceRank(b)
   ));
 
   const sourceEntries = [
@@ -113,7 +120,7 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
     <main>
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/parts">Parts</Link>
-        {part.manufacturerSlug && part.manufacturerName ? <> / <Link href={`/brands/${part.manufacturerSlug}`}>{part.manufacturerName}</Link></> : null}
+        {part.manufacturerName ? <> / {part.manufacturerName}</> : null}
         {' / '}{part.partNumber}
       </div>
 
