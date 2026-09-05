@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipment-service';
 import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
+import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 import { groupAttachmentEvidence, uniqueEvidenceValues } from '@/lib/attachment-evidence';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +97,13 @@ function formatAttachmentConfidence(value: 'official' | 'high' | 'medium' | 'low
   return `${value.charAt(0).toUpperCase()}${value.slice(1)} confidence`;
 }
 
+function formatPartFitmentConfidence(value: 'official' | 'high' | 'medium' | 'low') {
+  if (value === 'official') return 'Official direct fitment';
+  if (value === 'high') return 'High-confidence source-backed fitment';
+  if (value === 'medium') return 'Medium-confidence fitment reference';
+  return 'Low-confidence fitment reference — verify before ordering';
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand, model } = await params;
   const machine = await getEquipmentMachine(type, brand, model);
@@ -132,7 +142,14 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const selectedVersion = versions.find((version) => version.isCurrent)
     || versions.find((version) => version.specCount > 0)
     || versions[0];
-  const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
+  const [specs, machineParts] = await Promise.all([
+    selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
+    getMachinePartsWithConfigurations(machine.id, selectedVersion?.id),
+  ]);
+  const publishedParts = machineParts.filter((part) => part.dataStatus === 'partial' || part.dataStatus === 'verified');
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
+    publishedParts.map((part) => part.normalizedPartNumber),
+  );
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : undefined;
   const specsBySection = new Map<string, MachineSpec[]>();
@@ -151,6 +168,13 @@ export default async function EquipmentModelPage({ params }: PageProps) {
       title: spec.sourceTitle || 'Manufacturer source',
       publishedDate: spec.sourcePublishedDate,
     })),
+    ...publishedParts.flatMap((part) => part.fitmentEvidence
+      .filter((evidence) => evidence.sourceUrl)
+      .map((evidence) => ({
+        url: evidence.sourceUrl as string,
+        title: evidence.sourceTitle || `${part.partNumber} fitment source`,
+        publishedDate: null,
+      }))),
     ...attachments.filter((attachment) => attachment.sourceUrl).map((attachment) => ({
       url: attachment.sourceUrl as string,
       title: attachment.sourceTitle || 'Attachment compatibility source',
@@ -248,7 +272,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         <section className="machine-header">
           <span className="eyebrow">{machine.equipmentType} reference</span>
           <h1>{machine.title}</h1>
-          <p>Source-backed specifications and published market/configuration reference for this {machine.equipmentType.toLowerCase()}.</p>
+          <p>Source-backed specifications, parts and published market/configuration reference for this {machine.equipmentType.toLowerCase()}.</p>
           {selectedVersion && (
             <div className="notice">
               <strong>Specification set:</strong>{' '}
@@ -262,6 +286,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             {orderedSections.map((section) => <a key={section} href={`#${sectionId(section)}`}>{section}</a>)}
+            {publishedParts.length > 0 && <a href="#compatible-parts">Compatible parts & kits</a>}
             {attachmentGroups.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
             {relatedModels.length > 0 && <a href="#related-models">Related models</a>}
@@ -283,6 +308,44 @@ export default async function EquipmentModelPage({ params }: PageProps) {
               <section className="data-section">
                 <h2>Specifications</h2>
                 <div className="notice">Numerical specifications are published only when a cited source supports the selected reference context.</div>
+              </section>
+            )}
+
+            {publishedParts.length > 0 && (
+              <section className="data-section" id="compatible-parts">
+                <h2>Compatible parts & kits</h2>
+                <p className="section-note">Parts shown here have a cited relationship to this machine and are limited to the selected reference context plus generic machine-level fitment. Open the part reference for replacement, kit and wider fitment context before ordering.</p>
+                <div className="parts-list">
+                  {publishedParts.map((part) => {
+                    const partHref = getPartReferenceHref(
+                      part.normalizedPartNumber,
+                      part.manufacturerSlug,
+                      ambiguousPartNumbers,
+                    );
+                    return (
+                      <div className="part-row" key={part.id}>
+                        <span>
+                          <strong><Link href={partHref}>{part.partNumber}</Link></strong>
+                          <small>{part.manufacturerName ? `${part.manufacturerName} · ` : ''}{part.name || part.categoryName || 'Farm equipment part'}</small>
+                          {part.configurationNotes.map((note) => (
+                            <small key={note}><strong>Applies to:</strong> {note}</small>
+                          ))}
+                          {part.fitmentEvidence.map((evidence, index) => (
+                            <small key={`${evidence.confidence}-${evidence.sourceUrl || evidence.sourceTitle}-${index}`}>
+                              <strong>Evidence:</strong> {formatPartFitmentConfidence(evidence.confidence)}
+                              {' · '}
+                              {evidence.sourceUrl ? (
+                                <a href={evidence.sourceUrl} target="_blank" rel="noopener noreferrer">{evidence.sourceTitle} →</a>
+                              ) : evidence.sourceTitle}
+                            </small>
+                          ))}
+                        </span>
+                        <span><Link href={partHref}>{part.categoryName || 'Part'} →</Link></span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="section-note">A documented part relationship is not a substitute for serial-number or configuration verification. Use the part page and Fitment Checker when the source publishes narrower applicability.</p>
               </section>
             )}
 
@@ -338,7 +401,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {sources.length > 0 && (
               <section className="data-section" id="sources">
                 <h2>Sources</h2>
-                <p className="section-note">Specifications and attachment fitment on this page are tied to cited source records. Specification values use the selected market/configuration version; attachment evidence is listed separately when published.</p>
+                <p className="section-note">Specifications, documented part fitment and attachment fitment on this page are tied to cited source records. Specification and part records use the selected market/configuration version where one is available.</p>
                 <div className="parts-list">
                   {sources.map((source) => (
                     <a className="part-row" key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">
