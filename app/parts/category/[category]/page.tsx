@@ -7,6 +7,7 @@ import { getPartReferenceHref } from '@/lib/part-url';
 import { getCachedPartCategory, getCachedPartCatalogStats } from '@/lib/parts-catalog-cache';
 import {
   getPartCatalogPage,
+  getPartManufacturerSummaries,
   type PartCatalogItem,
 } from '@/lib/parts-catalog-service';
 
@@ -106,9 +107,10 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
   const category = await getCachedPartCategory(slug);
   if (!category) notFound();
 
-  const [catalog, stats] = await Promise.all([
+  const [catalog, stats, manufacturers] = await Promise.all([
     getPartCatalogPage({ categorySlug: category.slug, page }),
     getCachedPartCatalogStats(category.slug),
+    getPartManufacturerSummaries(),
   ]);
 
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
@@ -116,6 +118,22 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
   const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
     catalog.items.map((part) => part.normalizedPartNumber),
   );
+  const indexableManufacturerSlugs = new Set(
+    manufacturers.filter((manufacturer) => manufacturer.partCount >= 2).map((manufacturer) => manufacturer.slug),
+  );
+  const manufacturerGroups = Array.from(
+    catalog.items.reduce<Map<string, { name: string; slug: string | null; count: number }>>((groups, part) => {
+      const name = part.manufacturerName || 'Other documented parts';
+      const slug = part.manufacturerSlug && indexableManufacturerSlugs.has(part.manufacturerSlug)
+        ? part.manufacturerSlug
+        : null;
+      const key = part.manufacturerSlug || name;
+      const current = groups.get(key) || { name, slug, count: 0 };
+      current.count += 1;
+      groups.set(key, current);
+      return groups;
+    }, new Map()).values(),
+  ).sort((a, b) => a.name.localeCompare(b.name));
   const basePath = `/parts/category/${category.slug}`;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalPath = canonicalForPage(category.slug, page);
@@ -191,6 +209,18 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
             </div>
             <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
           </div>
+
+          {manufacturerGroups.length > 0 && (
+            <p className="section-note">
+              <strong>Manufacturers on this page:</strong>{' '}
+              {manufacturerGroups.map((group, index) => (
+                <span key={group.slug || group.name}>
+                  {index > 0 ? ' · ' : ''}
+                  {group.slug ? <Link href={`/parts/manufacturer/${group.slug}`}>{group.name}</Link> : group.name} ({group.count})
+                </span>
+              ))}
+            </p>
+          )}
 
           <div className="grid">
             {catalog.items.map((part) => (
