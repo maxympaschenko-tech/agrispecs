@@ -24,12 +24,13 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug);
   const primaryImage = images[0];
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalPath = `/parts/${part.normalizedPartNumber.toLowerCase()}`;
   const canonicalUrl = `${baseUrl}${canonicalPath}`;
-  const absoluteImageUrl = primaryImage?.imageUrl
-    ? `${baseUrl.replace(/\/$/, '')}${primaryImage.imageUrl}`
+  const exactImageUrl = primaryImage?.imageKind === 'exact' && primaryImage.imageUrl
+    ? `${baseUrl}${primaryImage.imageUrl}`
     : undefined;
+  const productId = `${canonicalUrl}#product`;
   const breadcrumbItems = [
     {
       '@type': 'ListItem',
@@ -61,6 +62,14 @@ export default async function PartLayout({ children, params }: LayoutProps) {
     item: canonicalUrl,
   });
 
+  const productProperties = [
+    part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
+    { '@type': 'PropertyValue', name: 'Source-backed compatible machines', value: String(part.fitments.length) },
+    part.components.length > 0
+      ? { '@type': 'PropertyValue', name: 'Documented kit components', value: String(part.components.length) }
+      : null,
+  ].filter(Boolean);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -70,7 +79,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
         url: canonicalUrl,
         name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber} ${part.name || 'part reference'}`,
         description: part.description || `${part.partNumber} source-backed farm equipment part fitment, replacement and cross-reference reference.`,
-        image: absoluteImageUrl,
+        image: exactImageUrl,
         isPartOf: {
           '@type': 'WebSite',
           '@id': `${baseUrl}/#website`,
@@ -80,12 +89,27 @@ export default async function PartLayout({ children, params }: LayoutProps) {
         breadcrumb: {
           '@id': `${canonicalUrl}#breadcrumb`,
         },
-        about: {
-          '@type': 'Thing',
-          name: part.partNumber,
-          description: part.name || undefined,
-          image: absoluteImageUrl,
+        mainEntity: {
+          '@id': productId,
         },
+      },
+      {
+        '@type': 'Product',
+        '@id': productId,
+        url: canonicalUrl,
+        name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
+        sku: part.partNumber,
+        mpn: part.partNumber,
+        category: part.categoryName || 'Farm equipment part',
+        description: part.description || part.name || `${part.partNumber} farm equipment part reference.`,
+        image: exactImageUrl,
+        brand: part.manufacturerName
+          ? {
+              '@type': 'Brand',
+              name: part.manufacturerName,
+            }
+          : undefined,
+        additionalProperty: productProperties,
       },
       {
         '@type': 'BreadcrumbList',
