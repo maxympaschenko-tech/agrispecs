@@ -1,5 +1,8 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const EQUIPMENT_CATALOG_TTL_MS = 5 * 60 * 1000;
 
 export type EquipmentMachine = {
   id: string;
@@ -60,50 +63,77 @@ const equipmentSelect = `
 `;
 
 export async function getNonTractorEquipment(): Promise<EquipmentMachine[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
-      WHERE et.slug <> 'tractor'
-        AND m.data_status IN ('partial','verified')
-      ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
-    `);
-    return rows.map(rowToEquipment);
-  } catch (error) {
-    console.error('Unable to load non-tractor equipment:', error);
-    return [];
-  }
+  return withServerTtlCache(
+    'equipment:catalog',
+    EQUIPMENT_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
+          WHERE et.slug <> 'tractor'
+            AND m.data_status IN ('partial','verified')
+          ORDER BY et.name ASC, mf.name ASC, m.model_name ASC
+        `);
+        return rows.map(rowToEquipment);
+      } catch (error) {
+        console.error('Unable to load non-tractor equipment:', error);
+        return [];
+      }
+    },
+    (equipment) => equipment.length > 0,
+  );
 }
 
 export async function getNonTractorEquipmentByType(equipmentTypeSlug: string): Promise<EquipmentMachine[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
-      WHERE et.slug = ?
-        AND et.slug <> 'tractor'
-        AND m.data_status IN ('partial','verified')
-      ORDER BY mf.name ASC, m.model_name ASC
-    `, [equipmentTypeSlug]);
-    return rows.map(rowToEquipment);
-  } catch (error) {
-    console.error('Unable to load equipment type:', error);
-    return [];
-  }
+  const normalized = equipmentTypeSlug.trim().toLowerCase();
+  if (!normalized) return [];
+
+  return withServerTtlCache(
+    `equipment:type:${normalized}`,
+    EQUIPMENT_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
+          WHERE et.slug = ?
+            AND et.slug <> 'tractor'
+            AND m.data_status IN ('partial','verified')
+          ORDER BY mf.name ASC, m.model_name ASC
+        `, [normalized]);
+        return rows.map(rowToEquipment);
+      } catch (error) {
+        console.error('Unable to load equipment type:', error);
+        return [];
+      }
+    },
+    (equipment) => equipment.length > 0,
+  );
 }
 
 export async function getNonTractorEquipmentByBrand(brandSlug: string): Promise<EquipmentMachine[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
-      WHERE et.slug <> 'tractor'
-        AND mf.slug = ?
-        AND m.data_status IN ('partial','verified','review')
-      ORDER BY et.name ASC, m.model_name ASC
-    `, [brandSlug]);
-    return rows.map(rowToEquipment);
-  } catch (error) {
-    console.error('Unable to load non-tractor equipment by brand:', error);
-    return [];
-  }
+  const normalized = brandSlug.trim().toLowerCase();
+  if (!normalized) return [];
+
+  return withServerTtlCache(
+    `equipment:brand:${normalized}`,
+    EQUIPMENT_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<EquipmentRow[]>(`${equipmentSelect}
+          WHERE et.slug <> 'tractor'
+            AND mf.slug = ?
+            AND m.data_status IN ('partial','verified','review')
+          ORDER BY et.name ASC, m.model_name ASC
+        `, [normalized]);
+        return rows.map(rowToEquipment);
+      } catch (error) {
+        console.error('Unable to load non-tractor equipment by brand:', error);
+        return [];
+      }
+    },
+    (equipment) => equipment.length > 0,
+  );
 }
 
 export async function getEquipmentMachine(
@@ -187,20 +217,27 @@ export async function searchNonTractorEquipment(term: string): Promise<Equipment
 }
 
 export async function getNonTractorEquipmentTypes(): Promise<Array<{ name: string; slug: string; machineCount: number }>> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<EquipmentTypeRow[]>(`
-      SELECT et.name, et.slug, COUNT(m.id) AS machine_count
-      FROM equipment_types et
-      INNER JOIN machines m ON m.equipment_type_id = et.id
-      WHERE et.slug <> 'tractor'
-        AND m.data_status IN ('partial','verified')
-      GROUP BY et.id
-      ORDER BY et.name ASC
-    `);
-    return rows.map((row) => ({ name: row.name, slug: row.slug, machineCount: Number(row.machine_count || 0) }));
-  } catch (error) {
-    console.error('Unable to load equipment types:', error);
-    return [];
-  }
+  return withServerTtlCache(
+    'equipment:types',
+    EQUIPMENT_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<EquipmentTypeRow[]>(`
+          SELECT et.name, et.slug, COUNT(m.id) AS machine_count
+          FROM equipment_types et
+          INNER JOIN machines m ON m.equipment_type_id = et.id
+          WHERE et.slug <> 'tractor'
+            AND m.data_status IN ('partial','verified')
+          GROUP BY et.id
+          ORDER BY et.name ASC
+        `);
+        return rows.map((row) => ({ name: row.name, slug: row.slug, machineCount: Number(row.machine_count || 0) }));
+      } catch (error) {
+        console.error('Unable to load equipment types:', error);
+        return [];
+      }
+    },
+    (types) => types.length > 0,
+  );
 }
