@@ -7,6 +7,7 @@ import { newHollandT6StageVFuelFiltersMigration } from '@/lib/migrations/2026090
 import { newHollandT6StageVAirFiltersMigration } from '@/lib/migrations/20260905_649_new_holland_t6_stagev_air_filters';
 import { newHollandT6StageVHydraulicFiltersMigration } from '@/lib/migrations/20260905_650_new_holland_t6_stagev_hydraulic_filters';
 import { newHollandT6StageVDefModuleFilterMigration } from '@/lib/migrations/20260905_651_new_holland_t6_stagev_def_module_filter';
+import { newHollandT6StageVCabFiltersMigration } from '@/lib/migrations/20260905_652_new_holland_t6_stagev_cab_filters';
 
 export const newHollandT6ContinuationMigrations: DbMigration[] = [
   newHollandT6CurrentEnrichmentMigration,
@@ -17,4 +18,5 @@ export const newHollandT6ContinuationMigrations: DbMigration[] = [
   newHollandT6StageVAirFiltersMigration,
   newHollandT6StageVHydraulicFiltersMigration,
   newHollandT6StageVDefModuleFilterMigration,
+  newHollandT6StageVCabFiltersMigration,
 ];
