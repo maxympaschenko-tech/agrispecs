@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
 import { getPartCategory } from '@/lib/part-category-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 import {
   getPartCatalogPage,
   getPartCatalogStats,
@@ -56,7 +58,7 @@ function canonicalForPage(categorySlug: string, page: number) {
   return page <= 1 ? basePath : `${basePath}?page=${page}`;
 }
 
-function PartCard({ part }: { part: PartCatalogItem }) {
+function PartCard({ part, href }: { part: PartCatalogItem; href: string }) {
   const details = [
     part.fitmentCount > 0 ? `${part.fitmentCount} documented fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
     part.relationCount > 0 ? `${part.relationCount} replacement / cross-reference link${part.relationCount === 1 ? '' : 's'}` : null,
@@ -65,7 +67,7 @@ function PartCard({ part }: { part: PartCatalogItem }) {
   ].filter(Boolean).join(' · ');
 
   return (
-    <Link className="card" href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+    <Link className="card" href={href}>
       <span className="eyebrow">{part.manufacturerName || 'Part'}</span>
       <h3>{part.partNumber}</h3>
       <p>{part.name || part.categoryName || 'Farm equipment part'}</p>
@@ -112,6 +114,9 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
 
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
 
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
+    catalog.items.map((part) => part.normalizedPartNumber),
+  );
   const basePath = `/parts/category/${category.slug}`;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalPath = canonicalForPage(category.slug, page);
@@ -150,7 +155,11 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
         itemListElement: catalog.items.map((part, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          url: `${baseUrl}/parts/${part.normalizedPartNumber.toLowerCase()}`,
+          url: `${baseUrl}${getPartReferenceHref(
+            part.normalizedPartNumber,
+            part.manufacturerSlug,
+            ambiguousPartNumbers,
+          )}`,
           name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
         })),
       },
@@ -185,7 +194,17 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
           </div>
 
           <div className="grid">
-            {catalog.items.map((part) => <PartCard key={part.id} part={part} />)}
+            {catalog.items.map((part) => (
+              <PartCard
+                key={part.id}
+                part={part}
+                href={getPartReferenceHref(
+                  part.normalizedPartNumber,
+                  part.manufacturerSlug,
+                  ambiguousPartNumbers,
+                )}
+              />
+            ))}
           </div>
 
           <CatalogPagination basePath={basePath} page={page} totalPages={catalog.totalPages} />
