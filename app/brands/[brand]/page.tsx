@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
 import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
+import { getMachineDisplayTitle, getMachineGenerationLabel } from '@/lib/machine-display';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
@@ -147,16 +148,20 @@ export default async function BrandPage({ params }: PageProps) {
           {publishedTractors.length > 0 && (
             <section className="catalog-group">
               <h2>{info.name} tractors with published data</h2>
-              <p className="section-note">These tractor pages contain source-backed technical, maintenance, parts or compatibility data.</p>
+              <p className="section-note">These tractor pages contain source-backed technical, maintenance, parts or compatibility data. Archived generations are labeled separately when a model name was reused.</p>
               <div className="grid">
-                {publishedTractors.map((machine) => (
-                  <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
-                    <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
-                    <h3>{machine.title}</h3>
-                    <p>Tractor specifications, maintenance, parts and compatibility reference.</p>
-                  </Link>
-                ))}
+                {publishedTractors.map((machine) => {
+                  const generationLabel = getMachineGenerationLabel(machine.modelSlug);
+                  const displayTitle = getMachineDisplayTitle(machine);
+                  return (
+                    <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
+                      {machineThumbnail(machine.brandSlug, machine.modelSlug, displayTitle)}
+                      <span className="eyebrow">{generationLabel || (machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data')}</span>
+                      <h3>{displayTitle}</h3>
+                      <p>{generationLabel ? 'Archived tractor generation with its own source-backed specifications and fitment context.' : 'Tractor specifications, maintenance, parts and compatibility reference.'}</p>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -185,9 +190,9 @@ export default async function BrandPage({ params }: PageProps) {
               <div className="grid">
                 {researchTractors.map((machine) => (
                   <Link className="card" key={`tractor-${machine.id}`} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
-                    {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
+                    {machineThumbnail(machine.brandSlug, machine.modelSlug, getMachineDisplayTitle(machine))}
                     <span className="eyebrow">Research queue · Tractor</span>
-                    <h3>{machine.title}</h3>
+                    <h3>{getMachineDisplayTitle(machine)}</h3>
                     <p>Source verification in progress</p>
                   </Link>
                 ))}

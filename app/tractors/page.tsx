@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMachines } from '@/lib/catalog-service';
+import { getMachineDisplayModel, getMachineGenerationLabel } from '@/lib/machine-display';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
@@ -107,18 +108,24 @@ export default async function TractorsPage() {
               <h2>{brand} tractor models</h2>
               <p className="section-note">Published {brand} model pages with source-backed specifications and related reference data.</p>
               <div className="grid">
-                {brandMachines.map((machine) => (
-                  <div className="card" key={machine.id}>
-                    <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`} aria-label={`View ${machine.title}`}>
-                      {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
-                    </Link>
-                    <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
-                    <h3>{machine.model}</h3>
-                    <p>Specs, maintenance, parts, fitment and related equipment.</p>
-                    <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
-                    <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
-                  </div>
-                ))}
+                {brandMachines.map((machine) => {
+                  const generationLabel = getMachineGenerationLabel(machine.modelSlug);
+                  const displayModel = getMachineDisplayModel(machine);
+                  return (
+                    <div className="card" key={machine.id}>
+                      <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`} aria-label={`View ${machine.brand} ${displayModel}`}>
+                        {tractorThumbnail(machine.brandSlug, machine.modelSlug, `${machine.brand} ${displayModel}`)}
+                      </Link>
+                      <span className="eyebrow">
+                        {generationLabel || (machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data')}
+                      </span>
+                      <h3>{displayModel}</h3>
+                      <p>{generationLabel ? 'Archived generation with its own source-backed specifications, parts and fitment context.' : 'Specs, maintenance, parts, fitment and related equipment.'}</p>
+                      <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
+                      <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
+                    </div>
+                  );
+                })}
               </div>
               <Link className="tool-link" href={`/brands/${brandSlug}`}>View all {brand} references</Link>
             </section>
@@ -134,7 +141,7 @@ export default async function TractorsPage() {
                 <Link className="card" key={machine.id} href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>
                   {tractorThumbnail(machine.brandSlug, machine.modelSlug, machine.title)}
                   <span className="eyebrow">Research queue</span>
-                  <h3>{machine.title}</h3>
+                  <h3>{getMachineDisplayModel(machine)}</h3>
                   <p>Source verification in progress.</p>
                 </Link>
               ))}
