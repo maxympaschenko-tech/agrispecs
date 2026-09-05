@@ -2,13 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
-import { getPartCategories } from '@/lib/part-category-service';
 import { getPartImages } from '@/lib/part-images-service';
 import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
 import { getPartReferenceHref } from '@/lib/part-url';
+import { getCachedPartCategories, getCachedPartCatalogStats } from '@/lib/parts-catalog-cache';
 import {
   getPartCatalogPage,
-  getPartCatalogStats,
   type PartCatalogItem,
 } from '@/lib/parts-catalog-service';
 
@@ -97,8 +96,8 @@ export default async function PartsPage({ searchParams }: PageProps) {
 
   const [catalog, stats, categories] = await Promise.all([
     getPartCatalogPage({ page }),
-    getPartCatalogStats(),
-    getPartCategories(),
+    getCachedPartCatalogStats(),
+    getCachedPartCategories(),
   ]);
 
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
