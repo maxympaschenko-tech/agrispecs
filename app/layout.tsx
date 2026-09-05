@@ -49,9 +49,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         url: siteUrl,
         logo: {
           '@type': 'ImageObject',
-          url: `${siteUrl}/favicon.svg`,
-          width: 64,
-          height: 64,
+          url: `${siteUrl}/farm-machine-specs-logo.svg`,
+          width: 336,
+          height: 48,
         },
         description: 'Independent source-backed farm equipment specifications, parts, fitment and maintenance reference.',
       },
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
 
   return (
-    <html lang="en">
+    <html lang="en-US">
       <body>
         <script
           type="application/ld+json"
