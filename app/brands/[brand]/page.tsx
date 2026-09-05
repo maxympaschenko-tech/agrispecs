@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBrands, getMachinesByBrand } from '@/lib/catalog-service';
 import { getNonTractorEquipmentByBrand } from '@/lib/equipment-service';
+import { getAttachmentCatalog } from '@/lib/attachments-service';
 import { getMachineDisplayModel, getMachineDisplayTitle, getMachineGenerationLabel } from '@/lib/machine-display';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from './brand-page.module.css';
@@ -12,6 +13,7 @@ export const revalidate = 0;
 
 const TRACTOR_CARD_LIMIT = 12;
 const EQUIPMENT_CARD_LIMIT = 6;
+const ATTACHMENT_CARD_LIMIT = 6;
 
 type PageProps = { params: Promise<{ brand: string }> };
 
@@ -37,6 +39,16 @@ function machineThumbnail(
       }}
     />
   );
+}
+
+function attachmentTypeLabel(type: string) {
+  if (type === 'front-loader') return 'Front loader';
+  if (type === 'backhoe') return 'Backhoe';
+  return type
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || 'Attachment';
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -65,10 +77,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BrandPage({ params }: PageProps) {
   const { brand } = await params;
-  const [brands, brandTractors, brandEquipment] = await Promise.all([
+  const [brands, brandTractors, brandEquipment, attachmentCatalog] = await Promise.all([
     getBrands(),
     getMachinesByBrand(brand),
     getNonTractorEquipmentByBrand(brand),
+    getAttachmentCatalog(),
   ]);
   const tractorBrand = brands.find((item) => item.slug === brand);
   const equipmentBrand = brandEquipment[0] ? { slug: brandEquipment[0].brandSlug, name: brandEquipment[0].brand } : undefined;
@@ -85,6 +98,9 @@ export default async function BrandPage({ params }: PageProps) {
   const researchTractors = brandTractors.filter((machine) => machine.dataStatus === 'review');
   const researchEquipment = brandEquipment.filter((machine) => machine.dataStatus === 'review');
   const equipmentTypeCount = new Set(publishedEquipment.map((machine) => machine.equipmentTypeSlug)).size;
+  const brandAttachments = attachmentCatalog.filter(
+    (attachment) => attachment.manufacturerSlug === info.slug,
+  );
 
   const displayTractors = [...publishedTractors].sort((a, b) => {
     const aArchive = getMachineGenerationLabel(a.modelSlug) ? 1 : 0;
@@ -102,6 +118,14 @@ export default async function BrandPage({ params }: PageProps) {
       return groups;
     }, new Map()),
   );
+  const attachmentGroups = Array.from(
+    brandAttachments.reduce<Map<string, typeof brandAttachments>>((groups, attachment) => {
+      const existing = groups.get(attachment.attachmentType) ?? [];
+      existing.push(attachment);
+      groups.set(attachment.attachmentType, existing);
+      return groups;
+    }, new Map()),
+  ).sort(([a], [b]) => attachmentTypeLabel(a).localeCompare(attachmentTypeLabel(b)));
 
   return (
     <main>
@@ -154,11 +178,13 @@ export default async function BrandPage({ params }: PageProps) {
               <p>Search part numbers, replacement references and documented machine fitment records.</p>
               <span className="tool-link">Browse parts</span>
             </Link>
-            <Link className="card" href="/attachments">
+            <Link className="card" href={brandAttachments.length > 0 ? '#brand-attachments' : '/attachments'}>
               <span className="eyebrow">Attachments</span>
-              <h3>Browse compatible attachments</h3>
-              <p>Find source-backed loader, backhoe and attachment fitment where available.</p>
-              <span className="tool-link">View attachments</span>
+              <h3>{brandAttachments.length > 0 ? `${info.name} attachments` : 'Browse compatible attachments'}</h3>
+              <p>{brandAttachments.length > 0
+                ? `${brandAttachments.length.toLocaleString('en-US')} published attachment model${brandAttachments.length === 1 ? '' : 's'} with documented machine fitment.`
+                : 'Find source-backed loader, backhoe and attachment fitment where available.'}</p>
+              <span className="tool-link">{brandAttachments.length > 0 ? 'View brand attachments' : 'View attachments'}</span>
             </Link>
           </div>
 
@@ -243,6 +269,53 @@ export default async function BrandPage({ params }: PageProps) {
                   </div>
                 );
               })}
+            </section>
+          )}
+
+          {attachmentGroups.length > 0 && (
+            <section className="catalog-group" id="brand-attachments">
+              <h2>{info.name} attachments with documented fitment</h2>
+              <p className="section-note">
+                Published attachment models below have at least one cited compatible-machine relationship. Open an attachment type hub to browse across brands, or open a model for its full source-backed fitment list.
+              </p>
+
+              {attachmentGroups.map(([attachmentType, attachments]) => {
+                const label = attachmentTypeLabel(attachmentType);
+                const featured = attachments.slice(0, ATTACHMENT_CARD_LIMIT);
+                const compact = attachments.slice(ATTACHMENT_CARD_LIMIT);
+                const fitmentCount = attachments.reduce((total, attachment) => total + attachment.compatibleMachineCount, 0);
+                return (
+                  <div className={styles.equipmentGroup} key={attachmentType}>
+                    <div className={styles.equipmentGroupHeader}>
+                      <h3><Link href={`/attachments/type/${attachmentType}`}>{label}</Link></h3>
+                      <span>{attachments.length.toLocaleString('en-US')} attachment{attachments.length === 1 ? '' : 's'} · {fitmentCount.toLocaleString('en-US')} fitment{fitmentCount === 1 ? '' : 's'}</span>
+                    </div>
+                    <div className="grid">
+                      {featured.map((attachment) => (
+                        <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
+                          <span className="eyebrow">{label} · Source-backed fitment</span>
+                          <h3>{attachment.manufacturerName} {attachment.modelName}</h3>
+                          <p>{attachment.compatibleMachineCount.toLocaleString('en-US')} documented compatible machine{attachment.compatibleMachineCount === 1 ? '' : 's'}.</p>
+                          <span className="tool-link">View attachment fitment →</span>
+                        </Link>
+                      ))}
+                    </div>
+
+                    {compact.length > 0 && (
+                      <div className={styles.modelDirectory} style={{ marginTop: 10 }}>
+                        {compact.map((attachment) => (
+                          <Link className={styles.modelLink} key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
+                            <span>{attachment.modelName}</span>
+                            <small>{attachment.compatibleMachineCount} fitment{attachment.compatibleMachineCount === 1 ? '' : 's'}</small>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              <p><Link className="tool-link" href="/attachments">Browse the complete attachment compatibility catalog →</Link></p>
             </section>
           )}
 
