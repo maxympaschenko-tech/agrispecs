@@ -144,7 +144,8 @@ export async function getPartCatalogPage(options: {
     const params: unknown[] = [];
     const categoryFilter = options.categorySlug ? 'AND pc.slug = ?' : '';
     if (options.categorySlug) params.push(options.categorySlug);
-    const countCacheKey = `parts:catalog-count:${options.categorySlug?.trim().toLowerCase() || 'all'}`;
+    const categoryCacheKey = options.categorySlug?.trim().toLowerCase() || 'all';
+    const countCacheKey = `parts:catalog-count:${categoryCacheKey}`;
 
     const total = await withServerTtlCache(
       countCacheKey,
@@ -170,66 +171,75 @@ export async function getPartCatalogPage(options: {
     }
 
     const itemParams = [...params, pageSize, offset];
-    const [rows] = await db.query<CatalogRow[]>(`
-      SELECT
-        p.id,
-        p.part_number,
-        p.normalized_part_number,
-        p.name,
-        pc.name AS category_name,
-        pc.slug AS category_slug,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug,
-        (
-          SELECT COUNT(DISTINCT mp.machine_id)
-          FROM machine_parts mp
-          JOIN machines m_fitment ON m_fitment.id=mp.machine_id
-            AND m_fitment.data_status IN ('partial','verified')
-          JOIN source_records fitment_source ON fitment_source.id=mp.source_record_id
-          WHERE mp.part_id=p.id
-        ) AS fitment_count,
-        (
-          (SELECT COUNT(*)
-           FROM part_cross_references pcr1
-           JOIN parts related1 ON related1.id=pcr1.cross_part_id
-             AND related1.data_status IN ('partial','verified')
-           JOIN source_records source1 ON source1.id=pcr1.source_record_id
-           WHERE pcr1.part_id=p.id) +
-          (SELECT COUNT(*)
-           FROM part_cross_references pcr2
-           JOIN parts related2 ON related2.id=pcr2.part_id
-             AND related2.data_status IN ('partial','verified')
-           JOIN source_records source2 ON source2.id=pcr2.source_record_id
-           WHERE pcr2.cross_part_id=p.id)
-        ) AS relation_count,
-        (
-          SELECT COUNT(*)
-          FROM part_components pco
-          JOIN parts component_part ON component_part.id=pco.component_part_id
-            AND component_part.data_status IN ('partial','verified')
-          JOIN source_records component_source ON component_source.id=pco.source_record_id
-          WHERE pco.parent_part_id=p.id
-        ) AS component_count,
-        (
-          SELECT COUNT(*)
-          FROM part_components pci
-          JOIN parts parent_part ON parent_part.id=pci.parent_part_id
-            AND parent_part.data_status IN ('partial','verified')
-          JOIN source_records kit_source ON kit_source.id=pci.source_record_id
-          WHERE pci.component_part_id=p.id
-        ) AS kit_membership_count
-      FROM parts p
-      LEFT JOIN part_categories pc ON pc.id=p.category_id
-      LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
-      WHERE ${indexablePartCondition}
-        ${categoryFilter}
-      ORDER BY
-        CASE WHEN mf.slug='john-deere' THEN 0 ELSE 1 END,
-        mf.name ASC,
-        pc.name ASC,
-        p.part_number ASC
-      LIMIT ? OFFSET ?
-    `, itemParams);
+    const itemCacheKey = `parts:catalog-page:${categoryCacheKey}:${requestedPage}:${pageSize}`;
+    const rows = await withServerTtlCache(
+      itemCacheKey,
+      PARTS_COUNT_TTL_MS,
+      async () => {
+        const [itemRows] = await db.query<CatalogRow[]>(`
+          SELECT
+            p.id,
+            p.part_number,
+            p.normalized_part_number,
+            p.name,
+            pc.name AS category_name,
+            pc.slug AS category_slug,
+            mf.name AS manufacturer_name,
+            mf.slug AS manufacturer_slug,
+            (
+              SELECT COUNT(DISTINCT mp.machine_id)
+              FROM machine_parts mp
+              JOIN machines m_fitment ON m_fitment.id=mp.machine_id
+                AND m_fitment.data_status IN ('partial','verified')
+              JOIN source_records fitment_source ON fitment_source.id=mp.source_record_id
+              WHERE mp.part_id=p.id
+            ) AS fitment_count,
+            (
+              (SELECT COUNT(*)
+               FROM part_cross_references pcr1
+               JOIN parts related1 ON related1.id=pcr1.cross_part_id
+                 AND related1.data_status IN ('partial','verified')
+               JOIN source_records source1 ON source1.id=pcr1.source_record_id
+               WHERE pcr1.part_id=p.id) +
+              (SELECT COUNT(*)
+               FROM part_cross_references pcr2
+               JOIN parts related2 ON related2.id=pcr2.part_id
+                 AND related2.data_status IN ('partial','verified')
+               JOIN source_records source2 ON source2.id=pcr2.source_record_id
+               WHERE pcr2.cross_part_id=p.id)
+            ) AS relation_count,
+            (
+              SELECT COUNT(*)
+              FROM part_components pco
+              JOIN parts component_part ON component_part.id=pco.component_part_id
+                AND component_part.data_status IN ('partial','verified')
+              JOIN source_records component_source ON component_source.id=pco.source_record_id
+              WHERE pco.parent_part_id=p.id
+            ) AS component_count,
+            (
+              SELECT COUNT(*)
+              FROM part_components pci
+              JOIN parts parent_part ON parent_part.id=pci.parent_part_id
+                AND parent_part.data_status IN ('partial','verified')
+              JOIN source_records kit_source ON kit_source.id=pci.source_record_id
+              WHERE pci.component_part_id=p.id
+            ) AS kit_membership_count
+          FROM parts p
+          LEFT JOIN part_categories pc ON pc.id=p.category_id
+          LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
+          WHERE ${indexablePartCondition}
+            ${categoryFilter}
+          ORDER BY
+            CASE WHEN mf.slug='john-deere' THEN 0 ELSE 1 END,
+            mf.name ASC,
+            pc.name ASC,
+            p.part_number ASC
+          LIMIT ? OFFSET ?
+        `, itemParams);
+        return itemRows;
+      },
+      (itemRows) => itemRows.length > 0,
+    );
 
     return {
       items: rows.map(rowToItem),
