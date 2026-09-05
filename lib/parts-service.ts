@@ -22,6 +22,8 @@ export type PartFitment = {
   brandSlug: string;
   model: string;
   modelSlug: string;
+  equipmentType: string;
+  equipmentTypeSlug: string;
   fitmentNote: string | null;
   quantity: number | null;
   serialPrefix: string | null;
@@ -90,6 +92,8 @@ type FitmentRow = RowDataPacket & {
   brand_slug: string;
   model: string;
   model_slug: string;
+  equipment_type: string;
+  equipment_type_slug: string;
   fitment_note: string | null;
   quantity: string | number | null;
   serial_prefix: string | null;
@@ -173,6 +177,8 @@ const partSelect = `
     (
       SELECT COUNT(DISTINCT mp_count.machine_id)
       FROM machine_parts mp_count
+      INNER JOIN machines m_count ON m_count.id = mp_count.machine_id
+        AND m_count.data_status IN ('partial','verified')
       WHERE mp_count.part_id = p.id
     ) AS fitment_count
   FROM parts p
@@ -265,6 +271,8 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         mf.slug AS brand_slug,
         m.model_name AS model,
         m.slug AS model_slug,
+        et.name AS equipment_type,
+        et.slug AS equipment_type_slug,
         mp.fitment_note,
         mp.quantity,
         mp.serial_prefix,
@@ -283,7 +291,9 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM machine_parts mp
       INNER JOIN machines m ON m.id = mp.machine_id
+        AND m.data_status IN ('partial','verified')
       INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
       LEFT JOIN machine_versions mv ON mv.id = mp.machine_version_id
       LEFT JOIN source_records sr ON sr.id = mp.source_record_id
       WHERE mp.part_id = ?
@@ -345,6 +355,8 @@ export async function getPart(partNumberOrSlug: string): Promise<PartDetail | un
         brandSlug: row.brand_slug,
         model: row.model,
         modelSlug: row.model_slug,
+        equipmentType: row.equipment_type,
+        equipmentTypeSlug: row.equipment_type_slug,
         fitmentNote: row.fitment_note,
         quantity: row.quantity === null ? null : Number(row.quantity),
         serialPrefix: row.serial_prefix,
@@ -405,6 +417,8 @@ export async function getMachineParts(machineId: string, machineVersionId?: numb
         (
           SELECT COUNT(DISTINCT mp_count.machine_id)
           FROM machine_parts mp_count
+          INNER JOIN machines m_count ON m_count.id = mp_count.machine_id
+            AND m_count.data_status IN ('partial','verified')
           WHERE mp_count.part_id = p.id
         ) AS fitment_count
       FROM machine_parts mp
@@ -412,6 +426,7 @@ export async function getMachineParts(machineId: string, machineVersionId?: numb
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
       WHERE mp.machine_id = ?
+        AND p.data_status IN ('partial','verified')
         ${versionFilter}
       GROUP BY p.id, p.part_number, p.normalized_part_number, p.name, p.description, p.data_status,
                pc.name, pc.slug, mf.name, mf.slug

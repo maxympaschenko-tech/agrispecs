@@ -66,6 +66,12 @@ function fitmentSortRank(fitment: PartFitment) {
   return confidenceRank * 10 + versionRank;
 }
 
+function fitmentMachineHref(fitment: PartFitment) {
+  return fitment.equipmentTypeSlug === 'tractor'
+    ? `/tractors/${fitment.brandSlug}/${fitment.modelSlug}`
+    : `/equipment/${fitment.equipmentTypeSlug}/${fitment.brandSlug}/${fitment.modelSlug}`;
+}
+
 function sourceProvenanceLabel(source: SourceProvenance | undefined) {
   if (!source) return 'Source record';
   if (source.authorityLevel === 'official') {
@@ -233,7 +239,7 @@ export default async function PartPage({ params }: PageProps) {
                   <span>{categoryHref ? <Link href={categoryHref}>{part.categoryName}</Link> : part.categoryName}</span>
                 </div>
               )}
-              <div className="placeholder-row"><span>Source-backed fitments</span><span>{part.fitmentCount}</span></div>
+              <div className="placeholder-row"><span>Source-backed fitments</span><span>{orderedFitments.length}</span></div>
               {replacementSets.length > 0 && <div className="placeholder-row"><span>Service replacement sets</span><span>{replacementSets.length}</span></div>}
               {replacementMemberships.length > 0 && <div className="placeholder-row"><span>Service replacement memberships</span><span>{replacementMemberships.length}</span></div>}
               {part.components.length > 0 && <div className="placeholder-row"><span>Verified kit components</span><span>{part.components.length}</span></div>}
@@ -356,12 +362,14 @@ export default async function PartPage({ params }: PageProps) {
                 const serialRange = serialRangeLabel(fitment);
                 const versionLabel = fitmentVersionLabel(fitment);
                 const modelCheckerHref = `/fitment-checker?part=${encodeURIComponent(part.partNumber)}&model=${encodeURIComponent(fitment.model)}`;
+                const machineHref = fitmentMachineHref(fitment);
                 return (
                   <div className="part-fitment" key={`${fitment.machineId}-${fitment.machineVersionId ?? 'generic'}-${index}`}>
                     <div>
-                      <Link className="part-fitment-machine" href={`/tractors/${fitment.brandSlug}/${fitment.modelSlug}`}>
+                      <Link className="part-fitment-machine" href={machineHref}>
                         {fitment.brand} {fitment.model}
                       </Link>
+                      <p><strong>Equipment type:</strong> {fitment.equipmentType}</p>
                       <p><strong>Fitment confidence:</strong> {fitmentConfidenceLabel(fitment)}</p>
                       {versionLabel && <p><strong>Version:</strong> {versionLabel}</p>}
                       {serialRange && <p><strong>Serial:</strong> {serialRange}</p>}
@@ -375,7 +383,11 @@ export default async function PartPage({ params }: PageProps) {
                           </a>
                         </p>
                       )}
-                      <p><Link href={modelCheckerHref}>Check a serial number for this model →</Link></p>
+                      <p>
+                        <Link href={machineHref}>View machine specs →</Link>
+                        {' · '}
+                        <Link href={modelCheckerHref}>Check a serial number for this model →</Link>
+                      </p>
                     </div>
                     {fitment.quantity !== null && <span>Qty: {fitment.quantity}</span>}
                   </div>
