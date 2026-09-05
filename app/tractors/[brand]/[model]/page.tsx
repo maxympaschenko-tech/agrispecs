@@ -8,6 +8,8 @@ import { getMachineMaintenance } from '@/lib/maintenance-service';
 import { getMachineCapacities } from '@/lib/capacities-service';
 import { getMachineAttachments } from '@/lib/attachments-service';
 import { getSourceProvenanceByUrls, type SourceProvenance } from '@/lib/source-provenance-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -201,6 +203,9 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
 
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const verifiedParts = machineParts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
+    verifiedParts.map((part) => part.normalizedPartNumber),
+  );
 
   const specsBySection = new Map<string, MachineSpec[]>();
   for (const spec of specs) {
@@ -423,27 +428,34 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
                 <h2>Compatible parts & kits</h2>
                 <p className="section-note">Parts shown here are limited to the selected reference context plus generic machine-level fitment. Configuration-specific fitment, evidence confidence and the direct fitment source are shown under each part when available.</p>
                 <div className="parts-list">
-                  {verifiedParts.map((part) => (
-                    <div className="part-row" key={part.id}>
-                      <span>
-                        <strong><Link href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>{part.partNumber}</Link></strong>
-                        <small>{part.name || part.categoryName || 'OEM part'}</small>
-                        {part.configurationNotes.map((note) => (
-                          <small key={note}><strong>Applies to:</strong> {note}</small>
-                        ))}
-                        {part.fitmentEvidence.map((evidence, index) => (
-                          <small key={`${evidence.confidence}-${evidence.sourceUrl || evidence.sourceTitle}-${index}`}>
-                            <strong>Evidence:</strong> {partFitmentConfidenceLabel(evidence.confidence)}
-                            {' · '}
-                            {evidence.sourceUrl ? (
-                              <a href={evidence.sourceUrl} target="_blank" rel="noopener noreferrer">{evidence.sourceTitle} →</a>
-                            ) : evidence.sourceTitle}
-                          </small>
-                        ))}
-                      </span>
-                      <span><Link href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>{part.categoryName || 'Part'} →</Link></span>
-                    </div>
-                  ))}
+                  {verifiedParts.map((part) => {
+                    const partHref = getPartReferenceHref(
+                      part.normalizedPartNumber,
+                      part.manufacturerSlug,
+                      ambiguousPartNumbers,
+                    );
+                    return (
+                      <div className="part-row" key={part.id}>
+                        <span>
+                          <strong><Link href={partHref}>{part.partNumber}</Link></strong>
+                          <small>{part.name || part.categoryName || 'OEM part'}</small>
+                          {part.configurationNotes.map((note) => (
+                            <small key={note}><strong>Applies to:</strong> {note}</small>
+                          ))}
+                          {part.fitmentEvidence.map((evidence, index) => (
+                            <small key={`${evidence.confidence}-${evidence.sourceUrl || evidence.sourceTitle}-${index}`}>
+                              <strong>Evidence:</strong> {partFitmentConfidenceLabel(evidence.confidence)}
+                              {' · '}
+                              {evidence.sourceUrl ? (
+                                <a href={evidence.sourceUrl} target="_blank" rel="noopener noreferrer">{evidence.sourceTitle} →</a>
+                              ) : evidence.sourceTitle}
+                            </small>
+                          ))}
+                        </span>
+                        <span><Link href={partHref}>{part.categoryName || 'Part'} →</Link></span>
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
             )}
