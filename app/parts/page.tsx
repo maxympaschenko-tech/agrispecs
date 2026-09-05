@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
 import { getPartCategories } from '@/lib/part-category-service';
 import { getPartImages } from '@/lib/part-images-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 import {
   getPartCatalogPage,
   getPartCatalogStats,
@@ -54,7 +56,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   };
 }
 
-function PartCard({ part }: { part: PartCatalogItem }) {
+function PartCard({ part, href }: { part: PartCatalogItem; href: string }) {
   const details = [
     part.fitmentCount > 0 ? `${part.fitmentCount} documented fitment${part.fitmentCount === 1 ? '' : 's'}` : null,
     part.relationCount > 0 ? `${part.relationCount} replacement / cross-reference link${part.relationCount === 1 ? '' : 's'}` : null,
@@ -64,7 +66,7 @@ function PartCard({ part }: { part: PartCatalogItem }) {
   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
 
   return (
-    <Link className="card" href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+    <Link className="card" href={href}>
       {image && (
         <img
           src={image.imageUrl}
@@ -102,6 +104,9 @@ export default async function PartsPage({ searchParams }: PageProps) {
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
 
   const parts = catalog.items;
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
+    parts.map((part) => part.normalizedPartNumber),
+  );
   const usefulCategories = categories.filter((category) => category.partCount >= 2);
   const manufacturerGroups = Array.from(
     parts.reduce<Map<string, { name: string; slug: string | null; items: PartCatalogItem[] }>>((groups, part) => {
@@ -153,7 +158,11 @@ export default async function PartsPage({ searchParams }: PageProps) {
         itemListElement: parts.map((part, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          url: `${baseUrl}/parts/${part.normalizedPartNumber.toLowerCase()}`,
+          url: `${baseUrl}${getPartReferenceHref(
+            part.normalizedPartNumber,
+            part.manufacturerSlug,
+            ambiguousPartNumbers,
+          )}`,
           name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
         })),
       },
@@ -214,7 +223,17 @@ export default async function PartsPage({ searchParams }: PageProps) {
               Source-backed part numbers and documented replacement, kit or fitment relationships for {group.name}.
             </p>
             <div className="grid">
-              {group.items.map((part) => <PartCard key={part.id} part={part} />)}
+              {group.items.map((part) => (
+                <PartCard
+                  key={part.id}
+                  part={part}
+                  href={getPartReferenceHref(
+                    part.normalizedPartNumber,
+                    part.manufacturerSlug,
+                    ambiguousPartNumbers,
+                  )}
+                />
+              ))}
             </div>
           </section>
         ))}
