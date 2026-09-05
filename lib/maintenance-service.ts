@@ -1,5 +1,8 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const MACHINE_DETAIL_TTL_MS = 5 * 60 * 1000;
 
 export type MaintenanceTask = {
   id: number;
@@ -64,94 +67,102 @@ type MaintenanceRow = RowDataPacket & {
 export async function getMachineMaintenance(machineId: string, machineVersionId?: number): Promise<MaintenanceTask[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
+  const versionKey = machineVersionId ? String(machineVersionId) : 'all';
+
   try {
-    const db = await getDbReady();
-    const versionFilter = machineVersionId ? 'AND (mt.machine_version_id IS NULL OR mt.machine_version_id = ?)' : '';
-    const params: number[] = [Number(machineId)];
-    if (machineVersionId) params.push(machineVersionId);
+    return await withServerTtlCache(
+      `machine-maintenance:${machineId}:${versionKey}`,
+      MACHINE_DETAIL_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const versionFilter = machineVersionId ? 'AND (mt.machine_version_id IS NULL OR mt.machine_version_id = ?)' : '';
+        const params: number[] = [Number(machineId)];
+        if (machineVersionId) params.push(machineVersionId);
 
-    const [rows] = await db.query<MaintenanceRow[]>(`
-      SELECT
-        mt.id,
-        mt.task_key,
-        mt.section,
-        mt.action,
-        mt.title,
-        p.part_number,
-        p.normalized_part_number AS part_normalized_part_number,
-        p.name AS part_name,
-        pmf.slug AS part_manufacturer_slug,
-        mt.interval_hours,
-        mt.interval_months,
-        mt.initial_interval_hours,
-        mt.capacity_value,
-        mt.capacity_unit,
-        mt.interval_text,
-        mt.notes,
-        mt.confidence,
-        mt.machine_version_id,
-        mv.slug AS version_slug,
-        mv.market_name AS version_market_name,
-        mv.model_year_start AS version_model_year_start,
-        mv.model_year_end AS version_model_year_end,
-        mv.configuration AS version_configuration,
-        mv.is_current AS version_is_current,
-        sr.title AS source_title,
-        sr.url AS source_url,
-        DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
-      FROM maintenance_tasks mt
-      LEFT JOIN parts p ON p.id = mt.part_id
-        AND p.data_status IN ('partial','verified')
-      LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
-      LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
-      INNER JOIN source_records sr ON sr.id = mt.source_record_id
-      WHERE mt.machine_id = ?
-        ${versionFilter}
-      ORDER BY
-        CASE WHEN mt.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
-        COALESCE(mt.interval_hours, 999999),
-        CASE mt.section
-          WHEN 'Engine' THEN 10
-          WHEN 'Fuel & Air' THEN 20
-          WHEN 'Transmission' THEN 30
-          WHEN 'PTO' THEN 35
-          WHEN 'Hydraulics' THEN 40
-          WHEN 'Axle' THEN 45
-          WHEN 'Cab' THEN 50
-          ELSE 90
-        END,
-        mt.title ASC
-    `, params);
+        const [rows] = await db.query<MaintenanceRow[]>(`
+          SELECT
+            mt.id,
+            mt.task_key,
+            mt.section,
+            mt.action,
+            mt.title,
+            p.part_number,
+            p.normalized_part_number AS part_normalized_part_number,
+            p.name AS part_name,
+            pmf.slug AS part_manufacturer_slug,
+            mt.interval_hours,
+            mt.interval_months,
+            mt.initial_interval_hours,
+            mt.capacity_value,
+            mt.capacity_unit,
+            mt.interval_text,
+            mt.notes,
+            mt.confidence,
+            mt.machine_version_id,
+            mv.slug AS version_slug,
+            mv.market_name AS version_market_name,
+            mv.model_year_start AS version_model_year_start,
+            mv.model_year_end AS version_model_year_end,
+            mv.configuration AS version_configuration,
+            mv.is_current AS version_is_current,
+            sr.title AS source_title,
+            sr.url AS source_url,
+            DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
+          FROM maintenance_tasks mt
+          LEFT JOIN parts p ON p.id = mt.part_id
+            AND p.data_status IN ('partial','verified')
+          LEFT JOIN manufacturers pmf ON pmf.id=p.manufacturer_id
+          LEFT JOIN machine_versions mv ON mv.id = mt.machine_version_id
+          INNER JOIN source_records sr ON sr.id = mt.source_record_id
+          WHERE mt.machine_id = ?
+            ${versionFilter}
+          ORDER BY
+            CASE WHEN mt.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
+            COALESCE(mt.interval_hours, 999999),
+            CASE mt.section
+              WHEN 'Engine' THEN 10
+              WHEN 'Fuel & Air' THEN 20
+              WHEN 'Transmission' THEN 30
+              WHEN 'PTO' THEN 35
+              WHEN 'Hydraulics' THEN 40
+              WHEN 'Axle' THEN 45
+              WHEN 'Cab' THEN 50
+              ELSE 90
+            END,
+            mt.title ASC
+        `, params);
 
-    return rows.map((row) => ({
-      id: Number(row.id),
-      taskKey: row.task_key,
-      section: row.section,
-      action: row.action,
-      title: row.title,
-      partNumber: row.part_number,
-      partNormalizedPartNumber: row.part_normalized_part_number,
-      partName: row.part_name,
-      partManufacturerSlug: row.part_manufacturer_slug,
-      intervalHours: row.interval_hours === null ? null : Number(row.interval_hours),
-      intervalMonths: row.interval_months === null ? null : Number(row.interval_months),
-      initialIntervalHours: row.initial_interval_hours === null ? null : Number(row.initial_interval_hours),
-      capacityValue: row.capacity_value === null ? null : Number(row.capacity_value),
-      capacityUnit: row.capacity_unit,
-      intervalText: row.interval_text,
-      notes: row.notes,
-      confidence: row.confidence,
-      machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
-      versionSlug: row.version_slug,
-      versionMarketName: row.version_market_name,
-      versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
-      versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
-      versionConfiguration: row.version_configuration,
-      versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
-      sourceTitle: row.source_title,
-      sourceUrl: row.source_url,
-      sourcePublishedDate: row.source_published_date,
-    }));
+        return rows.map((row) => ({
+          id: Number(row.id),
+          taskKey: row.task_key,
+          section: row.section,
+          action: row.action,
+          title: row.title,
+          partNumber: row.part_number,
+          partNormalizedPartNumber: row.part_normalized_part_number,
+          partName: row.part_name,
+          partManufacturerSlug: row.part_manufacturer_slug,
+          intervalHours: row.interval_hours === null ? null : Number(row.interval_hours),
+          intervalMonths: row.interval_months === null ? null : Number(row.interval_months),
+          initialIntervalHours: row.initial_interval_hours === null ? null : Number(row.initial_interval_hours),
+          capacityValue: row.capacity_value === null ? null : Number(row.capacity_value),
+          capacityUnit: row.capacity_unit,
+          intervalText: row.interval_text,
+          notes: row.notes,
+          confidence: row.confidence,
+          machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
+          versionSlug: row.version_slug,
+          versionMarketName: row.version_market_name,
+          versionModelYearStart: row.version_model_year_start === null ? null : Number(row.version_model_year_start),
+          versionModelYearEnd: row.version_model_year_end === null ? null : Number(row.version_model_year_end),
+          versionConfiguration: row.version_configuration,
+          versionIsCurrent: row.version_is_current === null ? null : Boolean(row.version_is_current),
+          sourceTitle: row.source_title,
+          sourceUrl: row.source_url,
+          sourcePublishedDate: row.source_published_date,
+        }));
+      },
+    );
   } catch (error) {
     console.error('Unable to load machine maintenance schedule:', error);
     return [];
