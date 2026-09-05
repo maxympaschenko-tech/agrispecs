@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 
@@ -7,6 +8,7 @@ type IdentityRow = RowDataPacket & {
   id: number;
   part_number: string;
   normalized_part_number: string;
+  name: string | null;
   manufacturer_name: string | null;
   manufacturer_slug: string | null;
 };
@@ -15,6 +17,7 @@ export type PublishedPartIdentity = {
   id: number;
   partNumber: string;
   normalizedPartNumber: string;
+  name: string | null;
   manufacturerName: string | null;
   manufacturerSlug: string | null;
 };
@@ -70,7 +73,7 @@ export async function getAmbiguousPublishedPartNumbers(partNumbersOrSlugs: strin
   }
 }
 
-export async function getPublishedPartNumberMatches(partNumberOrSlug: string): Promise<PublishedPartIdentity[]> {
+async function loadPublishedPartNumberMatches(partNumberOrSlug: string): Promise<PublishedPartIdentity[]> {
   const normalized = normalizePartNumber(partNumberOrSlug);
   if (!normalized) return [];
 
@@ -81,6 +84,7 @@ export async function getPublishedPartNumberMatches(partNumberOrSlug: string): P
         p.id,
         p.part_number,
         p.normalized_part_number,
+        p.name,
         mf.name AS manufacturer_name,
         mf.slug AS manufacturer_slug
       FROM parts p
@@ -94,6 +98,7 @@ export async function getPublishedPartNumberMatches(partNumberOrSlug: string): P
       id: Number(row.id),
       partNumber: row.part_number,
       normalizedPartNumber: row.normalized_part_number,
+      name: row.name,
       manufacturerName: row.manufacturer_name,
       manufacturerSlug: row.manufacturer_slug,
     }));
@@ -102,6 +107,8 @@ export async function getPublishedPartNumberMatches(partNumberOrSlug: string): P
     return [];
   }
 }
+
+export const getPublishedPartNumberMatches = cache(loadPublishedPartNumberMatches);
 
 export async function hasAmbiguousPublishedPartNumber(partNumberOrSlug: string): Promise<boolean> {
   return (await getPublishedPartNumberMatchCount(partNumberOrSlug)) > 1;
