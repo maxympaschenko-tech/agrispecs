@@ -75,7 +75,7 @@ function formatSpecValue(spec: MachineSpec) {
 }
 
 function jsonLd(value: unknown) {
-  return JSON.stringify(value).replace(/</g, '\\u003c');
+  return JSON.stringify(value).replace(/</g, '\u003c');
 }
 
 function formatAttachmentType(value: string) {
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const publishable = machine.dataStatus === 'partial' || machine.dataStatus === 'verified';
   return {
     title: `${machine.title} ${machine.equipmentType} Specs`,
-    description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications, configuration and source-backed current market reference data.`,
+    description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications, configuration and source-backed market reference data.`,
     alternates: { canonical: `/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}` },
     robots: publishable ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -105,7 +105,9 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     getNonTractorEquipmentByBrand(machine.brandSlug),
     getMachineAttachments(machine.id),
   ]);
-  const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
+  const selectedVersion = versions.find((version) => version.isCurrent)
+    || versions.find((version) => version.specCount > 0)
+    || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
   const specsBySection = new Map<string, MachineSpec[]>();
   for (const spec of specs) {
@@ -139,11 +141,52 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     )
     .slice(0, 6);
 
+  const versionYears = selectedVersion
+    ? selectedVersion.modelYearStart && selectedVersion.modelYearEnd
+      ? `MY${selectedVersion.modelYearStart}-${selectedVersion.modelYearEnd}`
+      : selectedVersion.modelYearStart
+        ? `MY${selectedVersion.modelYearStart}+`
+        : null
+    : null;
+  const referenceContext = selectedVersion
+    ? [
+        selectedVersion.marketName,
+        versionYears,
+        selectedVersion.configuration,
+        selectedVersion.isCurrent ? 'Current' : null,
+      ].filter(Boolean).join(' · ')
+    : null;
+  const additionalProperty = [
+    referenceContext
+      ? { '@type': 'PropertyValue', name: 'Reference context', value: referenceContext }
+      : null,
+    ...specs.map((spec) => (
+      spec.valueText || spec.valueNumber !== null
+        ? { '@type': 'PropertyValue', name: spec.label, value: formatSpecValue(spec) }
+        : null
+    )),
+  ].filter(Boolean);
+
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`;
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: `${machine.title} ${machine.equipmentType} Specs`,
+        description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed market reference data.`,
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          url: baseUrl,
+          name: 'Farm Machine Specs',
+        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#product` },
+      },
       {
         '@type': 'BreadcrumbList',
         '@id': `${canonicalUrl}#breadcrumb`,
@@ -162,14 +205,9 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         name: machine.title,
         model: machine.model,
         category: `${machine.equipmentType} agricultural equipment`,
-        description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed current market reference data.`,
+        description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed market reference data.`,
         brand: { '@type': 'Brand', name: machine.brand },
-        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
-        additionalProperty: specs.map((spec) => ({
-          '@type': 'PropertyValue',
-          name: spec.label,
-          value: formatSpecValue(spec),
-        })),
+        ...(additionalProperty.length > 0 ? { additionalProperty } : {}),
       },
     ],
   };
@@ -184,11 +222,11 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         <section className="machine-header">
           <span className="eyebrow">{machine.equipmentType} reference</span>
           <h1>{machine.title}</h1>
-          <p>Source-backed specifications and current market configuration for this {machine.equipmentType.toLowerCase()}.</p>
+          <p>Source-backed specifications and published market/configuration reference for this {machine.equipmentType.toLowerCase()}.</p>
           {selectedVersion && (
             <div className="notice">
               <strong>Specification set:</strong>{' '}
-              {[selectedVersion.marketName, selectedVersion.configuration].filter(Boolean).join(' · ')}
+              {referenceContext || selectedVersion.slug}
               {selectedVersion.notes ? ` ${selectedVersion.notes}` : ''}
             </div>
           )}
@@ -218,7 +256,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {specs.length === 0 && (
               <section className="data-section">
                 <h2>Specifications</h2>
-                <div className="notice">Numerical specifications are published only after source verification.</div>
+                <div className="notice">Numerical specifications are published only when a cited source supports the selected reference context.</div>
               </section>
             )}
 
@@ -274,7 +312,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
                     <Link className="card" key={related.id} href={`/equipment/${related.equipmentTypeSlug}/${related.brandSlug}/${related.modelSlug}`}>
                       <span className="eyebrow">{related.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
                       <h3>{related.title}</h3>
-                      <p>{related.equipmentType} specifications and current market reference.</p>
+                      <p>{related.equipmentType} specifications and published market reference.</p>
                     </Link>
                   ))}
                 </div>
