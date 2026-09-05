@@ -5,6 +5,8 @@ import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipm
 import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
+import { getMachineMaintenance } from '@/lib/maintenance-service';
+import { getMachineCapacities } from '@/lib/capacities-service';
 import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
 import { getPartReferenceHref } from '@/lib/part-url';
 import { groupAttachmentEvidence, uniqueEvidenceValues } from '@/lib/attachment-evidence';
@@ -14,6 +16,16 @@ export const revalidate = 0;
 
 type PageProps = {
   params: Promise<{ type: string; brand: string; model: string }>;
+};
+
+type VersionScopedRecord = {
+  machineVersionId: number | null;
+  versionMarketName: string | null;
+  versionModelYearStart: number | null;
+  versionModelYearEnd: number | null;
+  versionConfiguration: string | null;
+  versionIsCurrent: boolean | null;
+  sourcePublishedDate: string | null;
 };
 
 const sectionOrder = [
@@ -79,6 +91,32 @@ function formatSpecValue(spec: MachineSpec) {
   return `${trimNumber(value, Number.isInteger(value) ? 0 : 1)}${spec.unit ? ` ${spec.unit}` : ''}`;
 }
 
+function formatCapacity(value: number, unit: string) {
+  if (unit !== 'L') return `${trimNumber(value, 1)} ${unit}`;
+  if (value < 4) return `${trimNumber(value * 1.056688, 1)} US qt (${trimNumber(value, 1)} L)`;
+  return `${trimNumber(value / 3.785411784, 1)} US gal (${trimNumber(value, 1)} L)`;
+}
+
+function versionContext(record: VersionScopedRecord) {
+  if (record.machineVersionId === null) return null;
+
+  const years = record.versionModelYearStart && record.versionModelYearEnd
+    ? `MY${record.versionModelYearStart}-${record.versionModelYearEnd}`
+    : record.versionModelYearStart
+      ? `MY${record.versionModelYearStart}+`
+      : null;
+  const current = record.versionIsCurrent ? 'current version' : null;
+  const published = record.sourcePublishedDate ? `source ${record.sourcePublishedDate}` : null;
+
+  return [
+    record.versionMarketName,
+    years,
+    record.versionConfiguration,
+    current,
+    published,
+  ].filter(Boolean).join(' · ');
+}
+
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
@@ -102,6 +140,13 @@ function formatPartFitmentConfidence(value: 'official' | 'high' | 'medium' | 'lo
   if (value === 'high') return 'High-confidence source-backed fitment';
   if (value === 'medium') return 'Medium-confidence fitment reference';
   return 'Low-confidence fitment reference — verify before ordering';
+}
+
+function maintenanceConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low') {
+  if (value === 'official') return 'Official source';
+  if (value === 'high') return 'High-confidence source-backed interval';
+  if (value === 'medium') return 'Medium-confidence reference';
+  return 'Low-confidence reference — verify before service';
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -142,14 +187,19 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const selectedVersion = versions.find((version) => version.isCurrent)
     || versions.find((version) => version.specCount > 0)
     || versions[0];
-  const [specs, machineParts] = await Promise.all([
+  const [specs, machineParts, maintenance, capacities] = await Promise.all([
     selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
     getMachinePartsWithConfigurations(machine.id, selectedVersion?.id),
+    getMachineMaintenance(machine.id, selectedVersion?.id),
+    getMachineCapacities(machine.id, selectedVersion?.id),
   ]);
   const publishedParts = machineParts.filter((part) => part.dataStatus === 'partial' || part.dataStatus === 'verified');
-  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
-    publishedParts.map((part) => part.normalizedPartNumber),
-  );
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers([
+    ...publishedParts.map((part) => part.normalizedPartNumber),
+    ...maintenance
+      .map((task) => task.partNormalizedPartNumber)
+      .filter((value): value is string => Boolean(value)),
+  ]);
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
   const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : undefined;
   const specsBySection = new Map<string, MachineSpec[]>();
@@ -167,6 +217,16 @@ export default async function EquipmentModelPage({ params }: PageProps) {
       url: spec.sourceUrl as string,
       title: spec.sourceTitle || 'Manufacturer source',
       publishedDate: spec.sourcePublishedDate,
+    })),
+    ...maintenance.filter((task) => task.sourceUrl).map((task) => ({
+      url: task.sourceUrl as string,
+      title: task.sourceTitle || 'Maintenance source',
+      publishedDate: task.sourcePublishedDate,
+    })),
+    ...capacities.filter((capacity) => capacity.sourceUrl).map((capacity) => ({
+      url: capacity.sourceUrl as string,
+      title: capacity.sourceTitle || 'Capacity source',
+      publishedDate: capacity.sourcePublishedDate,
     })),
     ...publishedParts.flatMap((part) => part.fitmentEvidence
       .filter((evidence) => evidence.sourceUrl)
@@ -272,7 +332,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         <section className="machine-header">
           <span className="eyebrow">{machine.equipmentType} reference</span>
           <h1>{machine.title}</h1>
-          <p>Source-backed specifications, parts and published market/configuration reference for this {machine.equipmentType.toLowerCase()}.</p>
+          <p>Source-backed specifications, maintenance, parts and published market/configuration reference for this {machine.equipmentType.toLowerCase()}.</p>
           {selectedVersion && (
             <div className="notice">
               <strong>Specification set:</strong>{' '}
@@ -286,6 +346,8 @@ export default async function EquipmentModelPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             {orderedSections.map((section) => <a key={section} href={`#${sectionId(section)}`}>{section}</a>)}
+            {capacities.length > 0 && <a href="#capacities-fluids">Capacities & fluids</a>}
+            {maintenance.length > 0 && <a href="#maintenance">Maintenance</a>}
             {publishedParts.length > 0 && <a href="#compatible-parts">Compatible parts & kits</a>}
             {attachmentGroups.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
@@ -308,6 +370,76 @@ export default async function EquipmentModelPage({ params }: PageProps) {
               <section className="data-section">
                 <h2>Specifications</h2>
                 <div className="notice">Numerical specifications are published only when a cited source supports the selected reference context.</div>
+              </section>
+            )}
+
+            {capacities.length > 0 && (
+              <section className="data-section" id="capacities-fluids">
+                <h2>Capacities & fluids</h2>
+                <p className="section-note">Configuration- and generation-specific values stay separate. Match the selected market, model-year and machine configuration before servicing fluids or reservoirs.</p>
+                <div className="capacity-list">
+                  {capacities.map((capacity) => {
+                    const context = versionContext(capacity);
+                    return (
+                      <div className="capacity-row" key={capacity.id}>
+                        <div>
+                          <strong>{capacity.label}</strong>
+                          {capacity.configuration && <span>{capacity.configuration}</span>}
+                          {capacity.fluidName && <small>{capacity.fluidName}</small>}
+                          {context && <small><strong>Applies to:</strong> {context}</small>}
+                        </div>
+                        <div>
+                          <strong>{formatCapacity(capacity.valueNumber, capacity.unit)}</strong>
+                          {capacity.notes && <small>{capacity.notes}</small>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {maintenance.length > 0 && (
+              <section className="data-section" id="maintenance">
+                <h2>Maintenance schedule</h2>
+                <p className="section-note">Maintenance tasks are limited to the selected reference context plus generic machine-level records. Intervals and linked parts are shown only when a cited maintenance source supports them.</p>
+                <div className="maintenance-list">
+                  {maintenance.map((task) => {
+                    const context = versionContext(task);
+                    const maintenancePartHref = task.partNumber && task.partNormalizedPartNumber
+                      ? getPartReferenceHref(
+                          task.partNormalizedPartNumber,
+                          task.partManufacturerSlug,
+                          ambiguousPartNumbers,
+                        )
+                      : null;
+                    return (
+                      <div className="maintenance-row" key={task.id}>
+                        <div>
+                          <span className="maintenance-section">{task.section}</span>
+                          <strong>{task.action} {task.title}</strong>
+                          {task.partNumber && maintenancePartHref && (
+                            <Link href={maintenancePartHref}>{task.partNumber}{task.partName ? ` · ${task.partName}` : ''}</Link>
+                          )}
+                          {context && <small><strong>Applies to:</strong> {context}</small>}
+                          <small><strong>Evidence:</strong> {maintenanceConfidenceLabel(task.confidence)}</small>
+                          {task.sourceUrl && (
+                            <small>
+                              <strong>Source:</strong>{' '}
+                              <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer">{task.sourceTitle || 'Maintenance source'} →</a>
+                            </small>
+                          )}
+                          {task.notes && <small>{task.notes}</small>}
+                        </div>
+                        <div>
+                          <strong>{task.intervalText}</strong>
+                          {task.initialIntervalHours !== null && <span>Initial service: {task.initialIntervalHours} hours</span>}
+                          {task.capacityValue !== null && <span>Capacity: {trimNumber(task.capacityValue, 1)} {task.capacityUnit || ''}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </section>
             )}
 
@@ -401,7 +533,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {sources.length > 0 && (
               <section className="data-section" id="sources">
                 <h2>Sources</h2>
-                <p className="section-note">Specifications, documented part fitment and attachment fitment on this page are tied to cited source records. Specification and part records use the selected market/configuration version where one is available.</p>
+                <p className="section-note">Specifications, capacities, maintenance, documented part fitment and attachment fitment on this page are tied to cited source records. Version-scoped records use the selected market/configuration context where one is available.</p>
                 <div className="parts-list">
                   {sources.map((source) => (
                     <a className="part-row" key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">
