@@ -205,9 +205,14 @@ export async function searchMachines(term: string): Promise<Machine[]> {
   const normalized = term.trim();
   if (!normalized) return [];
 
+  const compactKey = normalized.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const like = `%${normalized}%`;
+  const keyLike = `%${compactKey}%`;
+  const modelKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,m.model_name),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+
   try {
     const db = await getDbReady();
-    const like = `%${normalized}%`;
     const [rows] = await db.query<MachineRow[]>(`
       SELECT
         m.id,
@@ -220,10 +225,25 @@ export async function searchMachines(term: string): Promise<Machine[]> {
       INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
       INNER JOIN equipment_types et ON et.id = m.equipment_type_id
       WHERE et.slug = 'tractor'
-        AND (m.model_name LIKE ? OR mf.name LIKE ? OR CONCAT(mf.name, ' ', m.model_name) LIKE ?)
-      ORDER BY mf.name ASC, m.model_name ASC
+        AND (
+          m.model_name LIKE ?
+          OR mf.name LIKE ?
+          OR CONCAT(mf.name, ' ', m.model_name) LIKE ?
+          OR ${modelKeySql} LIKE ?
+          OR ${fullKeySql} LIKE ?
+        )
+      ORDER BY
+        CASE
+          WHEN ${modelKeySql} = ? THEN 0
+          WHEN ${fullKeySql} = ? THEN 1
+          WHEN m.model_name LIKE ? THEN 2
+          WHEN CONCAT(mf.name, ' ', m.model_name) LIKE ? THEN 3
+          ELSE 4
+        END,
+        mf.name ASC,
+        m.model_name ASC
       LIMIT 50
-    `, [like, like, like]);
+    `, [like, like, like, keyLike, keyLike, compactKey, compactKey, like, like]);
 
     if (rows.length > 0) return rows.map(rowToMachine);
   } catch (error) {
@@ -231,9 +251,11 @@ export async function searchMachines(term: string): Promise<Machine[]> {
   }
 
   const lower = normalized.toLowerCase();
-  return seedMachines.filter((machine) =>
-    `${machine.brand} ${machine.model}`.toLowerCase().includes(lower),
-  );
+  return seedMachines.filter((machine) => {
+    const text = `${machine.brand} ${machine.model}`;
+    const key = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    return text.toLowerCase().includes(lower) || key.includes(compactKey);
+  });
 }
 
 export async function getMachineVersions(machineId: string): Promise<MachineVersion[]> {
