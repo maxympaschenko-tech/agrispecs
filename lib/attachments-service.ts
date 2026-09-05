@@ -175,9 +175,17 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
   const normalized = term.trim();
   if (!normalized) return [];
 
+  const compactKey = normalized.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const like = `%${normalized}%`;
+  const keyLike = compactKey ? `%${compactKey}%` : '__NO_COMPACT_SEARCH_KEY__';
+  const modelKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(a.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,a.model_name),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const typeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(a.attachment_type,' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const modelGenericTypeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(a.model_name,SUBSTRING_INDEX(a.attachment_type,'-',-1)),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+  const fullGenericTypeKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,a.model_name,SUBSTRING_INDEX(a.attachment_type,'-',-1)),' ',''),'-',''),'/',''),'.',''),'_',''))`;
+
   try {
     const db = await getDbReady();
-    const like = `%${normalized}%`;
     const [rows] = await db.query<AttachmentCatalogRow[]>(`
       SELECT
         a.id,
@@ -198,12 +206,49 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
           OR REPLACE(a.attachment_type,'-',' ') LIKE ?
           OR CONCAT(a.model_name,' ',REPLACE(a.attachment_type,'-',' ')) LIKE ?
           OR CONCAT(mf.name,' ',a.model_name,' ',REPLACE(a.attachment_type,'-',' ')) LIKE ?
+          OR ${modelKeySql} LIKE ?
+          OR ${fullKeySql} LIKE ?
+          OR ${typeKeySql} LIKE ?
+          OR ${modelGenericTypeKeySql} LIKE ?
+          OR ${fullGenericTypeKeySql} LIKE ?
         )
       GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
       HAVING COUNT(DISTINCT ma.machine_id) > 0
-      ORDER BY mf.name,a.attachment_type,a.model_name
+      ORDER BY
+        CASE
+          WHEN ${modelKeySql} = ? THEN 0
+          WHEN ${fullKeySql} = ? THEN 1
+          WHEN ${modelGenericTypeKeySql} = ? THEN 2
+          WHEN ${fullGenericTypeKeySql} = ? THEN 3
+          WHEN a.model_name LIKE ? THEN 4
+          WHEN CONCAT(mf.name,' ',a.model_name) LIKE ? THEN 5
+          WHEN REPLACE(a.attachment_type,'-',' ') LIKE ? THEN 6
+          ELSE 7
+        END,
+        mf.name ASC,
+        a.attachment_type ASC,
+        a.model_name ASC
       LIMIT 30
-    `, [like,like,like,like,like,like]);
+    `, [
+      like,
+      like,
+      like,
+      like,
+      like,
+      like,
+      keyLike,
+      keyLike,
+      keyLike,
+      keyLike,
+      keyLike,
+      compactKey,
+      compactKey,
+      compactKey,
+      compactKey,
+      like,
+      like,
+      like,
+    ]);
 
     return rows.map(rowToCatalogItem);
   } catch (error) {
