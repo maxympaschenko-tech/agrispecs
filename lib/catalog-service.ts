@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import { withServerTtlCache } from '@/lib/server-ttl-cache';
@@ -155,7 +156,7 @@ export async function getMachines(): Promise<Machine[]> {
   );
 }
 
-export async function getMachine(brandSlug: string, modelSlug: string): Promise<Machine | undefined> {
+async function loadMachine(brandSlug: string, modelSlug: string): Promise<Machine | undefined> {
   try {
     const db = await getDbReady();
     const [rows] = await db.query<MachineRow[]>(`
@@ -182,6 +183,8 @@ export async function getMachine(brandSlug: string, modelSlug: string): Promise<
     return undefined;
   }
 }
+
+export const getMachine = cache(loadMachine);
 
 export async function getBrands(): Promise<Array<{ slug: string; name: string }>> {
   return withServerTtlCache(
@@ -304,7 +307,7 @@ export async function searchMachines(term: string): Promise<Machine[]> {
   });
 }
 
-export async function getMachineVersions(machineId: string): Promise<MachineVersion[]> {
+async function loadMachineVersions(machineId: string): Promise<MachineVersion[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
@@ -347,7 +350,9 @@ export async function getMachineVersions(machineId: string): Promise<MachineVers
   }
 }
 
-export async function getMachineSpecs(machineId: string, machineVersionId?: number): Promise<MachineSpec[]> {
+export const getMachineVersions = cache(loadMachineVersions);
+
+async function loadMachineSpecs(machineId: string, machineVersionId?: number): Promise<MachineSpec[]> {
   if (!/^\d+$/.test(machineId) || !machineVersionId) return [];
 
   try {
@@ -388,6 +393,8 @@ export async function getMachineSpecs(machineId: string, machineVersionId?: numb
     return [];
   }
 }
+
+export const getMachineSpecs = cache(loadMachineSpecs);
 
 export async function getMachineAttachments(machineId: string): Promise<MachineAttachment[]> {
   if (!/^\d+$/.test(machineId)) return [];
