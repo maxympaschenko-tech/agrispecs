@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 
@@ -259,7 +260,7 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
   }
 }
 
-export async function getPart(partNumberOrSlug: string, manufacturerSlug?: string): Promise<PartDetail | undefined> {
+async function loadPart(partNumberOrSlug: string, manufacturerSlug?: string): Promise<PartDetail | undefined> {
   let normalized = '';
   let normalizedManufacturerSlug = '';
   try {
@@ -424,6 +425,8 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
     return undefined;
   }
 }
+
+export const getPart = cache(loadPart);
 
 export async function getMachineParts(machineId: string, machineVersionId?: number): Promise<PartSummary[]> {
   if (!/^\d+$/.test(machineId)) return [];
