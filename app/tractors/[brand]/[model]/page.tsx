@@ -158,6 +158,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const publishable = machine.dataStatus === 'partial' || machine.dataStatus === 'verified';
   const images = await getMachineImages(machine.id);
   const primaryImage = images.find((image) => image.isPrimary) || images[0];
+  const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : undefined;
 
   return {
     title: `${machine.title} Specs, Parts and Maintenance`,
@@ -166,11 +167,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     robots: publishable
       ? { index: true, follow: true }
       : { index: false, follow: true },
-    openGraph: primaryImage
+    openGraph: exactPrimaryImage
       ? {
           title: `${machine.title} Specs, Parts and Maintenance`,
           description: `${machine.title} specifications, parts and maintenance reference.`,
-          images: [{ url: primaryImage.imageUrl, alt: primaryImage.altText || machine.title }],
+          images: [{ url: exactPrimaryImage.imageUrl, alt: exactPrimaryImage.altText || machine.title }],
         }
       : undefined,
   };
@@ -302,17 +303,24 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
               <figure className="machine-photo">
                 <img src={primaryImage.imageUrl} alt={primaryImage.altText || machine.title} loading="eager" />
                 <figcaption>
+                  {primaryImage.imageKind === 'fallback' && <strong>Exact model photo pending. </strong>}
+                  {primaryImage.imageKind === 'family' && <strong>Family image. </strong>}
+                  {primaryImage.imageKind === 'representative' && <strong>Representative image. </strong>}
                   {primaryImage.caption && <span>{primaryImage.caption} </span>}
-                  Photo:{' '}
-                  <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
-                    {primaryImage.author || 'source'}
-                  </a>
-                  {primaryImage.licenseName && (
+                  {primaryImage.imageKind !== 'fallback' && primaryImage.sourcePageUrl && (
                     <>
-                      {' '}·{' '}
-                      {primaryImage.licenseUrl ? (
-                        <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
-                      ) : primaryImage.licenseName}
+                      Photo:{' '}
+                      <a href={primaryImage.sourcePageUrl} target="_blank" rel="noopener noreferrer">
+                        {primaryImage.author || 'source'}
+                      </a>
+                      {primaryImage.licenseName && (
+                        <>
+                          {' '}·{' '}
+                          {primaryImage.licenseUrl ? (
+                            <a href={primaryImage.licenseUrl} target="_blank" rel="noopener noreferrer">{primaryImage.licenseName}</a>
+                          ) : primaryImage.licenseName}
+                        </>
+                      )}
                     </>
                   )}
                 </figcaption>
@@ -442,7 +450,7 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
 
             {attachments.length > 0 && (
               <section className="data-section" id="attachments">
-                <h2>Verified attachment fitment</h2>
+                <h2>Documented attachment fitment</h2>
                 <p className="section-note">Attachment fitment is stored separately from the specification/parts version selector. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration; verify the requirement below before ordering or installing.</p>
                 <div className="maintenance-list">
                   {attachments.map((attachment) => {
@@ -453,7 +461,7 @@ export default async function TractorModelPage({ params, searchParams }: PagePro
                       <div className="maintenance-row" key={attachment.id}>
                         <div>
                           <span className="maintenance-section">{typeLabel}{conditional ? ' · Conditional fitment' : ''}</span>
-                          <strong><Link href={`/attachments/${machine.brandSlug}/${attachment.slug}`}>{machine.brand} {attachment.modelName}</Link></strong>
+                          <strong><Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>{attachment.manufacturerName} {attachment.modelName}</Link></strong>
                           {attachment.compatibilityNote && <small><strong>{conditional ? 'Requirement' : 'Fitment note'}:</strong> {attachment.compatibilityNote}</small>}
                           {attachment.configurationText && <small><strong>{typeLabel} details:</strong> {attachment.configurationText}</small>}
                         </div>
