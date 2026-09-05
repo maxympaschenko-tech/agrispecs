@@ -8,6 +8,7 @@ import { getPartReferenceHref } from '@/lib/part-url';
 import { getCachedPartCategories, getCachedPartCatalogStats } from '@/lib/parts-catalog-cache';
 import {
   getPartCatalogPage,
+  getPartManufacturerSummaries,
   type PartCatalogItem,
 } from '@/lib/parts-catalog-service';
 
@@ -94,10 +95,11 @@ export default async function PartsPage({ searchParams }: PageProps) {
   const page = parsePage(pageParam);
   if (page === null) notFound();
 
-  const [catalog, stats, categories] = await Promise.all([
+  const [catalog, stats, categories, partManufacturers] = await Promise.all([
     getPartCatalogPage({ page }),
     getCachedPartCatalogStats(),
     getCachedPartCategories(),
+    getPartManufacturerSummaries(),
   ]);
 
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
@@ -107,6 +109,7 @@ export default async function PartsPage({ searchParams }: PageProps) {
     parts.map((part) => part.normalizedPartNumber),
   );
   const usefulCategories = categories.filter((category) => category.partCount >= 2);
+  const usefulManufacturers = partManufacturers.filter((manufacturer) => manufacturer.partCount >= 2);
   const manufacturerGroups = Array.from(
     parts.reduce<Map<string, { name: string; slug: string | null; items: PartCatalogItem[] }>>((groups, part) => {
       const key = part.manufacturerSlug || 'other-documented-parts';
@@ -198,6 +201,23 @@ export default async function PartsPage({ searchParams }: PageProps) {
           </div>
           <Link className="tool-link" href="/fitment-checker">Open Fitment Checker →</Link>
         </div>
+
+        {page === 1 && usefulManufacturers.length > 0 && (
+          <section className="catalog-group">
+            <h2>Browse parts by manufacturer</h2>
+            <p className="section-note">Manufacturer hubs are published only when at least two source-backed part records are available.</p>
+            <div className="grid">
+              {usefulManufacturers.map((manufacturer) => (
+                <Link className="card" href={`/parts/manufacturer/${manufacturer.slug}`} key={manufacturer.slug}>
+                  <span className="eyebrow">Parts manufacturer</span>
+                  <h3>{manufacturer.name}</h3>
+                  <p>{manufacturer.partCount.toLocaleString('en-US')} source-backed part page{manufacturer.partCount === 1 ? '' : 's'}</p>
+                  <span className="tool-link">Browse {manufacturer.name} parts →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {page === 1 && usefulCategories.length > 0 && (
           <section className="catalog-group">
