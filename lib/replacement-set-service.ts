@@ -5,6 +5,7 @@ export type ReplacementSetItem = {
   partNumber: string;
   normalizedPartNumber: string;
   name: string | null;
+  manufacturerSlug: string | null;
   quantity: number | null;
   role: string | null;
 };
@@ -24,6 +25,7 @@ export type ReplacementSetMembership = {
   legacyPartNumber: string;
   legacyNormalizedPartNumber: string;
   legacyPartName: string | null;
+  legacyManufacturerSlug: string | null;
   quantity: number | null;
   role: string | null;
   sourceTitle: string | null;
@@ -43,6 +45,7 @@ type ItemRow = RowDataPacket & {
   part_number: string;
   normalized_part_number: string;
   name: string | null;
+  manufacturer_slug: string | null;
   quantity: string | number | null;
   role: string | null;
 };
@@ -53,6 +56,7 @@ type MembershipRow = RowDataPacket & {
   legacy_part_number: string;
   legacy_normalized_part_number: string;
   legacy_part_name: string | null;
+  legacy_manufacturer_slug: string | null;
   quantity: string | number | null;
   role: string | null;
   source_title: string | null;
@@ -91,10 +95,11 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
     const placeholders = ids.map(() => '?').join(',');
     const [itemRows] = await db.query<ItemRow[]>(`
       SELECT prsi.replacement_set_id, p.part_number, p.normalized_part_number, p.name,
-             prsi.quantity, prsi.role
+             mf.slug AS manufacturer_slug, prsi.quantity, prsi.role
       FROM part_replacement_set_items prsi
       INNER JOIN parts p ON p.id=prsi.part_id
         AND p.data_status IN ('partial','verified')
+      LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
       WHERE prsi.replacement_set_id IN (${placeholders})
       ORDER BY prsi.replacement_set_id ASC, prsi.id ASC
     `, ids);
@@ -111,6 +116,7 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
           partNumber: item.part_number,
           normalizedPartNumber: item.normalized_part_number,
           name: item.name,
+          manufacturerSlug: item.manufacturer_slug,
           quantity: item.quantity === null ? null : Number(item.quantity),
           role: item.role,
         })),
@@ -131,12 +137,14 @@ export async function getReplacementSetMembershipsForPart(partId: number): Promi
              legacy.part_number AS legacy_part_number,
              legacy.normalized_part_number AS legacy_normalized_part_number,
              legacy.name AS legacy_part_name,
+             legacy_mf.slug AS legacy_manufacturer_slug,
              prsi.quantity, prsi.role,
              sr.title AS source_title, sr.url AS source_url
       FROM part_replacement_set_items prsi
       INNER JOIN part_replacement_sets prs ON prs.id=prsi.replacement_set_id
       INNER JOIN parts legacy ON legacy.id=prs.legacy_part_id
         AND legacy.data_status IN ('partial','verified')
+      LEFT JOIN manufacturers legacy_mf ON legacy_mf.id=legacy.manufacturer_id
       INNER JOIN source_records sr ON sr.id=prs.source_record_id
       WHERE prsi.part_id=?
         AND NOT EXISTS (
@@ -155,6 +163,7 @@ export async function getReplacementSetMembershipsForPart(partId: number): Promi
       legacyPartNumber: row.legacy_part_number,
       legacyNormalizedPartNumber: row.legacy_normalized_part_number,
       legacyPartName: row.legacy_part_name,
+      legacyManufacturerSlug: row.legacy_manufacturer_slug,
       quantity: row.quantity === null ? null : Number(row.quantity),
       role: row.role,
       sourceTitle: row.source_title,
