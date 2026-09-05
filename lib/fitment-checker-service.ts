@@ -175,7 +175,6 @@ export async function getPublishedMachineMatches(modelInput: string): Promise<Pu
           OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.slug,' ',''),'-',''),'/',''),'.',''),'_',''))=?
         )
       ORDER BY mf.name ASC, et.name ASC, m.model_name ASC, m.id ASC
-      LIMIT 25
     `, [model, model]);
 
     return rows.map((row) => ({
