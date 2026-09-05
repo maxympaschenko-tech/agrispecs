@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
-import { redirect } from 'next/navigation';
 import { getPart } from '@/lib/parts-service';
-import { hasAmbiguousPublishedPartNumber } from '@/lib/part-identity-service';
+import { getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
 import { getPartImages } from '@/lib/part-images-service';
 
 type LayoutProps = {
   children: ReactNode;
-  params: Promise<{ part: string }>;
+  params: Promise<{ manufacturer: string; part: string }>;
 };
 
 function jsonLd(value: unknown) {
@@ -18,25 +17,25 @@ function needsVisibleAttribution(licenseName: string | null) {
   return /\bCC\s+BY\b|\bCC\s+BY-SA\b|Creative Commons Attribution/i.test(licenseName);
 }
 
-export default async function PartLayout({ children, params }: LayoutProps) {
-  const { part: slug } = await params;
-  if (await hasAmbiguousPublishedPartNumber(slug)) {
-    redirect(`/parts/resolve/${encodeURIComponent(slug)}`);
-  }
+export default async function ManufacturerPartLayout({ children, params }: LayoutProps) {
+  const { manufacturer, part: slug } = await params;
+  const part = await getPart(slug, manufacturer);
+  const publishable = part && (part.dataStatus === 'partial' || part.dataStatus === 'verified');
+  if (!part || !publishable || !part.manufacturerSlug) return children;
 
-  const part = await getPart(slug);
-
-  if (!part) return children;
-
+  const matchCount = await getPublishedPartNumberMatchCount(part.normalizedPartNumber);
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalPath = matchCount > 1
+    ? `/parts/${part.manufacturerSlug}/${part.normalizedPartNumber.toLowerCase()}`
+    : `/parts/${part.normalizedPartNumber.toLowerCase()}`;
+  const canonicalUrl = `${baseUrl}${canonicalPath}`;
   const images = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug);
   const primaryImage = images[0];
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
-  const canonicalPath = `/parts/${part.normalizedPartNumber.toLowerCase()}`;
-  const canonicalUrl = `${baseUrl}${canonicalPath}`;
   const exactImageUrl = primaryImage?.imageKind === 'exact' && primaryImage.imageUrl
     ? `${baseUrl}${primaryImage.imageUrl}`
     : undefined;
   const productId = `${canonicalUrl}#product`;
+
   const breadcrumbItems = [
     {
       '@type': 'ListItem',
@@ -50,31 +49,13 @@ export default async function PartLayout({ children, params }: LayoutProps) {
       name: 'Parts',
       item: `${baseUrl}/parts`,
     },
-  ];
-
-  if (part.categorySlug && part.categoryName) {
-    breadcrumbItems.push({
+    {
       '@type': 'ListItem',
-      position: breadcrumbItems.length + 1,
-      name: part.categoryName,
-      item: `${baseUrl}/parts/category/${part.categorySlug}`,
-    });
-  }
-
-  breadcrumbItems.push({
-    '@type': 'ListItem',
-    position: breadcrumbItems.length + 1,
-    name: part.partNumber,
-    item: canonicalUrl,
-  });
-
-  const productProperties = [
-    part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
-    { '@type': 'PropertyValue', name: 'Source-backed compatible machines', value: String(part.fitments.length) },
-    part.components.length > 0
-      ? { '@type': 'PropertyValue', name: 'Documented kit components', value: String(part.components.length) }
-      : null,
-  ].filter(Boolean);
+      position: 3,
+      name: `${part.manufacturerName || 'OEM'} ${part.partNumber}`,
+      item: canonicalUrl,
+    },
+  ];
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -83,8 +64,8 @@ export default async function PartLayout({ children, params }: LayoutProps) {
         '@type': 'WebPage',
         '@id': `${canonicalUrl}#webpage`,
         url: canonicalUrl,
-        name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber} ${part.name || 'part reference'}`,
-        description: part.description || `${part.partNumber} source-backed farm equipment part fitment, replacement and cross-reference reference.`,
+        name: `${part.manufacturerName || 'OEM'} ${part.partNumber} ${part.name || 'part reference'}`,
+        description: part.description || `${part.manufacturerName || 'OEM'} ${part.partNumber} source-backed farm equipment part reference.`,
         image: exactImageUrl,
         isPartOf: {
           '@type': 'WebSite',
@@ -92,30 +73,27 @@ export default async function PartLayout({ children, params }: LayoutProps) {
           url: baseUrl,
           name: 'Farm Machine Specs',
         },
-        breadcrumb: {
-          '@id': `${canonicalUrl}#breadcrumb`,
-        },
-        mainEntity: {
-          '@id': productId,
-        },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': productId },
       },
       {
         '@type': 'Product',
         '@id': productId,
         url: canonicalUrl,
-        name: `${part.manufacturerName ? `${part.manufacturerName} ` : ''}${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
+        name: `${part.manufacturerName || 'OEM'} ${part.partNumber}${part.name ? ` ${part.name}` : ''}`,
         sku: part.partNumber,
         mpn: part.partNumber,
         category: part.categoryName || 'Farm equipment part',
         description: part.description || part.name || `${part.partNumber} farm equipment part reference.`,
         image: exactImageUrl,
         brand: part.manufacturerName
-          ? {
-              '@type': 'Brand',
-              name: part.manufacturerName,
-            }
+          ? { '@type': 'Brand', name: part.manufacturerName }
           : undefined,
-        additionalProperty: productProperties,
+        additionalProperty: [
+          part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
+          { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(part.fitments.length) },
+          matchCount > 1 ? { '@type': 'PropertyValue', name: 'Part-number identity', value: 'Manufacturer-qualified due to cross-brand number collision' } : null,
+        ].filter(Boolean),
       },
       {
         '@type': 'BreadcrumbList',
@@ -129,10 +107,7 @@ export default async function PartLayout({ children, params }: LayoutProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       {primaryImage && (
         <section className="section" style={{ paddingTop: 18, paddingBottom: 0 }}>
           <div className="container">
