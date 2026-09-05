@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 import { withServerTtlCache } from '@/lib/server-ttl-cache';
@@ -136,7 +137,7 @@ export async function getNonTractorEquipmentByBrand(brandSlug: string): Promise<
   );
 }
 
-export async function getEquipmentMachine(
+async function loadEquipmentMachine(
   equipmentTypeSlug: string,
   brandSlug: string,
   modelSlug: string,
@@ -156,6 +157,8 @@ export async function getEquipmentMachine(
     return undefined;
   }
 }
+
+export const getEquipmentMachine = cache(loadEquipmentMachine);
 
 export async function searchNonTractorEquipment(term: string): Promise<EquipmentMachine[]> {
   const normalized = term.trim();
