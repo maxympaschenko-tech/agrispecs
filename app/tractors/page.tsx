@@ -33,6 +33,10 @@ function tractorThumbnail(brandSlug: string, modelSlug: string, title: string) {
   );
 }
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export default async function TractorsPage() {
   const machines = await getMachines();
   const publishedMachines = machines.filter(
@@ -48,12 +52,51 @@ export default async function TractorsPage() {
     }, new Map()),
   );
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/tractors`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: 'Tractor Specs by Brand and Model',
+        description: 'Browse source-backed tractor specifications by manufacturer, including maintenance, OEM parts, attachment fitment and comparisons.',
+        isPartOf: { '@id': `${baseUrl}/#website` },
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        mainEntity: { '@id': `${canonicalUrl}#manufacturers` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Tractors', item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#manufacturers`,
+        name: 'Tractor manufacturers',
+        numberOfItems: brandGroups.length,
+        itemListElement: brandGroups.map(([brand, brandMachines], index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: brand,
+          url: `${baseUrl}/brands/${brandMachines[0]?.brandSlug}`,
+        })),
+      },
+    ],
+  };
+
   return (
     <main className="section">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container">
         <span className="eyebrow">Equipment catalog</span>
         <h1>Tractor specs by brand and model</h1>
-        <p className="section-lead">Browse source-backed tractor specifications, maintenance, OEM parts, attachment fitment and comparison tools for models published in the catalog.</p>
+        <p className="section-lead">Browse source-backed tractor specifications, maintenance, OEM parts, attachment fitment and comparison tools. Start with a manufacturer here, then use its brand hub for the complete published model list.</p>
 
         <div className="parts-stats">
           <div>
@@ -73,25 +116,47 @@ export default async function TractorsPage() {
         <div className="parts-tool-callout">
           <div>
             <strong>Need to compare models?</strong>
-            <span>Open the side-by-side tractor comparison tool or browse a manufacturer hub.</span>
+            <span>Open the side-by-side tractor comparison tool, or choose a manufacturer below to browse its full tractor catalog.</span>
           </div>
           <Link className="tool-link" href="/compare">Compare tractors</Link>
         </div>
 
         {brandGroups.length > 0 && (
           <section className="catalog-group">
-            <h2>Browse by manufacturer</h2>
-            <p className="section-note">Jump directly to a manufacturer section or open its dedicated brand hub.</p>
+            <span className="eyebrow">Browse catalog</span>
+            <h2>Tractor manufacturers</h2>
+            <p className="section-note">Each manufacturer card shows a small sample only. The brand hub contains every published tractor model, while all model URLs remain included in the sitemap.</p>
             <div className="grid">
               {brandGroups.map(([brand, brandMachines]) => {
                 const brandSlug = brandMachines[0]?.brandSlug;
+                const representative = brandMachines.find((machine) => !getMachineGenerationLabel(machine.modelSlug)) ?? brandMachines[0];
+                const sample = brandMachines.filter((machine) => !getMachineGenerationLabel(machine.modelSlug)).slice(0, 4);
+                if (!brandSlug || !representative) return null;
+
                 return (
                   <div className="card" key={brand}>
+                    <Link href={`/brands/${brandSlug}`} aria-label={`Browse ${brand} tractors`}>
+                      {tractorThumbnail(
+                        representative.brandSlug,
+                        representative.modelSlug,
+                        `${brand} tractor catalog`,
+                      )}
+                    </Link>
                     <span className="eyebrow">Manufacturer</span>
                     <h3>{brand}</h3>
-                    <p>{brandMachines.length} published model{brandMachines.length === 1 ? '' : 's'} in the catalog.</p>
-                    <a className="tool-link" href={`#brand-${brandSlug}`}>View models</a>{' '}
-                    <Link className="tool-link" href={`/brands/${brandSlug}`}>Brand hub</Link>
+                    <p>{brandMachines.length.toLocaleString('en-US')} published tractor model{brandMachines.length === 1 ? '' : 's'}.</p>
+                    {sample.length > 0 && (
+                      <p>
+                        <strong>Example models:</strong>{' '}
+                        {sample.map((machine, index) => (
+                          <span key={machine.id}>
+                            {index > 0 ? ' · ' : ''}
+                            <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>{getMachineDisplayModel(machine)}</Link>
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    <Link className="tool-link" href={`/brands/${brandSlug}`}>Browse all {brand} models →</Link>
                   </div>
                 );
               })}
@@ -99,36 +164,29 @@ export default async function TractorsPage() {
           </section>
         )}
 
-        {brandGroups.map(([brand, brandMachines]) => {
-          const brandSlug = brandMachines[0]?.brandSlug;
-          return (
-            <section className="catalog-group" id={`brand-${brandSlug}`} key={brand}>
-              <h2>{brand} tractor models</h2>
-              <p className="section-note">Published {brand} model pages with source-backed specifications and related reference data.</p>
-              <div className="grid">
-                {brandMachines.map((machine) => {
-                  const generationLabel = getMachineGenerationLabel(machine.modelSlug);
-                  const displayModel = getMachineDisplayModel(machine);
-                  return (
-                    <div className="card" key={machine.id}>
-                      <Link href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`} aria-label={`View ${machine.brand} ${displayModel}`}>
-                        {tractorThumbnail(machine.brandSlug, machine.modelSlug, `${machine.brand} ${displayModel}`)}
-                      </Link>
-                      <span className="eyebrow">
-                        {generationLabel || (machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data')}
-                      </span>
-                      <h3>{displayModel}</h3>
-                      <p>{generationLabel ? 'Archived generation with its own source-backed specifications, parts and fitment context.' : 'Specs, maintenance, parts, fitment and related equipment.'}</p>
-                      <Link className="tool-link" href={`/tractors/${machine.brandSlug}/${machine.modelSlug}`}>View model</Link>{' '}
-                      <Link className="tool-link" href={`/compare?m1=${machine.id}`}>Compare</Link>
-                    </div>
-                  );
-                })}
-              </div>
-              <Link className="tool-link" href={`/brands/${brandSlug}`}>View all {brand} references</Link>
-            </section>
-          );
-        })}
+        <section className="catalog-group">
+          <h2>How to use the tractor catalog</h2>
+          <div className="grid">
+            <Link className="card" href="/brands">
+              <span className="eyebrow">Manufacturers</span>
+              <h3>Browse all farm equipment brands</h3>
+              <p>Open brand hubs that combine tractors with other agricultural equipment from the same manufacturer.</p>
+              <span className="tool-link">View brands →</span>
+            </Link>
+            <Link className="card" href="/parts">
+              <span className="eyebrow">Parts reference</span>
+              <h3>Search OEM parts</h3>
+              <p>Find part numbers, replacement references and source-backed machine fitment.</p>
+              <span className="tool-link">Browse parts →</span>
+            </Link>
+            <Link className="card" href="/fitment-checker">
+              <span className="eyebrow">Compatibility</span>
+              <h3>Check part fitment</h3>
+              <p>Match an OEM part number to a machine and available serial or configuration context.</p>
+              <span className="tool-link">Open fitment checker →</span>
+            </Link>
+          </div>
+        </section>
 
         {researchMachines.length > 0 && (
           <section className="catalog-group">
