@@ -97,7 +97,7 @@ export default async function AttachmentsPage() {
             </div>
             <div>
               <strong>{fitmentCount.toLocaleString('en-US')}</strong>
-              <span>Documented machine fitment records</span>
+              <span>Documented attachment-machine fitments</span>
             </div>
             <div>
               <strong>{manufacturerCount.toLocaleString('en-US')}</strong>
@@ -146,7 +146,7 @@ export default async function AttachmentsPage() {
               <span className="eyebrow">Attachment type</span>
               <h2>{attachmentTypeLabel(type)}</h2>
               <p className="section-note">
-                {items.length.toLocaleString('en-US')} published attachment{items.length === 1 ? '' : 's'} with {typeFitmentCount.toLocaleString('en-US')} documented machine fitment record{typeFitmentCount === 1 ? '' : 's'}. Open a model to see compatible machines and source context.
+                {items.length.toLocaleString('en-US')} published attachment{items.length === 1 ? '' : 's'} with {typeFitmentCount.toLocaleString('en-US')} documented compatible-machine fitment{typeFitmentCount === 1 ? '' : 's'}. Open a model to see compatible machines and source context.
               </p>
 
               {manufacturerGroups.map(([manufacturerSlug, manufacturerItems]) => {
