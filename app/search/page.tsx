@@ -6,6 +6,8 @@ import { searchParts } from '@/lib/parts-service';
 import { searchAttachments } from '@/lib/attachments-service';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import { getPartImages } from '@/lib/part-images-service';
+import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -61,6 +63,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const publishableMachines = machines.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const publishableEquipment = equipment.filter((machine) => machine.dataStatus === 'verified' || machine.dataStatus === 'partial');
   const publishedParts = parts.filter((part) => part.dataStatus === 'verified' || part.dataStatus === 'partial');
+  const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
+    publishedParts.map((part) => part.normalizedPartNumber),
+  );
   const totalResults = publishableMachines.length + publishableEquipment.length + publishedParts.length + attachments.length;
   const resultGroupCount = [
     publishableMachines.length,
@@ -172,8 +177,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="grid">
                 {publishedParts.map((part) => {
                   const image = getPartImages(part.normalizedPartNumber, part.manufacturerSlug, part.categorySlug)[0];
+                  const partHref = getPartReferenceHref(
+                    part.normalizedPartNumber,
+                    part.manufacturerSlug,
+                    ambiguousPartNumbers,
+                  );
                   return (
-                    <Link className="card" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+                    <Link className="card" key={part.id} href={partHref}>
                       {cardImage(image.imageUrl, image.altText || `${part.partNumber} ${part.name || 'part'}`)}
                       <span className="eyebrow">
                         {part.categoryName || 'Part'}
