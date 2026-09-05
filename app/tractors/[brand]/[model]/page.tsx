@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
+import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec, type MachineVersion } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
@@ -14,6 +14,7 @@ export const revalidate = 0;
 
 type PageProps = {
   params: Promise<{ brand: string; model: string }>;
+  searchParams?: Promise<{ version?: string | string[] }>;
 };
 
 type VersionScopedRecord = {
@@ -80,6 +81,20 @@ function partFitmentConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low
   if (value === 'high') return 'High-confidence source-backed fitment';
   if (value === 'medium') return 'Medium-confidence fitment reference';
   return 'Low-confidence fitment reference — verify before ordering';
+}
+
+function machineVersionLabel(version: MachineVersion) {
+  const years = version.modelYearStart && version.modelYearEnd
+    ? `MY${version.modelYearStart}-${version.modelYearEnd}`
+    : version.modelYearStart
+      ? `MY${version.modelYearStart}+`
+      : null;
+  return [
+    version.marketName,
+    years,
+    version.configuration,
+    version.isCurrent ? 'Current' : null,
+  ].filter(Boolean).join(' · ') || version.slug;
 }
 
 function trimNumber(value: number, digits = 1) {
@@ -161,19 +176,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function TractorModelPage({ params }: PageProps) {
+export default async function TractorModelPage({ params, searchParams }: PageProps) {
   const { brand, model } = await params;
   const machine = await getMachine(brand, model);
   if (!machine) notFound();
 
   const versions = await getMachineVersions(machine.id);
-  const selectedVersion = versions.find((version) => version.specCount > 0) || versions[0];
+  const query = searchParams ? await searchParams : {};
+  const requestedVersion = Array.isArray(query.version) ? query.version[0] : query.version;
+  const selectedVersion = versions.find((version) => version.slug === requestedVersion)
+    || versions.find((version) => version.isCurrent)
+    || versions.find((version) => version.specCount > 0)
+    || versions[0];
 
   const [images, machineParts, maintenance, capacities, attachments, specs] = await Promise.all([
     getMachineImages(machine.id),
     getMachinePartsWithConfigurations(machine.id, selectedVersion?.id),
-    getMachineMaintenance(machine.id),
-    getMachineCapacities(machine.id),
+    getMachineMaintenance(machine.id, selectedVersion?.id),
+    getMachineCapacities(machine.id, selectedVersion?.id),
     getMachineAttachments(machine.id),
     selectedVersion ? getMachineSpecs(machine.id, selectedVersion.id) : Promise.resolve([]),
   ]);
@@ -245,15 +265,35 @@ export default async function TractorModelPage({ params }: PageProps) {
 
               {selectedVersion && (
                 <div className="notice">
-                  <strong>Specification set:</strong>{' '}
-                  {[selectedVersion.marketName, versionYears, selectedVersion.configuration].filter(Boolean).join(' - ')}
+                  <strong>Reference set:</strong>{' '}
+                  {[selectedVersion.marketName, versionYears, selectedVersion.configuration, selectedVersion.isCurrent ? 'Current' : null].filter(Boolean).join(' · ')}
                   {selectedVersion.notes ? ` ${selectedVersion.notes}` : ''}
+                </div>
+              )}
+
+              {versions.length > 1 && (
+                <div className="notice">
+                  <strong>Reference versions:</strong>{' '}
+                  {versions.map((version, index) => {
+                    const selected = selectedVersion?.id === version.id;
+                    const href = version.isCurrent
+                      ? `/tractors/${machine.brandSlug}/${machine.modelSlug}`
+                      : `/tractors/${machine.brandSlug}/${machine.modelSlug}?version=${encodeURIComponent(version.slug)}`;
+                    return (
+                      <span key={version.id}>
+                        {index > 0 ? ' · ' : ''}
+                        {selected ? <strong>{machineVersionLabel(version)}</strong> : <Link href={href}><u>{machineVersionLabel(version)}</u></Link>}
+                      </span>
+                    );
+                  })}
+                  <br />
+                  <small>Current is selected by default. Historical, manual-specific and market-unspecified contexts stay separate so their parts and service data are not presented as current-US fitment.</small>
                 </div>
               )}
 
               {specs.length === 0 && (
                 <div className="notice">
-                  Numerical specifications are published only after source verification.
+                  Numerical specifications are not published for this reference context unless a source explicitly supports them.
                 </div>
               )}
             </div>
@@ -336,7 +376,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {maintenance.length > 0 && (
               <section className="data-section" id="maintenance">
                 <h2>Maintenance schedule</h2>
-                <p className="section-note">Tasks are ordered by service interval within each machine-version context. Intervals are tied to the cited maintenance source, and each task shows its evidence confidence. Operating conditions and serial-number ranges can change the required service.</p>
+                <p className="section-note">Tasks shown here are limited to the selected reference context plus any generic machine-level tasks. Intervals are tied to the cited maintenance source, and each task shows its evidence confidence.</p>
                 <div className="maintenance-list">
                   {maintenance.map((task) => {
                     const context = versionContext(task);
@@ -373,7 +413,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
                 <h2>Compatible parts & kits</h2>
-                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Configuration-specific fitment, evidence confidence and the direct fitment source are shown under each part when available; still review the part page for serial-number and build details before ordering or installing.</p>
+                <p className="section-note">Parts shown here are limited to the selected reference context plus generic machine-level fitment. Configuration-specific fitment, evidence confidence and the direct fitment source are shown under each part when available.</p>
                 <div className="parts-list">
                   {verifiedParts.map((part) => (
                     <div className="part-row" key={part.id}>
@@ -403,7 +443,7 @@ export default async function TractorModelPage({ params }: PageProps) {
             {attachments.length > 0 && (
               <section className="data-section" id="attachments">
                 <h2>Verified attachment fitment</h2>
-                <p className="section-note">Attachment fitment is stored separately from service parts. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration; verify the requirement below before ordering or installing.</p>
+                <p className="section-note">Attachment fitment is stored separately from the specification/parts version selector. A listed attachment may still require a specific axle, driveline, transmission or tractor configuration; verify the requirement below before ordering or installing.</p>
                 <div className="maintenance-list">
                   {attachments.map((attachment) => {
                     const typeLabel = attachmentTypeLabel(attachment.attachmentType);

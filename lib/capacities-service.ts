@@ -43,11 +43,15 @@ type CapacityRow = RowDataPacket & {
   source_published_date: string | null;
 };
 
-export async function getMachineCapacities(machineId: string): Promise<MachineCapacity[]> {
+export async function getMachineCapacities(machineId: string, machineVersionId?: number): Promise<MachineCapacity[]> {
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
     const db = await getDbReady();
+    const versionFilter = machineVersionId ? 'AND (mc.machine_version_id IS NULL OR mc.machine_version_id = ?)' : '';
+    const params: number[] = [Number(machineId)];
+    if (machineVersionId) params.push(machineVersionId);
+
     const [rows] = await db.query<CapacityRow[]>(`
       SELECT
         mc.id,
@@ -72,6 +76,7 @@ export async function getMachineCapacities(machineId: string): Promise<MachineCa
       LEFT JOIN machine_versions mv ON mv.id = mc.machine_version_id
       LEFT JOIN source_records sr ON sr.id = mc.source_record_id
       WHERE mc.machine_id = ?
+        ${versionFilter}
       ORDER BY
         CASE WHEN mc.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
         CASE mc.label
@@ -85,7 +90,7 @@ export async function getMachineCapacities(machineId: string): Promise<MachineCa
         END,
         mc.configuration ASC,
         mc.id ASC
-    `, [Number(machineId)]);
+    `, params);
 
     return rows.map((row) => ({
       id: Number(row.id),
