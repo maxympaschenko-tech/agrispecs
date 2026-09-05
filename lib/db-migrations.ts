@@ -83,6 +83,7 @@ import { rkTractorsMigrations } from '@/lib/migrations/rk-tractors';
 import { antonioCarraroMigrations } from '@/lib/migrations/antonio-carraro';
 
 type AppliedMigrationRow = RowDataPacket & { id: string };
+type MigrationCountRow = RowDataPacket & { count: number | string };
 type LockRow = RowDataPacket & { acquired: number | null };
 
 const migrations: DbMigration[] = [
@@ -175,6 +176,29 @@ const migrations: DbMigration[] = [
 
 let migrationPromise: Promise<void> | null = null;
 
+async function migrationsAreCurrent() {
+  if (migrations.length === 0) return true;
+
+  const ids = migrations.map((migration) => migration.id);
+  const uniqueIds = new Set(ids);
+  if (uniqueIds.size !== ids.length) {
+    throw new Error('Duplicate database migration IDs are configured.');
+  }
+
+  try {
+    const pool = getDb();
+    const placeholders = ids.map(() => '?').join(',');
+    const [rows] = await pool.query<MigrationCountRow[]>(`
+      SELECT COUNT(*) AS count
+      FROM schema_migrations
+      WHERE id IN (${placeholders})
+    `, ids);
+    return Number(rows[0]?.count || 0) === ids.length;
+  } catch {
+    return false;
+  }
+}
+
 async function applyMigrations() {
   const pool = getDb();
   const connection = await pool.getConnection();
@@ -224,7 +248,10 @@ async function applyMigrations() {
 
 export async function ensureDatabaseMigrations() {
   if (!migrationPromise) {
-    migrationPromise = applyMigrations().catch((error) => {
+    migrationPromise = (async () => {
+      if (await migrationsAreCurrent()) return;
+      await applyMigrations();
+    })().catch((error) => {
       migrationPromise = null;
       throw error;
     });
