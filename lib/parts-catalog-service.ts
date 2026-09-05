@@ -35,6 +35,12 @@ export type PartCatalogStats = {
   aftermarket: number;
 };
 
+export type PartManufacturerSummary = {
+  name: string;
+  slug: string;
+  partCount: number;
+};
+
 type CatalogRow = RowDataPacket & {
   id: number;
   part_number: string;
@@ -56,6 +62,11 @@ type StatsRow = RowDataPacket & {
   replacement_linked: number | null;
   kit_linked: number | null;
   aftermarket: number | null;
+};
+type ManufacturerSummaryRow = RowDataPacket & {
+  name: string;
+  slug: string;
+  part_count: number;
 };
 
 const indexablePartCondition = `
@@ -131,21 +142,37 @@ function normalizePageSize(value: number | undefined) {
   return Math.max(1, Math.min(100, Math.floor(value as number)));
 }
 
+function normalizeSlug(value: string | undefined) {
+  return value?.trim().toLowerCase() || '';
+}
+
 export async function getPartCatalogPage(options: {
   categorySlug?: string;
+  manufacturerSlug?: string;
   page?: number;
   pageSize?: number;
 } = {}): Promise<PartCatalogPage> {
   const requestedPage = normalizePage(options.page);
   const pageSize = normalizePageSize(options.pageSize);
+  const categorySlug = normalizeSlug(options.categorySlug);
+  const manufacturerSlug = normalizeSlug(options.manufacturerSlug);
 
   try {
     const db = await getDbReady();
     const params: unknown[] = [];
-    const categoryFilter = options.categorySlug ? 'AND pc.slug = ?' : '';
-    if (options.categorySlug) params.push(options.categorySlug);
-    const categoryCacheKey = options.categorySlug?.trim().toLowerCase() || 'all';
-    const countCacheKey = `parts:catalog-count:${categoryCacheKey}`;
+    const filters: string[] = [];
+    if (categorySlug) {
+      filters.push('pc.slug = ?');
+      params.push(categorySlug);
+    }
+    if (manufacturerSlug) {
+      filters.push('mf.slug = ?');
+      params.push(manufacturerSlug);
+    }
+    const filterSql = filters.length > 0 ? `AND ${filters.join(' AND ')}` : '';
+    const categoryCacheKey = categorySlug || 'all';
+    const manufacturerCacheKey = manufacturerSlug || 'all';
+    const countCacheKey = `parts:catalog-count:${categoryCacheKey}:${manufacturerCacheKey}`;
 
     const total = await withServerTtlCache(
       countCacheKey,
@@ -155,8 +182,9 @@ export async function getPartCatalogPage(options: {
           SELECT COUNT(*) AS total
           FROM parts p
           LEFT JOIN part_categories pc ON pc.id=p.category_id
+          LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
           WHERE ${indexablePartCondition}
-            ${categoryFilter}
+            ${filterSql}
         `, params);
         return Number(countRows[0]?.total || 0);
       },
@@ -171,7 +199,7 @@ export async function getPartCatalogPage(options: {
     }
 
     const itemParams = [...params, pageSize, offset];
-    const itemCacheKey = `parts:catalog-page:${categoryCacheKey}:${requestedPage}:${pageSize}`;
+    const itemCacheKey = `parts:catalog-page:${categoryCacheKey}:${manufacturerCacheKey}:${requestedPage}:${pageSize}`;
     const rows = await withServerTtlCache(
       itemCacheKey,
       PARTS_COUNT_TTL_MS,
@@ -228,7 +256,7 @@ export async function getPartCatalogPage(options: {
           LEFT JOIN part_categories pc ON pc.id=p.category_id
           LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
           WHERE ${indexablePartCondition}
-            ${categoryFilter}
+            ${filterSql}
           ORDER BY
             CASE WHEN mf.slug='john-deere' THEN 0 ELSE 1 END,
             mf.name ASC,
@@ -251,6 +279,40 @@ export async function getPartCatalogPage(options: {
   } catch (error) {
     console.error('Unable to load paginated parts catalog:', error);
     return { items: [], total: 0, page: requestedPage, pageSize, totalPages: 0 };
+  }
+}
+
+export async function getPartManufacturerSummaries(): Promise<PartManufacturerSummary[]> {
+  try {
+    return await withServerTtlCache(
+      'parts:manufacturer-summaries',
+      PARTS_COUNT_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<ManufacturerSummaryRow[]>(`
+          SELECT
+            mf.name,
+            mf.slug,
+            COUNT(*) AS part_count
+          FROM parts p
+          INNER JOIN manufacturers mf ON mf.id=p.manufacturer_id
+          WHERE ${indexablePartCondition}
+          GROUP BY mf.id,mf.name,mf.slug
+          HAVING COUNT(*) > 0
+          ORDER BY part_count DESC,mf.name ASC
+        `);
+
+        return rows.map((row) => ({
+          name: row.name,
+          slug: row.slug,
+          partCount: Number(row.part_count || 0),
+        }));
+      },
+      (manufacturers) => manufacturers.length > 0,
+    );
+  } catch (error) {
+    console.error('Unable to load parts manufacturers:', error);
+    return [];
   }
 }
 
