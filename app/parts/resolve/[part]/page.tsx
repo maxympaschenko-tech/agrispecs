@@ -52,14 +52,14 @@ export default async function PartManufacturerResolverPage({ params }: PageProps
                 href={`/parts/${match.manufacturerSlug}/${match.normalizedPartNumber.toLowerCase()}`}
               >
                 <span className="eyebrow">Manufacturer-specific record</span>
-                <h2>{match.manufacturerName || 'Manufacturer'} {match.partNumber}</h2>
+                <h3>{match.manufacturerName || 'Manufacturer'} {match.partNumber}</h3>
                 <p>Open the source-backed fitment, replacement and part-reference record for this manufacturer.</p>
                 <span className="tool-link">Open exact part record</span>
               </Link>
             ) : (
               <div className="card" key={match.id}>
                 <span className="eyebrow">Manufacturer unresolved</span>
-                <h2>{match.partNumber}</h2>
+                <h3>{match.partNumber}</h3>
                 <p>This published record does not yet have a manufacturer slug, so it is intentionally not exposed through a manufacturer-qualified URL.</p>
               </div>
             )
