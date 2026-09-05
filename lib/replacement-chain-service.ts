@@ -34,6 +34,7 @@ export async function getReplacementChain(startPartId: number): Promise<Replacem
       SELECT p2.id, p2.part_number, p2.normalized_part_number, p2.name, mf.name AS manufacturer_name
       FROM part_cross_references pcr
       JOIN parts p2 ON p2.id=pcr.cross_part_id
+        AND p2.data_status IN ('partial','verified')
       LEFT JOIN manufacturers mf ON mf.id=p2.manufacturer_id
       WHERE pcr.part_id=?
         AND pcr.relation_type IN ('replaces','supersedes')

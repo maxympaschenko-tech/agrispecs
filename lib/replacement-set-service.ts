@@ -67,8 +67,22 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
     const [setRows] = await db.query<SetRow[]>(`
       SELECT prs.id, prs.title, prs.notes, sr.title AS source_title, sr.url AS source_url
       FROM part_replacement_sets prs
-      LEFT JOIN source_records sr ON sr.id=prs.source_record_id
+      INNER JOIN source_records sr ON sr.id=prs.source_record_id
       WHERE prs.legacy_part_id=?
+        AND EXISTS (
+          SELECT 1
+          FROM part_replacement_set_items required_item
+          INNER JOIN parts required_part ON required_part.id=required_item.part_id
+            AND required_part.data_status IN ('partial','verified')
+          WHERE required_item.replacement_set_id=prs.id
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM part_replacement_set_items hidden_item
+          INNER JOIN parts hidden_part ON hidden_part.id=hidden_item.part_id
+          WHERE hidden_item.replacement_set_id=prs.id
+            AND hidden_part.data_status NOT IN ('partial','verified')
+        )
       ORDER BY prs.id ASC
     `, [partId]);
     if (setRows.length === 0) return [];
@@ -80,6 +94,7 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
              prsi.quantity, prsi.role
       FROM part_replacement_set_items prsi
       INNER JOIN parts p ON p.id=prsi.part_id
+        AND p.data_status IN ('partial','verified')
       WHERE prsi.replacement_set_id IN (${placeholders})
       ORDER BY prsi.replacement_set_id ASC, prsi.id ASC
     `, ids);
@@ -121,8 +136,16 @@ export async function getReplacementSetMembershipsForPart(partId: number): Promi
       FROM part_replacement_set_items prsi
       INNER JOIN part_replacement_sets prs ON prs.id=prsi.replacement_set_id
       INNER JOIN parts legacy ON legacy.id=prs.legacy_part_id
-      LEFT JOIN source_records sr ON sr.id=prs.source_record_id
+        AND legacy.data_status IN ('partial','verified')
+      INNER JOIN source_records sr ON sr.id=prs.source_record_id
       WHERE prsi.part_id=?
+        AND NOT EXISTS (
+          SELECT 1
+          FROM part_replacement_set_items hidden_item
+          INNER JOIN parts hidden_part ON hidden_part.id=hidden_item.part_id
+          WHERE hidden_item.replacement_set_id=prs.id
+            AND hidden_part.data_status NOT IN ('partial','verified')
+        )
       ORDER BY prs.id ASC
     `, [partId]);
 
