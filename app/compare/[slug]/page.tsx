@@ -119,10 +119,11 @@ export default async function ComparisonPresetPage({ params }: PageProps) {
   );
 
   const selected = preset.machines
-    .map((target) => {
-      const candidates = machines.filter((machine) => machine.brand === target.brand && machine.model === target.model);
-      return candidates.find((machine) => !getMachineGenerationLabel(machine.modelSlug)) ?? candidates[0];
-    })
+    .map((target) => machines.find(
+      (machine) => machine.brand === target.brand
+        && machine.model === target.model
+        && !getMachineGenerationLabel(machine.modelSlug),
+    ))
     .filter((machine): machine is NonNullable<typeof machine> => Boolean(machine));
 
   if (selected.length !== preset.machines.length) notFound();
