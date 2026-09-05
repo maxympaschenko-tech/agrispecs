@@ -107,6 +107,7 @@ export type MachineAttachment = {
 };
 
 function rowToMachine(row: MachineRow): Machine {
+  const generationSuffix = /(^|-)previous($|-)/.test(row.model_slug) ? ' — Previous generation' : '';
   return {
     id: String(row.id),
     category: 'tractor',
@@ -114,7 +115,7 @@ function rowToMachine(row: MachineRow): Machine {
     brandSlug: row.manufacturer_slug,
     model: row.model_name,
     modelSlug: row.model_slug,
-    title: `${row.manufacturer_name} ${row.model_name}`,
+    title: `${row.manufacturer_name} ${row.model_name}${generationSuffix}`,
     dataStatus: row.data_status,
   };
 }
