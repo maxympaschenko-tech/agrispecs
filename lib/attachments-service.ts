@@ -17,6 +17,7 @@ export type MachineAttachment = {
   liftHeightText: string | null;
   configurationText: string | null;
   compatibilityNote: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
   sourceTitle: string | null;
   sourceUrl: string | null;
 };
@@ -69,6 +70,7 @@ type AttachmentRow = RowDataPacket & {
   lift_height_text: string | null;
   configuration_text: string | null;
   compatibility_note: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
   source_title: string | null;
   source_url: string | null;
 };
@@ -131,45 +133,53 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<AttachmentRow[]>(`
-      SELECT
-        ma.id AS relation_id,
-        a.id,
-        amf.name AS manufacturer_name,
-        amf.slug AS manufacturer_slug,
-        a.model_name,
-        a.slug,
-        a.attachment_type,
-        COALESCE(ma.performance_capacity_text,a.lift_capacity_text) AS lift_capacity_text,
-        COALESCE(ma.performance_height_text,a.lift_height_text) AS lift_height_text,
-        COALESCE(ma.performance_configuration_text,a.configuration_text) AS configuration_text,
-        ma.compatibility_note,
-        sr.title AS source_title,
-        sr.url AS source_url
-      FROM machine_attachments ma
-      JOIN attachments a ON a.id=ma.attachment_id
-      JOIN manufacturers amf ON amf.id=a.manufacturer_id
-      INNER JOIN source_records sr ON sr.id=ma.source_record_id
-      WHERE ma.machine_id=? AND a.data_status IN ('partial','verified')
-      ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC, sr.id ASC, ma.id ASC
-    `, [Number(machineId)]);
+    return await withServerTtlCache(
+      `machine-attachments:${machineId}`,
+      ATTACHMENT_CATALOG_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<AttachmentRow[]>(`
+          SELECT
+            ma.id AS relation_id,
+            a.id,
+            amf.name AS manufacturer_name,
+            amf.slug AS manufacturer_slug,
+            a.model_name,
+            a.slug,
+            a.attachment_type,
+            COALESCE(ma.performance_capacity_text,a.lift_capacity_text) AS lift_capacity_text,
+            COALESCE(ma.performance_height_text,a.lift_height_text) AS lift_height_text,
+            COALESCE(ma.performance_configuration_text,a.configuration_text) AS configuration_text,
+            ma.compatibility_note,
+            ma.confidence,
+            sr.title AS source_title,
+            sr.url AS source_url
+          FROM machine_attachments ma
+          JOIN attachments a ON a.id=ma.attachment_id
+          JOIN manufacturers amf ON amf.id=a.manufacturer_id
+          INNER JOIN source_records sr ON sr.id=ma.source_record_id
+          WHERE ma.machine_id=? AND a.data_status IN ('partial','verified')
+          ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC, sr.id ASC, ma.id ASC
+        `, [Number(machineId)]);
 
-    return rows.map((row) => ({
-      relationId: Number(row.relation_id),
-      id: Number(row.id),
-      manufacturerName: row.manufacturer_name,
-      manufacturerSlug: row.manufacturer_slug,
-      modelName: row.model_name,
-      slug: row.slug,
-      attachmentType: row.attachment_type,
-      liftCapacityText: row.lift_capacity_text,
-      liftHeightText: row.lift_height_text,
-      configurationText: row.configuration_text,
-      compatibilityNote: row.compatibility_note,
-      sourceTitle: row.source_title,
-      sourceUrl: row.source_url,
-    }));
+        return rows.map((row) => ({
+          relationId: Number(row.relation_id),
+          id: Number(row.id),
+          manufacturerName: row.manufacturer_name,
+          manufacturerSlug: row.manufacturer_slug,
+          modelName: row.model_name,
+          slug: row.slug,
+          attachmentType: row.attachment_type,
+          liftCapacityText: row.lift_capacity_text,
+          liftHeightText: row.lift_height_text,
+          configurationText: row.configuration_text,
+          compatibilityNote: row.compatibility_note,
+          confidence: row.confidence,
+          sourceTitle: row.source_title,
+          sourceUrl: row.source_url,
+        }));
+      },
+    );
   } catch (error) {
     console.error('Unable to load machine attachments:', error);
     return [];

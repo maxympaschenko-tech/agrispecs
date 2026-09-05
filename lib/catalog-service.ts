@@ -8,6 +8,7 @@ import {
 } from '@/lib/catalog';
 
 const TRACTOR_CATALOG_TTL_MS = 5 * 60 * 1000;
+const MACHINE_DETAIL_TTL_MS = 5 * 60 * 1000;
 
 type MachineRow = RowDataPacket & {
   id: number;
@@ -306,39 +307,45 @@ async function loadMachineVersions(machineId: string): Promise<MachineVersion[]>
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<VersionRow[]>(`
-      SELECT
-        mv.id,
-        mv.slug,
-        mv.market_code,
-        mv.market_name,
-        mv.model_year_start,
-        mv.model_year_end,
-        mv.configuration,
-        mv.is_current,
-        mv.notes,
-        COUNT(spec_source.id) AS spec_count
-      FROM machine_versions mv
-      LEFT JOIN machine_specs ms ON ms.machine_version_id = mv.id
-      LEFT JOIN source_records spec_source ON spec_source.id = ms.source_record_id
-      WHERE mv.machine_id = ?
-      GROUP BY mv.id
-      ORDER BY mv.is_current DESC, spec_count DESC, mv.model_year_end DESC, mv.model_year_start DESC
-    `, [Number(machineId)]);
+    return await withServerTtlCache(
+      `machine-versions:${machineId}`,
+      MACHINE_DETAIL_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<VersionRow[]>(`
+          SELECT
+            mv.id,
+            mv.slug,
+            mv.market_code,
+            mv.market_name,
+            mv.model_year_start,
+            mv.model_year_end,
+            mv.configuration,
+            mv.is_current,
+            mv.notes,
+            COUNT(spec_source.id) AS spec_count
+          FROM machine_versions mv
+          LEFT JOIN machine_specs ms ON ms.machine_version_id = mv.id
+          LEFT JOIN source_records spec_source ON spec_source.id = ms.source_record_id
+          WHERE mv.machine_id = ?
+          GROUP BY mv.id
+          ORDER BY mv.is_current DESC, spec_count DESC, mv.model_year_end DESC, mv.model_year_start DESC
+        `, [Number(machineId)]);
 
-    return rows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      marketCode: row.market_code,
-      marketName: row.market_name,
-      modelYearStart: row.model_year_start,
-      modelYearEnd: row.model_year_end,
-      configuration: row.configuration,
-      isCurrent: Boolean(row.is_current),
-      notes: row.notes,
-      specCount: Number(row.spec_count || 0),
-    }));
+        return rows.map((row) => ({
+          id: row.id,
+          slug: row.slug,
+          marketCode: row.market_code,
+          marketName: row.market_name,
+          modelYearStart: row.model_year_start,
+          modelYearEnd: row.model_year_end,
+          configuration: row.configuration,
+          isCurrent: Boolean(row.is_current),
+          notes: row.notes,
+          specCount: Number(row.spec_count || 0),
+        }));
+      },
+    );
   } catch (error) {
     console.error('Unable to load machine versions:', error);
     return [];
@@ -351,38 +358,44 @@ async function loadMachineSpecs(machineId: string, machineVersionId?: number): P
   if (!/^\d+$/.test(machineId) || !machineVersionId) return [];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<SpecRow[]>(`
-      SELECT
-        sd.spec_key,
-        sd.section,
-        sd.label,
-        ms.value_text,
-        ms.value_number,
-        ms.unit,
-        ms.confidence,
-        sr.title AS source_title,
-        sr.url AS source_url,
-        DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
-      FROM machine_specs ms
-      INNER JOIN spec_definitions sd ON sd.id = ms.spec_definition_id
-      INNER JOIN source_records sr ON sr.id = ms.source_record_id
-      WHERE ms.machine_id = ? AND ms.machine_version_id = ?
-      ORDER BY sd.section ASC, sd.display_order ASC, sd.label ASC
-    `, [Number(machineId), machineVersionId]);
+    return await withServerTtlCache(
+      `machine-specs:${machineId}:${machineVersionId}`,
+      MACHINE_DETAIL_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<SpecRow[]>(`
+          SELECT
+            sd.spec_key,
+            sd.section,
+            sd.label,
+            ms.value_text,
+            ms.value_number,
+            ms.unit,
+            ms.confidence,
+            sr.title AS source_title,
+            sr.url AS source_url,
+            DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
+          FROM machine_specs ms
+          INNER JOIN spec_definitions sd ON sd.id = ms.spec_definition_id
+          INNER JOIN source_records sr ON sr.id = ms.source_record_id
+          WHERE ms.machine_id = ? AND ms.machine_version_id = ?
+          ORDER BY sd.section ASC, sd.display_order ASC, sd.label ASC
+        `, [Number(machineId), machineVersionId]);
 
-    return rows.map((row) => ({
-      specKey: row.spec_key,
-      section: row.section,
-      label: row.label,
-      valueText: row.value_text,
-      valueNumber: row.value_number === null ? null : Number(row.value_number),
-      unit: row.unit,
-      confidence: row.confidence,
-      sourceTitle: row.source_title,
-      sourceUrl: row.source_url,
-      sourcePublishedDate: row.source_published_date,
-    }));
+        return rows.map((row) => ({
+          specKey: row.spec_key,
+          section: row.section,
+          label: row.label,
+          valueText: row.value_text,
+          valueNumber: row.value_number === null ? null : Number(row.value_number),
+          unit: row.unit,
+          confidence: row.confidence,
+          sourceTitle: row.source_title,
+          sourceUrl: row.source_url,
+          sourcePublishedDate: row.source_published_date,
+        }));
+      },
+    );
   } catch (error) {
     console.error('Unable to load machine specifications:', error);
     return [];
@@ -395,47 +408,53 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
   if (!/^\d+$/.test(machineId)) return [];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<AttachmentRow[]>(`
-      SELECT
-        a.id,
-        amf.name AS manufacturer_name,
-        amf.slug AS manufacturer_slug,
-        a.attachment_type,
-        a.model_name,
-        a.slug,
-        COALESCE(ma.performance_capacity_text,a.lift_capacity_text) AS lift_capacity_text,
-        COALESCE(ma.performance_height_text,a.lift_height_text) AS lift_height_text,
-        COALESCE(ma.performance_configuration_text,a.configuration_text) AS configuration_text,
-        a.data_status,
-        ma.compatibility_note,
-        ma.confidence,
-        sr.title AS source_title,
-        sr.url AS source_url
-      FROM machine_attachments ma
-      INNER JOIN attachments a ON a.id = ma.attachment_id
-      INNER JOIN manufacturers amf ON amf.id = a.manufacturer_id
-      INNER JOIN source_records sr ON sr.id = ma.source_record_id
-      WHERE ma.machine_id = ? AND a.data_status IN ('partial','verified')
-      ORDER BY a.attachment_type ASC, a.model_name ASC
-    `, [Number(machineId)]);
+    return await withServerTtlCache(
+      `catalog-machine-attachments:${machineId}`,
+      MACHINE_DETAIL_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<AttachmentRow[]>(`
+          SELECT
+            a.id,
+            amf.name AS manufacturer_name,
+            amf.slug AS manufacturer_slug,
+            a.attachment_type,
+            a.model_name,
+            a.slug,
+            COALESCE(ma.performance_capacity_text,a.lift_capacity_text) AS lift_capacity_text,
+            COALESCE(ma.performance_height_text,a.lift_height_text) AS lift_height_text,
+            COALESCE(ma.performance_configuration_text,a.configuration_text) AS configuration_text,
+            a.data_status,
+            ma.compatibility_note,
+            ma.confidence,
+            sr.title AS source_title,
+            sr.url AS source_url
+          FROM machine_attachments ma
+          INNER JOIN attachments a ON a.id = ma.attachment_id
+          INNER JOIN manufacturers amf ON amf.id = a.manufacturer_id
+          INNER JOIN source_records sr ON sr.id = ma.source_record_id
+          WHERE ma.machine_id = ? AND a.data_status IN ('partial','verified')
+          ORDER BY a.attachment_type ASC, a.model_name ASC
+        `, [Number(machineId)]);
 
-    return rows.map((row) => ({
-      id: row.id,
-      manufacturerName: row.manufacturer_name,
-      manufacturerSlug: row.manufacturer_slug,
-      attachmentType: row.attachment_type,
-      modelName: row.model_name,
-      slug: row.slug,
-      liftCapacityText: row.lift_capacity_text,
-      liftHeightText: row.lift_height_text,
-      configurationText: row.configuration_text,
-      dataStatus: row.data_status,
-      compatibilityNote: row.compatibility_note,
-      confidence: row.confidence,
-      sourceTitle: row.source_title,
-      sourceUrl: row.source_url,
-    }));
+        return rows.map((row) => ({
+          id: row.id,
+          manufacturerName: row.manufacturer_name,
+          manufacturerSlug: row.manufacturer_slug,
+          attachmentType: row.attachment_type,
+          modelName: row.model_name,
+          slug: row.slug,
+          liftCapacityText: row.lift_capacity_text,
+          liftHeightText: row.lift_height_text,
+          configurationText: row.configuration_text,
+          dataStatus: row.data_status,
+          compatibilityNote: row.compatibility_note,
+          confidence: row.confidence,
+          sourceTitle: row.source_title,
+          sourceUrl: row.source_url,
+        }));
+      },
+    );
   } catch (error) {
     console.error('Unable to load machine attachments:', error);
     return [];
