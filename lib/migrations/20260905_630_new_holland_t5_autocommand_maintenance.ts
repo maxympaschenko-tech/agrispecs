@@ -8,7 +8,6 @@ type TaskInput = {
   section: string;
   action: string;
   title: string;
-  partNumber?: string;
   intervalHours: number;
   intervalMonths?: number;
   intervalText: string;
@@ -21,7 +20,7 @@ const MANUAL_URL = 'https://www.ebooklibonline.com/onlinepages/PREVIEW-51493747-
 const MANUAL_EXTERNAL_ID = 'nh-t5-autocommand-operator-manual-51493747-maintenance-preview-2019-02';
 const OFFICIAL_T5_URL = 'https://agriculture.newholland.com/en-us/nar/products/tractors-telehandlers/t5-series';
 const OFFICIAL_T5_EXTERNAL_ID = 'new-holland-t5-series-na-600-hour-engine-oil-2026-09';
-const VERSION_SLUG = 'autocommand-stage-v-manual-51493747';
+const VERSION_SLUG = 'autocommand-manual-51493747';
 
 const models = [
   { slug: 't5-110', model: 'T5.110' },
@@ -80,8 +79,6 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
   id: '20260905_630_new_holland_t5_autocommand_maintenance',
   description: 'Add version-scoped T5.110-T5.140 AutoCommand maintenance intervals from operator manual 51493747',
   async apply(connection) {
-    const manufacturerId = await selectId(connection, `SELECT id FROM manufacturers WHERE slug='new-holland' LIMIT 1`);
-
     const manualSourceId = await ensureSource(
       connection,
       'New Holland Operator Manual Preview',
@@ -123,8 +120,8 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
             'Engine - breather filter replacement',
           ],
         },
-        provenanceNote: 'The hosted PDF is a preview/reproduction of an original New Holland operator manual, not an official New Holland web host. Maintenance tasks are therefore stored with high rather than official confidence unless independently confirmed by an official New Holland source.',
-        marketGuardrail: 'The preview does not establish a North America-specific manual edition. Tasks are scoped to the AutoCommand manual family, not asserted as universal across every T5 transmission or regional build.',
+        provenanceNote: 'The hosted PDF is a preview/reproduction of an original New Holland operator manual, not an official New Holland web host. Manual-derived tasks are therefore stored with high rather than official confidence.',
+        guardrail: 'The accessible preview proves the four AutoCommand model names and publication date, but does not establish Stage V or a North America-specific edition for the complete schedule. The schedule is therefore scoped only to the AutoCommand manual family.',
       },
     );
 
@@ -140,7 +137,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
       officialSourceId,
       OFFICIAL_T5_EXTERNAL_ID,
       OFFICIAL_T5_URL,
-      'New Holland T5 Series North America - simple maintenance and 600-hour engine oil interval',
+      'New Holland T5 Series North America - 600-hour engine oil interval',
       null,
       {
         role: 'Official current North American T5 service-interval corroboration',
@@ -150,26 +147,15 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
       },
     );
 
-    const partIds = new Map<string, number>();
-    for (const partNumber of ['84228488', '51447239', '87720899']) {
-      const partId = await selectId(
-        connection,
-        `SELECT id FROM parts WHERE manufacturer_id=? AND normalized_part_number=? LIMIT 1`,
-        [manufacturerId, partNumber],
-      );
-      partIds.set(partNumber, partId);
-    }
-
     const manualTasks: Omit<TaskInput, 'sourceRecordId' | 'confidence'>[] = [
       {
         taskKey: 'autocommand-engine-oil-filter-600',
         section: 'Engine',
         action: 'Replace',
         title: 'engine oil filter',
-        partNumber: '84228488',
         intervalHours: 600,
         intervalText: 'Every 600 hours',
-        notes: 'Operator manual 51493747 specifies changing engine oil and filter at this interval. Part 84228488 is separately verified for the T5.110-T5.140 AutoCommand Stage V family.',
+        notes: 'Operator manual 51493747 specifies changing engine oil and filter. No OEM part number is attached here because the accessible manual preview does not establish the exact market/emissions build.',
       },
       {
         taskKey: 'autocommand-fuel-filters-600',
@@ -178,17 +164,16 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         title: 'first-stage fuel filter and fuel filter element',
         intervalHours: 600,
         intervalText: 'Every 600 hours',
-        notes: 'The manual defines two fuel-service positions. Multiple OEM fuel-filter numbers are verified across T5 Stage V builds, so no single part number is forced onto this task; confirm the exact build and service position before ordering.',
+        notes: 'The manual defines two fuel-service positions. Confirm the exact build and service position before ordering parts.',
       },
       {
         taskKey: 'autocommand-outer-air-cleaner-600',
         section: 'Fuel & Air',
         action: 'Replace',
         title: 'engine air cleaner outer element',
-        partNumber: '51447239',
         intervalHours: 600,
         intervalText: 'Every 600 hours',
-        notes: 'Part 51447239 is separately verified as the primary/outer engine air filter for T5.110-T5.140 AutoCommand Stage V configurations.',
+        notes: 'No OEM part number is forced onto this broader manual family; use the machine-specific parts section to match the exact build.',
       },
       {
         taskKey: 'autocommand-hydraulic-transmission-filters-600',
@@ -197,7 +182,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         title: 'hydraulic charge-pump and transmission oil filters',
         intervalHours: 600,
         intervalText: 'Every 600 hours',
-        notes: 'The manual specifies two filter roles. Exact OEM numbers can vary by build and service position; this task intentionally avoids collapsing them into one part number.',
+        notes: 'The manual specifies two filter roles. Exact OEM numbers can vary by build and service position.',
       },
       {
         taskKey: 'autocommand-def-inline-filter-clean-600',
@@ -223,7 +208,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         intervalHours: 1200,
         intervalMonths: 12,
         intervalText: 'Every 1200 hours or annually',
-        notes: 'Roof configuration changes the correct OEM cab-filter part number, so the maintenance task is intentionally not pinned to a single filter.',
+        notes: 'Cab/roof configuration can change the correct filter part number.',
       },
       {
         taskKey: 'autocommand-hydraulic-suction-filter-1200',
@@ -240,11 +225,10 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         section: 'Fuel & Air',
         action: 'Replace',
         title: 'engine air cleaner inner element',
-        partNumber: '87720899',
         intervalHours: 1200,
         intervalMonths: 24,
         intervalText: 'Every 1200 hours or every 2 years',
-        notes: 'Part 87720899 is separately verified as the secondary/inner engine air filter for the T5.110-T5.140 AutoCommand Stage V family.',
+        notes: 'No OEM part number is forced onto this broader manual family; match the machine-specific build.',
       },
       {
         taskKey: 'autocommand-transmission-rear-axle-hydraulic-oil-1200',
@@ -254,7 +238,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         intervalHours: 1200,
         intervalMonths: 24,
         intervalText: 'Every 1200 hours or every 2 years',
-        notes: 'Fluid specification and capacity can depend on build configuration; this task records the interval without inventing a universal fluid quantity.',
+        notes: 'Fluid specification and capacity can depend on build configuration; this records the interval without inventing a universal quantity.',
       },
       {
         taskKey: 'autocommand-engine-breather-1800',
@@ -264,7 +248,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         intervalHours: 1800,
         intervalMonths: 24,
         intervalText: 'Every 1800 hours or every 2 years',
-        notes: 'The interval is directly listed in operator manual 51493747. No part number is attached because the exact Stage V AutoCommand breather-filter fitment is still being verified separately.',
+        notes: 'No part number is attached because exact market/build breather-filter fitment remains under separate verification.',
       },
     ];
 
@@ -278,15 +262,15 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
       await connection.query(
         `INSERT INTO machine_versions (
           machine_id,slug,market_code,market_name,model_year_start,model_year_end,configuration,is_current,source_record_id,notes
-        ) VALUES (?,?,NULL,'Market not specified',2019,NULL,'AutoCommand Stage V',FALSE,?,?)
+        ) VALUES (?,?,NULL,'Market not specified',NULL,NULL,'AutoCommand',FALSE,?,?)
         ON DUPLICATE KEY UPDATE
-          market_name=VALUES(market_name),model_year_start=VALUES(model_year_start),model_year_end=VALUES(model_year_end),
+          market_code=NULL,market_name=VALUES(market_name),model_year_start=NULL,model_year_end=NULL,
           configuration=VALUES(configuration),is_current=VALUES(is_current),source_record_id=VALUES(source_record_id),notes=VALUES(notes)`,
         [
           machineId,
           VERSION_SLUG,
           manualSourceRecordId,
-          'Maintenance-only version context from New Holland operator manual 51493747. It does not imply current availability in every market or universal applicability to other T5 transmissions.',
+          'Maintenance-only version context from operator manual 51493747. It does not imply a specific emissions generation, market, model-year range, or applicability to other T5 transmissions.',
         ],
       );
       const machineVersionId = await selectId(
@@ -296,15 +280,14 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
       );
 
       const upsertTask = async (task: TaskInput) => {
-        const partId = task.partNumber ? partIds.get(task.partNumber) ?? null : null;
         await connection.query(
           `INSERT INTO maintenance_tasks (
             machine_id,machine_version_id,task_key,section,action,title,part_id,interval_hours,interval_months,
             interval_text,notes,source_record_id,confidence
-          ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+          ) VALUES (?,?,?,?,?,?,NULL,?,?,?,?,?,?)
           ON DUPLICATE KEY UPDATE
             machine_version_id=VALUES(machine_version_id),section=VALUES(section),action=VALUES(action),title=VALUES(title),
-            part_id=VALUES(part_id),interval_hours=VALUES(interval_hours),interval_months=VALUES(interval_months),
+            part_id=NULL,interval_hours=VALUES(interval_hours),interval_months=VALUES(interval_months),
             interval_text=VALUES(interval_text),notes=VALUES(notes),confidence=VALUES(confidence)`,
           [
             machineId,
@@ -313,7 +296,6 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
             task.section,
             task.action,
             task.title,
-            partId,
             task.intervalHours,
             task.intervalMonths ?? null,
             task.intervalText,
@@ -331,7 +313,7 @@ export const newHollandT5AutoCommandMaintenanceMigration: DbMigration = {
         title: 'engine oil',
         intervalHours: 600,
         intervalText: 'Every 600 hours',
-        notes: 'Official New Holland North America current T5 page confirms a 600-hour engine oil change interval. The AutoCommand operator manual independently places engine oil service at 600 hours.',
+        notes: 'Official New Holland North America current T5 page confirms a 600-hour engine oil change interval. Operator manual 51493747 independently places engine oil service at 600 hours.',
         sourceRecordId: officialSourceRecordId,
         confidence: 'official',
       });
