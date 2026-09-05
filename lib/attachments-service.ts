@@ -83,6 +83,18 @@ type AttachmentCatalogRow = RowDataPacket & {
   configuration_text?: string | null;
 };
 
+type AttachmentDetailRow = RowDataPacket & {
+  id: number;
+  manufacturer_name: string;
+  manufacturer_slug: string;
+  model_name: string;
+  slug: string;
+  attachment_type: string;
+  lift_capacity_text: string | null;
+  lift_height_text: string | null;
+  configuration_text: string | null;
+};
+
 type CompatibleMachineRow = RowDataPacket & {
   machine_id: number;
   brand: string;
@@ -288,7 +300,7 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
 async function loadAttachment(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
   try {
     const db = await getDbReady();
-    const [attachmentRows] = await db.query<AttachmentCatalogRow[]>(`
+    const [attachmentRows] = await db.query<AttachmentDetailRow[]>(`
       SELECT
         a.id,
         mf.name AS manufacturer_name,
@@ -298,15 +310,7 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
         a.attachment_type,
         a.lift_capacity_text,
         a.lift_height_text,
-        a.configuration_text,
-        (
-          SELECT COUNT(DISTINCT ma_count.machine_id)
-          FROM machine_attachments ma_count
-          JOIN machines m_count ON m_count.id=ma_count.machine_id
-            AND m_count.data_status IN ('partial','verified')
-          JOIN source_records count_source ON count_source.id=ma_count.source_record_id
-          WHERE ma_count.attachment_id=a.id
-        ) AS compatible_machine_count
+        a.configuration_text
       FROM attachments a
       JOIN manufacturers mf ON mf.id=a.manufacturer_id
       WHERE a.slug=? AND a.data_status IN ('partial','verified')
@@ -343,6 +347,7 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
     `, [Number(attachment.id)]);
 
     const firstSource = machineRows.find((row) => row.source_url);
+    const compatibleMachineCount = new Set(machineRows.map((row) => Number(row.machine_id))).size;
 
     return {
       id: Number(attachment.id),
@@ -351,10 +356,10 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
       modelName: attachment.model_name,
       slug: attachment.slug,
       attachmentType: attachment.attachment_type,
-      compatibleMachineCount: Number(attachment.compatible_machine_count || 0),
-      liftCapacityText: attachment.lift_capacity_text ?? null,
-      liftHeightText: attachment.lift_height_text ?? null,
-      configurationText: attachment.configuration_text ?? null,
+      compatibleMachineCount,
+      liftCapacityText: attachment.lift_capacity_text,
+      liftHeightText: attachment.lift_height_text,
+      configurationText: attachment.configuration_text,
       compatibleMachines: machineRows.map((row) => ({
         machineId: Number(row.machine_id),
         brand: row.brand,
