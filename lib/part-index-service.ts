@@ -4,10 +4,16 @@ import { withServerTtlCache } from '@/lib/server-ttl-cache';
 
 const PART_INDEX_TTL_MS = 5 * 60 * 1000;
 
-type IndexablePartRow = RowDataPacket & { normalized_part_number: string };
-type IndexableManufacturerPartRow = RowDataPacket & {
+type IndexablePartRouteRow = RowDataPacket & {
   normalized_part_number: string;
-  manufacturer_slug: string;
+  manufacturer_slug: string | null;
+  published_count: number;
+};
+
+type IndexablePartRouteRecord = {
+  normalizedPartNumber: string;
+  manufacturerSlug: string | null;
+  publishedCount: number;
 };
 
 export type IndexableManufacturerPartRoute = {
@@ -60,54 +66,28 @@ const indexableRelationshipSql = `
   )
 `;
 
-export async function getIndexablePartNumbers(): Promise<string[]> {
+async function getIndexablePartRouteRecords(): Promise<IndexablePartRouteRecord[]> {
   return withServerTtlCache(
-    'parts:indexable-short-routes',
+    'parts:indexable-route-records',
     PART_INDEX_TTL_MS,
     async () => {
       try {
         const db = await getDbReady();
-        const [rows] = await db.query<IndexablePartRow[]>(`
-          SELECT DISTINCT p.normalized_part_number
+        const [rows] = await db.query<IndexablePartRouteRow[]>(`
+          SELECT
+            p.normalized_part_number,
+            mf.slug AS manufacturer_slug,
+            published_counts.published_count
           FROM parts p
+          LEFT JOIN manufacturers mf ON mf.id=p.manufacturer_id
+          INNER JOIN (
+            SELECT normalized_part_number, COUNT(*) AS published_count
+            FROM parts
+            WHERE data_status IN ('partial','verified')
+            GROUP BY normalized_part_number
+          ) published_counts
+            ON published_counts.normalized_part_number=p.normalized_part_number
           WHERE p.data_status IN ('partial','verified')
-            AND (
-              SELECT COUNT(*)
-              FROM parts same_number
-              WHERE same_number.normalized_part_number=p.normalized_part_number
-                AND same_number.data_status IN ('partial','verified')
-            ) = 1
-            AND ${indexableRelationshipSql}
-          ORDER BY p.normalized_part_number ASC
-        `);
-        return rows.map((row) => row.normalized_part_number);
-      } catch (error) {
-        console.error('Unable to load indexable part numbers:', error);
-        return [];
-      }
-    },
-    (partNumbers) => partNumbers.length > 0,
-  );
-}
-
-export async function getIndexableManufacturerPartRoutes(): Promise<IndexableManufacturerPartRoute[]> {
-  return withServerTtlCache(
-    'parts:indexable-manufacturer-routes',
-    PART_INDEX_TTL_MS,
-    async () => {
-      try {
-        const db = await getDbReady();
-        const [rows] = await db.query<IndexableManufacturerPartRow[]>(`
-          SELECT p.normalized_part_number, mf.slug AS manufacturer_slug
-          FROM parts p
-          INNER JOIN manufacturers mf ON mf.id=p.manufacturer_id
-          WHERE p.data_status IN ('partial','verified')
-            AND (
-              SELECT COUNT(*)
-              FROM parts same_number
-              WHERE same_number.normalized_part_number=p.normalized_part_number
-                AND same_number.data_status IN ('partial','verified')
-            ) > 1
             AND ${indexableRelationshipSql}
           ORDER BY p.normalized_part_number ASC, mf.slug ASC
         `);
@@ -115,12 +95,36 @@ export async function getIndexableManufacturerPartRoutes(): Promise<IndexableMan
         return rows.map((row) => ({
           normalizedPartNumber: row.normalized_part_number,
           manufacturerSlug: row.manufacturer_slug,
+          publishedCount: Number(row.published_count || 0),
         }));
       } catch (error) {
-        console.error('Unable to load indexable manufacturer-qualified part routes:', error);
+        console.error('Unable to load indexable part routes:', error);
         return [];
       }
     },
-    (routes) => routes.length > 0,
+    (records) => records.length > 0,
   );
+}
+
+export async function getIndexablePartNumbers(): Promise<string[]> {
+  const records = await getIndexablePartRouteRecords();
+  return Array.from(
+    new Set(
+      records
+        .filter((record) => record.publishedCount === 1)
+        .map((record) => record.normalizedPartNumber),
+    ),
+  );
+}
+
+export async function getIndexableManufacturerPartRoutes(): Promise<IndexableManufacturerPartRoute[]> {
+  const records = await getIndexablePartRouteRecords();
+  return records
+    .filter((record): record is IndexablePartRouteRecord & { manufacturerSlug: string } => (
+      record.publishedCount > 1 && Boolean(record.manufacturerSlug)
+    ))
+    .map((record) => ({
+      normalizedPartNumber: record.normalizedPartNumber,
+      manufacturerSlug: record.manufacturerSlug,
+    }));
 }
