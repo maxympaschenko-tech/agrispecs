@@ -2,6 +2,7 @@ import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 
 type CountRow = RowDataPacket & { total: number };
+type AmbiguousRow = RowDataPacket & { normalized_part_number: string };
 type IdentityRow = RowDataPacket & {
   id: number;
   part_number: string;
@@ -42,6 +43,30 @@ export async function getPublishedPartNumberMatchCount(partNumberOrSlug: string)
   } catch (error) {
     console.error('Unable to count published part-number matches:', error);
     return 0;
+  }
+}
+
+export async function getAmbiguousPublishedPartNumbers(partNumbersOrSlugs: string[]): Promise<Set<string>> {
+  const normalizedNumbers = Array.from(new Set(
+    partNumbersOrSlugs.map(normalizePartNumber).filter(Boolean),
+  ));
+  if (normalizedNumbers.length === 0) return new Set();
+
+  try {
+    const db = await getDbReady();
+    const placeholders = normalizedNumbers.map(() => '?').join(',');
+    const [rows] = await db.query<AmbiguousRow[]>(`
+      SELECT normalized_part_number
+      FROM parts
+      WHERE normalized_part_number IN (${placeholders})
+        AND data_status IN ('partial','verified')
+      GROUP BY normalized_part_number
+      HAVING COUNT(*) > 1
+    `, normalizedNumbers);
+    return new Set(rows.map((row) => row.normalized_part_number));
+  } catch (error) {
+    console.error('Unable to load ambiguous published part numbers:', error);
+    return new Set();
   }
 }
 
