@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getAttachmentCatalog, type AttachmentCatalogItem } from '@/lib/attachments-service';
+import styles from './attachments-page.module.css';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -29,12 +30,14 @@ export default async function AttachmentsPage() {
   const attachments = await getAttachmentCatalog();
   const fitmentCount = attachments.reduce((total, attachment) => total + attachment.compatibleMachineCount, 0);
   const manufacturerCount = new Set(attachments.map((attachment) => attachment.manufacturerSlug)).size;
-  const groups = attachments.reduce<Map<string, AttachmentCatalogItem[]>>((map, attachment) => {
-    const list = map.get(attachment.manufacturerName) ?? [];
-    list.push(attachment);
-    map.set(attachment.manufacturerName, list);
-    return map;
-  }, new Map());
+  const typeGroups = Array.from(
+    attachments.reduce<Map<string, AttachmentCatalogItem[]>>((groups, attachment) => {
+      const current = groups.get(attachment.attachmentType) ?? [];
+      current.push(attachment);
+      groups.set(attachment.attachmentType, current);
+      return groups;
+    }, new Map()),
+  ).sort(([a], [b]) => attachmentTypeLabel(a).localeCompare(attachmentTypeLabel(b)));
 
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/attachments`;
@@ -94,7 +97,7 @@ export default async function AttachmentsPage() {
             </div>
             <div>
               <strong>{fitmentCount.toLocaleString('en-US')}</strong>
-              <span>Verified machine fitment records</span>
+              <span>Documented machine fitment records</span>
             </div>
             <div>
               <strong>{manufacturerCount.toLocaleString('en-US')}</strong>
@@ -103,30 +106,73 @@ export default async function AttachmentsPage() {
           </div>
         )}
 
-        {Array.from(groups.entries()).map(([manufacturer, items]) => (
-          <section className="catalog-group" key={manufacturer}>
-            <h2>{manufacturer} attachments</h2>
-            <p className="section-note">{items.length} published attachment{items.length === 1 ? '' : 's'} with source-backed machine compatibility.</p>
-            <div className="grid">
-              {items.map((attachment) => (
-                <Link className="card" key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
-                  <img
-                    src="/media/fallbacks/attachment.svg"
-                    alt={`${attachment.manufacturerName} ${attachment.modelName} attachment image pending`}
-                    loading="lazy"
-                    style={{ display: 'block', width: '100%', aspectRatio: '4 / 3', objectFit: 'contain', borderRadius: 12, marginBottom: 14 }}
-                  />
-                  <span className="eyebrow">{attachmentTypeLabel(attachment.attachmentType)} · Photo pending</span>
-                  <h3>{attachment.modelName}</h3>
-                  <p>{attachment.compatibleMachineCount} verified machine fitment record{attachment.compatibleMachineCount === 1 ? '' : 's'}</p>
-                  <span className="tool-link">View fitment</span>
-                </Link>
-              ))}
+        <form className="search-shell" action="/search" style={{ marginBottom: 28 }}>
+          <input name="q" aria-label="Search attachment model or type" placeholder="Try: 120R, front loader, backhoe or pallet fork" />
+          <button type="submit">Search attachments</button>
+        </form>
+
+        {typeGroups.length > 0 && (
+          <section className="catalog-group">
+            <span className="eyebrow">Browse catalog</span>
+            <h2>Browse attachments by type</h2>
+            <p className="section-note">Choose the attachment job first, then browse manufacturer and model fitment references below.</p>
+            <div className={styles.typeDirectory}>
+              {typeGroups.map(([type, items]) => {
+                const manufacturers = new Set(items.map((item) => item.manufacturerSlug)).size;
+                return (
+                  <a className={styles.typeCard} href={`#type-${type}`} key={type}>
+                    <strong>{attachmentTypeLabel(type)}</strong>
+                    <span>{items.length.toLocaleString('en-US')} attachment{items.length === 1 ? '' : 's'} · {manufacturers} manufacturer{manufacturers === 1 ? '' : 's'}</span>
+                  </a>
+                );
+              })}
             </div>
           </section>
-        ))}
+        )}
 
-        {attachments.length === 0 && <div className="notice">Verified attachment fitment records are being added.</div>}
+        {typeGroups.map(([type, items]) => {
+          const manufacturerGroups = Array.from(
+            items.reduce<Map<string, AttachmentCatalogItem[]>>((groups, attachment) => {
+              const current = groups.get(attachment.manufacturerSlug) ?? [];
+              current.push(attachment);
+              groups.set(attachment.manufacturerSlug, current);
+              return groups;
+            }, new Map()),
+          );
+          const typeFitmentCount = items.reduce((total, item) => total + item.compatibleMachineCount, 0);
+
+          return (
+            <section className="catalog-group" id={`type-${type}`} key={type}>
+              <span className="eyebrow">Attachment type</span>
+              <h2>{attachmentTypeLabel(type)}</h2>
+              <p className="section-note">
+                {items.length.toLocaleString('en-US')} published attachment{items.length === 1 ? '' : 's'} with {typeFitmentCount.toLocaleString('en-US')} documented machine fitment record{typeFitmentCount === 1 ? '' : 's'}. Open a model to see compatible machines and source context.
+              </p>
+
+              {manufacturerGroups.map(([manufacturerSlug, manufacturerItems]) => {
+                const manufacturerName = manufacturerItems[0]?.manufacturerName || manufacturerSlug;
+                return (
+                  <div className={styles.manufacturerBlock} key={manufacturerSlug}>
+                    <div className={styles.manufacturerHeader}>
+                      <h3>{manufacturerName}</h3>
+                      <span>{manufacturerItems.length} attachment{manufacturerItems.length === 1 ? '' : 's'}</span>
+                    </div>
+                    <div className={styles.attachmentDirectory}>
+                      {manufacturerItems.map((attachment) => (
+                        <Link className={styles.attachmentLink} key={attachment.id} href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>
+                          <strong>{attachment.modelName}</strong>
+                          <span>{attachment.compatibleMachineCount} fitment{attachment.compatibleMachineCount === 1 ? '' : 's'}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          );
+        })}
+
+        {attachments.length === 0 && <div className="notice">Source-backed attachment fitment records are being added.</div>}
       </div>
     </main>
   );
