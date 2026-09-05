@@ -6,6 +6,7 @@ import { withServerTtlCache } from '@/lib/server-ttl-cache';
 const ATTACHMENT_CATALOG_TTL_MS = 5 * 60 * 1000;
 
 export type MachineAttachment = {
+  relationId: number;
   id: number;
   manufacturerName: string;
   manufacturerSlug: string;
@@ -31,6 +32,7 @@ export type AttachmentCatalogItem = {
 };
 
 export type AttachmentCompatibleMachine = {
+  relationId: number;
   machineId: number;
   brand: string;
   brandSlug: string;
@@ -56,6 +58,7 @@ export type AttachmentDetail = AttachmentCatalogItem & {
 };
 
 type AttachmentRow = RowDataPacket & {
+  relation_id: number;
   id: number;
   manufacturer_name: string;
   manufacturer_slug: string;
@@ -96,6 +99,7 @@ type AttachmentDetailRow = RowDataPacket & {
 };
 
 type CompatibleMachineRow = RowDataPacket & {
+  relation_id: number;
   machine_id: number;
   brand: string;
   brand_slug: string;
@@ -130,6 +134,7 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
     const db = await getDbReady();
     const [rows] = await db.query<AttachmentRow[]>(`
       SELECT
+        ma.id AS relation_id,
         a.id,
         amf.name AS manufacturer_name,
         amf.slug AS manufacturer_slug,
@@ -147,10 +152,11 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
       JOIN manufacturers amf ON amf.id=a.manufacturer_id
       INNER JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.machine_id=? AND a.data_status IN ('partial','verified')
-      ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC
+      ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC, sr.id ASC, ma.id ASC
     `, [Number(machineId)]);
 
     return rows.map((row) => ({
+      relationId: Number(row.relation_id),
       id: Number(row.id),
       manufacturerName: row.manufacturer_name,
       manufacturerSlug: row.manufacturer_slug,
@@ -324,6 +330,7 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
 
     const [machineRows] = await db.query<CompatibleMachineRow[]>(`
       SELECT
+        ma.id AS relation_id,
         m.id AS machine_id,
         mf.name AS brand,
         mf.slug AS brand_slug,
@@ -343,7 +350,7 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
       JOIN equipment_types et ON et.id=m.equipment_type_id
       INNER JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.attachment_id=? AND m.data_status IN ('partial','verified')
-      ORDER BY mf.name,et.name,m.model_name
+      ORDER BY mf.name,et.name,m.model_name,sr.id,ma.id
     `, [Number(attachment.id)]);
 
     const firstSource = machineRows.find((row) => row.source_url);
@@ -361,6 +368,7 @@ async function loadAttachment(brandSlug: string, attachmentSlug: string): Promis
       liftHeightText: attachment.lift_height_text,
       configurationText: attachment.configuration_text,
       compatibleMachines: machineRows.map((row) => ({
+        relationId: Number(row.relation_id),
         machineId: Number(row.machine_id),
         brand: row.brand,
         brandSlug: row.brand_slug,
