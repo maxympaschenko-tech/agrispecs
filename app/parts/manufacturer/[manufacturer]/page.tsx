@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
 import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
 import { getPartReferenceHref } from '@/lib/part-url';
+import { getCachedPartCategories } from '@/lib/parts-catalog-cache';
 import {
   getPartCatalogPage,
   getPartManufacturerSummaries,
@@ -100,19 +101,29 @@ export default async function PartManufacturerPage({ params, searchParams }: Pag
   const manufacturer = manufacturers.find((item) => item.slug === manufacturerSlug);
   if (!manufacturer) notFound();
 
-  const catalog = await getPartCatalogPage({ manufacturerSlug, page });
+  const [catalog, categories] = await Promise.all([
+    getPartCatalogPage({ manufacturerSlug, page }),
+    getCachedPartCategories(),
+  ]);
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
 
   const ambiguousPartNumbers = await getAmbiguousPublishedPartNumbers(
     catalog.items.map((part) => part.normalizedPartNumber),
   );
+  const indexableCategorySlugs = new Set(
+    categories.filter((category) => category.partCount >= 2).map((category) => category.slug),
+  );
   const categoryGroups = Array.from(
-    catalog.items.reduce<Map<string, number>>((groups, part) => {
-      const key = part.categoryName || 'Other documented parts';
-      groups.set(key, (groups.get(key) || 0) + 1);
+    catalog.items.reduce<Map<string, { name: string; slug: string | null; count: number }>>((groups, part) => {
+      const name = part.categoryName || 'Other documented parts';
+      const slug = part.categorySlug && indexableCategorySlugs.has(part.categorySlug) ? part.categorySlug : null;
+      const key = part.categorySlug || name;
+      const current = groups.get(key) || { name, slug, count: 0 };
+      current.count += 1;
+      groups.set(key, current);
       return groups;
-    }, new Map()),
-  ).sort(([a], [b]) => a.localeCompare(b));
+    }, new Map()).values(),
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalPath = canonicalForPage(manufacturer.slug, page);
@@ -185,8 +196,11 @@ export default async function PartManufacturerPage({ params, searchParams }: Pag
           {categoryGroups.length > 0 && (
             <p className="section-note">
               <strong>Categories on this page:</strong>{' '}
-              {categoryGroups.map(([name, count], index) => (
-                <span key={name}>{index > 0 ? ' · ' : ''}{name} ({count})</span>
+              {categoryGroups.map((group, index) => (
+                <span key={group.slug || group.name}>
+                  {index > 0 ? ' · ' : ''}
+                  {group.slug ? <Link href={`/parts/category/${group.slug}`}>{group.name}</Link> : group.name} ({group.count})
+                </span>
               ))}
             </p>
           )}
