@@ -274,9 +274,10 @@ export async function getMachineVersions(machineId: string): Promise<MachineVers
         mv.configuration,
         mv.is_current,
         mv.notes,
-        COUNT(ms.id) AS spec_count
+        COUNT(spec_source.id) AS spec_count
       FROM machine_versions mv
       LEFT JOIN machine_specs ms ON ms.machine_version_id = mv.id
+      LEFT JOIN source_records spec_source ON spec_source.id = ms.source_record_id
       WHERE mv.machine_id = ?
       GROUP BY mv.id
       ORDER BY mv.is_current DESC, spec_count DESC, mv.model_year_end DESC, mv.model_year_start DESC
@@ -319,7 +320,7 @@ export async function getMachineSpecs(machineId: string, machineVersionId?: numb
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM machine_specs ms
       INNER JOIN spec_definitions sd ON sd.id = ms.spec_definition_id
-      LEFT JOIN source_records sr ON sr.id = ms.source_record_id
+      INNER JOIN source_records sr ON sr.id = ms.source_record_id
       WHERE ms.machine_id = ? AND ms.machine_version_id = ?
       ORDER BY sd.section ASC, sd.display_order ASC, sd.label ASC
     `, [Number(machineId), machineVersionId]);
@@ -366,7 +367,7 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
       FROM machine_attachments ma
       INNER JOIN attachments a ON a.id = ma.attachment_id
       INNER JOIN manufacturers amf ON amf.id = a.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id = ma.source_record_id
+      INNER JOIN source_records sr ON sr.id = ma.source_record_id
       WHERE ma.machine_id = ? AND a.data_status IN ('partial','verified')
       ORDER BY a.attachment_type ASC, a.model_name ASC
     `, [Number(machineId)]);
