@@ -17,6 +17,7 @@ import { newHollandT5My2391843297RolesMigration } from '@/lib/migrations/2026090
 import { newHollandT5AutoCommandMaintenanceMigration } from '@/lib/migrations/20260905_630_new_holland_t5_autocommand_maintenance';
 import { newHollandT5StageVDefFiltersMigration } from '@/lib/migrations/20260905_633_new_holland_t5_stagev_def_filters';
 import { newHollandT5AutoCommandMaintenanceCompletionMigration } from '@/lib/migrations/20260905_634_new_holland_t5_autocommand_maintenance_completion';
+import { newHollandT5110120HistoricalFitmentContextMigration } from '@/lib/migrations/20260905_635_new_holland_t5_110_120_historical_fitment_context';
 
 export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120SecondaryAirMigration,
@@ -37,4 +38,5 @@ export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5AutoCommandMaintenanceMigration,
   newHollandT5StageVDefFiltersMigration,
   newHollandT5AutoCommandMaintenanceCompletionMigration,
+  newHollandT5110120HistoricalFitmentContextMigration,
 ];
