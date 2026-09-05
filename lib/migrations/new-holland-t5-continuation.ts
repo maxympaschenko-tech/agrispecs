@@ -22,6 +22,7 @@ import { newHollandT5130140CurrentSpecsEnrichmentMigration } from '@/lib/migrati
 import { newHollandT5110120CurrentEngineMigration } from '@/lib/migrations/20260905_637_new_holland_t5_110_120_current_engine';
 import { newHollandT5110120DualDefFilterMigration } from '@/lib/migrations/20260905_639_new_holland_t5_110_120_dual_def_filter';
 import { newHollandT5CurrentCoreFilterCorrectionMigration } from '@/lib/migrations/20260905_640_new_holland_t5_current_core_filter_correction';
+import { newHollandT5DualDefLegacyMigration } from '@/lib/migrations/20260905_642_new_holland_t5_dual_def_legacy';
 
 export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120SecondaryAirMigration,
@@ -47,4 +48,5 @@ export const newHollandT5ContinuationMigrations: DbMigration[] = [
   newHollandT5110120CurrentEngineMigration,
   newHollandT5110120DualDefFilterMigration,
   newHollandT5CurrentCoreFilterCorrectionMigration,
+  newHollandT5DualDefLegacyMigration,
 ];
