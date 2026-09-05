@@ -5,7 +5,7 @@ import { getPartImages } from '@/lib/part-images-service';
 
 type LayoutProps = {
   children: ReactNode;
-  params: Promise<{ manufacturer: string; part: string }>;
+  params: Promise<{ part: string; manufacturer: string }>;
 };
 
 function jsonLd(value: unknown) {
@@ -18,7 +18,7 @@ function needsVisibleAttribution(licenseName: string | null) {
 }
 
 export default async function ManufacturerPartLayout({ children, params }: LayoutProps) {
-  const { manufacturer, part: slug } = await params;
+  const { part: manufacturer, manufacturer: slug } = await params;
   const part = await getPart(slug, manufacturer);
   const publishable = part && (part.dataStatus === 'partial' || part.dataStatus === 'verified');
   if (!part || !publishable || !part.manufacturerSlug) return children;

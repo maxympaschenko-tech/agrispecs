@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 type PageProps = {
-  params: Promise<{ manufacturer: string; part: string }>;
+  params: Promise<{ part: string; manufacturer: string }>;
 };
 
 function isPublished(status: string) {
@@ -67,7 +67,7 @@ function relationLabel(relation: PartRelation) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { manufacturer, part: slug } = await params;
+  const { part: manufacturer, manufacturer: slug } = await params;
   const part = await getPart(slug, manufacturer);
   if (!part || !isPublished(part.dataStatus)) return {};
 
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ManufacturerPartPage({ params }: PageProps) {
-  const { manufacturer, part: slug } = await params;
+  const { part: manufacturer, manufacturer: slug } = await params;
   const part = await getPart(slug, manufacturer);
   if (!part || !isPublished(part.dataStatus) || !part.manufacturerSlug) notFound();
 
