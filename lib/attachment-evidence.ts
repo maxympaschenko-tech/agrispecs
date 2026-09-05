@@ -3,6 +3,11 @@ export type AttachmentEvidenceGroup<T extends { id: number }> = {
   records: T[];
 };
 
+export type MachineEvidenceGroup<T extends { machineId: number }> = {
+  machineId: number;
+  records: T[];
+};
+
 export function groupAttachmentEvidence<T extends { id: number }>(records: T[]): AttachmentEvidenceGroup<T>[] {
   const groups = new Map<number, T[]>();
 
@@ -14,6 +19,21 @@ export function groupAttachmentEvidence<T extends { id: number }>(records: T[]):
 
   return Array.from(groups, ([attachmentId, groupedRecords]) => ({
     attachmentId,
+    records: groupedRecords,
+  }));
+}
+
+export function groupMachineEvidence<T extends { machineId: number }>(records: T[]): MachineEvidenceGroup<T>[] {
+  const groups = new Map<number, T[]>();
+
+  for (const record of records) {
+    const current = groups.get(record.machineId) ?? [];
+    current.push(record);
+    groups.set(record.machineId, current);
+  }
+
+  return Array.from(groups, ([machineId, groupedRecords]) => ({
+    machineId,
     records: groupedRecords,
   }));
 }
