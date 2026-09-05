@@ -11,6 +11,12 @@ export async function getIndexablePartNumbers(): Promise<string[]> {
       FROM parts p
       WHERE p.data_status IN ('partial','verified')
         AND (
+          SELECT COUNT(*)
+          FROM parts same_number
+          WHERE same_number.normalized_part_number=p.normalized_part_number
+            AND same_number.data_status IN ('partial','verified')
+        ) = 1
+        AND (
           EXISTS (
             SELECT 1
             FROM machine_parts mp
