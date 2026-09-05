@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipment-service';
 import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
+import { groupAttachmentEvidence, uniqueEvidenceValues } from '@/lib/attachment-evidence';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -88,6 +89,11 @@ function formatAttachmentType(value: string) {
   return value.replace(/-/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+function formatAttachmentConfidence(value: 'official' | 'high' | 'medium' | 'low') {
+  if (value === 'official') return 'Official fitment';
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)} confidence`;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand, model } = await params;
   const machine = await getEquipmentMachine(type, brand, model);
@@ -122,6 +128,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     getMachineAttachments(machine.id),
     getMachineImages(machine.id),
   ]);
+  const attachmentGroups = groupAttachmentEvidence(attachments);
   const selectedVersion = versions.find((version) => version.isCurrent)
     || versions.find((version) => version.specCount > 0)
     || versions[0];
@@ -256,7 +263,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
           <aside className="toc">
             <strong>On this page</strong>
             {orderedSections.map((section) => <a key={section} href={`#${sectionId(section)}`}>{section}</a>)}
-            {attachments.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
+            {attachmentGroups.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
             {relatedModels.length > 0 && <a href="#related-models">Related models</a>}
           </aside>
@@ -280,28 +287,52 @@ export default async function EquipmentModelPage({ params }: PageProps) {
               </section>
             )}
 
-            {attachments.length > 0 && (
+            {attachmentGroups.length > 0 && (
               <section className="data-section" id="compatible-attachments">
                 <h2>Compatible attachments</h2>
-                <p className="section-note">Manufacturer-backed fitment records for this machine. Open an attachment page for its published configuration and full fitment list. A compatibility listing does not mean the attachment is standard equipment; hydraulic flow, hitch, carrier, model year and dealer configuration may still matter.</p>
+                <p className="section-note">Manufacturer-backed fitment records for this machine. Multiple cited records for the same attachment are grouped together below rather than shown as duplicate attachments. Open an attachment page for its published configuration and full fitment list.</p>
                 <div className="parts-list">
-                  {attachments.map((attachment) => (
-                    <div className="part-row" key={`${attachment.id}-${attachment.slug}`}>
-                      <span>
-                        <strong><Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>{attachment.modelName}</Link></strong>
-                        <small>{attachment.manufacturerName} · {formatAttachmentType(attachment.attachmentType)} · {attachment.confidence === 'official' ? 'Official fitment' : `${attachment.confidence} confidence`}</small>
-                        {attachment.configurationText && <small>{attachment.configurationText}</small>}
-                        {attachment.liftCapacityText && <small>Lift/capacity: {attachment.liftCapacityText}</small>}
-                        {attachment.liftHeightText && <small>Lift height: {attachment.liftHeightText}</small>}
-                        {attachment.compatibilityNote && <small>{attachment.compatibilityNote}</small>}
-                      </span>
-                      <span>
-                        <Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>Fitment →</Link>
-                        {attachment.sourceUrl && <>{' · '}<a href={attachment.sourceUrl} target="_blank" rel="noopener noreferrer">Source →</a></>}
-                      </span>
-                    </div>
-                  ))}
+                  {attachmentGroups.map(({ attachmentId, records }) => {
+                    const attachment = records[0];
+                    if (!attachment) return null;
+                    const configurations = uniqueEvidenceValues(records.map((record) => record.configurationText));
+                    const capacities = uniqueEvidenceValues(records.map((record) => record.liftCapacityText));
+                    const heights = uniqueEvidenceValues(records.map((record) => record.liftHeightText));
+                    const notes = uniqueEvidenceValues(records.map((record) => record.compatibilityNote));
+                    const confidenceLabels = uniqueEvidenceValues(records.map((record) => formatAttachmentConfidence(record.confidence)));
+                    const evidenceSources = Array.from(
+                      new Map(
+                        records
+                          .filter((record) => record.sourceUrl)
+                          .map((record) => [record.sourceUrl as string, {
+                            url: record.sourceUrl as string,
+                            title: record.sourceTitle || 'Fitment source',
+                          }]),
+                      ).values(),
+                    );
+
+                    return (
+                      <div className="part-row" key={attachmentId}>
+                        <span>
+                          <strong><Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>{attachment.modelName}</Link></strong>
+                          <small>{attachment.manufacturerName} · {formatAttachmentType(attachment.attachmentType)} · {confidenceLabels.join(' · ')}</small>
+                          {records.length > 1 && <small>{records.length} cited fitment records grouped for this attachment</small>}
+                          {configurations.map((value) => <small key={`configuration-${value}`}>{value}</small>)}
+                          {capacities.map((value) => <small key={`capacity-${value}`}>Lift/capacity: {value}</small>)}
+                          {heights.map((value) => <small key={`height-${value}`}>Lift height: {value}</small>)}
+                          {notes.map((value) => <small key={`note-${value}`}>{value}</small>)}
+                        </span>
+                        <span>
+                          <Link href={`/attachments/${attachment.manufacturerSlug}/${attachment.slug}`}>Fitment →</Link>
+                          {evidenceSources.map((source, index) => (
+                            <span key={source.url}>{' · '}<a href={source.url} target="_blank" rel="noopener noreferrer">{evidenceSources.length === 1 ? 'Source' : `Source ${index + 1}`} →</a></span>
+                          ))}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
+                <p className="section-note">A compatibility listing does not mean the attachment is standard equipment; hydraulic flow, hitch, carrier, model year and dealer configuration may still matter.</p>
               </section>
             )}
 
