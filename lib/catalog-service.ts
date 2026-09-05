@@ -1,9 +1,12 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
 import {
   machines as seedMachines,
   type Machine,
 } from '@/lib/catalog';
+
+const TRACTOR_CATALOG_TTL_MS = 5 * 60 * 1000;
 
 type MachineRow = RowDataPacket & {
   id: number;
@@ -120,29 +123,36 @@ function rowToMachine(row: MachineRow): Machine {
 }
 
 export async function getMachines(): Promise<Machine[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<MachineRow[]>(`
-      SELECT
-        m.id,
-        m.model_name,
-        m.slug AS model_slug,
-        m.data_status,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug
-      FROM machines m
-      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
-      WHERE et.slug = 'tractor'
-      ORDER BY mf.name ASC, m.model_name ASC
-    `);
+  return withServerTtlCache(
+    'tractors:catalog',
+    TRACTOR_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<MachineRow[]>(`
+          SELECT
+            m.id,
+            m.model_name,
+            m.slug AS model_slug,
+            m.data_status,
+            mf.name AS manufacturer_name,
+            mf.slug AS manufacturer_slug
+          FROM machines m
+          INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+          INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+          WHERE et.slug = 'tractor'
+          ORDER BY mf.name ASC, m.model_name ASC
+        `);
 
-    if (rows.length > 0) return rows.map(rowToMachine);
-  } catch (error) {
-    console.error('Falling back to seed machines:', error);
-  }
+        if (rows.length > 0) return rows.map(rowToMachine);
+      } catch (error) {
+        console.error('Falling back to seed machines:', error);
+      }
 
-  return seedMachines;
+      return seedMachines;
+    },
+    (machines) => machines.some((machine) => machine.dataStatus !== 'seed'),
+  );
 }
 
 export async function getMachine(brandSlug: string, modelSlug: string): Promise<Machine | undefined> {
@@ -174,53 +184,67 @@ export async function getMachine(brandSlug: string, modelSlug: string): Promise<
 }
 
 export async function getBrands(): Promise<Array<{ slug: string; name: string }>> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<BrandRow[]>(`
-      SELECT DISTINCT mf.name, mf.slug
-      FROM manufacturers mf
-      INNER JOIN machines m ON m.manufacturer_id = mf.id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
-      WHERE et.slug = 'tractor'
-        AND m.data_status IN ('partial','verified','review')
-      ORDER BY mf.name ASC
-    `);
+  return withServerTtlCache(
+    'tractors:brands',
+    TRACTOR_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<BrandRow[]>(`
+          SELECT DISTINCT mf.name, mf.slug
+          FROM manufacturers mf
+          INNER JOIN machines m ON m.manufacturer_id = mf.id
+          INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+          WHERE et.slug = 'tractor'
+            AND m.data_status IN ('partial','verified','review')
+          ORDER BY mf.name ASC
+        `);
 
-    return rows.map((row) => ({ slug: row.slug, name: row.name }));
-  } catch (error) {
-    console.error('Unable to load tractor brands:', error);
-    return [];
-  }
+        return rows.map((row) => ({ slug: row.slug, name: row.name }));
+      } catch (error) {
+        console.error('Unable to load tractor brands:', error);
+        return [];
+      }
+    },
+    (brands) => brands.length > 0,
+  );
 }
 
 export async function getMachinesByBrand(brandSlug: string): Promise<Machine[]> {
   const normalized = brandSlug.trim().toLowerCase();
   if (!normalized) return [];
 
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<MachineRow[]>(`
-      SELECT
-        m.id,
-        m.model_name,
-        m.slug AS model_slug,
-        m.data_status,
-        mf.name AS manufacturer_name,
-        mf.slug AS manufacturer_slug
-      FROM machines m
-      INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id = m.equipment_type_id
-      WHERE et.slug = 'tractor'
-        AND mf.slug = ?
-        AND m.data_status IN ('partial','verified','review')
-      ORDER BY m.model_name ASC
-    `, [normalized]);
+  return withServerTtlCache(
+    `tractors:brand:${normalized}`,
+    TRACTOR_CATALOG_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<MachineRow[]>(`
+          SELECT
+            m.id,
+            m.model_name,
+            m.slug AS model_slug,
+            m.data_status,
+            mf.name AS manufacturer_name,
+            mf.slug AS manufacturer_slug
+          FROM machines m
+          INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+          INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+          WHERE et.slug = 'tractor'
+            AND mf.slug = ?
+            AND m.data_status IN ('partial','verified','review')
+          ORDER BY m.model_name ASC
+        `, [normalized]);
 
-    return rows.map(rowToMachine);
-  } catch (error) {
-    console.error('Unable to load tractor machines by brand:', error);
-    return [];
-  }
+        return rows.map(rowToMachine);
+      } catch (error) {
+        console.error('Unable to load tractor machines by brand:', error);
+        return [];
+      }
+    },
+    (machines) => machines.length > 0,
+  );
 }
 
 export async function searchMachines(term: string): Promise<Machine[]> {
