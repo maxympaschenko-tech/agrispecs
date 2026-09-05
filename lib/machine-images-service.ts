@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
 import coreMachineImageManifest from '@/data/machine-images.json';
 import kubotaUtilityMachineImageManifest from '@/data/machine-images-kubota-utility.json';
 import kubotaEquipmentMachineImageManifest from '@/data/machine-images-kubota-equipment.json';
@@ -15,6 +16,8 @@ import johnDeereMachineImageManifest from '@/data/machine-images-john-deere.json
 import caseIHMachineImageManifest from '@/data/machine-images-case-ih.json';
 import masseyFergusonMachineImageManifest from '@/data/machine-images-massey-ferguson.json';
 import newHollandMachineImageManifest from '@/data/machine-images-new-holland.json';
+
+const MACHINE_IMAGE_TTL_MS = 5 * 60 * 1000;
 
 export type MachineImage = {
   id: number;
@@ -144,59 +147,65 @@ async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
   if (!/^\d+$/.test(machineId)) return [fallbackImage()];
 
   try {
-    const db = await getDbReady();
-    const [rows] = await db.query<MachineImageIdentityRow[]>(`
-      SELECT
-        mi.id AS image_id,
-        mi.image_url,
-        mi.source_page_url,
-        mi.author,
-        mi.license_name,
-        mi.license_url,
-        mi.caption,
-        mi.alt_text,
-        mi.is_primary,
-        mf.slug AS brand_slug,
-        m.slug AS model_slug,
-        et.slug AS equipment_type_slug
-      FROM machines m
-      INNER JOIN manufacturers mf ON mf.id=m.manufacturer_id
-      INNER JOIN equipment_types et ON et.id=m.equipment_type_id
-      LEFT JOIN machine_images mi ON mi.machine_id=m.id
-      WHERE m.id=?
-      ORDER BY mi.is_primary DESC,mi.display_order ASC,mi.id ASC
-    `,[Number(machineId)]);
+    return await withServerTtlCache(
+      `machine-images:${machineId}`,
+      MACHINE_IMAGE_TTL_MS,
+      async () => {
+        const db = await getDbReady();
+        const [rows] = await db.query<MachineImageIdentityRow[]>(`
+          SELECT
+            mi.id AS image_id,
+            mi.image_url,
+            mi.source_page_url,
+            mi.author,
+            mi.license_name,
+            mi.license_url,
+            mi.caption,
+            mi.alt_text,
+            mi.is_primary,
+            mf.slug AS brand_slug,
+            m.slug AS model_slug,
+            et.slug AS equipment_type_slug
+          FROM machines m
+          INNER JOIN manufacturers mf ON mf.id=m.manufacturer_id
+          INNER JOIN equipment_types et ON et.id=m.equipment_type_id
+          LEFT JOIN machine_images mi ON mi.machine_id=m.id
+          WHERE m.id=?
+          ORDER BY mi.is_primary DESC,mi.display_order ASC,mi.id ASC
+        `,[Number(machineId)]);
 
-    const identity = rows[0];
-    if (!identity) return [fallbackImage()];
+        const identity = rows[0];
+        if (!identity) return [fallbackImage()];
 
-    const images = rows
-      .map(rowToImage)
-      .filter((image): image is MachineImage => Boolean(image));
+        const images = rows
+          .map(rowToImage)
+          .filter((image): image is MachineImage => Boolean(image));
 
-    const localImages = manifest.filter(
-      (image) => image.brandSlug === identity.brand_slug
-        && image.modelSlug === identity.model_slug
-        && localMediaExists(image.publicUrl),
+        const localImages = manifest.filter(
+          (image) => image.brandSlug === identity.brand_slug
+            && image.modelSlug === identity.model_slug
+            && localMediaExists(image.publicUrl),
+        );
+        const existingUrls = new Set(images.map((image) => image.imageUrl));
+
+        localImages.forEach((image, index) => {
+          if (existingUrls.has(image.publicUrl)) return;
+          const manifestImage = manifestToImage(image, -(index + 1));
+          manifestImage.isPrimary = images.length === 0 && index === 0;
+          images.push(manifestImage);
+          existingUrls.add(image.publicUrl);
+        });
+
+        if (images.length === 0) {
+          images.push(fallbackImage(
+            identity.equipment_type_slug,
+            `${identity.brand_slug} ${identity.model_slug}`.replace(/-/g, ' '),
+          ));
+        }
+
+        return images.sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+      },
     );
-    const existingUrls = new Set(images.map((image) => image.imageUrl));
-
-    localImages.forEach((image, index) => {
-      if (existingUrls.has(image.publicUrl)) return;
-      const manifestImage = manifestToImage(image, -(index + 1));
-      manifestImage.isPrimary = images.length === 0 && index === 0;
-      images.push(manifestImage);
-      existingUrls.add(image.publicUrl);
-    });
-
-    if (images.length === 0) {
-      images.push(fallbackImage(
-        identity.equipment_type_slug,
-        `${identity.brand_slug} ${identity.model_slug}`.replace(/-/g, ' '),
-      ));
-    }
-
-    return images.sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
   } catch (error) {
     console.error('Unable to load machine images:', error);
     return [fallbackImage()];
