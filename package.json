@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/sync-machine-media.mjs",
+    "check:routes": "node scripts/check-route-slugs.mjs",
+    "prebuild": "npm run check:routes && node scripts/sync-machine-media.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
