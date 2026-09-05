@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMachines, getMachineVersions, getMachineSpecs, type MachineSpec } from '@/lib/catalog-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
+import { getMachineGenerationLabel } from '@/lib/machine-display';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -125,6 +126,14 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
   const machines = (await getMachines()).filter(
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
+  const publishableCurrentMachineKeys = new Set(
+    machines
+      .filter((machine) => !getMachineGenerationLabel(machine.modelSlug))
+      .map((machine) => `${machine.brand}\u0000${machine.model}`),
+  );
+  const availablePresets = comparisonPresets.filter((preset) =>
+    preset.machines.every((machine) => publishableCurrentMachineKeys.has(`${machine.brand}\u0000${machine.model}`)),
+  );
   const machinesByBrand = Array.from(
     machines.reduce<Map<string, typeof machines>>((map, machine) => {
       const list = map.get(machine.brand) ?? [];
@@ -218,8 +227,8 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         '@type': 'ItemList',
         '@id': `${canonicalUrl}#comparisons`,
         name: 'Source-backed tractor comparisons',
-        numberOfItems: comparisonPresets.length,
-        itemListElement: comparisonPresets.map((preset, index) => ({
+        numberOfItems: availablePresets.length,
+        itemListElement: availablePresets.map((preset, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           name: preset.title,
@@ -240,19 +249,21 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         <h1>Compare tractors side by side</h1>
         <p className="section-lead">Select up to four tractors. The table uses current source-backed records and normalized specification keys so equivalent fields line up across brands.</p>
 
-        <section className="catalog-group">
-          <h2>Popular source-backed comparisons</h2>
-          <p className="section-note">Permanent comparison pages use the same current database records as the interactive tool.</p>
-          <div className="grid">
-            {comparisonPresets.map((preset) => (
-              <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
-                <span className="eyebrow">Source-backed comparison</span>
-                <h3>{preset.title}</h3>
-                <p>{preset.description}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {availablePresets.length > 0 && (
+          <section className="catalog-group">
+            <h2>Popular source-backed comparisons</h2>
+            <p className="section-note">Permanent comparison pages use the same current database records as the interactive tool.</p>
+            <div className="grid">
+              {availablePresets.map((preset) => (
+                <Link className="card" key={preset.slug} href={`/compare/${preset.slug}`}>
+                  <span className="eyebrow">Source-backed comparison</span>
+                  <h3>{preset.title}</h3>
+                  <p>{preset.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <form className="compare-form" action="/compare" method="get">
           {[1, 2, 3, 4].map((slot) => {
