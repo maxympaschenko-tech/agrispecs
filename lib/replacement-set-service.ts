@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 
@@ -63,7 +64,7 @@ type MembershipRow = RowDataPacket & {
   source_url: string | null;
 };
 
-export async function getReplacementSetsForLegacyPart(partId: number): Promise<ReplacementSet[]> {
+async function loadReplacementSetsForLegacyPart(partId: number): Promise<ReplacementSet[]> {
   if (!Number.isInteger(partId) || partId <= 0) return [];
 
   try {
@@ -126,6 +127,8 @@ export async function getReplacementSetsForLegacyPart(partId: number): Promise<R
     return [];
   }
 }
+
+export const getReplacementSetsForLegacyPart = cache(loadReplacementSetsForLegacyPart);
 
 export async function getReplacementSetMembershipsForPart(partId: number): Promise<ReplacementSetMembership[]> {
   if (!Number.isInteger(partId) || partId <= 0) return [];
