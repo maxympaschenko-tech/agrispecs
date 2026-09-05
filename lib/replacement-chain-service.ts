@@ -7,6 +7,7 @@ export type ReplacementChainNode = {
   normalizedPartNumber: string;
   name: string | null;
   manufacturerName: string | null;
+  manufacturerSlug: string | null;
 };
 
 type ReplacementRow = RowDataPacket & {
@@ -15,6 +16,7 @@ type ReplacementRow = RowDataPacket & {
   normalized_part_number: string;
   name: string | null;
   manufacturer_name: string | null;
+  manufacturer_slug: string | null;
 };
 
 export type ReplacementChain = {
@@ -31,7 +33,8 @@ export async function getReplacementChain(startPartId: number): Promise<Replacem
 
   for (let depth = 0; depth < 10; depth += 1) {
     const [rows] = await db.query<ReplacementRow[]>(`
-      SELECT p2.id, p2.part_number, p2.normalized_part_number, p2.name, mf.name AS manufacturer_name
+      SELECT p2.id, p2.part_number, p2.normalized_part_number, p2.name,
+             mf.name AS manufacturer_name, mf.slug AS manufacturer_slug
       FROM part_cross_references pcr
       JOIN parts p2 ON p2.id=pcr.cross_part_id
         AND p2.data_status IN ('partial','verified')
@@ -56,6 +59,7 @@ export async function getReplacementChain(startPartId: number): Promise<Replacem
       normalizedPartNumber: row.normalized_part_number,
       name: row.name,
       manufacturerName: row.manufacturer_name,
+      manufacturerSlug: row.manufacturer_slug,
     });
     currentId = id;
   }
