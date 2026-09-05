@@ -24,6 +24,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/methodology',
     '/about',
     '/editorial-policy',
+    '/contact',
+    '/privacy',
+    '/terms',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
   const [machines, equipment, equipmentTypes, partNumbers, categories, attachments] = await Promise.all([
