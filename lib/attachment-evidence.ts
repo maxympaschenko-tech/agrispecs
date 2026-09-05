@@ -19,5 +19,8 @@ export function groupAttachmentEvidence<T extends { id: number }>(records: T[]):
 }
 
 export function uniqueEvidenceValues(values: Array<string | null | undefined>): string[] {
-  return Array.from(new Set(values.filter((value): value is string => Boolean(value?.trim()))));
+  const normalized = values
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+  return Array.from(new Set(normalized));
 }
