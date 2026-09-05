@@ -62,6 +62,8 @@ export async function getMachinePartsWithConfigurations(
         (
           SELECT COUNT(DISTINCT mp_count.machine_id)
           FROM machine_parts mp_count
+          INNER JOIN machines m_count ON m_count.id=mp_count.machine_id
+            AND m_count.data_status IN ('partial','verified')
           WHERE mp_count.part_id = p.id
         ) AS fitment_count,
         GROUP_CONCAT(
@@ -91,11 +93,13 @@ export async function getMachinePartsWithConfigurations(
           SELECT GROUP_CONCAT(DISTINCT replacement.part_number ORDER BY replacement.part_number SEPARATOR ' || ')
           FROM part_cross_references pcr
           INNER JOIN parts replacement ON replacement.id = pcr.cross_part_id
+            AND replacement.data_status IN ('partial','verified')
           WHERE pcr.part_id = p.id
             AND pcr.relation_type IN ('replaces','supersedes')
         ) AS replacement_numbers
       FROM machine_parts mp
       INNER JOIN parts p ON p.id = mp.part_id
+        AND p.data_status IN ('partial','verified')
       LEFT JOIN part_categories pc ON pc.id = p.category_id
       LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
       LEFT JOIN source_records sr ON sr.id = mp.source_record_id
