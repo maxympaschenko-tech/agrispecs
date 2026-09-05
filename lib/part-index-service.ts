@@ -1,5 +1,8 @@
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
+import { withServerTtlCache } from '@/lib/server-ttl-cache';
+
+const PART_INDEX_TTL_MS = 5 * 60 * 1000;
 
 type IndexablePartRow = RowDataPacket & { normalized_part_number: string };
 type IndexableManufacturerPartRow = RowDataPacket & {
@@ -58,52 +61,66 @@ const indexableRelationshipSql = `
 `;
 
 export async function getIndexablePartNumbers(): Promise<string[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<IndexablePartRow[]>(`
-      SELECT DISTINCT p.normalized_part_number
-      FROM parts p
-      WHERE p.data_status IN ('partial','verified')
-        AND (
-          SELECT COUNT(*)
-          FROM parts same_number
-          WHERE same_number.normalized_part_number=p.normalized_part_number
-            AND same_number.data_status IN ('partial','verified')
-        ) = 1
-        AND ${indexableRelationshipSql}
-      ORDER BY p.normalized_part_number ASC
-    `);
-    return rows.map((row) => row.normalized_part_number);
-  } catch (error) {
-    console.error('Unable to load indexable part numbers:', error);
-    return [];
-  }
+  return withServerTtlCache(
+    'parts:indexable-short-routes',
+    PART_INDEX_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<IndexablePartRow[]>(`
+          SELECT DISTINCT p.normalized_part_number
+          FROM parts p
+          WHERE p.data_status IN ('partial','verified')
+            AND (
+              SELECT COUNT(*)
+              FROM parts same_number
+              WHERE same_number.normalized_part_number=p.normalized_part_number
+                AND same_number.data_status IN ('partial','verified')
+            ) = 1
+            AND ${indexableRelationshipSql}
+          ORDER BY p.normalized_part_number ASC
+        `);
+        return rows.map((row) => row.normalized_part_number);
+      } catch (error) {
+        console.error('Unable to load indexable part numbers:', error);
+        return [];
+      }
+    },
+    (partNumbers) => partNumbers.length > 0,
+  );
 }
 
 export async function getIndexableManufacturerPartRoutes(): Promise<IndexableManufacturerPartRoute[]> {
-  try {
-    const db = await getDbReady();
-    const [rows] = await db.query<IndexableManufacturerPartRow[]>(`
-      SELECT p.normalized_part_number, mf.slug AS manufacturer_slug
-      FROM parts p
-      INNER JOIN manufacturers mf ON mf.id=p.manufacturer_id
-      WHERE p.data_status IN ('partial','verified')
-        AND (
-          SELECT COUNT(*)
-          FROM parts same_number
-          WHERE same_number.normalized_part_number=p.normalized_part_number
-            AND same_number.data_status IN ('partial','verified')
-        ) > 1
-        AND ${indexableRelationshipSql}
-      ORDER BY p.normalized_part_number ASC, mf.slug ASC
-    `);
+  return withServerTtlCache(
+    'parts:indexable-manufacturer-routes',
+    PART_INDEX_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<IndexableManufacturerPartRow[]>(`
+          SELECT p.normalized_part_number, mf.slug AS manufacturer_slug
+          FROM parts p
+          INNER JOIN manufacturers mf ON mf.id=p.manufacturer_id
+          WHERE p.data_status IN ('partial','verified')
+            AND (
+              SELECT COUNT(*)
+              FROM parts same_number
+              WHERE same_number.normalized_part_number=p.normalized_part_number
+                AND same_number.data_status IN ('partial','verified')
+            ) > 1
+            AND ${indexableRelationshipSql}
+          ORDER BY p.normalized_part_number ASC, mf.slug ASC
+        `);
 
-    return rows.map((row) => ({
-      normalizedPartNumber: row.normalized_part_number,
-      manufacturerSlug: row.manufacturer_slug,
-    }));
-  } catch (error) {
-    console.error('Unable to load indexable manufacturer-qualified part routes:', error);
-    return [];
-  }
+        return rows.map((row) => ({
+          normalizedPartNumber: row.normalized_part_number,
+          manufacturerSlug: row.manufacturer_slug,
+        }));
+      } catch (error) {
+        console.error('Unable to load indexable manufacturer-qualified part routes:', error);
+        return [];
+      }
+    },
+    (routes) => routes.length > 0,
+  );
 }
