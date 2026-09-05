@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipment-service';
 import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
+import { getMachineImages } from '@/lib/machine-images-service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -78,6 +79,11 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+function absoluteUrl(baseUrl: string, value: string) {
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${baseUrl}${value.startsWith('/') ? '' : '/'}${value}`;
+}
+
 function formatAttachmentType(value: string) {
   return value.replace(/-/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
 }
@@ -87,11 +93,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const machine = await getEquipmentMachine(type, brand, model);
   if (!machine) return {};
   const publishable = machine.dataStatus === 'partial' || machine.dataStatus === 'verified';
+  const images = publishable ? await getMachineImages(machine.id) : [];
+  const primaryImage = images.find((image) => image.isPrimary) || images[0];
+  const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : undefined;
   return {
     title: `${machine.title} ${machine.equipmentType} Specs`,
     description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications, configuration and source-backed market reference data.`,
     alternates: { canonical: `/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}` },
     robots: publishable ? { index: true, follow: true } : { index: false, follow: true },
+    openGraph: exactPrimaryImage
+      ? {
+          title: `${machine.title} ${machine.equipmentType} Specs`,
+          description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed market reference data.`,
+          images: [{ url: exactPrimaryImage.imageUrl, alt: exactPrimaryImage.altText || machine.title }],
+        }
+      : undefined,
   };
 }
 
@@ -100,15 +116,18 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const machine = await getEquipmentMachine(type, brand, model);
   if (!machine) notFound();
 
-  const [versions, brandEquipment, attachments] = await Promise.all([
+  const [versions, brandEquipment, attachments, images] = await Promise.all([
     getMachineVersions(machine.id),
     getNonTractorEquipmentByBrand(machine.brandSlug),
     getMachineAttachments(machine.id),
+    getMachineImages(machine.id),
   ]);
   const selectedVersion = versions.find((version) => version.isCurrent)
     || versions.find((version) => version.specCount > 0)
     || versions[0];
   const specs = selectedVersion ? await getMachineSpecs(machine.id, selectedVersion.id) : [];
+  const primaryImage = images.find((image) => image.isPrimary) || images[0];
+  const exactPrimaryImage = primaryImage?.imageKind === 'exact' ? primaryImage : undefined;
   const specsBySection = new Map<string, MachineSpec[]>();
   for (const spec of specs) {
     const group = specsBySection.get(spec.section) || [];
@@ -207,6 +226,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
         category: `${machine.equipmentType} agricultural equipment`,
         description: `${machine.title} ${machine.equipmentType.toLowerCase()} specifications and source-backed market reference data.`,
         brand: { '@type': 'Brand', name: machine.brand },
+        ...(exactPrimaryImage ? { image: [absoluteUrl(baseUrl, exactPrimaryImage.imageUrl)] } : {}),
         ...(additionalProperty.length > 0 ? { additionalProperty } : {}),
       },
     ],
