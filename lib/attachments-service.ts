@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { RowDataPacket } from 'mysql2';
 import { getDbReady } from '@/lib/db-migrations';
 
@@ -274,7 +275,7 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
   }
 }
 
-export async function getAttachment(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
+async function loadAttachment(brandSlug: string, attachmentSlug: string): Promise<AttachmentDetail | null> {
   try {
     const db = await getDbReady();
     const [attachmentRows] = await db.query<AttachmentCatalogRow[]>(`
@@ -367,3 +368,5 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
     return null;
   }
 }
+
+export const getAttachment = cache(loadAttachment);
