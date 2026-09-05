@@ -115,15 +115,15 @@ export default async function AttachmentsPage() {
           <section className="catalog-group">
             <span className="eyebrow">Browse catalog</span>
             <h2>Browse attachments by type</h2>
-            <p className="section-note">Choose the attachment job first, then browse manufacturer and model fitment references below.</p>
+            <p className="section-note">Choose the attachment job first, then open its dedicated type catalog for manufacturer and model fitment references.</p>
             <div className={styles.typeDirectory}>
               {typeGroups.map(([type, items]) => {
                 const manufacturers = new Set(items.map((item) => item.manufacturerSlug)).size;
                 return (
-                  <a className={styles.typeCard} href={`#type-${type}`} key={type}>
+                  <Link className={styles.typeCard} href={`/attachments/type/${type}`} key={type}>
                     <strong>{attachmentTypeLabel(type)}</strong>
                     <span>{items.length.toLocaleString('en-US')} attachment{items.length === 1 ? '' : 's'} · {manufacturers} manufacturer{manufacturers === 1 ? '' : 's'}</span>
-                  </a>
+                  </Link>
                 );
               })}
             </div>
@@ -144,7 +144,7 @@ export default async function AttachmentsPage() {
           return (
             <section className="catalog-group" id={`type-${type}`} key={type}>
               <span className="eyebrow">Attachment type</span>
-              <h2>{attachmentTypeLabel(type)}</h2>
+              <h2><Link href={`/attachments/type/${type}`}>{attachmentTypeLabel(type)}</Link></h2>
               <p className="section-note">
                 {items.length.toLocaleString('en-US')} published attachment{items.length === 1 ? '' : 's'} with {typeFitmentCount.toLocaleString('en-US')} documented compatible-machine fitment{typeFitmentCount === 1 ? '' : 's'}. Open a model to see compatible machines and source context.
               </p>
@@ -168,6 +168,8 @@ export default async function AttachmentsPage() {
                   </div>
                 );
               })}
+
+              <p><Link className="tool-link" href={`/attachments/type/${type}`}>Open the {attachmentTypeLabel(type).toLowerCase()} compatibility hub →</Link></p>
             </section>
           );
         })}
