@@ -207,7 +207,7 @@ export async function searchMachines(term: string): Promise<Machine[]> {
 
   const compactKey = normalized.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   const like = `%${normalized}%`;
-  const keyLike = `%${compactKey}%`;
+  const keyLike = compactKey ? `%${compactKey}%` : '__NO_COMPACT_SEARCH_KEY__';
   const modelKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(m.model_name,' ',''),'-',''),'/',''),'.',''),'_',''))`;
   const fullKeySql = `UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT(mf.name,m.model_name),' ',''),'-',''),'/',''),'.',''),'_',''))`;
 
@@ -254,7 +254,7 @@ export async function searchMachines(term: string): Promise<Machine[]> {
   return seedMachines.filter((machine) => {
     const text = `${machine.brand} ${machine.model}`;
     const key = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    return text.toLowerCase().includes(lower) || key.includes(compactKey);
+    return text.toLowerCase().includes(lower) || (compactKey.length > 0 && key.includes(compactKey));
   });
 }
 
