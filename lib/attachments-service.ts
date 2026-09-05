@@ -129,7 +129,7 @@ export async function getMachineAttachments(machineId: string): Promise<MachineA
       FROM machine_attachments ma
       JOIN attachments a ON a.id=ma.attachment_id
       JOIN manufacturers amf ON amf.id=a.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id=ma.source_record_id
+      INNER JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.machine_id=? AND a.data_status IN ('partial','verified')
       ORDER BY amf.name ASC, a.attachment_type ASC, a.model_name ASC
     `, [Number(machineId)]);
@@ -171,6 +171,7 @@ export async function getAttachmentCatalog(): Promise<AttachmentCatalogItem[]> {
       JOIN machine_attachments ma ON ma.attachment_id=a.id
       JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
         AND fitment_machine.data_status IN ('partial','verified')
+      JOIN source_records fitment_source ON fitment_source.id=ma.source_record_id
       WHERE a.data_status IN ('partial','verified')
       GROUP BY a.id,mf.name,mf.slug,a.model_name,a.slug,a.attachment_type
       HAVING COUNT(DISTINCT ma.machine_id) > 0
@@ -213,6 +214,7 @@ export async function searchAttachments(term: string): Promise<AttachmentCatalog
       JOIN machine_attachments ma ON ma.attachment_id=a.id
       JOIN machines fitment_machine ON fitment_machine.id=ma.machine_id
         AND fitment_machine.data_status IN ('partial','verified')
+      JOIN source_records fitment_source ON fitment_source.id=ma.source_record_id
       WHERE a.data_status IN ('partial','verified')
         AND (
           a.model_name LIKE ?
@@ -291,6 +293,7 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
           FROM machine_attachments ma_count
           JOIN machines m_count ON m_count.id=ma_count.machine_id
             AND m_count.data_status IN ('partial','verified')
+          JOIN source_records count_source ON count_source.id=ma_count.source_record_id
           WHERE ma_count.attachment_id=a.id
         ) AS compatible_machine_count
       FROM attachments a
@@ -323,7 +326,7 @@ export async function getAttachment(brandSlug: string, attachmentSlug: string): 
       JOIN machines m ON m.id=ma.machine_id
       JOIN manufacturers mf ON mf.id=m.manufacturer_id
       JOIN equipment_types et ON et.id=m.equipment_type_id
-      LEFT JOIN source_records sr ON sr.id=ma.source_record_id
+      INNER JOIN source_records sr ON sr.id=ma.source_record_id
       WHERE ma.attachment_id=? AND m.data_status IN ('partial','verified')
       ORDER BY mf.name,et.name,m.model_name
     `, [Number(attachment.id)]);
