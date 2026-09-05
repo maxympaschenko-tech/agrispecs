@@ -165,6 +165,12 @@ export default async function HomePage() {
               <p>Find OEM part numbers, replacements and machine fitment records.</p>
               <span className="tool-link">Browse parts</span>
             </Link>
+            <Link className="card" href="/attachments">
+              <span className="eyebrow">Attachment compatibility</span>
+              <h3>Browse attachments</h3>
+              <p>Find source-backed loaders, backhoes and other attachments with documented compatible-machine fitment.</p>
+              <span className="tool-link">Explore attachments</span>
+            </Link>
             <Link className="card" href="/fitment-checker">
               <span className="eyebrow">Compatibility</span>
               <h3>Check fitment</h3>
