@@ -59,7 +59,7 @@ const indexablePartExists = `
       FROM part_components component_in
       JOIN parts related_kit ON related_kit.id=component_in.parent_part_id
         AND related_kit.data_status IN ('partial','verified')
-      JOIN source_records component_source_in ON component_source_in.source_record_id
+      JOIN source_records component_source_in ON component_source_in.id=component_in.source_record_id
       WHERE component_in.component_part_id=p.id
     )
   )
