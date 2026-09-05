@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getPart, type PartFitment, type PartRelation } from '@/lib/parts-service';
-import { getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
+import { getAmbiguousPublishedPartNumbers, getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -93,6 +94,13 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
     redirect(`/parts/${part.normalizedPartNumber.toLowerCase()}`);
   }
 
+  const relatedPartNumbers = [
+    ...part.relations.map((relation) => relation.normalizedPartNumber),
+    ...part.components.map((component) => component.normalizedPartNumber),
+    ...part.includedInKits.map((kit) => kit.normalizedPartNumber),
+  ];
+  const ambiguousRelatedPartNumbers = await getAmbiguousPublishedPartNumbers(relatedPartNumbers);
+
   const orderedFitments = [...part.fitments].sort((a, b) => (
     a.brand.localeCompare(b.brand)
     || a.model.localeCompare(b.model, undefined, { numeric: true })
@@ -168,7 +176,11 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
                   <div className="placeholder-row" key={`${relation.direction}-${relation.relationType}-${relation.normalizedPartNumber}-${index}`}>
                     <span>{relationLabel(relation)}</span>
                     <span>
-                      <Link href={`/parts/${relation.normalizedPartNumber.toLowerCase()}`}>{relation.partNumber}</Link>
+                      <Link href={getPartReferenceHref(
+                        relation.normalizedPartNumber,
+                        relation.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{relation.partNumber}</Link>
                       {relation.manufacturerName ? ` · ${relation.manufacturerName}` : ''}
                       {relation.name ? ` · ${relation.name}` : ''}
                     </span>
@@ -183,7 +195,13 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
                 <p className="section-note">Components appear only where a source-backed kit relationship is recorded.</p>
                 {part.components.map((component) => (
                   <div className="placeholder-row" key={component.normalizedPartNumber}>
-                    <span><Link href={`/parts/${component.normalizedPartNumber.toLowerCase()}`}>{component.partNumber}</Link></span>
+                    <span>
+                      <Link href={getPartReferenceHref(
+                        component.normalizedPartNumber,
+                        component.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{component.partNumber}</Link>
+                    </span>
                     <span>{component.name || 'OEM component'}{component.quantity !== null ? ` · Qty ${component.quantity}` : ''}</span>
                   </div>
                 ))}
@@ -195,7 +213,13 @@ export default async function ManufacturerPartPage({ params }: PageProps) {
                 <h2>Included in kits</h2>
                 {part.includedInKits.map((kit) => (
                   <div className="placeholder-row" key={kit.normalizedPartNumber}>
-                    <span><Link href={`/parts/${kit.normalizedPartNumber.toLowerCase()}`}>{kit.partNumber}</Link></span>
+                    <span>
+                      <Link href={getPartReferenceHref(
+                        kit.normalizedPartNumber,
+                        kit.manufacturerSlug,
+                        ambiguousRelatedPartNumbers,
+                      )}>{kit.partNumber}</Link>
+                    </span>
                     <span>{kit.name || 'Maintenance kit'}</span>
                   </div>
                 ))}
