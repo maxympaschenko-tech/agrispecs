@@ -30,7 +30,7 @@ function normalizePartNumber(value: string) {
   }
 }
 
-export async function getPublishedPartNumberMatchCount(partNumberOrSlug: string): Promise<number> {
+async function loadPublishedPartNumberMatchCount(partNumberOrSlug: string): Promise<number> {
   const normalized = normalizePartNumber(partNumberOrSlug);
   if (!normalized) return 0;
 
@@ -48,6 +48,8 @@ export async function getPublishedPartNumberMatchCount(partNumberOrSlug: string)
     return 0;
   }
 }
+
+export const getPublishedPartNumberMatchCount = cache(loadPublishedPartNumberMatchCount);
 
 export async function getAmbiguousPublishedPartNumbers(partNumbersOrSlugs: string[]): Promise<Set<string>> {
   const normalizedNumbers = Array.from(new Set(
