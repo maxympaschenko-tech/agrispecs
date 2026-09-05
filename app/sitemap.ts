@@ -69,6 +69,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}/equipment/${type.slug}`,
   }));
 
+  const equipmentBrandTypePages: MetadataRoute.Sitemap = Array.from(
+    publishableEquipment.reduce<Map<string, { typeSlug: string; brandSlug: string; count: number }>>((map, machine) => {
+      const key = `${machine.equipmentTypeSlug}\u0000${machine.brandSlug}`;
+      const current = map.get(key);
+      if (current) {
+        current.count += 1;
+      } else {
+        map.set(key, {
+          typeSlug: machine.equipmentTypeSlug,
+          brandSlug: machine.brandSlug,
+          count: 1,
+        });
+      }
+      return map;
+    }, new Map()).values(),
+  )
+    .filter((entry) => entry.count >= 2)
+    .map((entry) => ({
+      url: `${baseUrl}/equipment/${entry.typeSlug}/${entry.brandSlug}`,
+    }));
+
   const equipmentPages: MetadataRoute.Sitemap = publishableEquipment.map((machine) => ({
     url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
   }));
@@ -117,6 +138,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...brandPages,
     ...machinePages,
     ...equipmentTypePages,
+    ...equipmentBrandTypePages,
     ...equipmentPages,
     ...comparisonPages,
     ...categoryPages,

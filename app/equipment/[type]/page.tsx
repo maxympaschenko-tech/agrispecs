@@ -136,13 +136,17 @@ export default async function EquipmentTypePage({ params }: PageProps) {
           const brandName = machines[0]?.brand || brandSlug;
           const featured = machines.slice(0, BRAND_CARD_LIMIT);
           const compact = machines.slice(BRAND_CARD_LIMIT);
+          const brandTypeHref = machines.length >= 2 ? `/equipment/${type}/${brandSlug}` : `/brands/${brandSlug}`;
           return (
             <section className="catalog-group" id={`brand-${brandSlug}`} key={brandSlug}>
               <span className="eyebrow">Manufacturer</span>
-              <h2><Link href={`/brands/${brandSlug}`}>{brandName}</Link></h2>
+              <h2><Link href={brandTypeHref}>{brandName}</Link></h2>
               <p className="section-note">
                 {machines.length.toLocaleString('en-US')} published {brandName} {typeName.toLowerCase()} model{machines.length === 1 ? '' : 's'} with source-backed technical reference data. Featured models use image cards; the complete remaining catalog stays directly linked below.
               </p>
+              {machines.length >= 2 && (
+                <p><Link className="tool-link" href={brandTypeHref}>Browse all {brandName} {typeName.toLowerCase()} →</Link></p>
+              )}
               <div className="grid">
                 {featured.map((machine) => (
                   <div className="card" key={machine.id}>
