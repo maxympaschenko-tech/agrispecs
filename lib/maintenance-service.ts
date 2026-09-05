@@ -16,6 +16,7 @@ export type MaintenanceTask = {
   capacityUnit: string | null;
   intervalText: string;
   notes: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
   machineVersionId: number | null;
   versionSlug: string | null;
   versionMarketName: string | null;
@@ -43,6 +44,7 @@ type MaintenanceRow = RowDataPacket & {
   capacity_unit: string | null;
   interval_text: string;
   notes: string | null;
+  confidence: 'official' | 'high' | 'medium' | 'low';
   machine_version_id: number | null;
   version_slug: string | null;
   version_market_name: string | null;
@@ -76,6 +78,7 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
         mt.capacity_unit,
         mt.interval_text,
         mt.notes,
+        mt.confidence,
         mt.machine_version_id,
         mv.slug AS version_slug,
         mv.market_name AS version_market_name,
@@ -122,6 +125,7 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
       capacityUnit: row.capacity_unit,
       intervalText: row.interval_text,
       notes: row.notes,
+      confidence: row.confidence,
       machineVersionId: row.machine_version_id === null ? null : Number(row.machine_version_id),
       versionSlug: row.version_slug,
       versionMarketName: row.version_market_name,
