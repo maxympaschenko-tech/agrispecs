@@ -2,12 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CatalogPagination } from '@/components/catalog-pagination';
-import { getPartCategory } from '@/lib/part-category-service';
 import { getAmbiguousPublishedPartNumbers } from '@/lib/part-identity-service';
 import { getPartReferenceHref } from '@/lib/part-url';
+import { getCachedPartCategory, getCachedPartCatalogStats } from '@/lib/parts-catalog-cache';
 import {
   getPartCatalogPage,
-  getPartCatalogStats,
   type PartCatalogItem,
 } from '@/lib/parts-catalog-service';
 
@@ -78,7 +77,7 @@ function PartCard({ part, href }: { part: PartCatalogItem; href: string }) {
 
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const [{ category: slug }, { page: pageParam }] = await Promise.all([params, searchParams]);
-  const [category, page] = await Promise.all([getPartCategory(slug), Promise.resolve(parsePage(pageParam))]);
+  const [category, page] = await Promise.all([getCachedPartCategory(slug), Promise.resolve(parsePage(pageParam))]);
   if (!category) return {};
 
   if (page === null) {
@@ -104,12 +103,12 @@ export default async function PartCategoryPage({ params, searchParams }: PagePro
   const page = parsePage(pageParam);
   if (page === null) notFound();
 
-  const category = await getPartCategory(slug);
+  const category = await getCachedPartCategory(slug);
   if (!category) notFound();
 
   const [catalog, stats] = await Promise.all([
     getPartCatalogPage({ categorySlug: category.slug, page }),
-    getPartCatalogStats(category.slug),
+    getCachedPartCatalogStats(category.slug),
   ]);
 
   if (page > 1 && (catalog.totalPages === 0 || page > catalog.totalPages)) notFound();
