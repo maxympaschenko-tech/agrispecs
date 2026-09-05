@@ -117,6 +117,7 @@ export async function getEquipmentMachine(
       WHERE et.slug = ?
         AND mf.slug = ?
         AND m.slug = ?
+        AND m.data_status IN ('partial','verified','review')
       LIMIT 1
     `, [equipmentTypeSlug, brandSlug, modelSlug]);
     return rows[0] ? rowToEquipment(rows[0]) : undefined;
