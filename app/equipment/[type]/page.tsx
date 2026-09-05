@@ -4,9 +4,12 @@ import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
 import { getEquipmentTypePageContent } from '@/lib/equipment-type-content-overrides';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
+import styles from './equipment-type.module.css';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+const BRAND_CARD_LIMIT = 4;
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -118,7 +121,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
         <div className="parts-stats">
           <div><strong>{equipment.length.toLocaleString('en-US')}</strong><span>Published models</span></div>
           <div><strong>{brandGroups.length.toLocaleString('en-US')}</strong><span>Manufacturers</span></div>
-          <div><strong>{equipment.filter((machine) => machine.dataStatus === 'verified').length.toLocaleString('en-US')}</strong><span>Verified records</span></div>
+          <div><strong>Official</strong><span>Manufacturer-first source policy</span></div>
         </div>
 
         {equipment.length >= 2 && (
@@ -131,13 +134,17 @@ export default async function EquipmentTypePage({ params }: PageProps) {
 
         {brandGroups.map(([brandSlug, machines]) => {
           const brandName = machines[0]?.brand || brandSlug;
+          const featured = machines.slice(0, BRAND_CARD_LIMIT);
+          const compact = machines.slice(BRAND_CARD_LIMIT);
           return (
             <section className="catalog-group" id={`brand-${brandSlug}`} key={brandSlug}>
               <span className="eyebrow">Manufacturer</span>
               <h2><Link href={`/brands/${brandSlug}`}>{brandName}</Link></h2>
-              <p className="section-note">Published {brandName} {typeName.toLowerCase()} models with source-backed technical reference data.</p>
+              <p className="section-note">
+                {machines.length.toLocaleString('en-US')} published {brandName} {typeName.toLowerCase()} model{machines.length === 1 ? '' : 's'} with source-backed technical reference data. Featured models use image cards; the complete remaining catalog stays directly linked below.
+              </p>
               <div className="grid">
-                {machines.map((machine) => (
+                {featured.map((machine) => (
                   <div className="card" key={machine.id}>
                     {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug, machine.title)}
                     <span className="eyebrow">{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed data'}</span>
@@ -147,6 +154,17 @@ export default async function EquipmentTypePage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
+
+              {compact.length > 0 && (
+                <div className={styles.modelDirectory}>
+                  {compact.map((machine) => (
+                    <Link className={styles.modelLink} key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
+                      <span>{machine.model}</span>
+                      <small>{machine.dataStatus === 'verified' ? 'Verified' : 'Specs'}</small>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </section>
           );
         })}
