@@ -217,13 +217,16 @@ export async function searchParts(term: string): Promise<PartSummary[]> {
   try {
     const db = await getDbReady();
     const [rows] = await db.query<PartRow[]>(`${partSelect}
-      WHERE p.normalized_part_number LIKE ?
-         OR p.part_number LIKE ?
-         OR p.name LIKE ?
-         OR pc.name LIKE ?
-         OR mf.name LIKE ?
-         OR CONCAT(COALESCE(mf.name,''), ' ', p.part_number) LIKE ?
-         OR ${fullKeySql} LIKE ?
+      WHERE p.data_status IN ('partial','verified')
+        AND (
+          p.normalized_part_number LIKE ?
+          OR p.part_number LIKE ?
+          OR p.name LIKE ?
+          OR pc.name LIKE ?
+          OR mf.name LIKE ?
+          OR CONCAT(COALESCE(mf.name,''), ' ', p.part_number) LIKE ?
+          OR ${fullKeySql} LIKE ?
+        )
       ORDER BY
         CASE
           WHEN p.normalized_part_number = ? THEN 0
@@ -273,7 +276,11 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
     const partParams = normalizedManufacturerSlug ? [normalized, normalizedManufacturerSlug] : [normalized];
     const [rows] = await db.query<PartRow[]>(`${partSelect}
       WHERE p.normalized_part_number = ?
+        AND p.data_status IN ('partial','verified','review')
         ${manufacturerFilter}
+      ORDER BY
+        CASE WHEN p.data_status IN ('partial','verified') THEN 0 ELSE 1 END,
+        p.id ASC
       LIMIT 1
     `, partParams);
 
