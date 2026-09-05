@@ -40,7 +40,8 @@ function machineThumbnail(brandSlug: string, modelSlug: string, equipmentTypeSlu
 
 async function getCatalog(type: string, brand: string) {
   const equipment = await getNonTractorEquipmentByType(type);
-  return equipment.filter((machine) => machine.brandSlug === brand.toLowerCase());
+  const normalizedBrand = brand.trim().toLowerCase();
+  return equipment.filter((machine) => machine.brandSlug === normalizedBrand);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -51,14 +52,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const brandName = machines[0].brand;
+  const brandSlug = machines[0].brandSlug;
   const typeName = machines[0].equipmentType;
+  const typeSlug = machines[0].equipmentTypeSlug;
   const title = `${brandName} ${typeName} Models & Specifications`;
   const description = `Browse ${machines.length.toLocaleString('en-US')} published ${brandName} ${typeName.toLowerCase()} models with source-backed specifications and direct links to individual machine records.`;
 
   return {
     title,
     description,
-    alternates: { canonical: `/equipment/${type}/${brand}` },
+    alternates: { canonical: `/equipment/${typeSlug}/${brandSlug}` },
   };
 }
 
@@ -68,12 +71,14 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
   if (machines.length < MIN_INDEXABLE_MODELS) notFound();
 
   const brandName = machines[0].brand;
+  const brandSlug = machines[0].brandSlug;
   const typeName = machines[0].equipmentType;
+  const typeSlug = machines[0].equipmentTypeSlug;
   const featured = machines.slice(0, FEATURED_MODEL_LIMIT);
   const compact = machines.slice(FEATURED_MODEL_LIMIT);
-  const compareHref = `/equipment/compare?type=${type}&m1=${machines[0].id}&m2=${machines[1].id}`;
+  const compareHref = `/equipment/compare?type=${typeSlug}&m1=${machines[0].id}&m2=${machines[1].id}`;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
-  const canonicalUrl = `${baseUrl}/equipment/${type}/${brand}`;
+  const canonicalUrl = `${baseUrl}/equipment/${typeSlug}/${brandSlug}`;
   const description = `Browse ${machines.length.toLocaleString('en-US')} published ${brandName} ${typeName.toLowerCase()} models with source-backed specifications and direct links to individual machine records.`;
   const structuredData = {
     '@context': 'https://schema.org',
@@ -94,7 +99,7 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
           { '@type': 'ListItem', position: 2, name: 'Equipment', item: `${baseUrl}/equipment` },
-          { '@type': 'ListItem', position: 3, name: typeName, item: `${baseUrl}/equipment/${type}` },
+          { '@type': 'ListItem', position: 3, name: typeName, item: `${baseUrl}/equipment/${typeSlug}` },
           { '@type': 'ListItem', position: 4, name: brandName, item: canonicalUrl },
         ],
       },
@@ -118,7 +123,7 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> /{' '}
-        <Link href={`/equipment/${type}`}>{typeName}</Link> / {brandName}
+        <Link href={`/equipment/${typeSlug}`}>{typeName}</Link> / {brandName}
       </div>
       <div className="container">
         <span className="eyebrow">Manufacturer catalog</span>
@@ -175,8 +180,8 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
             Browse the complete manufacturer catalog or return to the full {typeName.toLowerCase()} directory to compare models from other manufacturers.
           </p>
           <p>
-            <Link className="tool-link" href={`/brands/${brand}`}>All {brandName} equipment →</Link>{' · '}
-            <Link className="tool-link" href={`/equipment/${type}`}>All {typeName.toLowerCase()} →</Link>{' · '}
+            <Link className="tool-link" href={`/brands/${brandSlug}`}>All {brandName} equipment →</Link>{' · '}
+            <Link className="tool-link" href={`/equipment/${typeSlug}`}>All {typeName.toLowerCase()} →</Link>{' · '}
             <Link className="tool-link" href="/methodology">Data methodology →</Link>
           </p>
         </section>
