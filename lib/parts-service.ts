@@ -193,6 +193,24 @@ const partSelect = `
   LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
 `;
 
+const partDetailSelect = `
+  SELECT
+    p.id,
+    p.part_number,
+    p.normalized_part_number,
+    p.name,
+    p.description,
+    p.data_status,
+    pc.name AS category_name,
+    pc.slug AS category_slug,
+    mf.name AS manufacturer_name,
+    mf.slug AS manufacturer_slug,
+    0 AS fitment_count
+  FROM parts p
+  LEFT JOIN part_categories pc ON pc.id = p.category_id
+  LEFT JOIN manufacturers mf ON mf.id = p.manufacturer_id
+`;
+
 export async function getParts(): Promise<PartSummary[]> {
   try {
     const db = await getDbReady();
@@ -275,7 +293,7 @@ async function loadPart(partNumberOrSlug: string, manufacturerSlug?: string): Pr
     const db = await getDbReady();
     const manufacturerFilter = normalizedManufacturerSlug ? 'AND mf.slug = ?' : '';
     const partParams = normalizedManufacturerSlug ? [normalized, normalizedManufacturerSlug] : [normalized];
-    const [rows] = await db.query<PartRow[]>(`${partSelect}
+    const [rows] = await db.query<PartRow[]>(`${partDetailSelect}
       WHERE p.normalized_part_number = ?
         AND p.data_status IN ('partial','verified','review')
         ${manufacturerFilter}
@@ -378,8 +396,11 @@ async function loadPart(partNumberOrSlug: string, manufacturerSlug?: string): Pr
       ORDER BY p2.part_number ASC
     `, [base.id]);
 
+    const fitmentCount = new Set(fitmentRows.map((row) => Number(row.machine_id))).size;
+
     return {
       ...base,
+      fitmentCount,
       description: rows[0].description,
       fitments: fitmentRows.map((row) => ({
         machineId: Number(row.machine_id),
