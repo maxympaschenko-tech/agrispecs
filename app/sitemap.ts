@@ -93,11 +93,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}/parts/${part.manufacturerSlug}/${part.normalizedPartNumber.toLowerCase()}`,
   }));
 
-  const attachmentPages: MetadataRoute.Sitemap = attachments
-    .filter((attachment) => attachment.compatibleMachineCount > 0)
-    .map((attachment) => ({
-      url: `${baseUrl}/attachments/${attachment.manufacturerSlug}/${attachment.slug}`,
-    }));
+  const indexableAttachments = attachments.filter((attachment) => attachment.compatibleMachineCount > 0);
+  const attachmentTypePages: MetadataRoute.Sitemap = Array.from(
+    new Set(indexableAttachments.map((attachment) => attachment.attachmentType)),
+  ).map((attachmentType) => ({
+    url: `${baseUrl}/attachments/type/${attachmentType}`,
+  }));
+
+  const attachmentPages: MetadataRoute.Sitemap = indexableAttachments.map((attachment) => ({
+    url: `${baseUrl}/attachments/${attachment.manufacturerSlug}/${attachment.slug}`,
+  }));
 
   return [
     ...staticPages,
@@ -109,6 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryPages,
     ...partPages,
     ...manufacturerPartPages,
+    ...attachmentTypePages,
     ...attachmentPages,
   ];
 }
