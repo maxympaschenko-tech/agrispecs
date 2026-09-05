@@ -74,7 +74,7 @@ export async function getMachineCapacities(machineId: string, machineVersionId?:
         DATE_FORMAT(sr.published_date, '%Y-%m-%d') AS source_published_date
       FROM machine_capacities mc
       LEFT JOIN machine_versions mv ON mv.id = mc.machine_version_id
-      LEFT JOIN source_records sr ON sr.id = mc.source_record_id
+      INNER JOIN source_records sr ON sr.id = mc.source_record_id
       WHERE mc.machine_id = ?
         ${versionFilter}
       ORDER BY
