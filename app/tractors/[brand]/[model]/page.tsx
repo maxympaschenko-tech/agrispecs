@@ -75,6 +75,13 @@ function maintenanceConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low
   return 'Low-confidence reference — verify before service';
 }
 
+function partFitmentConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low') {
+  if (value === 'official') return 'Official direct fitment';
+  if (value === 'high') return 'High-confidence source-backed fitment';
+  if (value === 'medium') return 'Medium-confidence fitment reference';
+  return 'Low-confidence fitment reference — verify before ordering';
+}
+
 function trimNumber(value: number, digits = 1) {
   const rounded = Number(value.toFixed(digits));
   return String(rounded);
@@ -198,6 +205,13 @@ export default async function TractorModelPage({ params }: PageProps) {
       title: capacity.sourceTitle || 'Capacity source',
       publishedDate: capacity.sourcePublishedDate,
     })),
+    ...verifiedParts.flatMap((part) => part.fitmentEvidence
+      .filter((evidence) => evidence.sourceUrl)
+      .map((evidence) => ({
+        url: evidence.sourceUrl as string,
+        title: evidence.sourceTitle || `${part.partNumber} fitment source`,
+        publishedDate: null,
+      }))),
     ...attachments.filter((attachment) => attachment.sourceUrl).map((attachment) => ({
       url: attachment.sourceUrl as string,
       title: attachment.sourceTitle || 'Attachment compatibility source',
@@ -359,19 +373,28 @@ export default async function TractorModelPage({ params }: PageProps) {
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
                 <h2>Compatible parts & kits</h2>
-                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Configuration-specific fitment is shown directly under each part when available; still review the part page for serial-number, build and source details before ordering or installing.</p>
+                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Configuration-specific fitment, evidence confidence and the direct fitment source are shown under each part when available; still review the part page for serial-number and build details before ordering or installing.</p>
                 <div className="parts-list">
                   {verifiedParts.map((part) => (
-                    <Link className="part-row" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
+                    <div className="part-row" key={part.id}>
                       <span>
-                        <strong>{part.partNumber}</strong>
+                        <strong><Link href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>{part.partNumber}</Link></strong>
                         <small>{part.name || part.categoryName || 'OEM part'}</small>
                         {part.configurationNotes.map((note) => (
                           <small key={note}><strong>Applies to:</strong> {note}</small>
                         ))}
+                        {part.fitmentEvidence.map((evidence, index) => (
+                          <small key={`${evidence.confidence}-${evidence.sourceUrl || evidence.sourceTitle}-${index}`}>
+                            <strong>Evidence:</strong> {partFitmentConfidenceLabel(evidence.confidence)}
+                            {' · '}
+                            {evidence.sourceUrl ? (
+                              <a href={evidence.sourceUrl} target="_blank" rel="noopener noreferrer">{evidence.sourceTitle} →</a>
+                            ) : evidence.sourceTitle}
+                          </small>
+                        ))}
                       </span>
-                      <span>{part.categoryName || 'Part'} →</span>
-                    </Link>
+                      <span><Link href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>{part.categoryName || 'Part'} →</Link></span>
+                    </div>
                   ))}
                 </div>
               </section>
