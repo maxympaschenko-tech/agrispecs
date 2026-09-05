@@ -49,6 +49,7 @@ export type PartRelation = {
   normalizedPartNumber: string;
   name: string | null;
   manufacturerName: string | null;
+  manufacturerSlug: string | null;
   sourceTitle: string | null;
   sourceUrl: string | null;
 };
@@ -58,6 +59,7 @@ export type PartComponent = {
   normalizedPartNumber: string;
   name: string | null;
   manufacturerName: string | null;
+  manufacturerSlug: string | null;
   quantity: number | null;
   notes: string | null;
   sourceTitle: string | null;
@@ -119,6 +121,7 @@ type RelationRow = RowDataPacket & {
   normalized_part_number: string;
   name: string | null;
   manufacturer_name: string | null;
+  manufacturer_slug: string | null;
   source_title: string | null;
   source_url: string | null;
 };
@@ -128,6 +131,7 @@ type ComponentRow = RowDataPacket & {
   normalized_part_number: string;
   name: string | null;
   manufacturer_name: string | null;
+  manufacturer_slug: string | null;
   quantity: string | number | null;
   notes: string | null;
   source_title: string | null;
@@ -155,6 +159,7 @@ function rowToComponent(row: ComponentRow): PartComponent {
     normalizedPartNumber: row.normalized_part_number,
     name: row.name,
     manufacturerName: row.manufacturer_name,
+    manufacturerSlug: row.manufacturer_slug,
     quantity: row.quantity === null ? null : Number(row.quantity),
     notes: row.notes,
     sourceTitle: row.source_title,
@@ -315,7 +320,8 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
 
     const [relationRows] = await db.query<RelationRow[]>(`
       SELECT 'outgoing' AS direction, pcr.relation_type, p2.part_number, p2.normalized_part_number,
-             p2.name, mf2.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
+             p2.name, mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+             sr.title AS source_title, sr.url AS source_url
       FROM part_cross_references pcr
       JOIN parts p2 ON p2.id=pcr.cross_part_id
         AND p2.data_status IN ('partial','verified')
@@ -324,7 +330,8 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
       WHERE pcr.part_id=?
       UNION ALL
       SELECT 'incoming' AS direction, pcr.relation_type, p1.part_number, p1.normalized_part_number,
-             p1.name, mf1.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
+             p1.name, mf1.name AS manufacturer_name, mf1.slug AS manufacturer_slug,
+             sr.title AS source_title, sr.url AS source_url
       FROM part_cross_references pcr
       JOIN parts p1 ON p1.id=pcr.part_id
         AND p1.data_status IN ('partial','verified')
@@ -336,7 +343,8 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
 
     const [componentRows] = await db.query<ComponentRow[]>(`
       SELECT p2.part_number, p2.normalized_part_number, p2.name,
-             mf2.name AS manufacturer_name, pc.quantity, pc.notes,
+             mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+             pc.quantity, pc.notes,
              sr.title AS source_title, sr.url AS source_url
       FROM part_components pc
       JOIN parts p2 ON p2.id=pc.component_part_id
@@ -349,7 +357,8 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
 
     const [kitRows] = await db.query<ComponentRow[]>(`
       SELECT p2.part_number, p2.normalized_part_number, p2.name,
-             mf2.name AS manufacturer_name, pc.quantity, pc.notes,
+             mf2.name AS manufacturer_name, mf2.slug AS manufacturer_slug,
+             pc.quantity, pc.notes,
              sr.title AS source_title, sr.url AS source_url
       FROM part_components pc
       JOIN parts p2 ON p2.id=pc.parent_part_id
@@ -395,6 +404,7 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
         normalizedPartNumber: row.normalized_part_number,
         name: row.name,
         manufacturerName: row.manufacturer_name,
+        manufacturerSlug: row.manufacturer_slug,
         sourceTitle: row.source_title,
         sourceUrl: row.source_url,
       })),
