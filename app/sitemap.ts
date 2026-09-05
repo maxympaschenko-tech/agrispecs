@@ -5,6 +5,7 @@ import { getPartCategories } from '@/lib/part-category-service';
 import { getIndexablePartNumbers } from '@/lib/part-index-service';
 import { getAttachmentCatalog } from '@/lib/attachments-service';
 import { comparisonPresets } from '@/lib/comparison-presets';
+import { getMachineGenerationLabel } from '@/lib/machine-display';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -42,8 +43,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (machine) => machine.dataStatus === 'partial' || machine.dataStatus === 'verified',
   );
 
-  const publishableMachineKeys = new Set(
-    publishableMachines.map((machine) => `${machine.brand}\u0000${machine.model}`),
+  const publishableCurrentMachineKeys = new Set(
+    publishableMachines
+      .filter((machine) => !getMachineGenerationLabel(machine.modelSlug))
+      .map((machine) => `${machine.brand}\u0000${machine.model}`),
   );
 
   const brandPages: MetadataRoute.Sitemap = Array.from(
@@ -69,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const comparisonPages: MetadataRoute.Sitemap = comparisonPresets
     .filter((preset) =>
-      preset.machines.every((machine) => publishableMachineKeys.has(`${machine.brand}\u0000${machine.model}`)),
+      preset.machines.every((machine) => publishableCurrentMachineKeys.has(`${machine.brand}\u0000${machine.model}`)),
     )
     .map((preset) => ({
       url: `${baseUrl}/compare/${preset.slug}`,
