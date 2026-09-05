@@ -4,7 +4,11 @@ import { getDbReady } from '@/lib/db-migrations';
 type CountRow = RowDataPacket & { total: number };
 
 function normalizePartNumber(value: string) {
-  return decodeURIComponent(value).trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  try {
+    return decodeURIComponent(value).trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  } catch {
+    return '';
+  }
 }
 
 export async function getPublishedPartNumberMatchCount(partNumberOrSlug: string): Promise<number> {
