@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 function jsonLd(value: unknown) {
-  return JSON.stringify(value).replace(/</g, '\u003c');
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 type ComparePageProps = {
