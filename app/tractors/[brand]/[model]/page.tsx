@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getMachine, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
-import { getMachineParts } from '@/lib/parts-service';
+import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
 import { getMachineMaintenance } from '@/lib/maintenance-service';
 import { getMachineCapacities } from '@/lib/capacities-service';
 import { getMachineAttachments } from '@/lib/attachments-service';
@@ -164,7 +164,7 @@ export default async function TractorModelPage({ params }: PageProps) {
 
   const [images, machineParts, maintenance, capacities, attachments, specs] = await Promise.all([
     getMachineImages(machine.id),
-    getMachineParts(machine.id, selectedVersion?.id),
+    getMachinePartsWithConfigurations(machine.id, selectedVersion?.id),
     getMachineMaintenance(machine.id),
     getMachineCapacities(machine.id),
     getMachineAttachments(machine.id),
@@ -359,13 +359,16 @@ export default async function TractorModelPage({ params }: PageProps) {
             {verifiedParts.length > 0 && (
               <section className="data-section" id="parts">
                 <h2>Compatible parts & kits</h2>
-                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Serial-number and machine-configuration restrictions may still apply, so review each part page before ordering or installing.</p>
+                <p className="section-note">This source-backed list can include maintenance parts, mounting hardware and accessory kits. Configuration-specific fitment is shown directly under each part when available; still review the part page for serial-number, build and source details before ordering or installing.</p>
                 <div className="parts-list">
                   {verifiedParts.map((part) => (
                     <Link className="part-row" key={part.id} href={`/parts/${part.normalizedPartNumber.toLowerCase()}`}>
                       <span>
                         <strong>{part.partNumber}</strong>
                         <small>{part.name || part.categoryName || 'OEM part'}</small>
+                        {part.configurationNotes.map((note) => (
+                          <small key={note}><strong>Applies to:</strong> {note}</small>
+                        ))}
                       </span>
                       <span>{part.categoryName || 'Part'} →</span>
                     </Link>
