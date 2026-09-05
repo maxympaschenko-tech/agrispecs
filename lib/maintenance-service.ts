@@ -96,6 +96,7 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
       WHERE mt.machine_id = ?
       ORDER BY
         CASE WHEN mt.machine_version_id IS NULL THEN 0 WHEN mv.is_current = 1 THEN 1 ELSE 2 END,
+        COALESCE(mt.interval_hours, 999999),
         CASE mt.section
           WHEN 'Engine' THEN 10
           WHEN 'Fuel & Air' THEN 20
@@ -106,7 +107,6 @@ export async function getMachineMaintenance(machineId: string): Promise<Maintena
           WHEN 'Cab' THEN 50
           ELSE 90
         END,
-        COALESCE(mt.interval_hours, 999999),
         mt.title ASC
     `, [Number(machineId)]);
 
