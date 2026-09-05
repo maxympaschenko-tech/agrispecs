@@ -1,8 +1,16 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { getPart } from '@/lib/parts-service';
-import { getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
+import { getAmbiguousPublishedPartNumbers, getPublishedPartNumberMatchCount } from '@/lib/part-identity-service';
+import { getPartReferenceHref } from '@/lib/part-url';
 import { getPartImages } from '@/lib/part-images-service';
+import { getReplacementChain, type ReplacementChain } from '@/lib/replacement-chain-service';
+import {
+  getReplacementSetMembershipsForPart,
+  getReplacementSetsForLegacyPart,
+  type ReplacementSet,
+  type ReplacementSetMembership,
+} from '@/lib/replacement-set-service';
 
 type LayoutProps = {
   children: ReactNode;
@@ -25,6 +33,30 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
   if (!part || !publishable || !part.manufacturerSlug) return children;
 
   const matchCount = await getPublishedPartNumberMatchCount(part.normalizedPartNumber);
+  let replacementChain: ReplacementChain = { nodes: [], complete: true, ambiguous: false };
+  let replacementSets: ReplacementSet[] = [];
+  let replacementMemberships: ReplacementSetMembership[] = [];
+
+  if (matchCount > 1) {
+    [replacementChain, replacementSets, replacementMemberships] = await Promise.all([
+      getReplacementChain(part.id),
+      getReplacementSetsForLegacyPart(part.id),
+      getReplacementSetMembershipsForPart(part.id),
+    ]);
+  }
+
+  const replacementPartNumbers = [
+    ...replacementChain.nodes.map((node) => node.normalizedPartNumber),
+    ...replacementSets.flatMap((set) => set.items.map((item) => item.normalizedPartNumber)),
+    ...replacementMemberships.map((membership) => membership.legacyNormalizedPartNumber),
+  ];
+  const ambiguousReplacementPartNumbers = replacementPartNumbers.length > 0
+    ? await getAmbiguousPublishedPartNumbers(replacementPartNumbers)
+    : new Set<string>();
+  const hasReplacementContext = replacementChain.nodes.length > 0
+    || replacementSets.length > 0
+    || replacementMemberships.length > 0;
+
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalPath = matchCount > 1
     ? `/parts/${part.manufacturerSlug}/${part.normalizedPartNumber.toLowerCase()}`
@@ -120,6 +152,12 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
           part.categoryName ? { '@type': 'PropertyValue', name: 'Part category', value: part.categoryName } : null,
           { '@type': 'PropertyValue', name: 'Documented compatible machines', value: String(part.fitmentCount) },
           matchCount > 1 ? { '@type': 'PropertyValue', name: 'Part-number identity', value: 'Manufacturer-qualified due to cross-brand number collision' } : null,
+          replacementChain.nodes.length > 0
+            ? { '@type': 'PropertyValue', name: 'Verified replacement chain length', value: String(replacementChain.nodes.length) }
+            : null,
+          replacementSets.length > 0
+            ? { '@type': 'PropertyValue', name: 'Documented service replacement sets', value: String(replacementSets.length) }
+            : null,
         ].filter(Boolean),
       },
       {
@@ -171,6 +209,76 @@ export default async function ManufacturerPartLayout({ children, params }: Layou
             Manufacturer catalog: <Link href={manufacturerHubHref}>browse all source-backed {part.manufacturerName} parts →</Link>
           </p>
         </div>
+      )}
+      {hasReplacementContext && (
+        <section className="section" style={{ paddingTop: 12, paddingBottom: 0 }}>
+          <div className="container">
+            <div className="replacement-summary">
+              <strong>Source-backed replacement context for this manufacturer-specific record</strong>
+              {replacementChain.nodes.length > 0 && (
+                <p style={{ marginTop: 8 }}>
+                  Verified chain: <span>{part.partNumber}</span>
+                  {replacementChain.nodes.map((node) => (
+                    <span key={node.id}>
+                      {' → '}
+                      <Link href={getPartReferenceHref(
+                        node.normalizedPartNumber,
+                        node.manufacturerSlug,
+                        ambiguousReplacementPartNumbers,
+                      )}>{node.partNumber}</Link>
+                    </span>
+                  ))}
+                  {!replacementChain.complete && (
+                    <small style={{ display: 'block', marginTop: 6 }}>
+                      {replacementChain.ambiguous
+                        ? 'The verified chain branches or loops after this point, so no single final replacement is asserted.'
+                        : 'The verified chain continues beyond the current depth limit.'}
+                    </small>
+                  )}
+                </p>
+              )}
+              {replacementSets.map((set) => (
+                <div key={set.id} style={{ marginTop: 10 }}>
+                  <strong>{set.title}</strong>
+                  {set.items.map((item) => (
+                    <span key={`${set.id}-${item.normalizedPartNumber}`} style={{ display: 'block' }}>
+                      <Link href={getPartReferenceHref(
+                        item.normalizedPartNumber,
+                        item.manufacturerSlug,
+                        ambiguousReplacementPartNumbers,
+                      )}>{item.partNumber}</Link>
+                      {item.role ? ` · ${item.role}` : item.name ? ` · ${item.name}` : ''}
+                      {item.quantity !== null ? ` · Qty ${item.quantity}` : ''}
+                    </span>
+                  ))}
+                  {set.notes && <small style={{ display: 'block' }}>{set.notes}</small>}
+                  {set.sourceUrl && (
+                    <small style={{ display: 'block' }}>
+                      <a href={set.sourceUrl} target="_blank" rel="noopener noreferrer">{set.sourceTitle || 'Replacement-set source'} →</a>
+                    </small>
+                  )}
+                </div>
+              ))}
+              {replacementMemberships.map((membership) => (
+                <div key={`${membership.id}-${membership.legacyNormalizedPartNumber}`} style={{ marginTop: 10 }}>
+                  <strong>Used in service replacement for: </strong>
+                  <Link href={getPartReferenceHref(
+                    membership.legacyNormalizedPartNumber,
+                    membership.legacyManufacturerSlug,
+                    ambiguousReplacementPartNumbers,
+                  )}>{membership.legacyPartNumber}</Link>
+                  {membership.role ? ` · ${membership.role}` : ''}
+                  {membership.quantity !== null ? ` · Qty ${membership.quantity}` : ''}
+                  {membership.sourceUrl && (
+                    <small style={{ display: 'block' }}>
+                      <a href={membership.sourceUrl} target="_blank" rel="noopener noreferrer">{membership.sourceTitle || 'Replacement-set source'} →</a>
+                    </small>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
       {children}
     </>
