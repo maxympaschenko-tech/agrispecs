@@ -151,7 +151,7 @@ export default async function BrandPage({ params }: PageProps) {
             <Link className="card" href="/parts">
               <span className="eyebrow">Parts reference</span>
               <h3>Search OEM parts</h3>
-              <p>Search part numbers, replacement references and verified machine fitment records.</p>
+              <p>Search part numbers, replacement references and documented machine fitment records.</p>
               <span className="tool-link">Browse parts</span>
             </Link>
             <Link className="card" href="/attachments">
@@ -225,7 +225,7 @@ export default async function BrandPage({ params }: PageProps) {
                           {machineThumbnail(machine.brandSlug, machine.modelSlug, machine.title, machine.equipmentTypeSlug)}
                           <span className="eyebrow">{machine.equipmentType}</span>
                           <h3>{machine.title}</h3>
-                          <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and current market reference.</p>
+                          <p>{machine.dataStatus === 'verified' ? 'Verified' : 'Source-backed'} {machine.equipmentType.toLowerCase()} specifications and published market reference.</p>
                         </Link>
                       ))}
                     </div>
@@ -279,7 +279,9 @@ export default async function BrandPage({ params }: PageProps) {
             <Link className="tool-link" href="/methodology">Read our data methodology</Link>
           </section>
 
-          {brandTractors.length === 0 && brandEquipment.length === 0 && <div className="notice">No model records are available for this manufacturer yet.</div>}
+          {publishedMachines.length === 0 && researchTractors.length === 0 && researchEquipment.length === 0 && (
+            <div className="notice">No published or editorial-review model records are available for this manufacturer yet.</div>
+          )}
         </div>
       </section>
     </main>
