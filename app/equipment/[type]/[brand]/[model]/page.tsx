@@ -75,7 +75,7 @@ function formatSpecValue(spec: MachineSpec) {
 }
 
 function jsonLd(value: unknown) {
-  return JSON.stringify(value).replace(/</g, '\u003c');
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 function formatAttachmentType(value: string) {
