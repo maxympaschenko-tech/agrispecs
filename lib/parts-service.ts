@@ -318,16 +318,18 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
              p2.name, mf2.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
       FROM part_cross_references pcr
       JOIN parts p2 ON p2.id=pcr.cross_part_id
+        AND p2.data_status IN ('partial','verified')
       LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id=pcr.source_record_id
+      INNER JOIN source_records sr ON sr.id=pcr.source_record_id
       WHERE pcr.part_id=?
       UNION ALL
       SELECT 'incoming' AS direction, pcr.relation_type, p1.part_number, p1.normalized_part_number,
              p1.name, mf1.name AS manufacturer_name, sr.title AS source_title, sr.url AS source_url
       FROM part_cross_references pcr
       JOIN parts p1 ON p1.id=pcr.part_id
+        AND p1.data_status IN ('partial','verified')
       LEFT JOIN manufacturers mf1 ON mf1.id=p1.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id=pcr.source_record_id
+      INNER JOIN source_records sr ON sr.id=pcr.source_record_id
       WHERE pcr.cross_part_id=?
       ORDER BY part_number ASC
     `, [base.id, base.id]);
@@ -338,8 +340,9 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
              sr.title AS source_title, sr.url AS source_url
       FROM part_components pc
       JOIN parts p2 ON p2.id=pc.component_part_id
+        AND p2.data_status IN ('partial','verified')
       LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id=pc.source_record_id
+      INNER JOIN source_records sr ON sr.id=pc.source_record_id
       WHERE pc.parent_part_id=?
       ORDER BY p2.part_number ASC
     `, [base.id]);
@@ -350,8 +353,9 @@ export async function getPart(partNumberOrSlug: string, manufacturerSlug?: strin
              sr.title AS source_title, sr.url AS source_url
       FROM part_components pc
       JOIN parts p2 ON p2.id=pc.parent_part_id
+        AND p2.data_status IN ('partial','verified')
       LEFT JOIN manufacturers mf2 ON mf2.id=p2.manufacturer_id
-      LEFT JOIN source_records sr ON sr.id=pc.source_record_id
+      INNER JOIN source_records sr ON sr.id=pc.source_record_id
       WHERE pc.component_part_id=?
       ORDER BY p2.part_number ASC
     `, [base.id]);
