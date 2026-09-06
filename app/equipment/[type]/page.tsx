@@ -149,7 +149,7 @@ export default async function EquipmentTypePage({ params }: PageProps) {
                     {formatRangeValue(facet.minValue)}–{formatRangeValue(facet.maxValue)} {facet.unit}
                   </strong>
                   <span>
-                    {facet.label} · {facet.modelCount.toLocaleString('en-US')} of {equipment.length.toLocaleString('en-US')} models
+                    {facet.label} · {facet.modelCount.toLocaleString('en-US')} of {equipment.length.toLocaleString('en-US')} models · {facet.manufacturerCount.toLocaleString('en-US')} manufacturers
                   </span>
                 </div>
               ))}
