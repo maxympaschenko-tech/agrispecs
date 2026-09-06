@@ -286,6 +286,32 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['travel.maximum_speed'],
     },
   ],
+  'large-square-baler': [
+    {
+      slug: 'bale-width',
+      label: 'Bale width',
+      canonicalUnit: 'in',
+      specKeys: ['baler.bale_width'],
+    },
+    {
+      slug: 'bale-height',
+      label: 'Bale height',
+      canonicalUnit: 'in',
+      specKeys: ['baler.bale_height'],
+    },
+    {
+      slug: 'plunger-speed',
+      label: 'Plunger speed',
+      canonicalUnit: 'strokes/min',
+      specKeys: ['baler.plunger_speed'],
+    },
+    {
+      slug: 'maximum-bale-length',
+      label: 'Maximum bale length',
+      canonicalUnit: 'in',
+      specKeys: ['baler.maximum_bale_length'],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
