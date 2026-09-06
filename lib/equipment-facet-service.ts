@@ -165,6 +165,32 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       ],
     },
   ],
+  'round-baler': [
+    {
+      slug: 'bale-width',
+      label: 'Bale width',
+      canonicalUnit: 'in',
+      specKeys: ['baler.bale_width'],
+    },
+    {
+      slug: 'minimum-bale-diameter',
+      label: 'Minimum bale diameter',
+      canonicalUnit: 'in',
+      specKeys: ['baler.bale_diameter_min'],
+    },
+    {
+      slug: 'maximum-bale-diameter',
+      label: 'Maximum bale diameter',
+      canonicalUnit: 'in',
+      specKeys: ['baler.bale_diameter_max'],
+    },
+    {
+      slug: 'minimum-tractor-horsepower',
+      label: 'Minimum tractor horsepower',
+      canonicalUnit: 'hp',
+      specKeys: ['kubota.round_baler.minimum_tractor_hp'],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
