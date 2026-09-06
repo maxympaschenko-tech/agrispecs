@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
+import { getNonTractorEquipmentByType, type EquipmentMachine } from '@/lib/equipment-service';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from '../equipment-type.module.css';
 
@@ -10,6 +10,7 @@ export const revalidate = 0;
 
 const MIN_INDEXABLE_MODELS = 2;
 const FEATURED_MODEL_LIMIT = 8;
+const RELATED_MANUFACTURER_LIMIT = 6;
 
 type PageProps = {
   params: Promise<{ type: string; brand: string }>;
@@ -39,14 +40,41 @@ function machineThumbnail(brandSlug: string, modelSlug: string, equipmentTypeSlu
 }
 
 async function getCatalog(type: string, brand: string) {
-  const equipment = await getNonTractorEquipmentByType(type);
+  const allMachines = await getNonTractorEquipmentByType(type);
   const normalizedBrand = brand.trim().toLowerCase();
-  return equipment.filter((machine) => machine.brandSlug === normalizedBrand);
+  return {
+    allMachines,
+    machines: allMachines.filter((machine) => machine.brandSlug === normalizedBrand),
+  };
+}
+
+function getRelatedManufacturers(
+  machines: EquipmentMachine[],
+  currentBrandSlug: string,
+  limit = RELATED_MANUFACTURER_LIMIT,
+) {
+  return Array.from(
+    machines.reduce<Map<string, EquipmentMachine[]>>((groups, machine) => {
+      const existing = groups.get(machine.brandSlug) || [];
+      existing.push(machine);
+      groups.set(machine.brandSlug, existing);
+      return groups;
+    }, new Map()),
+  )
+    .filter(([brandSlug, brandMachines]) => brandSlug !== currentBrandSlug && brandMachines.length >= MIN_INDEXABLE_MODELS)
+    .map(([brandSlug, brandMachines]) => ({
+      brandSlug,
+      brandName: brandMachines[0]?.brand || brandSlug,
+      count: brandMachines.length,
+      sampleMachineId: brandMachines[0]?.id,
+    }))
+    .sort((a, b) => b.count - a.count || a.brandName.localeCompare(b.brandName))
+    .slice(0, limit);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand } = await params;
-  const machines = await getCatalog(type, brand);
+  const { machines } = await getCatalog(type, brand);
   if (machines.length < MIN_INDEXABLE_MODELS) {
     return { robots: { index: false, follow: true } };
   }
@@ -62,12 +90,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: { canonical: `/equipment/${typeSlug}/${brandSlug}` },
+    robots: { index: true, follow: true },
   };
 }
 
 export default async function EquipmentBrandTypePage({ params }: PageProps) {
   const { type, brand } = await params;
-  const machines = await getCatalog(type, brand);
+  const { allMachines, machines } = await getCatalog(type, brand);
   if (machines.length < MIN_INDEXABLE_MODELS) notFound();
 
   const brandName = machines[0].brand;
@@ -76,7 +105,11 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
   const typeSlug = machines[0].equipmentTypeSlug;
   const featured = machines.slice(0, FEATURED_MODEL_LIMIT);
   const compact = machines.slice(FEATURED_MODEL_LIMIT);
+  const relatedManufacturers = getRelatedManufacturers(allMachines, brandSlug);
   const compareHref = `/equipment/compare?type=${typeSlug}&m1=${machines[0].id}&m2=${machines[1].id}`;
+  const crossBrandCompareHref = relatedManufacturers[0]?.sampleMachineId
+    ? `/equipment/compare?type=${typeSlug}&m1=${machines[0].id}&m2=${relatedManufacturers[0].sampleMachineId}`
+    : null;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
   const canonicalUrl = `${baseUrl}/equipment/${typeSlug}/${brandSlug}`;
   const description = `Browse ${machines.length.toLocaleString('en-US')} published ${brandName} ${typeName.toLowerCase()} models with source-backed specifications and direct links to individual machine records.`;
@@ -173,6 +206,35 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
             </div>
           )}
         </section>
+
+        {relatedManufacturers.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Cross-brand discovery</span>
+            <h2>Other {typeName.toLowerCase()} manufacturers</h2>
+            <p className="section-note">
+              Continue with manufacturer catalogs that have at least {MIN_INDEXABLE_MODELS} published {typeName.toLowerCase()} models. Smaller one-model groups stay out of this hub navigation.
+            </p>
+            <div className={styles.modelDirectory}>
+              {relatedManufacturers.map((manufacturer) => (
+                <Link
+                  className={styles.modelLink}
+                  key={manufacturer.brandSlug}
+                  href={`/equipment/${typeSlug}/${manufacturer.brandSlug}`}
+                >
+                  <span>{manufacturer.brandName}</span>
+                  <small>{manufacturer.count.toLocaleString('en-US')} models</small>
+                </Link>
+              ))}
+            </div>
+            {crossBrandCompareHref && (
+              <p>
+                <Link className="tool-link" href={crossBrandCompareHref}>
+                  Compare {brandName} with {relatedManufacturers[0].brandName} {typeName.toLowerCase()} →
+                </Link>
+              </p>
+            )}
+          </section>
+        )}
 
         <section className="data-section">
           <h2>More {brandName} and {typeName.toLowerCase()} references</h2>
