@@ -72,7 +72,15 @@ export default async function EquipmentPowertrainFacetPage({ params }: PageProps
   const machines = entry.machines;
   const typeName = machines[0].equipmentType;
   const typeSlug = machines[0].equipmentTypeSlug;
-  const brandCount = new Set(machines.map((machine) => machine.brandSlug)).size;
+  const brandGroups = Array.from(
+    machines.reduce<Map<string, typeof machines>>((groups, machine) => {
+      const existing = groups.get(machine.brandSlug) || [];
+      existing.push(machine);
+      groups.set(machine.brandSlug, existing);
+      return groups;
+    }, new Map()),
+  ).sort(([, a], [, b]) => b.length - a.length || (a[0]?.brand || '').localeCompare(b[0]?.brand || ''));
+  const brandCount = brandGroups.length;
   const featured = machines.slice(0, FEATURED_MODEL_LIMIT);
   const compact = machines.slice(FEATURED_MODEL_LIMIT);
   const comparePair = comparisonPair(machines);
@@ -145,6 +153,27 @@ export default async function EquipmentPowertrainFacetPage({ params }: PageProps
           start with two matching models from different brands when available, then adjust the selection.{' '}
           <Link className="tool-link" href={compareHref}>Compare {entry.value.toLowerCase()} {typeName.toLowerCase()} →</Link>
         </div>
+
+        {brandGroups.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Manufacturer catalogs</span>
+            <h2>{entry.value} {typeName.toLowerCase()} by manufacturer</h2>
+            <p className="section-note">
+              Open the broader manufacturer catalog for each brand represented here to compare its full published {typeName.toLowerCase()} lineup, including other powertrain configurations.
+            </p>
+            <div className={styles.modelDirectory}>
+              {brandGroups.map(([brandSlug, brandMachines]) => {
+                const brandName = brandMachines[0]?.brand || brandSlug;
+                return (
+                  <Link className={styles.modelLink} key={brandSlug} href={`/equipment/${typeSlug}/${brandSlug}`}>
+                    <span>{brandName} {typeName}</span>
+                    <small>{brandMachines.length.toLocaleString('en-US')} {entry.value.toLowerCase()} model{brandMachines.length === 1 ? '' : 's'}</small>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         <section className="catalog-group">
           <span className="eyebrow">Models</span>
