@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getMachines } from '@/lib/catalog-service';
 import { getNonTractorEquipment, getNonTractorEquipmentTypes } from '@/lib/equipment-service';
+import { getIndexableEquipmentFacetRoutes } from '@/lib/equipment-facet-service';
 import { getCachedPartCategories } from '@/lib/parts-catalog-cache';
 import { getPartManufacturerSummaries } from '@/lib/parts-catalog-service';
 import { getIndexableManufacturerPartRoutes, getIndexablePartNumbers } from '@/lib/part-index-service';
@@ -28,10 +29,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/editorial-policy',
   ].map((path) => ({ url: `${baseUrl}${path}` }));
 
-  const [machines, equipment, equipmentTypes, partNumbers, manufacturerPartRoutes, categories, partManufacturers, attachments] = await Promise.all([
+  const [machines, equipment, equipmentTypes, equipmentFacets, partNumbers, manufacturerPartRoutes, categories, partManufacturers, attachments] = await Promise.all([
     getMachines(),
     getNonTractorEquipment(),
     getNonTractorEquipmentTypes(),
+    getIndexableEquipmentFacetRoutes(),
     getIndexablePartNumbers(),
     getIndexableManufacturerPartRoutes(),
     getCachedPartCategories(),
@@ -90,6 +92,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/equipment/${entry.typeSlug}/${entry.brandSlug}`,
     }));
 
+  const equipmentFacetPages: MetadataRoute.Sitemap = equipmentFacets.map((facet) => ({
+    url: `${baseUrl}/equipment/${facet.equipmentTypeSlug}/${facet.facetSlug}/${facet.valueSlug}`,
+  }));
+
   const equipmentPages: MetadataRoute.Sitemap = publishableEquipment.map((machine) => ({
     url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
   }));
@@ -139,6 +145,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...machinePages,
     ...equipmentTypePages,
     ...equipmentBrandTypePages,
+    ...equipmentFacetPages,
     ...equipmentPages,
     ...comparisonPages,
     ...categoryPages,
