@@ -26,6 +26,7 @@ type CompareRow = {
   label: string;
   specs: Array<MachineSpec | undefined>;
   different: boolean;
+  mixedUnits: boolean;
 };
 
 type KeyDifference = {
@@ -61,6 +62,12 @@ function formatSpec(spec: MachineSpec | undefined) {
 function rowIsDifferent(specs: Array<MachineSpec | undefined>) {
   const values = specs.filter((spec): spec is MachineSpec => Boolean(spec)).map(formatSpec);
   return values.length >= 2 && new Set(values).size > 1;
+}
+
+function rowHasMixedNumericUnits(specs: Array<MachineSpec | undefined>) {
+  const numeric = specs.filter((spec): spec is MachineSpec => Boolean(spec && !spec.valueText && spec.valueNumber !== null));
+  if (numeric.length < 2) return false;
+  return new Set(numeric.map((spec) => spec.unit || '')).size > 1;
 }
 
 function numericRange(specs: Array<MachineSpec | undefined>) {
@@ -151,14 +158,26 @@ export default async function EquipmentComparePage({ searchParams }: ComparePage
   const sharedEntries = Array.from(specMap.entries()).filter(([, item]) => item.specs.filter(Boolean).length >= 2);
   const keyDifferences = getKeyDifferences(sharedEntries, compared);
   const sections = sharedEntries
-    .map(([key, item]) => ({ key, ...item, different: rowIsDifferent(item.specs) }))
+    .map(([key, item]) => ({
+      key,
+      ...item,
+      different: rowIsDifferent(item.specs),
+      mixedUnits: rowHasMixedNumericUnits(item.specs),
+    }))
     .filter((item) => !differencesOnly || item.different)
     .reduce<Map<string, CompareRow[]>>((map, item) => {
       const list = map.get(item.section) ?? [];
-      list.push({ key: item.key, label: item.label, specs: item.specs, different: item.different });
+      list.push({
+        key: item.key,
+        label: item.label,
+        specs: item.specs,
+        different: item.different,
+        mixedUnits: item.mixedUnits,
+      });
       map.set(item.section, list);
       return map;
     }, new Map());
+  const hasMixedUnitRows = Array.from(sections.values()).some((rows) => rows.some((row) => row.mixedUnits));
 
   const machinesByBrand = Array.from(
     machines.reduce<Map<string, EquipmentMachine[]>>((map, machine) => {
@@ -204,7 +223,7 @@ export default async function EquipmentComparePage({ searchParams }: ComparePage
       <div className="container">
         <span className="eyebrow">Equipment comparison tool</span>
         <h1>Compare farm equipment side by side</h1>
-        <p className="section-lead">Choose one equipment type, then compare two to four published machines. Rows line up only when the manufacturer-backed section and specification label match, so gross power, net power and other differently defined metrics are not silently treated as equivalent.</p>
+        <p className="section-lead">Choose one equipment type, then compare two to four published machines. Rows line up only when the manufacturer-backed section and specification label match, so gross power, net power and other differently defined metrics are not silently treated as equivalent. Units are shown exactly as published; mixed-unit numeric rows are flagged and never ranked or converted automatically.</p>
 
         <form className="compare-form" action="/equipment/compare" method="get">
           <label>
@@ -303,6 +322,13 @@ export default async function EquipmentComparePage({ searchParams }: ComparePage
                   </section>
                 )}
 
+                {hasMixedUnitRows && (
+                  <div className="notice">
+                    <strong>† Mixed published units:</strong>{' '}
+                    matching labels with different numeric units stay in one source-backed row for visibility, but their values are not converted, ranked, highlighted as high/low or included in key numeric differences.
+                  </div>
+                )}
+
                 {sections.size === 0 ? (
                   <div className="notice">
                     {differencesOnly
@@ -327,7 +353,7 @@ export default async function EquipmentComparePage({ searchParams }: ComparePage
                                 const range = numericRange(row.specs);
                                 return (
                                   <tr key={row.key}>
-                                    <th scope="row">{row.label}{row.different ? ' *' : ''}</th>
+                                    <th scope="row">{row.label}{row.different ? ' *' : ''}{row.mixedUnits ? ' †' : ''}</th>
                                     {row.specs.map((spec, index) => {
                                       const isHigh = Boolean(range && spec?.valueNumber === range.max);
                                       const isLow = Boolean(range && spec?.valueNumber === range.min);
