@@ -236,6 +236,56 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['feeding.width'],
     },
   ],
+  'sprayer': [
+    {
+      slug: 'rated-engine-power',
+      label: 'Rated engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.rated_power'],
+    },
+    {
+      slug: 'solution-tank-capacity',
+      label: 'Solution tank capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['application.solution_tank_capacity'],
+    },
+    {
+      slug: 'maximum-boom-width',
+      label: 'Maximum boom width',
+      canonicalUnit: 'ft',
+      specKeys: ['application.maximum_boom_width'],
+    },
+    {
+      slug: 'maximum-engine-power',
+      label: 'Maximum engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.maximum_power'],
+    },
+    {
+      slug: 'peak-engine-power',
+      label: 'Peak engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.peak_power'],
+    },
+    {
+      slug: 'rinse-tank-capacity',
+      label: 'Rinse tank capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['application.rinse_tank_capacity'],
+    },
+    {
+      slug: 'fuel-tank-capacity',
+      label: 'Fuel tank capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['capacities.fuel_tank'],
+    },
+    {
+      slug: 'maximum-travel-speed',
+      label: 'Maximum travel speed',
+      canonicalUnit: 'mph',
+      specKeys: ['travel.maximum_speed'],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
