@@ -47,6 +47,12 @@ function formatRangeValue(value: number) {
   });
 }
 
+function formatPublishedRange(minValue: number, maxValue: number, unit: string) {
+  const min = formatRangeValue(minValue);
+  if (minValue === maxValue) return `${min} ${unit}`;
+  return `${min}–${formatRangeValue(maxValue)} ${unit}`;
+}
+
 async function getCatalog(type: string, brand: string) {
   const allMachines = await getNonTractorEquipmentByType(type);
   const normalizedBrand = brand.trim().toLowerCase();
@@ -193,7 +199,7 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
             <div className="parts-stats">
               {numericFacets.map((facet) => (
                 <div key={facet.slug}>
-                  <strong>{formatRangeValue(facet.minValue)}–{formatRangeValue(facet.maxValue)} {facet.unit}</strong>
+                  <strong>{formatPublishedRange(facet.minValue, facet.maxValue, facet.unit)}</strong>
                   <span>{facet.label} · {facet.modelCount.toLocaleString('en-US')} of {machines.length.toLocaleString('en-US')} models</span>
                 </div>
               ))}
