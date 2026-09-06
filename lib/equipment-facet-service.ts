@@ -191,6 +191,50 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['kubota.round_baler.minimum_tractor_hp'],
     },
   ],
+  'combine': [
+    {
+      slug: 'maximum-engine-power',
+      label: 'Maximum engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.maximum_power'],
+    },
+    {
+      slug: 'grain-tank-capacity',
+      label: 'Grain tank capacity',
+      canonicalUnit: 'bu',
+      specKeys: ['grain.grain_tank_capacity'],
+    },
+    {
+      slug: 'peak-unloading-rate',
+      label: 'Peak unloading rate',
+      canonicalUnit: 'bu/sec',
+      specKeys: ['grain.peak_unloading_rate'],
+    },
+    {
+      slug: 'rated-engine-power',
+      label: 'Rated engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.rated_power'],
+    },
+    {
+      slug: 'gross-engine-power',
+      label: 'Gross engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.gross_power'],
+    },
+    {
+      slug: 'threshing-drum-width',
+      label: 'Threshing drum width',
+      canonicalUnit: 'in',
+      specKeys: ['threshing.drum_width'],
+    },
+    {
+      slug: 'feeder-width',
+      label: 'Feeder width',
+      canonicalUnit: 'in',
+      specKeys: ['feeding.width'],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
