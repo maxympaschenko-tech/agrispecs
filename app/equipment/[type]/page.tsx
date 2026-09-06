@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
-import { getEquipmentNumericFacetCoverage } from '@/lib/equipment-facet-service';
+import { getEquipmentNumericFacetCoverage, getIndexableEquipmentFacetRoutes } from '@/lib/equipment-facet-service';
 import { getEquipmentTypePageContent } from '@/lib/equipment-type-content-overrides';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from './equipment-type.module.css';
@@ -61,9 +61,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EquipmentTypePage({ params }: PageProps) {
   const { type } = await params;
-  const [equipment, numericFacets] = await Promise.all([
+  const [equipment, numericFacets, indexableFacets] = await Promise.all([
     getNonTractorEquipmentByType(type),
     getEquipmentNumericFacetCoverage(type),
+    getIndexableEquipmentFacetRoutes(type),
   ]);
   if (equipment.length === 0) notFound();
 
@@ -151,6 +152,28 @@ export default async function EquipmentTypePage({ params }: PageProps) {
                     {facet.label} · {facet.modelCount.toLocaleString('en-US')} of {equipment.length.toLocaleString('en-US')} models
                   </span>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {indexableFacets.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Source-backed subsets</span>
+            <h2>Browse {typeName.toLowerCase()} by published configuration</h2>
+            <p className="section-note">
+              These catalog subsets appear only when at least two published machines share an explicitly sourced, whitelisted specification value. We do not create public facet pages from inferred attributes.
+            </p>
+            <div className={styles.modelDirectory}>
+              {indexableFacets.map((facet) => (
+                <Link
+                  className={styles.modelLink}
+                  key={`${facet.facetSlug}-${facet.valueSlug}`}
+                  href={`/equipment/${facet.equipmentTypeSlug}/${facet.facetSlug}/${facet.valueSlug}`}
+                >
+                  <span>{facet.value} {typeName}</span>
+                  <small>{facet.modelCount.toLocaleString('en-US')} models · {facet.facetLabel}</small>
+                </Link>
               ))}
             </div>
           </section>
