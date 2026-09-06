@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType, type EquipmentMachine } from '@/lib/equipment-service';
 import { getEquipmentNumericFacetCoverage } from '@/lib/equipment-facet-service';
+import { getIndexableEquipmentFacetRoutesForManufacturer } from '@/lib/manufacturer-equipment-facet-service';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from '../equipment-type.module.css';
 
@@ -103,9 +104,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EquipmentBrandTypePage({ params }: PageProps) {
   const { type, brand } = await params;
-  const [{ allMachines, machines }, numericFacets] = await Promise.all([
+  const [{ allMachines, machines }, numericFacets, manufacturerFacets] = await Promise.all([
     getCatalog(type, brand),
     getEquipmentNumericFacetCoverage(type, brand),
+    getIndexableEquipmentFacetRoutesForManufacturer(type, brand),
   ]);
   if (machines.length < MIN_INDEXABLE_MODELS) notFound();
 
@@ -194,6 +196,30 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
                   <strong>{formatRangeValue(facet.minValue)}–{formatRangeValue(facet.maxValue)} {facet.unit}</strong>
                   <span>{facet.label} · {facet.modelCount.toLocaleString('en-US')} of {machines.length.toLocaleString('en-US')} models</span>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {manufacturerFacets.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Published configuration subsets</span>
+            <h2>Browse source-backed {brandName} subsets</h2>
+            <p className="section-note">
+              These links appear only when this manufacturer actually has published models inside a globally indexable, explicitly sourced equipment subset.
+            </p>
+            <div className={styles.modelDirectory}>
+              {manufacturerFacets.map((facet) => (
+                <Link
+                  className={styles.modelLink}
+                  key={`${facet.facetSlug}-${facet.valueSlug}`}
+                  href={`/equipment/${facet.equipmentTypeSlug}/${facet.facetSlug}/${facet.valueSlug}`}
+                >
+                  <span>{facet.value} {typeName}</span>
+                  <small>
+                    {facet.manufacturerModelCount.toLocaleString('en-US')} {brandName} model{facet.manufacturerModelCount === 1 ? '' : 's'} · {facet.modelCount.toLocaleString('en-US')} total
+                  </small>
+                </Link>
               ))}
             </div>
           </section>
