@@ -323,6 +323,14 @@ const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
       indexableValues: ['electric', 'diesel'],
     },
   ],
+  'small-square-baler': [
+    {
+      slug: 'bale-size',
+      label: 'Bale size',
+      specKey: 'baler.bale_cross_section',
+      indexableValues: ['14-x-18-in'],
+    },
+  ],
 };
 
 function slugifyFacetValue(value: string) {
