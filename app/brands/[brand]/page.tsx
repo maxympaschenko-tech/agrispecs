@@ -249,12 +249,24 @@ export default async function BrandPage({ params }: PageProps) {
                 const equipmentType = machines[0]?.equipmentType || 'Farm equipment';
                 const featured = machines.slice(0, EQUIPMENT_CARD_LIMIT);
                 const compact = machines.slice(EQUIPMENT_CARD_LIMIT);
+                const equipmentHubHref = `/equipment/${equipmentTypeSlug}/${info.slug}`;
                 return (
                   <div className={styles.equipmentGroup} key={equipmentTypeSlug}>
                     <div className={styles.equipmentGroupHeader}>
-                      <h3>{equipmentType}</h3>
+                      <h3>
+                        {machines.length >= 2 ? (
+                          <Link href={equipmentHubHref}>{equipmentType}</Link>
+                        ) : equipmentType}
+                      </h3>
                       <span>{machines.length.toLocaleString('en-US')} published model{machines.length === 1 ? '' : 's'}</span>
                     </div>
+                    {machines.length >= 2 && (
+                      <p>
+                        <Link className="tool-link" href={equipmentHubHref}>
+                          Browse all {info.name} {equipmentType.toLowerCase()} →
+                        </Link>
+                      </p>
+                    )}
                     <div className="grid">
                       {featured.map((machine) => (
                         <Link className="card" key={machine.id} href={`/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`}>
