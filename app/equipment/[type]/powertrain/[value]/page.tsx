@@ -49,15 +49,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const entry = await getIndexableEquipmentCategoricalFacet(type, 'powertrain', value);
   if (!entry) return { robots: { index: false, follow: true } };
 
-  const typeName = entry.machines[0]?.equipmentType;
-  if (!typeName) return { robots: { index: false, follow: true } };
+  const firstMachine = entry.machines[0];
+  const typeName = firstMachine?.equipmentType;
+  const typeSlug = firstMachine?.equipmentTypeSlug;
+  if (!typeName || !typeSlug) return { robots: { index: false, follow: true } };
   const title = `${entry.value} ${typeName} Models & Specifications`;
   const description = `Browse ${entry.machines.length.toLocaleString('en-US')} published ${entry.value.toLowerCase()} ${typeName.toLowerCase()} models whose current source-backed records explicitly identify the powertrain as ${entry.value}.`;
 
   return {
     title,
     description,
-    alternates: { canonical: `/equipment/${type}/powertrain/${entry.valueSlug}` },
+    alternates: { canonical: `/equipment/${typeSlug}/powertrain/${entry.valueSlug}` },
     robots: { index: true, follow: true },
   };
 }
