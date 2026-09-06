@@ -135,6 +135,35 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       ],
     },
   ],
+  'compact-track-loader': [
+    {
+      slug: 'gross-engine-power',
+      label: 'Gross engine power',
+      canonicalUnit: 'hp',
+      specKeys: [
+        'new_holland.compact_track_loader.gross_power',
+        'kubota.svl.gross_power',
+      ],
+    },
+    {
+      slug: 'rated-operating-capacity-50-percent-tipping-load',
+      label: 'Rated operating capacity at 50% tipping load',
+      canonicalUnit: 'lb',
+      specKeys: [
+        'compact_track_loader.rated_operating_capacity',
+        'new_holland.compact_track_loader.rated_operating_capacity',
+      ],
+    },
+    {
+      slug: 'operating-weight',
+      label: 'Operating weight',
+      canonicalUnit: 'lb',
+      specKeys: [
+        'compact_track_loader.operating_weight',
+        'new_holland.compact_track_loader.operating_weight',
+      ],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
