@@ -3,6 +3,7 @@ import { getDbReady } from '@/lib/db-migrations';
 import { withServerTtlCache } from '@/lib/server-ttl-cache';
 
 const EQUIPMENT_FACET_TTL_MS = 5 * 60 * 1000;
+export const MIN_INDEXABLE_EQUIPMENT_FACET_MODELS = 2;
 
 type NumericFacetConfig = {
   slug: string;
@@ -11,11 +12,30 @@ type NumericFacetConfig = {
   specKeys: string[];
 };
 
-type FacetRow = RowDataPacket & {
+type CategoricalFacetConfig = {
+  slug: string;
+  label: string;
+  specKey: string;
+  indexableValues: string[];
+};
+
+type NumericFacetRow = RowDataPacket & {
   machine_id: number;
   spec_key: string;
   value_number: string | number;
   unit: string | null;
+};
+
+type CategoricalFacetRow = RowDataPacket & {
+  machine_id: number;
+  model_name: string;
+  model_slug: string;
+  data_status: 'partial' | 'verified';
+  manufacturer_name: string;
+  manufacturer_slug: string;
+  equipment_type_name: string;
+  equipment_type_slug: string;
+  value_text: string;
 };
 
 export type EquipmentNumericFacetCoverage = {
@@ -25,6 +45,35 @@ export type EquipmentNumericFacetCoverage = {
   modelCount: number;
   minValue: number;
   maxValue: number;
+};
+
+export type EquipmentFacetMachine = {
+  id: string;
+  equipmentType: string;
+  equipmentTypeSlug: string;
+  brand: string;
+  brandSlug: string;
+  model: string;
+  modelSlug: string;
+  title: string;
+  dataStatus: 'partial' | 'verified';
+};
+
+export type EquipmentCategoricalFacetEntry = {
+  facetSlug: string;
+  facetLabel: string;
+  value: string;
+  valueSlug: string;
+  machines: EquipmentFacetMachine[];
+};
+
+export type IndexableEquipmentFacetRoute = {
+  equipmentTypeSlug: string;
+  facetSlug: string;
+  facetLabel: string;
+  value: string;
+  valueSlug: string;
+  modelCount: number;
 };
 
 const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
@@ -50,6 +99,112 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
   ],
 };
 
+const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
+  'mini-excavator': [
+    {
+      slug: 'powertrain',
+      label: 'Powertrain',
+      specKey: 'mini_excavator.powertrain',
+      indexableValues: ['electric'],
+    },
+  ],
+};
+
+function slugifyFacetValue(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function getCategoricalFacetConfig(equipmentTypeSlug: string, facetSlug: string) {
+  return (CATEGORICAL_FACETS_BY_TYPE[equipmentTypeSlug] || [])
+    .find((facet) => facet.slug === facetSlug);
+}
+
+async function loadCategoricalFacetEntries(
+  equipmentTypeSlug: string,
+  facetSlug: string,
+): Promise<EquipmentCategoricalFacetEntry[]> {
+  const config = getCategoricalFacetConfig(equipmentTypeSlug, facetSlug);
+  if (!config) return [];
+
+  return withServerTtlCache(
+    `equipment:categorical-facet:${equipmentTypeSlug}:${facetSlug}`,
+    EQUIPMENT_FACET_TTL_MS,
+    async () => {
+      try {
+        const db = await getDbReady();
+        const [rows] = await db.query<CategoricalFacetRow[]>(`
+          SELECT DISTINCT
+            m.id AS machine_id,
+            m.model_name,
+            m.slug AS model_slug,
+            m.data_status,
+            mf.name AS manufacturer_name,
+            mf.slug AS manufacturer_slug,
+            et.name AS equipment_type_name,
+            et.slug AS equipment_type_slug,
+            ms.value_text
+          FROM machines m
+          INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
+          INNER JOIN equipment_types et ON et.id = m.equipment_type_id
+          INNER JOIN machine_versions mv ON mv.machine_id = m.id AND mv.is_current = TRUE
+          INNER JOIN machine_specs ms ON ms.machine_id = m.id AND ms.machine_version_id = mv.id
+          INNER JOIN spec_definitions sd ON sd.id = ms.spec_definition_id
+          WHERE et.slug = ?
+            AND m.data_status IN ('partial','verified')
+            AND ms.value_text IS NOT NULL
+            AND ms.confidence IN ('official','high')
+            AND sd.spec_key = ?
+          ORDER BY mf.name ASC, m.model_name ASC
+        `, [equipmentTypeSlug, config.specKey]);
+
+        const groups = new Map<string, EquipmentCategoricalFacetEntry>();
+        const seenMachines = new Map<string, Set<number>>();
+
+        for (const row of rows) {
+          const value = row.value_text.trim();
+          const valueSlug = slugifyFacetValue(value);
+          if (!value || !valueSlug) continue;
+
+          const existing = groups.get(valueSlug) || {
+            facetSlug: config.slug,
+            facetLabel: config.label,
+            value,
+            valueSlug,
+            machines: [],
+          };
+          const seen = seenMachines.get(valueSlug) || new Set<number>();
+          if (!seen.has(row.machine_id)) {
+            existing.machines.push({
+              id: String(row.machine_id),
+              equipmentType: row.equipment_type_name,
+              equipmentTypeSlug: row.equipment_type_slug,
+              brand: row.manufacturer_name,
+              brandSlug: row.manufacturer_slug,
+              model: row.model_name,
+              modelSlug: row.model_slug,
+              title: `${row.manufacturer_name} ${row.model_name}`,
+              dataStatus: row.data_status,
+            });
+            seen.add(row.machine_id);
+          }
+          groups.set(valueSlug, existing);
+          seenMachines.set(valueSlug, seen);
+        }
+
+        return Array.from(groups.values())
+          .sort((a, b) => b.machines.length - a.machines.length || a.value.localeCompare(b.value));
+      } catch (error) {
+        console.error('Unable to load categorical equipment facet:', error);
+        return [];
+      }
+    },
+  );
+}
+
 export async function getEquipmentNumericFacetCoverage(
   equipmentTypeSlug: string,
 ): Promise<EquipmentNumericFacetCoverage[]> {
@@ -65,7 +220,7 @@ export async function getEquipmentNumericFacetCoverage(
         const specKeys = Array.from(new Set(facets.flatMap((facet) => facet.specKeys)));
         const placeholders = specKeys.map(() => '?').join(',');
         const db = await getDbReady();
-        const [rows] = await db.query<FacetRow[]>(`
+        const [rows] = await db.query<NumericFacetRow[]>(`
           SELECT
             m.id AS machine_id,
             sd.spec_key,
@@ -113,4 +268,49 @@ export async function getEquipmentNumericFacetCoverage(
       }
     },
   );
+}
+
+export async function getIndexableEquipmentCategoricalFacet(
+  equipmentTypeSlug: string,
+  facetSlug: string,
+  valueSlug: string,
+): Promise<EquipmentCategoricalFacetEntry | undefined> {
+  const normalizedType = equipmentTypeSlug.trim().toLowerCase();
+  const normalizedFacet = facetSlug.trim().toLowerCase();
+  const normalizedValue = valueSlug.trim().toLowerCase();
+  const config = getCategoricalFacetConfig(normalizedType, normalizedFacet);
+  if (!config || !config.indexableValues.includes(normalizedValue)) return undefined;
+
+  const entries = await loadCategoricalFacetEntries(normalizedType, normalizedFacet);
+  const entry = entries.find((item) => item.valueSlug === normalizedValue);
+  return entry && entry.machines.length >= MIN_INDEXABLE_EQUIPMENT_FACET_MODELS ? entry : undefined;
+}
+
+export async function getIndexableEquipmentFacetRoutes(
+  equipmentTypeSlug?: string,
+): Promise<IndexableEquipmentFacetRoute[]> {
+  const requestedType = equipmentTypeSlug?.trim().toLowerCase();
+  const typeEntries = Object.entries(CATEGORICAL_FACETS_BY_TYPE)
+    .filter(([typeSlug]) => !requestedType || typeSlug === requestedType);
+  const routes: IndexableEquipmentFacetRoute[] = [];
+
+  for (const [typeSlug, configs] of typeEntries) {
+    for (const config of configs) {
+      const entries = await loadCategoricalFacetEntries(typeSlug, config.slug);
+      for (const entry of entries) {
+        if (!config.indexableValues.includes(entry.valueSlug)) continue;
+        if (entry.machines.length < MIN_INDEXABLE_EQUIPMENT_FACET_MODELS) continue;
+        routes.push({
+          equipmentTypeSlug: typeSlug,
+          facetSlug: config.slug,
+          facetLabel: config.label,
+          value: entry.value,
+          valueSlug: entry.valueSlug,
+          modelCount: entry.machines.length,
+        });
+      }
+    }
+  }
+
+  return routes;
 }
