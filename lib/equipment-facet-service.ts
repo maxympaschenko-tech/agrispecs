@@ -207,18 +207,25 @@ async function loadCategoricalFacetEntries(
 
 export async function getEquipmentNumericFacetCoverage(
   equipmentTypeSlug: string,
+  manufacturerSlug?: string,
 ): Promise<EquipmentNumericFacetCoverage[]> {
   const normalizedType = equipmentTypeSlug.trim().toLowerCase();
+  const normalizedManufacturer = manufacturerSlug?.trim().toLowerCase() || null;
   const facets = NUMERIC_FACETS_BY_TYPE[normalizedType] || [];
   if (facets.length === 0) return [];
 
   return withServerTtlCache(
-    `equipment:numeric-facets:${normalizedType}`,
+    `equipment:numeric-facets:${normalizedType}:${normalizedManufacturer || 'all'}`,
     EQUIPMENT_FACET_TTL_MS,
     async () => {
       try {
         const specKeys = Array.from(new Set(facets.flatMap((facet) => facet.specKeys)));
         const placeholders = specKeys.map(() => '?').join(',');
+        const manufacturerClause = normalizedManufacturer ? 'AND mf.slug = ?' : '';
+        const queryParams: unknown[] = [normalizedType];
+        if (normalizedManufacturer) queryParams.push(normalizedManufacturer);
+        queryParams.push(...specKeys);
+
         const db = await getDbReady();
         const [rows] = await db.query<NumericFacetRow[]>(`
           SELECT
@@ -227,16 +234,18 @@ export async function getEquipmentNumericFacetCoverage(
             ms.value_number,
             ms.unit
           FROM machines m
+          INNER JOIN manufacturers mf ON mf.id = m.manufacturer_id
           INNER JOIN equipment_types et ON et.id = m.equipment_type_id
           INNER JOIN machine_versions mv ON mv.machine_id = m.id AND mv.is_current = TRUE
           INNER JOIN machine_specs ms ON ms.machine_id = m.id AND ms.machine_version_id = mv.id
           INNER JOIN spec_definitions sd ON sd.id = ms.spec_definition_id
           WHERE et.slug = ?
+            ${manufacturerClause}
             AND m.data_status IN ('partial','verified')
             AND ms.value_number IS NOT NULL
             AND ms.confidence IN ('official','high')
             AND sd.spec_key IN (${placeholders})
-        `, [normalizedType, ...specKeys]);
+        `, queryParams);
 
         return facets.flatMap((facet) => {
           const matchingKeys = new Set(facet.specKeys);
