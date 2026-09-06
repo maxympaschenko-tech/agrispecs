@@ -97,6 +97,44 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       ],
     },
   ],
+  'skid-steer-loader': [
+    {
+      slug: 'net-engine-power',
+      label: 'Net engine power',
+      canonicalUnit: 'hp',
+      specKeys: [
+        'skid_steer.net_engine_power',
+        'kubota.ssv.net_power',
+      ],
+    },
+    {
+      slug: 'gross-engine-power',
+      label: 'Gross engine power',
+      canonicalUnit: 'hp',
+      specKeys: [
+        'new_holland.skid_steer.gross_power',
+        'kubota.ssv.gross_power',
+      ],
+    },
+    {
+      slug: 'rated-operating-capacity-50-percent-tipping-load',
+      label: 'Rated operating capacity at 50% tipping load',
+      canonicalUnit: 'lb',
+      specKeys: [
+        'new_holland.skid_steer.rated_operating_capacity',
+        'kubota.ssv.rated_operating_capacity',
+      ],
+    },
+    {
+      slug: 'operating-weight',
+      label: 'Operating weight',
+      canonicalUnit: 'lb',
+      specKeys: [
+        'skid_steer.operating_weight',
+        'new_holland.skid_steer.operating_weight',
+      ],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
