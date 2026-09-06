@@ -105,7 +105,7 @@ const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
       slug: 'powertrain',
       label: 'Powertrain',
       specKey: 'mini_excavator.powertrain',
-      indexableValues: ['electric'],
+      indexableValues: ['electric', 'diesel'],
     },
   ],
 };
