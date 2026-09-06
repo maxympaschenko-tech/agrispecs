@@ -1,4 +1,4 @@
-import { readdir } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 const appDir = path.resolve(process.cwd(), 'app');
@@ -81,8 +81,52 @@ function findDynamicRouteConflicts(routes) {
     .map(([position, descriptors]) => ({ position, descriptors }));
 }
 
+function extractCategoricalEquipmentFacetSlugs(source) {
+  const startMarker = 'const CATEGORICAL_FACETS_BY_TYPE';
+  const endMarker = '\nfunction slugifyFacetValue';
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start);
+  if (start < 0 || end < 0) {
+    throw new Error('Unable to locate CATEGORICAL_FACETS_BY_TYPE in lib/equipment-facet-service.ts');
+  }
+
+  const block = source.slice(start, end);
+  return Array.from(
+    new Set(Array.from(block.matchAll(/\bslug:\s*'([^']+)'/g), (match) => match[1])),
+  ).sort();
+}
+
+async function findMissingEquipmentFacetRoutes(facetSlugs) {
+  const missing = [];
+  for (const facetSlug of facetSlugs) {
+    const routeFile = path.join(
+      appDir,
+      'equipment',
+      '[type]',
+      facetSlug,
+      '[value]',
+      'page.tsx',
+    );
+    try {
+      await access(routeFile);
+    } catch {
+      missing.push({
+        facetSlug,
+        expectedFile: path.relative(process.cwd(), routeFile),
+      });
+    }
+  }
+  return missing;
+}
+
 const routes = await collectRouteFiles(appDir);
 const conflicts = findDynamicRouteConflicts(routes);
+const facetServiceSource = await readFile(
+  path.resolve(process.cwd(), 'lib/equipment-facet-service.ts'),
+  'utf8',
+);
+const categoricalFacetSlugs = extractCategoricalEquipmentFacetSlugs(facetServiceSource);
+const missingFacetRoutes = await findMissingEquipmentFacetRoutes(categoricalFacetSlugs);
 
 if (conflicts.length > 0) {
   console.error('Dynamic route parameter conflicts detected. Next.js requires one parameter name per dynamic URL position.');
@@ -95,8 +139,19 @@ if (conflicts.length > 0) {
       for (const file of files) console.error(`    - ${file}`);
     }
   }
+}
 
+if (missingFacetRoutes.length > 0) {
+  console.error('\nCategorical equipment facets without matching static routes detected.');
+  for (const missing of missingFacetRoutes) {
+    console.error(`  ${missing.facetSlug}: expected ${missing.expectedFile}`);
+  }
+}
+
+if (conflicts.length > 0 || missingFacetRoutes.length > 0) {
   process.exitCode = 1;
 } else {
-  console.log(`Route check passed: ${routes.length} route files scanned with no dynamic parameter conflicts.`);
+  console.log(
+    `Route check passed: ${routes.length} route files scanned with no dynamic parameter conflicts; ${categoricalFacetSlugs.length} categorical equipment facet routes verified.`,
+  );
 }
