@@ -44,6 +44,7 @@ export type EquipmentNumericFacetCoverage = {
   label: string;
   unit: string;
   modelCount: number;
+  manufacturerCount: number;
   minValue: number;
   maxValue: number;
 };
@@ -409,6 +410,7 @@ export async function getEquipmentNumericFacetCoverage(
             label: facet.label,
             unit: facet.canonicalUnit,
             modelCount: values.length,
+            manufacturerCount: manufacturers.size,
             minValue: Math.min(...values),
             maxValue: Math.max(...values),
           }];
