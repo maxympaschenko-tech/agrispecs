@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType, type EquipmentMachine } from '@/lib/equipment-service';
+import { getEquipmentNumericFacetCoverage } from '@/lib/equipment-facet-service';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from '../equipment-type.module.css';
 
@@ -37,6 +38,12 @@ function machineThumbnail(brandSlug: string, modelSlug: string, equipmentTypeSlu
       }}
     />
   );
+}
+
+function formatRangeValue(value: number) {
+  return value.toLocaleString('en-US', {
+    maximumFractionDigits: Number.isInteger(value) ? 0 : 1,
+  });
 }
 
 async function getCatalog(type: string, brand: string) {
@@ -96,7 +103,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EquipmentBrandTypePage({ params }: PageProps) {
   const { type, brand } = await params;
-  const { allMachines, machines } = await getCatalog(type, brand);
+  const [{ allMachines, machines }, numericFacets] = await Promise.all([
+    getCatalog(type, brand),
+    getEquipmentNumericFacetCoverage(type, brand),
+  ]);
   if (machines.length < MIN_INDEXABLE_MODELS) notFound();
 
   const brandName = machines[0].brand;
@@ -170,6 +180,24 @@ export default async function EquipmentBrandTypePage({ params }: PageProps) {
           <div><strong>{brandName}</strong><span>Manufacturer</span></div>
           <div><strong>Source-backed</strong><span>Missing values stay unpublished</span></div>
         </div>
+
+        {numericFacets.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Published lineup range</span>
+            <h2>{brandName} {typeName.toLowerCase()} specification ranges</h2>
+            <p className="section-note">
+              These ranges use only current official or high-confidence numeric records with matching semantics and units. Coverage is shown explicitly because some manufacturer configurations publish paired or non-comparable values that are intentionally left out.
+            </p>
+            <div className="parts-stats">
+              {numericFacets.map((facet) => (
+                <div key={facet.slug}>
+                  <strong>{formatRangeValue(facet.minValue)}–{formatRangeValue(facet.maxValue)} {facet.unit}</strong>
+                  <span>{facet.label} · {facet.modelCount.toLocaleString('en-US')} of {machines.length.toLocaleString('en-US')} models</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="notice">
           <strong>Need a side-by-side comparison?</strong>{' '}
