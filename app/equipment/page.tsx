@@ -77,6 +77,25 @@ function featuredByBrand(machines: EquipmentMachine[], limit = 8) {
   return featured;
 }
 
+function manufacturerHubsForType(machines: EquipmentMachine[], limit = 6) {
+  return Array.from(
+    machines.reduce<Map<string, EquipmentMachine[]>>((map, machine) => {
+      const list = map.get(machine.brandSlug) || [];
+      list.push(machine);
+      map.set(machine.brandSlug, list);
+      return map;
+    }, new Map()),
+  )
+    .map(([brandSlug, brandMachines]) => ({
+      brandSlug,
+      brandName: brandMachines[0]?.brand || brandSlug,
+      count: brandMachines.length,
+    }))
+    .filter((entry) => entry.count >= 2)
+    .sort((a, b) => b.count - a.count || a.brandName.localeCompare(b.brandName))
+    .slice(0, limit);
+}
+
 function machineThumbnail(machine: EquipmentMachine) {
   const image = getManifestMachinePrimaryImage(machine.brandSlug, machine.modelSlug, machine.equipmentTypeSlug);
   return (
@@ -231,6 +250,7 @@ export default async function EquipmentPage() {
           const typeName = machines[0]?.equipmentType || typeSlug;
           const featured = featuredByBrand(machines);
           const manufacturerCount = new Set(machines.map((machine) => machine.brandSlug)).size;
+          const manufacturerHubs = manufacturerHubsForType(machines);
           return (
             <section className="catalog-group" id={`type-${typeSlug}`} key={typeSlug}>
               <span className="eyebrow">Equipment type</span>
@@ -238,6 +258,19 @@ export default async function EquipmentPage() {
               <p className="section-note">
                 {machines.length.toLocaleString('en-US')} published {typeName.toLowerCase()} models across {manufacturerCount.toLocaleString('en-US')} manufacturer{manufacturerCount === 1 ? '' : 's'}. A cross-brand sample is shown here; the dedicated type page contains the full catalog.
               </p>
+              {manufacturerHubs.length > 0 && (
+                <p className="section-note">
+                  <strong>Browse by manufacturer:</strong>{' '}
+                  {manufacturerHubs.map((manufacturer, index) => (
+                    <span key={manufacturer.brandSlug}>
+                      {index > 0 ? ' · ' : ''}
+                      <Link href={`/equipment/${typeSlug}/${manufacturer.brandSlug}`}>
+                        {manufacturer.brandName} ({manufacturer.count})
+                      </Link>
+                    </span>
+                  ))}
+                </p>
+              )}
               <div className="grid">
                 {featured.map((machine) => (
                   <div className="card" key={machine.id}>
