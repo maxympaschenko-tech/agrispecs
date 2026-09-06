@@ -21,6 +21,7 @@ type CategoricalFacetConfig = {
 
 type NumericFacetRow = RowDataPacket & {
   machine_id: number;
+  manufacturer_slug: string;
   spec_key: string;
   value_number: string | number;
   unit: string | null;
@@ -297,6 +298,7 @@ export async function getEquipmentNumericFacetCoverage(
         const [rows] = await db.query<NumericFacetRow[]>(`
           SELECT
             m.id AS machine_id,
+            mf.slug AS manufacturer_slug,
             sd.spec_key,
             ms.value_number,
             ms.unit
@@ -317,6 +319,7 @@ export async function getEquipmentNumericFacetCoverage(
         return facets.flatMap((facet) => {
           const matchingKeys = new Set(facet.specKeys);
           const valuesByMachine = new Map<number, number>();
+          const manufacturers = new Set<string>();
 
           for (const row of rows) {
             if (!matchingKeys.has(row.spec_key)) continue;
@@ -324,10 +327,12 @@ export async function getEquipmentNumericFacetCoverage(
             const value = Number(row.value_number);
             if (!Number.isFinite(value)) continue;
             if (!valuesByMachine.has(row.machine_id)) valuesByMachine.set(row.machine_id, value);
+            manufacturers.add(row.manufacturer_slug);
           }
 
           const values = Array.from(valuesByMachine.values());
           if (values.length < 2) return [];
+          if (!normalizedManufacturer && manufacturers.size < 2) return [];
 
           return [{
             slug: facet.slug,
