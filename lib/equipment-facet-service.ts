@@ -15,7 +15,7 @@ type NumericFacetConfig = {
 type CategoricalFacetConfig = {
   slug: string;
   label: string;
-  specKey: string;
+  specKeys: string[];
   indexableValues: string[];
 };
 
@@ -319,7 +319,7 @@ const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
     {
       slug: 'powertrain',
       label: 'Powertrain',
-      specKey: 'mini_excavator.powertrain',
+      specKeys: ['mini_excavator.powertrain'],
       indexableValues: ['electric', 'diesel'],
     },
   ],
@@ -327,8 +327,19 @@ const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
     {
       slug: 'bale-size',
       label: 'Bale size',
-      specKey: 'baler.bale_cross_section',
+      specKeys: ['baler.bale_cross_section'],
       indexableValues: ['14-x-18-in'],
+    },
+  ],
+  'round-baler': [
+    {
+      slug: 'bale-size',
+      label: 'Nominal bale size',
+      specKeys: [
+        'baler.nominal_bale_size',
+        'kubota.round_baler.nominal_bale_size',
+      ],
+      indexableValues: ['4-x-5-ft', '4-x-6-ft', '5-x-6-ft'],
     },
   ],
 };
@@ -358,6 +369,7 @@ async function loadCategoricalFacetEntries(
     EQUIPMENT_FACET_TTL_MS,
     async () => {
       try {
+        const placeholders = config.specKeys.map(() => '?').join(',');
         const db = await getDbReady();
         const [rows] = await db.query<CategoricalFacetRow[]>(`
           SELECT DISTINCT
@@ -380,9 +392,9 @@ async function loadCategoricalFacetEntries(
             AND m.data_status IN ('partial','verified')
             AND ms.value_text IS NOT NULL
             AND ms.confidence IN ('official','high')
-            AND sd.spec_key = ?
+            AND sd.spec_key IN (${placeholders})
           ORDER BY mf.name ASC, m.model_name ASC
-        `, [equipmentTypeSlug, config.specKey]);
+        `, [equipmentTypeSlug, ...config.specKeys]);
 
         const groups = new Map<string, EquipmentCategoricalFacetEntry>();
         const seenMachines = new Map<string, Set<number>>();
