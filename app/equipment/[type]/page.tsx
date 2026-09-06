@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByType } from '@/lib/equipment-service';
+import { getEquipmentNumericFacetCoverage } from '@/lib/equipment-facet-service';
 import { getEquipmentTypePageContent } from '@/lib/equipment-type-content-overrides';
 import { getManifestMachinePrimaryImage } from '@/lib/machine-images-service';
 import styles from './equipment-type.module.css';
@@ -38,6 +39,12 @@ function machineThumbnail(brandSlug: string, modelSlug: string, equipmentTypeSlu
   );
 }
 
+function formatRangeValue(value: number) {
+  return value.toLocaleString('en-US', {
+    maximumFractionDigits: Number.isInteger(value) ? 0 : 1,
+  });
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type } = await params;
   const equipment = await getNonTractorEquipmentByType(type);
@@ -54,7 +61,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EquipmentTypePage({ params }: PageProps) {
   const { type } = await params;
-  const equipment = await getNonTractorEquipmentByType(type);
+  const [equipment, numericFacets] = await Promise.all([
+    getNonTractorEquipmentByType(type),
+    getEquipmentNumericFacetCoverage(type),
+  ]);
   if (equipment.length === 0) notFound();
 
   const typeName = equipment[0].equipmentType;
@@ -123,6 +133,28 @@ export default async function EquipmentTypePage({ params }: PageProps) {
           <div><strong>{brandGroups.length.toLocaleString('en-US')}</strong><span>Manufacturers</span></div>
           <div><strong>Official</strong><span>Manufacturer-first source policy</span></div>
         </div>
+
+        {numericFacets.length > 0 && (
+          <section className="data-section">
+            <span className="eyebrow">Cross-brand specification coverage</span>
+            <h2>Published specification ranges</h2>
+            <p className="section-note">
+              These ranges use only current official or high-confidence numeric records with matching semantics and units. Models whose source publishes configuration pairs or a different powertrain basis stay out of the range instead of being flattened into an inferred value.
+            </p>
+            <div className="parts-stats">
+              {numericFacets.map((facet) => (
+                <div key={facet.slug}>
+                  <strong>
+                    {formatRangeValue(facet.minValue)}–{formatRangeValue(facet.maxValue)} {facet.unit}
+                  </strong>
+                  <span>
+                    {facet.label} · {facet.modelCount.toLocaleString('en-US')} of {equipment.length.toLocaleString('en-US')} models
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {equipment.length >= 2 && (
           <div className="notice">
