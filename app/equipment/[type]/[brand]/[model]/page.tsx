@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getNonTractorEquipmentByBrand, getEquipmentMachine } from '@/lib/equipment-service';
+import {
+  getIndexableEquipmentCategoricalFacet,
+  getIndexableEquipmentFacetRoutes,
+  type IndexableEquipmentFacetRoute,
+} from '@/lib/equipment-facet-service';
 import { getMachineAttachments, getMachineSpecs, getMachineVersions, type MachineSpec } from '@/lib/catalog-service';
 import { getMachineImages } from '@/lib/machine-images-service';
 import { getMachinePartsWithConfigurations } from '@/lib/machine-parts-service';
@@ -149,6 +154,26 @@ function maintenanceConfidenceLabel(value: 'official' | 'high' | 'medium' | 'low
   return 'Low-confidence reference — verify before service';
 }
 
+async function getMatchingFacetRoutes(equipmentTypeSlug: string, machineId: string) {
+  const routes = await getIndexableEquipmentFacetRoutes(equipmentTypeSlug);
+  if (routes.length === 0) return [];
+
+  const resolved = await Promise.all(
+    routes.map(async (route) => {
+      const entry = await getIndexableEquipmentCategoricalFacet(
+        route.equipmentTypeSlug,
+        route.facetSlug,
+        route.valueSlug,
+      );
+      return entry?.machines.some((candidate) => candidate.id === machineId) ? route : null;
+    }),
+  );
+
+  return resolved
+    .filter((route): route is IndexableEquipmentFacetRoute => Boolean(route))
+    .sort((a, b) => b.modelCount - a.modelCount || a.facetLabel.localeCompare(b.facetLabel) || a.value.localeCompare(b.value));
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, brand, model } = await params;
   const machine = await getEquipmentMachine(type, brand, model);
@@ -177,11 +202,12 @@ export default async function EquipmentModelPage({ params }: PageProps) {
   const machine = await getEquipmentMachine(type, brand, model);
   if (!machine) notFound();
 
-  const [versions, brandEquipment, attachments, images] = await Promise.all([
+  const [versions, brandEquipment, attachments, images, matchingFacets] = await Promise.all([
     getMachineVersions(machine.id),
     getNonTractorEquipmentByBrand(machine.brandSlug),
     getMachineAttachments(machine.id),
     getMachineImages(machine.id),
+    getMatchingFacetRoutes(machine.equipmentTypeSlug, machine.id),
   ]);
   const attachmentGroups = groupAttachmentEvidence(attachments);
   const selectedVersion = versions.find((version) => version.isCurrent)
@@ -351,6 +377,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
             {publishedParts.length > 0 && <a href="#compatible-parts">Compatible parts & kits</a>}
             {attachmentGroups.length > 0 && <a href="#compatible-attachments">Compatible attachments</a>}
             {sources.length > 0 && <a href="#sources">Sources</a>}
+            {matchingFacets.length > 0 && <a href="#matching-subsets">Matching subsets</a>}
             {relatedModels.length > 0 && <a href="#related-models">Related models</a>}
           </aside>
           <div>
@@ -543,6 +570,30 @@ export default async function EquipmentModelPage({ params }: PageProps) {
                       </span>
                       <span>Source →</span>
                     </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {matchingFacets.length > 0 && (
+              <section className="data-section" id="matching-subsets">
+                <h2>Browse matching {machine.equipmentType.toLowerCase()} subsets</h2>
+                <p className="section-note">
+                  These links appear only when this exact machine belongs to an indexable catalog subset built from an explicitly published categorical specification. No subset membership is inferred from the model name or a sibling configuration.
+                </p>
+                <div className="parts-list">
+                  {matchingFacets.map((facet) => (
+                    <Link
+                      className="part-row"
+                      key={`${facet.facetSlug}-${facet.valueSlug}`}
+                      href={`/equipment/${facet.equipmentTypeSlug}/${facet.facetSlug}/${facet.valueSlug}`}
+                    >
+                      <span>
+                        <strong>{facet.value} {machine.equipmentType}</strong>
+                        <small>{facet.facetLabel} · {facet.modelCount.toLocaleString('en-US')} published models</small>
+                      </span>
+                      <span>Browse subset →</span>
+                    </Link>
                   ))}
                 </div>
               </section>
