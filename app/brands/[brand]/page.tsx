@@ -55,6 +55,10 @@ function attachmentTypeLabel(type: string) {
     .join(' ') || 'Attachment';
 }
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brand } = await params;
   const [brands, tractors, equipment] = await Promise.all([
@@ -135,8 +139,59 @@ export default async function BrandPage({ params }: PageProps) {
     }, new Map()),
   ).sort(([a], [b]) => attachmentTypeLabel(a).localeCompare(attachmentTypeLabel(b)));
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+  const canonicalUrl = `${baseUrl}/brands/${info.slug}`;
+  const description = `Browse ${info.name} tractor and farm equipment specifications, model references, maintenance, OEM parts, attachments and compatibility data where available.`;
+  const publishedCatalogItems = [
+    ...publishedTractors.map((machine) => ({
+      name: getMachineDisplayTitle(machine),
+      url: `${baseUrl}/tractors/${machine.brandSlug}/${machine.modelSlug}`,
+    })),
+    ...publishedEquipment.map((machine) => ({
+      name: machine.title,
+      url: `${baseUrl}/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}/${machine.modelSlug}`,
+    })),
+  ];
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#collection`,
+        url: canonicalUrl,
+        name: `${info.name} Farm Equipment Specs and Models`,
+        description,
+        breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        ...(publishedCatalogItems.length > 0 ? { mainEntity: { '@id': `${canonicalUrl}#items` } } : {}),
+        isPartOf: { '@id': `${baseUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'Brands', item: `${baseUrl}/brands` },
+          { '@type': 'ListItem', position: 3, name: info.name, item: canonicalUrl },
+        ],
+      },
+      ...(publishedCatalogItems.length > 0 ? [{
+        '@type': 'ItemList',
+        '@id': `${canonicalUrl}#items`,
+        name: `${info.name} published tractor and farm equipment models`,
+        numberOfItems: publishedCatalogItems.length,
+        itemListElement: publishedCatalogItems.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.name,
+          url: item.url,
+        })),
+      }] : []),
+    ],
+  };
+
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
         <Link href="/">Home</Link> / <Link href="/brands">Brands</Link> / {info.name}
       </div>
