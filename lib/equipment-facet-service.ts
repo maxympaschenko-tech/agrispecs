@@ -350,6 +350,14 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['baler.maximum_bale_length'],
     },
   ],
+  'windrower': [
+    {
+      slug: 'engine-power',
+      label: 'Engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['windrower.engine_power'],
+    },
+  ],
 };
 
 const CATEGORICAL_FACETS_BY_TYPE: Record<string, CategoricalFacetConfig[]> = {
