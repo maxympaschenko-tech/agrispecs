@@ -286,6 +286,44 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['travel.maximum_speed'],
     },
   ],
+  'cotton-harvester': [
+    {
+      slug: 'nominal-engine-power',
+      label: 'Nominal engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['cotton.engine_nominal_power'],
+    },
+    {
+      slug: 'maximum-engine-power',
+      label: 'Maximum engine power',
+      canonicalUnit: 'hp',
+      specKeys: ['cotton.engine_max_power'],
+    },
+    {
+      slug: 'fuel-tank-capacity',
+      label: 'Fuel tank capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['cotton.fuel_tank'],
+    },
+    {
+      slug: 'cotton-accumulator-capacity',
+      label: 'Cotton accumulator capacity',
+      canonicalUnit: 'ft3',
+      specKeys: ['cotton.accumulator_capacity'],
+    },
+    {
+      slug: 'maximum-round-module-diameter',
+      label: 'Maximum round module diameter',
+      canonicalUnit: 'in',
+      specKeys: ['cotton.module_max_diameter'],
+    },
+    {
+      slug: 'round-module-width',
+      label: 'Round module width',
+      canonicalUnit: 'in',
+      specKeys: ['cotton.module_width'],
+    },
+  ],
   'large-square-baler': [
     {
       slug: 'bale-width',
