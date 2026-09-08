@@ -352,12 +352,6 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
   ],
   'planter': [
     {
-      slug: 'number-of-rows',
-      label: 'Number of rows',
-      canonicalUnit: '',
-      specKeys: ['planting.row_count'],
-    },
-    {
       slug: 'row-spacing',
       label: 'Row spacing',
       canonicalUnit: 'in',
