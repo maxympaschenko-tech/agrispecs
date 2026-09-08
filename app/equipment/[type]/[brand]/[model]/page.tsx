@@ -268,13 +268,16 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     })),
   ];
   const sources = Array.from(new Map(sourceEntries.map((source) => [source.url, source])).values());
-  const relatedModels = brandEquipment
-    .filter((item) =>
-      item.id !== machine.id
-      && item.equipmentTypeSlug === machine.equipmentTypeSlug
-      && (item.dataStatus === 'partial' || item.dataStatus === 'verified'),
-    )
+  const sameTypeBrandEquipment = brandEquipment.filter((item) =>
+    item.equipmentTypeSlug === machine.equipmentTypeSlug
+    && (item.dataStatus === 'partial' || item.dataStatus === 'verified'),
+  );
+  const relatedModels = sameTypeBrandEquipment
+    .filter((item) => item.id !== machine.id)
     .slice(0, 6);
+  const brandCatalogHref = sameTypeBrandEquipment.length >= 2
+    ? `/equipment/${machine.equipmentTypeSlug}/${machine.brandSlug}`
+    : `/brands/${machine.brandSlug}`;
 
   const versionYears = selectedVersion
     ? selectedVersion.modelYearStart && selectedVersion.modelYearEnd
@@ -329,7 +332,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
           { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
           { '@type': 'ListItem', position: 2, name: 'Equipment', item: `${baseUrl}/equipment` },
           { '@type': 'ListItem', position: 3, name: machine.equipmentType, item: `${baseUrl}/equipment/${machine.equipmentTypeSlug}` },
-          { '@type': 'ListItem', position: 4, name: machine.brand, item: `${baseUrl}/brands/${machine.brandSlug}` },
+          { '@type': 'ListItem', position: 4, name: machine.brand, item: `${baseUrl}${brandCatalogHref}` },
           { '@type': 'ListItem', position: 5, name: machine.model, item: canonicalUrl },
         ],
       },
@@ -352,7 +355,7 @@ export default async function EquipmentModelPage({ params }: PageProps) {
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <div className="container breadcrumbs">
-        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / <Link href={`/equipment/${machine.equipmentTypeSlug}`}>{machine.equipmentType}</Link> / <Link href={`/brands/${machine.brandSlug}`}>{machine.brand}</Link> / {machine.model}
+        <Link href="/">Home</Link> / <Link href="/equipment">Equipment</Link> / <Link href={`/equipment/${machine.equipmentTypeSlug}`}>{machine.equipmentType}</Link> / <Link href={brandCatalogHref}>{machine.brand}</Link> / {machine.model}
       </div>
       <div className="container">
         <section className="machine-header">
