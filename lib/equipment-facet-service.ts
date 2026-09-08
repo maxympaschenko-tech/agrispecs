@@ -370,6 +370,50 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['planting.liquid_fertilizer_capacity'],
     },
   ],
+  'self-propelled-forage-harvester': [
+    {
+      slug: 'engine-displacement',
+      label: 'Engine displacement',
+      canonicalUnit: 'L',
+      specKeys: ['engine.displacement'],
+    },
+    {
+      slug: 'rated-engine-power-individual-product-page',
+      label: 'Rated engine power (individual product page)',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.rated_power'],
+    },
+    {
+      slug: 'family-table-rated-power',
+      label: 'F8/F9 family table rated power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.family_table_rated_power'],
+    },
+    {
+      slug: 'harvestmotion-plus-power',
+      label: 'HarvestMotion Plus power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.harvestmotion_plus_power'],
+    },
+    {
+      slug: 'eco-mode-power',
+      label: 'ECO mode power',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.eco_mode_power'],
+    },
+    {
+      slug: 'fuel-tank-capacity',
+      label: 'Fuel tank capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['capacities.fuel_tank'],
+    },
+    {
+      slug: 'maximum-output-ece-r120',
+      label: 'Maximum output (ECE R 120)',
+      canonicalUnit: 'hp',
+      specKeys: ['engine.ece_r120_max_power'],
+    },
+  ],
   'windrower': [
     {
       slug: 'engine-power',
