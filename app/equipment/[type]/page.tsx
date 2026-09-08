@@ -45,10 +45,11 @@ function formatRangeValue(value: number) {
   });
 }
 
-function formatPublishedRange(minValue: number, maxValue: number, unit: string) {
+function formatPublishedRange(minValue: number, maxValue: number, unit: string | null) {
   const min = formatRangeValue(minValue);
-  if (minValue === maxValue) return `${min} ${unit}`;
-  return `${min}–${formatRangeValue(maxValue)} ${unit}`;
+  const suffix = unit ? ` ${unit}` : '';
+  if (minValue === maxValue) return `${min}${suffix}`;
+  return `${min}–${formatRangeValue(maxValue)}${suffix}`;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
