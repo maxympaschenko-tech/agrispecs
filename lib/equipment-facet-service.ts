@@ -350,6 +350,32 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
       specKeys: ['baler.maximum_bale_length'],
     },
   ],
+  'planter': [
+    {
+      slug: 'number-of-rows',
+      label: 'Number of rows',
+      canonicalUnit: '',
+      specKeys: ['planting.row_count'],
+    },
+    {
+      slug: 'row-spacing',
+      label: 'Row spacing',
+      canonicalUnit: 'in',
+      specKeys: ['planting.row_spacing'],
+    },
+    {
+      slug: 'transport-width',
+      label: 'Transport width',
+      canonicalUnit: 'ft',
+      specKeys: ['dimensions.transport_width'],
+    },
+    {
+      slug: 'liquid-fertilizer-capacity',
+      label: 'Liquid fertilizer capacity',
+      canonicalUnit: 'gal',
+      specKeys: ['planting.liquid_fertilizer_capacity'],
+    },
+  ],
   'windrower': [
     {
       slug: 'engine-power',
