@@ -8,7 +8,7 @@ export const MIN_INDEXABLE_EQUIPMENT_FACET_MODELS = 2;
 type NumericFacetConfig = {
   slug: string;
   label: string;
-  canonicalUnit: string;
+  canonicalUnit: string | null;
   specKeys: string[];
 };
 
@@ -42,7 +42,7 @@ type CategoricalFacetRow = RowDataPacket & {
 export type EquipmentNumericFacetCoverage = {
   slug: string;
   label: string;
-  unit: string;
+  unit: string | null;
   modelCount: number;
   manufacturerCount: number;
   minValue: number;
@@ -351,6 +351,12 @@ const NUMERIC_FACETS_BY_TYPE: Record<string, NumericFacetConfig[]> = {
     },
   ],
   'planter': [
+    {
+      slug: 'number-of-rows',
+      label: 'Number of rows',
+      canonicalUnit: null,
+      specKeys: ['planting.row_count'],
+    },
     {
       slug: 'row-spacing',
       label: 'Row spacing',
