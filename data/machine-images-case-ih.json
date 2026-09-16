@@ -73,5 +73,35 @@
     "caption": "Case IH Axial-Flow 7160 combine displayed at Agritechnica 2025.",
     "altText": "Case IH Axial-Flow 7160 combine harvester",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "afs-connect-puma-260",
+    "sourceKey": "commons-case-ih-puma-260-cvxdrive-agra-2024-dsc01893",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Puma_260_CVXdrive_agra_2024_%28DSC01893%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/afs-connect-puma-260/main.jpg",
+    "publicUrl": "/media/machines/case-ih/afs-connect-puma-260/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Puma_260_CVXdrive_agra_2024_(DSC01893).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Puma 260 CVXdrive AFS Connect displayed at agra 2024.",
+    "altText": "Case IH AFS Connect Puma 260 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "steiger-715",
+    "sourceKey": "commons-case-ih-quadtrac-715-agritechnica-2023-dsc06964",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Quadtrac_715_Agritechnica_2023_%28DSC06964%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/steiger-715/main.jpg",
+    "publicUrl": "/media/machines/case-ih/steiger-715/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Quadtrac_715_Agritechnica_2023_(DSC06964).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Quadtrac 715 displayed at Agritechnica 2023; exact Quadtrac configuration for the Case IH Steiger 715 catalog model.",
+    "altText": "Case IH Steiger 715 Quadtrac tractor",
+    "imageKind": "exact"
   }
 ]
