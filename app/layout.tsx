@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SiteNavigation } from '@/components/site-navigation';
 import './globals.css';
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://farmmachinespecs.com').replace(/\/$/, '');
+const siteUrl = 'https://farmmachinespecs.com';
 const siteName = 'Farm Machine Specs';
 
 function jsonLd(value: unknown) {
