@@ -19,6 +19,8 @@ import newHollandMachineImageManifest from '@/data/machine-images-new-holland.js
 
 const MACHINE_IMAGE_TTL_MS = 5 * 60 * 1000;
 
+type MachineImageKind = 'exact' | 'family' | 'representative' | 'fallback';
+
 export type MachineImage = {
   id: number;
   imageUrl: string;
@@ -29,7 +31,7 @@ export type MachineImage = {
   caption: string | null;
   altText: string | null;
   isPrimary: boolean;
-  imageKind: 'exact' | 'family' | 'representative' | 'fallback';
+  imageKind: MachineImageKind;
 };
 
 type MachineImageIdentityRow = RowDataPacket & {
@@ -41,6 +43,7 @@ type MachineImageIdentityRow = RowDataPacket & {
   license_url: string | null;
   caption: string | null;
   alt_text: string | null;
+  image_kind: string | null;
   is_primary: number | null;
   brand_slug: string;
   model_slug: string;
@@ -83,6 +86,11 @@ function localMediaExists(publicUrl: string) {
   return existsSync(path.join(process.cwd(), 'public', publicUrl.replace(/^\/+/, '')));
 }
 
+function normalizeImageKind(value: string | null | undefined): Exclude<MachineImageKind, 'fallback'> {
+  if (value === 'family' || value === 'representative') return value;
+  return 'exact';
+}
+
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
   const isTractor = equipmentTypeSlug === 'tractor';
   return {
@@ -110,7 +118,7 @@ function manifestToImage(image: ManifestImage, id = -1): MachineImage {
     caption: image.caption,
     altText: image.altText,
     isPrimary: true,
-    imageKind: image.imageKind || 'exact',
+    imageKind: normalizeImageKind(image.imageKind),
   };
 }
 
@@ -126,7 +134,7 @@ function rowToImage(row: MachineImageIdentityRow): MachineImage | null {
     caption: row.caption,
     altText: row.alt_text,
     isPrimary: Boolean(row.is_primary),
-    imageKind: 'exact',
+    imageKind: normalizeImageKind(row.image_kind),
   };
 }
 
@@ -162,6 +170,7 @@ async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
             mi.license_url,
             mi.caption,
             mi.alt_text,
+            mi.image_kind,
             mi.is_primary,
             mf.slug AS brand_slug,
             m.slug AS model_slug,
