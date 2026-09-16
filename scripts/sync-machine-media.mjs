@@ -20,6 +20,7 @@ const manifests = [
   { kind: 'part', path: path.join(root, 'data', 'part-images.json') },
 ];
 const buildManifestPath = path.join(root, 'public', 'media', 'media-build-manifest.json');
+const allowedImageKinds = new Set(['exact', 'family', 'representative']);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -81,6 +82,46 @@ for (const image of manifest) {
     if (!image[required] || typeof image[required] !== 'string') {
       throw new Error(`[media] Missing ${required} in ${image.manifestPath}`);
     }
+  }
+
+  if (image.kind === 'machine') {
+    for (const required of ['brandSlug', 'modelSlug']) {
+      if (!image[required] || typeof image[required] !== 'string') {
+        throw new Error(`[media] Missing machine ${required} for ${image.sourceKey} in ${image.manifestPath}`);
+      }
+    }
+  }
+
+  if (image.kind === 'part') {
+    if (!image.brandSlug || typeof image.brandSlug !== 'string') {
+      throw new Error(`[media] Missing part brandSlug for ${image.sourceKey} in ${image.manifestPath}`);
+    }
+    if (
+      (!image.partNumber || typeof image.partNumber !== 'string')
+      && (!image.normalizedPartNumber || typeof image.normalizedPartNumber !== 'string')
+    ) {
+      throw new Error(`[media] Missing part number for ${image.sourceKey} in ${image.manifestPath}`);
+    }
+  }
+
+  if (image.imageKind !== undefined && !allowedImageKinds.has(image.imageKind)) {
+    throw new Error(
+      `[media] Unsupported imageKind ${String(image.imageKind)} for ${image.sourceKey}; expected exact, family or representative`,
+    );
+  }
+
+  if (!image.outputPath.startsWith('public/media/')) {
+    throw new Error(`[media] outputPath must live under public/media/: ${image.outputPath}`);
+  }
+  if (!image.publicUrl.startsWith('/media/')) {
+    throw new Error(`[media] publicUrl must live under /media/: ${image.publicUrl}`);
+  }
+
+  const expectedPublicUrl = `/${image.outputPath.replaceAll('\\', '/').replace(/^public\//, '')}`;
+  if (image.publicUrl !== expectedPublicUrl) {
+    throw new Error(
+      `[media] outputPath/publicUrl mismatch for ${image.sourceKey}: ${image.outputPath} should map to ${expectedPublicUrl}, received ${image.publicUrl}`,
+    );
   }
 
   const previousSource = sourceKeys.get(image.sourceKey);
