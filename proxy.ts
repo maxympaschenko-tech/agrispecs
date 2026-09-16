@@ -13,14 +13,12 @@ function isStaticLikePath(pathname: string) {
 export function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase();
-  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
-  const needsHttps = forwardedProto ? forwardedProto === 'http' : request.nextUrl.protocol === 'http:';
   const needsCanonicalHost = host === WWW_HOST;
   const needsTrailingSlashRemoval = pathname.length > 1
     && pathname.endsWith('/')
     && !isStaticLikePath(pathname);
 
-  if (needsHttps || needsCanonicalHost || needsTrailingSlashRemoval) {
+  if (needsCanonicalHost || needsTrailingSlashRemoval) {
     const destination = request.nextUrl.clone();
     destination.protocol = 'https:';
     destination.hostname = CANONICAL_HOST;
