@@ -60,6 +60,7 @@ import { caseIhNutriPlacerFertilizerApplicatorsCurrentMigration } from '@/lib/mi
 import { caseIhTitanFloatersCurrentMigration } from '@/lib/migrations/20260831_534_case_ih_titan_floaters_current';
 import { caseIhTrident5550CombinationApplicatorCurrentMigration } from '@/lib/migrations/20260831_535_case_ih_trident_5550_combination_applicator_current';
 import { caseIhTitanApplicationSystemsCurrentMigration } from '@/lib/migrations/20260831_536_case_ih_titan_application_systems_current';
+import { machineImageKindMigration } from '@/lib/migrations/20260916_012_machine_image_kind';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -103,4 +104,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIhTitanFloatersCurrentMigration,
   caseIhTrident5550CombinationApplicatorCurrentMigration,
   caseIhTitanApplicationSystemsCurrentMigration,
+  machineImageKindMigration,
 ];
