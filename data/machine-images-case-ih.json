@@ -103,5 +103,20 @@
     "caption": "Case IH Quadtrac 715 displayed at Agritechnica 2023; exact Quadtrac configuration for the Case IH Steiger 715 catalog model.",
     "altText": "Case IH Steiger 715 Quadtrac tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "farmall-120c",
+    "sourceKey": "commons-case-ih-farmall-120c-gotlands-skordefestival-2025",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Farmall_120C.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/farmall-120c/main.jpg",
+    "publicUrl": "/media/machines/case-ih/farmall-120c/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Farmall_120C.jpg",
+    "author": "Bene Riobó",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Farmall 120C photographed at Gotlands Skördefestival 2025 in Roma, Gotland.",
+    "altText": "Case IH Farmall Utility 120C tractor",
+    "imageKind": "exact"
   }
 ]
