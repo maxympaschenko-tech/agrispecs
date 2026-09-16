@@ -11,6 +11,22 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  trailingSlash: false,
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.farmmachinespecs.com',
+          },
+        ],
+        destination: 'https://farmmachinespecs.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
