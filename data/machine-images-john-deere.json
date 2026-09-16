@@ -121,6 +121,21 @@
   },
   {
     "brandSlug": "john-deere",
+    "modelSlug": "6r-175",
+    "sourceKey": "deere-nz-6r-175-product-image",
+    "remoteUrl": "https://www.deere.co.nz/assets/images/region-2/products/tractors/mid/6r-series/6r-series-new//r2g029439_tech_lsc_large_large_174380f3490bbe8022646cd6d80cce9ac4738aa3.png",
+    "outputPath": "public/media/machines/john-deere/6r-175/main.png",
+    "publicUrl": "/media/machines/john-deere/6r-175/main.png",
+    "sourcePageUrl": "https://www.deere.co.nz/en/tractors/utility-tractors/6-family-utility-tractors/6r175/",
+    "author": null,
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Official John Deere product image of the 6R 175 tractor.",
+    "altText": "John Deere 6R 175 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
     "modelSlug": "6r-185",
     "sourceKey": "commons-jd-6r-185-agra-2024-dsc03350",
     "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Deere_6R_185_agra_2024_%28DSC03350%29.jpg?width=1600",
@@ -132,6 +147,21 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "caption": "John Deere 6R 185 displayed at agra 2024.",
     "altText": "John Deere 6R 185 tractor",
+    "imageKind": "exact"
+  },
+  {
+    "brandSlug": "john-deere",
+    "modelSlug": "6r-195",
+    "sourceKey": "deere-nz-6r-195-product-image",
+    "remoteUrl": "https://www.deere.co.nz/assets/images/region-2/products/tractors/mid/6r-series/6r-series-new//r2g029452_tech_lsc_large_large_697fe6a3283b4fd23e4782b80fe6a2969b523dca.png",
+    "outputPath": "public/media/machines/john-deere/6r-195/main.png",
+    "publicUrl": "/media/machines/john-deere/6r-195/main.png",
+    "sourcePageUrl": "https://www.deere.co.nz/en/tractors/utility-tractors/6-family-utility-tractors/6r195/",
+    "author": null,
+    "licenseName": null,
+    "licenseUrl": null,
+    "caption": "Official John Deere product image of the 6R 195 tractor.",
+    "altText": "John Deere 6R 195 tractor",
     "imageKind": "exact"
   },
   {
