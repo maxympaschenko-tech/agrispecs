@@ -35,6 +35,18 @@ async function readManifest(entry) {
   }
 }
 
+function validateHttpsUrl(field, value, image) {
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:') {
+      throw new Error(`Expected HTTPS URL, received ${parsed.protocol}`);
+    }
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(`[media] Invalid ${field} for ${image.sourceKey} in ${image.manifestPath}: ${reason}`);
+  }
+}
+
 async function download(url, attempts = 3) {
   let lastError;
 
@@ -83,6 +95,23 @@ for (const image of manifest) {
       throw new Error(`[media] Missing ${required} in ${image.manifestPath}`);
     }
   }
+
+  validateHttpsUrl('remoteUrl', image.remoteUrl, image);
+  if (image.sourcePageUrl !== undefined && image.sourcePageUrl !== null) {
+    if (typeof image.sourcePageUrl !== 'string' || !image.sourcePageUrl.trim()) {
+      throw new Error(`[media] Invalid sourcePageUrl for ${image.sourceKey} in ${image.manifestPath}`);
+    }
+    validateHttpsUrl('sourcePageUrl', image.sourcePageUrl, image);
+  }
+
+  const hasLicenseName = typeof image.licenseName === 'string' && image.licenseName.trim().length > 0;
+  const hasLicenseUrl = typeof image.licenseUrl === 'string' && image.licenseUrl.trim().length > 0;
+  if (hasLicenseName !== hasLicenseUrl) {
+    throw new Error(
+      `[media] licenseName and licenseUrl must either both be present or both be omitted for ${image.sourceKey} in ${image.manifestPath}`,
+    );
+  }
+  if (hasLicenseUrl) validateHttpsUrl('licenseUrl', image.licenseUrl, image);
 
   if (image.kind === 'machine') {
     for (const required of ['brandSlug', 'modelSlug']) {
@@ -180,6 +209,8 @@ for (const image of manifest) {
       author: image.author,
       licenseName: image.licenseName,
       licenseUrl: image.licenseUrl,
+      caption: image.caption,
+      altText: image.altText,
       imageKind: image.imageKind || 'exact',
       sha256,
       bytes: result.bytes.length,
