@@ -63,6 +63,7 @@ import { caseIhTitanApplicationSystemsCurrentMigration } from '@/lib/migrations/
 import { caseIHAFSeriesHarvestEnrichmentMigration } from '@/lib/migrations/20260917_537_case_ih_af_series_harvest_enrichment';
 import { caseIHMaxxumSystemsEnrichmentMigration } from '@/lib/migrations/20260917_538_case_ih_maxxum_systems_enrichment';
 import { caseIHAxialFlow260SystemsEnrichmentMigration } from '@/lib/migrations/20260917_539_case_ih_axial_flow_260_systems_enrichment';
+import { caseIHAxialFlow160SystemsEnrichmentMigration } from '@/lib/migrations/20260917_540_case_ih_axial_flow_160_systems_enrichment';
 
 export const caseIHMigrations: DbMigration[] = [
   caseIHAfsConnectPumaCurrentSpecsMigration, caseIHAfsConnectPumaL117LoaderMigration,
@@ -109,4 +110,5 @@ export const caseIHMigrations: DbMigration[] = [
   caseIHAFSeriesHarvestEnrichmentMigration,
   caseIHMaxxumSystemsEnrichmentMigration,
   caseIHAxialFlow260SystemsEnrichmentMigration,
+  caseIHAxialFlow160SystemsEnrichmentMigration,
 ];
