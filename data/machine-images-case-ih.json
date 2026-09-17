@@ -163,5 +163,20 @@
     "caption": "Case IH Puma 175 CVXDrive displayed at Agritechnica 2023; exact Puma 175 model shown in a CVXDrive configuration.",
     "altText": "Case IH Puma 175 CVXDrive tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "puma-165",
+    "sourceKey": "commons-case-ih-puma-165-cvx-2019",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Puma_165_CVX.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/puma-165/main.jpg",
+    "publicUrl": "/media/machines/case-ih/puma-165/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Puma_165_CVX.jpg",
+    "author": "JoachimKohler-HB",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Puma 165 CVX; exact Puma 165 model shown in a CVX transmission configuration.",
+    "altText": "Case IH Puma 165 CVX tractor",
+    "imageKind": "exact"
   }
 ]
