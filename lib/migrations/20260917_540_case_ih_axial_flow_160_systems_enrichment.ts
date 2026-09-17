@@ -149,7 +149,7 @@ export const caseIHAxialFlow160SystemsEnrichmentMigration: DbMigration = {
       ['Transmission', 'transmission.ground_drive', 'Ground drive transmission', 'text', null, 20],
       ['Threshing & Separating', 'threshing.rotor_system', 'Rotor system', 'text', null, 20],
       ['Cleaning System', 'cleaning.system', 'Cleaning system', 'text', null, 10],
-      ['Grain Handling', 'grain.clean_grain_elevator_capacity', 'Clean grain elevator capacity', 'decimal', 'bu/hr', 30],
+      ['Grain Handling', 'grain.clean_grain_elevator_capacity', 'Clean grain elevator capacity', 'text', null, 30],
     ];
     for (const definition of definitions) {
       definitionIds.set(definition[1], await ensureDefinition(connection, definition));
@@ -199,7 +199,7 @@ export const caseIHAxialFlow160SystemsEnrichmentMigration: DbMigration = {
       await putSpec(connection, machineId, versionId, def('transmission.ground_drive'), familySourceRecordId, 'Two-speed electric shift transmission');
       await putSpec(connection, machineId, versionId, def('threshing.rotor_system'), familySourceRecordId, 'AFX single rotor');
       await putSpec(connection, machineId, versionId, def('cleaning.system'), familySourceRecordId, 'Cross Flow cleaning system');
-      await putSpec(connection, machineId, versionId, def('grain.clean_grain_elevator_capacity'), familySourceRecordId, 5000, 'bu/hr');
+      await putSpec(connection, machineId, versionId, def('grain.clean_grain_elevator_capacity'), familySourceRecordId, 'Up to 5,000 bu/hr');
     }
   },
 };
