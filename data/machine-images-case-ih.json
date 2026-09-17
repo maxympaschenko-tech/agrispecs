@@ -193,5 +193,20 @@
     "caption": "Case IH Farmall 120M displayed at Agritechnica 2025; used as a Large Utility M family image for the current Farmall 120 Super M page and not asserted as the exact Super M configuration.",
     "altText": "Case IH Farmall 120 Super M family image based on Farmall 120M",
     "imageKind": "family"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "puma-150",
+    "sourceKey": "commons-case-ih-puma-150-harrow-fair-2025-08-31-01",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Puma_150_Tractor%2C_Harrow_Fair%2C_Harrow%2C_Ontario%2C_2025-08-31_01.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/puma-150/main.jpg",
+    "publicUrl": "/media/machines/case-ih/puma-150/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Puma_150_Tractor,_Harrow_Fair,_Harrow,_Ontario,_2025-08-31_01.jpg",
+    "author": "Chris Woodrich",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Puma 150 tractor photographed at Harrow Fair in Ontario, Canada, on August 31, 2025.",
+    "altText": "Case IH Puma 150 tractor",
+    "imageKind": "exact"
   }
 ]
