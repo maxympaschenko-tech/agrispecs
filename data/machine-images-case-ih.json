@@ -178,5 +178,20 @@
     "caption": "Case IH Puma 165 CVX; exact Puma 165 model shown in a CVX transmission configuration.",
     "altText": "Case IH Puma 165 CVX tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "farmall-120-super-m",
+    "sourceKey": "commons-case-ih-farmall-120m-agritechnica-2025-dsc08496",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Farmall_120M_Agritechnica_2025_%28DSC08496%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/farmall-120-super-m/main.jpg",
+    "publicUrl": "/media/machines/case-ih/farmall-120-super-m/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Farmall_120M_Agritechnica_2025_(DSC08496).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Farmall 120M displayed at Agritechnica 2025; used as a Large Utility M family image for the current Farmall 120 Super M page and not asserted as the exact Super M configuration.",
+    "altText": "Case IH Farmall 120 Super M family image based on Farmall 120M",
+    "imageKind": "family"
   }
 ]
