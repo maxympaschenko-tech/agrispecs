@@ -223,5 +223,20 @@
     "caption": "Case IH Optum 340 CVXDrive displayed at Agritechnica 2023.",
     "altText": "Case IH Optum 340 CVXDrive tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "farmall-100c",
+    "sourceKey": "commons-case-ih-farmall-100c-agritechnica-2023-p1160183",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Farmall_100C%2C_Agritechnica_2023%2C_Hanover_%28P1160183%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/farmall-100c/main.jpg",
+    "publicUrl": "/media/machines/case-ih/farmall-100c/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Farmall_100C,_Agritechnica_2023,_Hanover_(P1160183).jpg",
+    "author": "MB-one (Matti Blume)",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Farmall 100C displayed at Agritechnica 2023 in Hanover.",
+    "altText": "Case IH Farmall 100C tractor",
+    "imageKind": "exact"
   }
 ]
