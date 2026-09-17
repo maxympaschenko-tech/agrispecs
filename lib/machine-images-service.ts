@@ -91,6 +91,23 @@ function normalizeImageKind(value: string | null | undefined): Exclude<MachineIm
   return 'exact';
 }
 
+function imageKindPriority(kind: MachineImageKind) {
+  switch (kind) {
+    case 'exact': return 0;
+    case 'family': return 1;
+    case 'representative': return 2;
+    case 'fallback': return 3;
+  }
+}
+
+function compareMachineImages(a: MachineImage, b: MachineImage) {
+  const kindDifference = imageKindPriority(a.imageKind) - imageKindPriority(b.imageKind);
+  if (kindDifference !== 0) return kindDifference;
+  const primaryDifference = Number(b.isPrimary) - Number(a.isPrimary);
+  if (primaryDifference !== 0) return primaryDifference;
+  return a.id - b.id;
+}
+
 function fallbackImage(equipmentTypeSlug = 'tractor', title = 'Farm equipment'): MachineImage {
   const isTractor = equipmentTypeSlug === 'tractor';
   return {
@@ -143,12 +160,15 @@ export function getManifestMachinePrimaryImage(
   modelSlug: string,
   equipmentTypeSlug = 'tractor',
 ): MachineImage {
-  const image = manifest.find((item) =>
-    item.brandSlug === brandSlug
-    && item.modelSlug === modelSlug
-    && localMediaExists(item.publicUrl),
-  );
-  return image ? manifestToImage(image) : fallbackImage(equipmentTypeSlug, `${brandSlug} ${modelSlug}`.replace(/-/g, ' '));
+  const images = manifest
+    .filter((item) =>
+      item.brandSlug === brandSlug
+      && item.modelSlug === modelSlug
+      && localMediaExists(item.publicUrl),
+    )
+    .map((item, index) => manifestToImage(item, -(index + 1)))
+    .sort(compareMachineImages);
+  return images[0] || fallbackImage(equipmentTypeSlug, `${brandSlug} ${modelSlug}`.replace(/-/g, ' '));
 }
 
 async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
@@ -212,7 +232,7 @@ async function loadMachineImages(machineId: string): Promise<MachineImage[]> {
           ));
         }
 
-        return images.sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+        return images.sort(compareMachineImages);
       },
     );
   } catch (error) {
