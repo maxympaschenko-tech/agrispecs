@@ -148,5 +148,20 @@
     "caption": "Case IH Puma 220 CVXDrive photographed at PotatoEurope 2026; used for the AFS Connect Puma 220 catalog model without asserting an exact U.S.-market configuration.",
     "altText": "Case IH AFS Connect Puma 220 model-family tractor image",
     "imageKind": "family"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "puma-175",
+    "sourceKey": "commons-case-ih-puma-175-cvxdrive-agritechnica-2023-dsc04894",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Puma_175_CVXDrive_Agritechnica_2023_%28DSC04894%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/puma-175/main.jpg",
+    "publicUrl": "/media/machines/case-ih/puma-175/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Puma_175_CVXDrive_Agritechnica_2023_(DSC04894).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Puma 175 CVXDrive displayed at Agritechnica 2023; exact Puma 175 model shown in a CVXDrive configuration.",
+    "altText": "Case IH Puma 175 CVXDrive tractor",
+    "imageKind": "exact"
   }
 ]
