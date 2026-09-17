@@ -238,5 +238,20 @@
     "caption": "Case IH Farmall 100C displayed at Agritechnica 2023 in Hanover.",
     "altText": "Case IH Farmall 100C tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "puma-185-new",
+    "sourceKey": "commons-case-ih-puma-185-cvx-edewecht-2026-side",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Puma_185_CVX_Traktor_Seitenansicht_%28Edewecht%2C_2026%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/puma-185-new/main.jpg",
+    "publicUrl": "/media/machines/case-ih/puma-185-new/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Puma_185_CVX_Traktor_Seitenansicht_(Edewecht,_2026).jpg",
+    "author": "JoachimKohler-HB",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Puma 185 CVX photographed in Edewecht, Germany, on August 27, 2026; used as a Puma 185 model-family image for the current Puma 185 New page without asserting the exact U.S.-market generation configuration.",
+    "altText": "Case IH Puma 185 New family image based on a Puma 185 CVX tractor",
+    "imageKind": "family"
   }
 ]
