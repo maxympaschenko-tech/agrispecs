@@ -208,5 +208,20 @@
     "caption": "Case IH Puma 150 tractor photographed at Harrow Fair in Ontario, Canada, on August 31, 2025.",
     "altText": "Case IH Puma 150 tractor",
     "imageKind": "exact"
+  },
+  {
+    "brandSlug": "case-ih",
+    "modelSlug": "optum-340",
+    "sourceKey": "commons-case-ih-optum-340-cvxdrive-agritechnica-2023-dsc05436",
+    "remoteUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Case_IH_Optum_340_CVXDrive_Agritechnica_2023_%28DSC05436%29.jpg?width=1600",
+    "outputPath": "public/media/machines/case-ih/optum-340/main.jpg",
+    "publicUrl": "/media/machines/case-ih/optum-340/main.jpg",
+    "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Case_IH_Optum_340_CVXDrive_Agritechnica_2023_(DSC05436).jpg",
+    "author": "MarcelX42",
+    "licenseName": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "caption": "Case IH Optum 340 CVXDrive displayed at Agritechnica 2023.",
+    "altText": "Case IH Optum 340 CVXDrive tractor",
+    "imageKind": "exact"
   }
 ]
