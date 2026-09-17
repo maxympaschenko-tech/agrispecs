@@ -47,6 +47,12 @@ function validateHttpsUrl(field, value, image) {
   }
 }
 
+function validatePathSegment(field, value, image) {
+  if (value.includes('/') || value.includes('\\') || value === '.' || value === '..' || value.includes('..')) {
+    throw new Error(`[media] Invalid ${field} path segment ${value} for ${image.sourceKey} in ${image.manifestPath}`);
+  }
+}
+
 async function download(url, attempts = 3) {
   let lastError;
 
@@ -118,6 +124,21 @@ for (const image of manifest) {
       if (!image[required] || typeof image[required] !== 'string') {
         throw new Error(`[media] Missing machine ${required} for ${image.sourceKey} in ${image.manifestPath}`);
       }
+      validatePathSegment(required, image[required], image);
+    }
+
+    const normalizedOutputPath = image.outputPath.replaceAll('\\', '/');
+    const expectedOutputPrefix = `public/media/machines/${image.brandSlug}/${image.modelSlug}/`;
+    const expectedPublicPrefix = `/media/machines/${image.brandSlug}/${image.modelSlug}/`;
+    if (!normalizedOutputPath.startsWith(expectedOutputPrefix)) {
+      throw new Error(
+        `[media] Machine outputPath must match brand/model slugs for ${image.sourceKey}: expected prefix ${expectedOutputPrefix}, received ${image.outputPath}`,
+      );
+    }
+    if (!image.publicUrl.startsWith(expectedPublicPrefix)) {
+      throw new Error(
+        `[media] Machine publicUrl must match brand/model slugs for ${image.sourceKey}: expected prefix ${expectedPublicPrefix}, received ${image.publicUrl}`,
+      );
     }
   }
 
@@ -125,6 +146,7 @@ for (const image of manifest) {
     if (!image.brandSlug || typeof image.brandSlug !== 'string') {
       throw new Error(`[media] Missing part brandSlug for ${image.sourceKey} in ${image.manifestPath}`);
     }
+    validatePathSegment('brandSlug', image.brandSlug, image);
     if (
       (!image.partNumber || typeof image.partNumber !== 'string')
       && (!image.normalizedPartNumber || typeof image.normalizedPartNumber !== 'string')
