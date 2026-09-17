@@ -116,7 +116,7 @@ export const caseIHAxialFlow260SystemsEnrichmentMigration: DbMigration = {
     const definitions: Array<[string, string, string, string, string | null, number]> = [
       ['Precision Technology', 'technology.display_system', 'Display system', 'text', null, 10],
       ['Precision Technology', 'technology.harvest_automation', 'Harvest automation', 'text', null, 20],
-      ['Precision Technology', 'technology.guidance_features', 'Guidance and fleet features', 'text', null, 30],
+      ['Precision Technology', 'technology.guidance_features', 'Guidance and precision features', 'text', null, 30],
       ['Transmission', 'transmission.ground_drive', 'Ground drive transmission', 'text', null, 20],
       ['Feeding', 'feeding.maximum_lift_capacity', 'Maximum feeder lift capacity', 'decimal', 'lb', 30],
       ['Threshing & Separating', 'threshing.rotor_system', 'Rotor system', 'text', null, 20],
