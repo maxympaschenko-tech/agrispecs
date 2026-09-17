@@ -91,10 +91,10 @@ async function putSpec(
       machineId,
       versionId,
       definitionId,
-      sourceRecordId,
       typeof value === 'string' ? value : null,
       typeof value === 'number' ? value : null,
       unit,
+      sourceRecordId,
     ],
   );
 }
