@@ -124,7 +124,7 @@ export const caseIHAxialFlow260SystemsEnrichmentMigration: DbMigration = {
       ['Cleaning System', 'cleaning.maximum_slope_percent', 'Self-leveling slope capacity', 'decimal', '%', 20],
       ['Cleaning System', 'cleaning.tailings_processor', 'Tailings processor', 'text', null, 30],
       ['Undercarriage', 'undercarriage.track_option', 'Track system option', 'text', null, 10],
-      ['Undercarriage', 'undercarriage.track_floatation_gain', 'Track flotation improvement', 'decimal', '%', 20],
+      ['Undercarriage', 'undercarriage.track_flotation_gain', 'Track flotation improvement', 'decimal', '%', 20],
     ];
     for (const definition of definitions) {
       definitionIds.set(definition[1], await ensureDefinition(connection, definition));
@@ -182,7 +182,7 @@ export const caseIHAxialFlow260SystemsEnrichmentMigration: DbMigration = {
         sourceRecordId,
         'ActiveTrac four-roller hydraulic suspended track system available',
       );
-      await putSpec(connection, machineId, versionId, def('undercarriage.track_floatation_gain'), sourceRecordId, 14, '%');
+      await putSpec(connection, machineId, versionId, def('undercarriage.track_flotation_gain'), sourceRecordId, 14, '%');
     }
   },
 };
