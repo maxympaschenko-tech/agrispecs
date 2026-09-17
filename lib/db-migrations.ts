@@ -56,6 +56,7 @@ import { johnDeere6M6RPickupHitchValveKitMigration } from '@/lib/migrations/2026
 import { johnDeere6M6RHydraulicStabilizerPartsMigration } from '@/lib/migrations/20260827_132_6m_6r_hydraulic_stabilizer_parts';
 import { readPathIndexesMigration } from '@/lib/migrations/20260905_010_read_path_indexes';
 import { removeRedundantReadIndexesMigration } from '@/lib/migrations/20260905_011_remove_redundant_read_indexes';
+import { machineImageKindMigration } from '@/lib/migrations/20260916_012_machine_image_kind';
 import { kubotaMigrations } from '@/lib/migrations/kubota';
 import { johnDeereExpansionMigrations } from '@/lib/migrations/john-deere-expansion';
 import { newHollandMigrations } from '@/lib/migrations/new-holland';
@@ -172,6 +173,7 @@ const migrations: DbMigration[] = [
   ...antonioCarraroMigrations,
   readPathIndexesMigration,
   removeRedundantReadIndexesMigration,
+  machineImageKindMigration,
 ];
 
 let migrationPromise: Promise<void> | null = null;
