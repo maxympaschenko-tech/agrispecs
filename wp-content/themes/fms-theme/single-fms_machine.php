@@ -23,6 +23,23 @@ while (have_posts()) {
     <article class="entry-content">
         <?php if (has_post_thumbnail()) { the_post_thumbnail('large',['loading'=>'eager']); } ?>
         <?php the_content(); ?>
+        <?php
+        // Show the source-edition distinction instead of silently overwriting
+        // previously imported, potentially edited WordPress specifications.
+        $fms_model_slug = get_post_field('post_name', $id);
+        if ($fms_model_slug === 'kubota-l2502-hst') : ?>
+        <aside class="fms-edition-note" aria-label="Important manufacturer brochure revision">
+          <h2>Check the Kubota specification edition</h2>
+          <p>This reference records the earlier Kubota US L02 sheet (24.8 gross hp and 19.0 HST PTO hp). Kubota's <strong>2026 Full Line Brochure</strong> lists 23.3 gross hp and 18.4 HST PTO hp for its L2502 table. These two document editions should not be mixed when choosing implements. Match the correct tractor serial and year.</p>
+          <p><a href="<?php echo esc_url(home_url('/kubota-l2502-24-8-vs-23-3-hp-brochure-differences/')); ?>">See both official brochure editions and verification steps →</a></p>
+        </aside>
+        <?php elseif (in_array($fms_model_slug, ['kubota-l3302-hst','kubota-l3902-hst'], true)) : ?>
+        <aside class="fms-edition-note" aria-label="Manufacturer brochure edition notice">
+          <h2>Manufacturer edition matters</h2>
+          <p>This page cites a particular Kubota L02 specification edition. The Kubota <strong>2026 Full Line Brochure</strong> gives a 2,778-lb HST tractor weight and a 1,435-lb 24-inch-behind hitch rating for the relevant L3302/L3902 configurations, different from some figures in the cited source on this page. Do not merge ratings from different publications without confirming the tractor's exact configuration.</p>
+          <p><a href="<?php echo esc_url(home_url('/kubota-l3302-l3902-dt-vs-hst-2026/')); ?>">Compare the 2026 manufacturer figures →</a></p>
+        </aside>
+        <?php endif; ?>
         <?php if (function_exists('fms_render_specs')) { fms_render_specs($id); } ?>
         <div class="notice"><strong>Safety:</strong> Check your machine's exact serial range and factory manual before lifting loads, selecting replacement parts or servicing hydraulic and PTO systems.</div>
         <?php if (function_exists('fms_render_source')) { fms_render_source($id); } ?>
@@ -56,6 +73,16 @@ while (have_posts()) {
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
             ],
+            'kubota-l3302-dt-2026' => [
+                'kubota-l3302-l3902-dt-vs-hst-2026',
+                'kubota-la526-loader-lift-capacity-height-comparison',
+                'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
+            ],
+            'kubota-l3902-dt-2026' => [
+                'kubota-l3302-l3902-dt-vs-hst-2026',
+                'kubota-la526-loader-lift-capacity-height-comparison',
+                'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
+            ],
             'kubota-bx2380' => [
                 'kubota-bx2380-fluid-capacities-engine-oil-coolant-transmission',
                 'kubota-bx1880-vs-bx2380-vs-bx2680-comparison',
@@ -88,10 +115,14 @@ while (have_posts()) {
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-l3302-hst' => [
+                'kubota-l3302-l3902-dt-vs-hst-2026',
+                'kubota-la526-loader-lift-capacity-height-comparison',
                 'kubota-l3302-vs-l3902-hst-tractor-spec-comparison',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-l3902-hst' => [
+                'kubota-l3302-l3902-dt-vs-hst-2026',
+                'kubota-la526-loader-lift-capacity-height-comparison',
                 'kubota-l3302-vs-l3902-hst-tractor-spec-comparison',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
