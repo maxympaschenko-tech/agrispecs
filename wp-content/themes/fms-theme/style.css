@@ -183,3 +183,18 @@ Text Domain: fms
 .fms-diagnostic-steps strong{font-size:15px;line-height:1.35;color:#1d4939}
 .fms-diagnostic-steps span{font-size:14px;line-height:1.55;color:#42574b}
 @media(max-width:620px){.fms-diagnostic-steps{grid-template-columns:1fr;gap:9px}.fms-diagnostic-steps>div{padding:14px}}
+
+
+/* First-party article layout for official Kubota video embeds; no remote hotlinked posters. */
+.fms-official-video{margin:24px 0 30px;max-width:850px}
+.fms-video-frame{width:100%;aspect-ratio:16/9;background:#0d241d;border-radius:13px;overflow:hidden}
+.fms-video-frame iframe{border:0;display:block;width:100%;height:100%}
+.fms-official-video figcaption{font-size:13px;color:#58675d;line-height:1.6;margin-top:9px}
+.fms-brand-statline{display:flex;flex-wrap:wrap;gap:12px 22px;margin-top:22px}
+.fms-brand-statline span{background:#ffffff12;border:1px solid #ffffff28;border-radius:11px;padding:9px 13px;color:#fff}
+.fms-brand-statline strong{font-size:19px;font-variant-numeric:tabular-nums;margin-right:5px}
+.fms-brand-more{margin:26px 0 0}.fms-brand-followup{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:start}
+.fms-brand-followup h2{margin-top:0}.fms-brand-followup p{max-width:70ch}
+.fms-brand-actions{display:flex;flex-direction:column;gap:10px;border:1px solid #dae9dd;border-radius:12px;background:#f6faf6;padding:18px 21px}
+.fms-brand-actions a{font-weight:700;font-size:14px}
+@media(max-width:700px){.fms-brand-followup{grid-template-columns:1fr;gap:17px}.fms-brand-statline span{font-size:13px}}
