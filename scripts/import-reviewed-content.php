@@ -46,7 +46,7 @@ foreach ($data['records'] as $record) {
     $type = $record['type'] ?? '';
     $slug = sanitize_title($record['slug'] ?? '');
     $title = sanitize_text_field($record['title'] ?? '');
-    if (!in_array($type, ['fms_machine', 'post'], true) || !$slug || !$title) {
+    if (!in_array($type, ['fms_machine', 'fms_part', 'post'], true) || !$slug || !$title) {
         throw new RuntimeException('Invalid content record type, slug or title.');
     }
     if (!empty($record['source_url'])) {
@@ -102,6 +102,26 @@ foreach ($data['records'] as $record) {
                 }
                 wp_set_object_terms($id, (int) (is_array($term) ? $term['term_id'] : $term), $tax);
             }
+        }
+    } elseif ($type === 'fms_part') {
+        // Parts are references, not automatic compatibility guarantees.
+        foreach (['_fms_part_number' => 'part_number',
+                  '_fms_serial_scope' => 'serial_scope'] as $meta_key => $record_key) {
+            if (!empty($record[$record_key]) && is_scalar($record[$record_key])) {
+                update_post_meta($id, $meta_key, sanitize_text_field((string) $record[$record_key]));
+            }
+        }
+        update_post_meta($id, '_fms_primary_source', esc_url_raw($record['source_url']));
+        $brand_name = sanitize_text_field((string) ($record['brand'] ?? ''));
+        if ($brand_name !== '') {
+            $term = term_exists($brand_name, 'fms_brand');
+            if (!$term) {
+                $term = wp_insert_term($brand_name, 'fms_brand', ['slug' => sanitize_title($brand_name)]);
+            }
+            if (is_wp_error($term)) {
+                throw new RuntimeException('Part brand taxonomy error for ' . $slug . ': ' . $term->get_error_message());
+            }
+            wp_set_object_terms($id, (int) (is_array($term) ? $term['term_id'] : $term), 'fms_brand');
         }
     } else {
         $category_slugs = array_map('sanitize_title', $record['categories'] ?? ['guides']);
