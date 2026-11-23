@@ -25,21 +25,21 @@ $type  = isset($_GET['fms_filter_type']) && is_scalar($_GET['fms_filter_type'])
     <label><span>Manufacturer</span>
       <select name="fms_filter_brand">
         <option value="">All brands</option>
-        <?php if (!is_wp_error($brands)) foreach ($brands as $term): ?>
+        <?php if (!is_wp_error($brands) && is_array($brands)): foreach ($brands as $term): ?>
           <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($brand, $term->slug); ?>>
             <?php echo esc_html($term->name); ?>
           </option>
-        <?php endforeach; ?>
+        <?php endforeach; endif; ?>
       </select>
     </label>
     <label><span>Equipment type</span>
       <select name="fms_filter_type">
         <option value="">All types</option>
-        <?php if (!is_wp_error($types)) foreach ($types as $term): ?>
+        <?php if (!is_wp_error($types) && is_array($types)): foreach ($types as $term): ?>
           <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($type, $term->slug); ?>>
             <?php echo esc_html($term->name); ?>
           </option>
-        <?php endforeach; ?>
+        <?php endforeach; endif; ?>
       </select>
     </label>
     <button class="btn" type="submit">Apply filters</button>
