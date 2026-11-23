@@ -92,6 +92,7 @@ get_header();
 // proof that a guide applies to every model of the manufacturer.
 $brand_guide_map = [
     'kubota' => [
+        'kubota-bx80-maintenance-schedule-50-100-200-hours',
         'kubota-bx80-100-hour-service-battery-air-filter-fuel',
         'kubota-bx80-200-hour-oil-filter-hst-maintenance',
         'kubota-l2502-24-8-vs-23-3-hp-brochure-differences',
