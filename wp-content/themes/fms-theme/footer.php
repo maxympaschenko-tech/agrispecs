@@ -2,7 +2,7 @@
 </main>
 <footer class="site-footer"><div class="wrap">
 <div class="footer-top">
-<div><a class="brand" href="<?php echo esc_url(home_url('/')); ?>"><span class="brand-mark">⚙</span><span>Farm Machine Specs<small>Independent equipment reference</small></span></a><p class="tagline" style="color:#c0d6c9;max-width:360px">Specs, diagnostics and parts information for US farmers, equipment owners and mechanics. Verify critical values against your exact machine's official documentation.</p></div>
+<div><a class="brand" href="<?php echo esc_url(home_url('/')); ?>"><img class="footer-brand-icon" src="<?php echo esc_url(get_template_directory_uri().'/assets/fms-favicon.svg'); ?>" alt="" width="48" height="48" decoding="async"><span>Farm Machine Specs<small>Independent equipment reference</small></span></a><p class="tagline" style="color:#c0d6c9;max-width:360px">Specs, diagnostics and parts information for US farmers, equipment owners and mechanics. Verify critical values against your exact machine's official documentation.</p></div>
 <div><h3>Explore</h3><ul><li><a href="<?php echo esc_url(home_url('/machines/')); ?>">Equipment specs</a></li><li><a href="<?php echo esc_url(home_url('/category/troubleshooting/')); ?>">Troubleshooting</a></li><li><a href="<?php echo esc_url(home_url('/category/maintenance/')); ?>">Maintenance</a></li><li><a href="<?php echo esc_url(home_url('/compare/')); ?>">Compare tractors</a></li><li><a href="<?php echo esc_url(home_url('/unit-converter/')); ?>">Unit converter</a></li></ul></div>
 <div><h3>About & policies</h3><ul><?php
 foreach (['methodology'=>'Data methodology','editorial-policy'=>'Editorial policy','about'=>'About us','contact'=>'Contact','privacy-policy'=>'Privacy policy'] as $slug=>$label) {
