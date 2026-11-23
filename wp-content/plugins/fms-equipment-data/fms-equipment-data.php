@@ -220,6 +220,10 @@ function fms_serial_filter_checker_shortcode() {
       <span class="kicker">Free owner tool</span>
       <h2 id="fms-1025r-heading">John Deere 1025R filter kit serial-range lookup</h2>
       <p>Enter the numerical serial sequence used in Deere\'s filter-kit listings. The checker runs locally in your browser. It does not verify the full machine identifier, part revisions or the actual fitment of a kit.</p>
+      <div class="fms-serial-split" aria-label="Manufacturer-listed serial-number boundaries for John Deere 1025R">
+        <div><span class="fms-serial-interval">Through 153036</span><strong>LVA21036</strong><small>Listed for earlier 1025R serials</small></div>
+        <div><span class="fms-serial-interval">153037 and later</span><strong>TA25769</strong><small>Listed for later 1025R serials</small></div>
+      </div>
       <div class="fms-serial-controls">
         <label for="fms-1025r-serial">1025R numeric serial sequence</label>
         <input type="text" id="fms-1025r-serial" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="e.g. 153037">
