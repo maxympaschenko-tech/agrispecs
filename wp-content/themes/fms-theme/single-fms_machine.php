@@ -64,23 +64,32 @@ while (have_posts()) {
             'john-deere-3025e' => [
                 'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
                 'john-deere-300e-loader-lift-capacity-pivot-vs-500mm',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
             ],
             'john-deere-3032e' => [
                 'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
                 'john-deere-300e-loader-lift-capacity-pivot-vs-500mm',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
+            ],
+            'kubota-l2502-hst' => [
+                'kubota-l2502-24-8-vs-23-3-hp-brochure-differences',
+                'kubota-la526-loader-lift-capacity-height-comparison',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
             ],
             'kubota-l3302-dt-2026' => [
                 'kubota-l3302-l3902-dt-vs-hst-2026',
                 'kubota-la526-loader-lift-capacity-height-comparison',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-l3902-dt-2026' => [
                 'kubota-l3302-l3902-dt-vs-hst-2026',
                 'kubota-la526-loader-lift-capacity-height-comparison',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-bx2380' => [
@@ -117,12 +126,14 @@ while (have_posts()) {
             'kubota-l3302-hst' => [
                 'kubota-l3302-l3902-dt-vs-hst-2026',
                 'kubota-la526-loader-lift-capacity-height-comparison',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'kubota-l3302-vs-l3902-hst-tractor-spec-comparison',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-l3902-hst' => [
                 'kubota-l3302-l3902-dt-vs-hst-2026',
                 'kubota-la526-loader-lift-capacity-height-comparison',
+                'john-deere-300e-vs-kubota-la526-loader-capacity',
                 'kubota-l3302-vs-l3902-hst-tractor-spec-comparison',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
