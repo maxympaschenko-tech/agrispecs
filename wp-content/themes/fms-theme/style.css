@@ -145,3 +145,12 @@ Text Domain: fms
 .fms-lift-track i{display:block;height:100%;background:#285f49;border-radius:999px}
 .fms-lift-line:nth-child(2) .fms-lift-track i{background:#d79b45}
 @media(max-width:620px){.fms-lift-capacity-visual{padding:14px}.fms-lift-line{grid-template-columns:92px minmax(0,1fr) 65px;gap:8px;font-size:12px}.fms-lift-track{height:15px}}
+
+
+/* Prominent but neutral source-edition disclosure for differing OEM brochure years. */
+.fms-edition-note{margin:26px 0 30px;padding:20px 24px;border-left:4px solid #c68e43;border-top:1px solid #e9ddc9;border-right:1px solid #e9ddc9;border-bottom:1px solid #e9ddc9;background:#fbf8f1;border-radius:0 12px 12px 0}
+.fms-edition-note h2{font-size:clamp(19px,2.5vw,23px);line-height:1.25;margin:0 0 11px;color:#624c2b}
+.fms-edition-note p{font-size:14px;line-height:1.7;margin:8px 0;color:#444e43}
+.fms-edition-note p:last-child{margin-bottom:0}
+.fms-edition-note a{font-weight:750;text-decoration:underline}
+@media(max-width:640px){.fms-edition-note{padding:15px 16px}}
