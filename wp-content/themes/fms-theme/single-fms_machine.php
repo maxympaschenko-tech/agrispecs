@@ -71,6 +71,22 @@ while (have_posts()) {
             ],
             'kioti-ck2620' => ['kioti-ck2620-vs-ck2620h-gear-vs-hst-tractor'],
             'kioti-ck2620h' => ['kioti-ck2620-vs-ck2620h-gear-vs-hst-tractor'],
+            'kioti-ck3520' => [
+                'kioti-ck3520-vs-ck3520h-manual-vs-hst',
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+            ],
+            'kioti-ck3520h' => [
+                'kioti-ck3520-vs-ck3520h-manual-vs-hst',
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+            ],
+            'massey-ferguson-gc1723e' => [
+                'massey-ferguson-gc1723e-vs-gc1725m-specifications',
+                'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
+            ],
+            'massey-ferguson-gc1725m' => [
+                'massey-ferguson-gc1723e-vs-gc1725m-specifications',
+                'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
+            ],
             'kubota-l3302-hst' => [
                 'kubota-l3302-vs-l3902-hst-tractor-spec-comparison',
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
