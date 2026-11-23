@@ -61,7 +61,7 @@ foreach ($data['records'] as $index => $record) {
         if (!is_array($record['specs'])) { $issue('specifications must be an object'); }
         if (($record['specs']['fms_source_url'] ?? null) !== $src) { $issue('machine source URL mismatch'); }
         $date = $record['specs']['fms_source_checked'] ?? null;
-        if (!is_string($date) || !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/D', $date)) {
+        if (!is_string($date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date)) {
             $issue('missing or invalid source verification date');
         }
         foreach ($numericFields as $field) {
