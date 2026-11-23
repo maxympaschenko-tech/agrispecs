@@ -209,7 +209,7 @@ function fms_theme_filtered_archive_robots($robots) {
     if (!is_post_type_archive('fms_machine') && !is_post_type_archive('fms_part')) {
         return $robots;
     }
-    foreach (['fms_filter_brand','fms_filter_type'] as $key) {
+    foreach (['fms_filter_brand','fms_filter_type','fms_filter_hp_min','fms_filter_hp_max'] as $key) {
         if (isset($_GET[$key]) && is_scalar($_GET[$key]) && trim((string) $_GET[$key]) !== '') {
             $robots['noindex'] = true;
             $robots['follow'] = true;
