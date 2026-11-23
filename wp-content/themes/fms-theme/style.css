@@ -205,3 +205,5 @@ Text Domain: fms
 @media(max-width:1080px){.site-header .brand-logo{width:225px}.header-inner{gap:16px}.main-menu{gap:13px}}
 @media(max-width:760px){.site-header .brand-logo{width:clamp(190px,56vw,250px);max-height:62px}.header-inner{gap:11px;min-height:72px}}
 @media(max-width:420px){.site-header .brand-logo{width:min(56vw,205px)}.header-inner{gap:8px}}
+
+.site-footer .footer-brand-icon{width:46px;height:46px;object-fit:contain;flex:none;background:#fff;border-radius:9px;padding:3px}
