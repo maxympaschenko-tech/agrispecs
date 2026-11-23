@@ -39,6 +39,16 @@ for source_dir in "$STAGE/wp-content/themes/fms-theme" "$STAGE/wp-content/plugin
   fi
 done
 
+# Validate the complete reviewed content bundle before touching the live site.
+if [[ ! -f "$STAGE/scripts/validate-reviewed-content.php" ]]; then
+  echo "Missing reviewed content validator; aborting deployment." >&2
+  exit 1
+fi
+if ! php "$STAGE/scripts/validate-reviewed-content.php"; then
+  echo "Reviewed content validation failed; no code or content was deployed." >&2
+  exit 1
+fi
+
 for kind in themes/fms-theme plugins/fms-equipment-data; do
   src="$STAGE/wp-content/$kind"
   dst="$DOCROOT/wp-content/$kind"
