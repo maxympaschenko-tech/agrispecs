@@ -44,6 +44,16 @@ while (have_posts()) {
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
             ],
+            'john-deere-3025e' => [
+                'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+                'used-compact-tractor-inspection-checklist-before-buying',
+            ],
+            'john-deere-3032e' => [
+                'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+                'used-compact-tractor-inspection-checklist-before-buying',
+            ],
             'kubota-bx2380' => [
                 'kubota-bx2380-fluid-capacities-engine-oil-coolant-transmission',
                 'kubota-bx1880-vs-bx2380-vs-bx2680-comparison',
