@@ -126,6 +126,35 @@ function fms_compare_shortcode(){
         $html.='<tr><th scope="row">'.esc_html($info[0]).'</th><td>'.esc_html($va!==''?$va:'Not verified').'</td><td>'.esc_html($vb!==''?$vb:'Not verified').'</td></tr>';
     }
     $html.='</tbody></table></div>';
+    $power_rows = [];
+    $max_hp = 0.0;
+    foreach ([$a, $b] as $machine_id) {
+        $raw_engine = get_post_meta($machine_id, 'fms_engine_hp', true);
+        $raw_pto = get_post_meta($machine_id, 'fms_pto_hp', true);
+        $figures = [];
+        foreach (['Engine HP' => $raw_engine, 'PTO HP' => $raw_pto] as $label => $raw_value) {
+            if ($raw_value !== '' && is_numeric($raw_value) && (float) $raw_value > 0) {
+                $figures[$label] = (float) $raw_value;
+                $max_hp = max($max_hp, (float) $raw_value);
+            }
+        }
+        if ($figures) {
+            $power_rows[] = ['id' => $machine_id, 'figures' => $figures];
+        }
+    }
+    if ($max_hp > 0 && $power_rows) {
+        $html.='<section class="fms-power-compare" aria-label="Recorded horsepower comparison"><h3>Recorded power at a glance</h3>';
+        foreach ($power_rows as $item) {
+            $html.='<div class="fms-power-group"><h4>'.esc_html(get_the_title($item['id'])).'</h4>';
+            foreach ($item['figures'] as $label => $value) {
+                $width = round(100 * $value / $max_hp, 1);
+                $bar_class = $label === 'PTO HP' ? ' fms-power-pto' : '';
+                $html.='<div class="fms-power-row"><span>'.esc_html($label).'</span><div class="fms-power-track"><span class="fms-power-fill'.$bar_class.'" style="width:'.esc_attr($width).'%"></span></div><strong>'.esc_html(number_format_i18n($value, 1)).' HP</strong></div>';
+            }
+            $html.='</div>';
+        }
+        $html.='<p class="tagline">These are published values for particular tractor configurations. Engine power may be reported under different rating standards; the graphic is not an independent performance test.</p></section>';
+    }
     $html.='<div class="fms-compare-notes"><h3>Source and configuration notes</h3>';
     foreach ([$a, $b] as $machine_id) {
         $context = get_post_meta($machine_id, 'fms_configuration_notes', true);
