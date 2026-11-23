@@ -87,6 +87,54 @@ get_header();
  <?php if ($part_count > 8): ?><p class="fms-brand-more"><a class="btn" href="<?php echo esc_url($parts_url); ?>">See all <?php echo esc_html(number_format_i18n($part_count)); ?> parts</a></p><?php endif; ?>
  </div></section>
 <?php else: wp_reset_postdata(); endif; ?>
+<?php
+// Explicit editorial cross-links rather than treating a shared keyword as
+// proof that a guide applies to every model of the manufacturer.
+$brand_guide_map = [
+    'kubota' => [
+        'kubota-bx80-100-hour-service-battery-air-filter-fuel',
+        'kubota-bx80-200-hour-oil-filter-hst-maintenance',
+        'kubota-l2502-24-8-vs-23-3-hp-brochure-differences',
+    ],
+    'john-deere' => [
+        'john-deere-1025r-200-hour-service-filters-oil-checklist',
+        'john-deere-1025r-air-filter-serial-numbers-m131802-lvu34503',
+        'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
+    ],
+    'kioti' => [
+        'kioti-ck2620-vs-ck2620h-gear-vs-hst-tractor',
+        'kioti-ck3520-vs-ck3520h-manual-vs-hst',
+    ],
+    'massey-ferguson' => [
+        'massey-ferguson-gc1723e-vs-gc1725m-specifications',
+    ],
+];
+$selected_guide_slugs = $brand_guide_map[$brand_term->slug] ?? [];
+if ($selected_guide_slugs):
+    $guide_posts = new WP_Query([
+        'post_type' => 'post',
+        'post_status' => 'publish',
+        'post_name__in' => $selected_guide_slugs,
+        'orderby' => 'post_name__in',
+        'posts_per_page' => count($selected_guide_slugs),
+        'no_found_rows' => true,
+    ]);
+    if ($guide_posts->have_posts()):
+?>
+<section class="section section-tint"><div class="wrap">
+ <div class="section-head">
+  <div><h2><?php echo esc_html($brand_name); ?> ownership &amp; comparison guides</h2>
+   <p>Curated manufacturer-specific technical topics. Check the applicable model and source edition in each article.</p></div>
+ </div>
+ <div class="card-grid">
+ <?php while ($guide_posts->have_posts()): $guide_posts->the_post(); fms_card(get_the_ID()); endwhile; ?>
+ </div>
+</div></section>
+<?php
+    endif;
+    wp_reset_postdata();
+endif;
+?>
 <section class="section"><div class="wrap fms-brand-followup">
  <div>
   <h2>Find the correct <?php echo esc_html($brand_name); ?> configuration</h2>
