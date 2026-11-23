@@ -26,3 +26,40 @@
     input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();check();}});
   });
 })();
+
+
+(function(){
+  'use strict';
+  document.querySelectorAll('[data-fms-hour-planner]').forEach(function(panel){
+    var start=panel.querySelector('[data-fms-last]');
+    var interval=panel.querySelector('[data-fms-interval]');
+    var current=panel.querySelector('[data-fms-now]');
+    var button=panel.querySelector('[data-fms-calculate]');
+    var output=panel.querySelector('[data-fms-hour-result]');
+    if(!start||!interval||!current||!button||!output)return;
+    function fmt(value){return new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(value);}
+    function calculate(){
+      var a=Number(start.value),b=Number(interval.value),c=Number(current.value);
+      var fields=[start,interval,current];
+      if(fields.some(function(node){return node.value.trim()==='';})||
+         !Number.isFinite(a)||!Number.isFinite(b)||!Number.isFinite(c)||
+         a<0||c<0||b<=0||b>10000||a>999999||c>999999||c<a){
+         output.textContent='Enter valid hour-meter readings (the current reading must not be before the last service) and a positive manual-specified interval.';
+         output.dataset.state='invalid';
+         return;
+      }
+      var next=a+b;
+      var remaining=next-c;
+      var message='Numerical checkpoint: '+fmt(next)+' engine hours. ';
+      if(remaining>0){message+=fmt(remaining)+' operating hours remain before that checkpoint.';}
+      else if(remaining===0){message+='Your current reading matches the checkpoint.';}
+      else{message+='Your current reading is '+fmt(Math.abs(remaining))+' hours beyond that checkpoint.';}
+      output.textContent=message+' Calendar-time and severe-service requirements may come earlier; consult your exact manual.';
+      output.dataset.state='found';
+    }
+    button.addEventListener('click',calculate);
+    [start,interval,current].forEach(function(field){
+      field.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();calculate();}});
+    });
+  });
+})();
