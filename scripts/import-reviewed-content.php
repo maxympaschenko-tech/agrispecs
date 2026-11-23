@@ -141,4 +141,6 @@ foreach ($data['records'] as $record) {
     $created++;
 }
 update_option('fms_content_bundle_digest', $digest, false);
+// Track only the public editorial dataset revision; never expose credentials or WP paths.
+update_option('fms_public_catalog_version', sanitize_text_field((string) ($data['version'] ?? 'unversioned')), false);
 echo "FMS verified import complete: {$created} created; {$skipped} retained.\n";
