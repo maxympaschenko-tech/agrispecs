@@ -206,7 +206,7 @@ add_action('wp_head','fms_theme_structured_data', 9);
 
 /** Unimportant GET-filter combinations should not become duplicate search pages. */
 function fms_theme_filtered_archive_robots($robots) {
-    if (!is_post_type_archive('fms_machine')) {
+    if (!is_post_type_archive('fms_machine') && !is_post_type_archive('fms_part')) {
         return $robots;
     }
     foreach (['fms_filter_brand','fms_filter_type'] as $key) {
