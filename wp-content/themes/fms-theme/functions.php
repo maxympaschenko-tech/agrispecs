@@ -210,3 +210,50 @@ function fms_theme_filtered_archive_robots($robots) {
     return $robots;
 }
 add_filter('wp_robots','fms_theme_filtered_archive_robots');
+
+
+/** Source-backed part references: no fake product offers, ratings or availability. */
+function fms_theme_part_reference_schema() {
+    if (is_admin() || fms_theme_has_seo_plugin() || !is_singular('fms_part')) {
+        return;
+    }
+    $id = get_queried_object_id();
+    if (!$id || get_post_status($id) !== 'publish') {
+        return;
+    }
+    $sku = get_post_meta($id, '_fms_part_number', true);
+    $scope = get_post_meta($id, '_fms_serial_scope', true);
+    $source = get_post_meta($id, '_fms_primary_source', true);
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => get_the_title($id),
+        'description' => fms_theme_description(),
+        'url' => get_permalink($id),
+        'mainEntityOfPage' => get_permalink($id),
+    ];
+    if ($sku) { $schema['sku'] = (string) $sku; }
+    $brands = wp_get_post_terms($id, 'fms_brand');
+    if (!is_wp_error($brands) && !empty($brands)) {
+        $schema['brand'] = ['@type' => 'Brand', 'name' => $brands[0]->name];
+    }
+    if ($scope) {
+        $schema['additionalProperty'] = [
+            ['@type' => 'PropertyValue',
+             'name' => 'Manufacturer-listed general serial applicability (verify exact fit)',
+             'value' => (string) $scope],
+        ];
+    }
+    if ($source) {
+        $schema['subjectOf'] = ['@type' => 'CreativeWork', 'url' => esc_url_raw($source)];
+    }
+    if (has_post_thumbnail($id)) {
+        $image = get_the_post_thumbnail_url($id, 'full');
+        if ($image) { $schema['image'] = $image; }
+    }
+    $json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    if ($json) {
+        echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
+    }
+}
+add_action('wp_head','fms_theme_part_reference_schema',9);
