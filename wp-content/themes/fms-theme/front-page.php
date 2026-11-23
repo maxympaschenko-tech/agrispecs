@@ -17,9 +17,69 @@
 <section class="section"><div class="wrap"><div class="section-head"><div><h2>Explore equipment models</h2><p>Browse verified information, with source references and configuration notes.</p></div><a href="<?php echo esc_url(home_url('/machines/')); ?>">Browse all models →</a></div><div class="card-grid">
 <?php $machines=new WP_Query(['post_type'=>'fms_machine','posts_per_page'=>6,'post_status'=>'publish','no_found_rows'=>true]); if($machines->have_posts()){while($machines->have_posts()){$machines->the_post(); fms_card(get_the_ID());}wp_reset_postdata();}else{echo '<p class="content-intro">The new equipment catalog is being prepared. See our guides below or search for a topic.</p>';} ?>
 </div></div></section>
-<section class="section section-tint"><div class="wrap"><div class="section-head"><div><h2>Repair, maintain & choose smarter</h2><p>Editorial guides written around real questions, not generic model lists.</p></div><a href="<?php echo esc_url(home_url('/category/guides/')); ?>">All guides →</a></div><div class="card-grid">
-<?php $guides=new WP_Query(['post_type'=>'post','posts_per_page'=>6,'post_status'=>'publish','no_found_rows'=>true,'tax_query'=>[['taxonomy'=>'category','field'=>'slug','terms'=>['guides','maintenance','troubleshooting','buying-guides','comparisons']]]]);if($guides->have_posts()){while($guides->have_posts()){$guides->the_post();fms_card(get_the_ID());}wp_reset_postdata();}else{echo '<p class="content-intro">In-depth maintenance and troubleshooting guides will appear here as they are sourced and reviewed.</p>';} ?>
-</div></div></section>
+<section class="section section-tint"><div class="wrap">
+ <div class="section-head">
+  <div><h2>Diagnose a tractor problem</h2><p>Symptom-focused checks grounded in manufacturer operating and safety instructions.</p></div>
+  <a href="<?php echo esc_url(home_url('/category/troubleshooting/')); ?>">All troubleshooting →</a>
+ </div>
+ <div class="card-grid">
+ <?php
+ $diagnostics = new WP_Query([
+   'post_type' => 'post',
+   'post_status' => 'publish',
+   'posts_per_page' => 3,
+   'category_name' => 'troubleshooting',
+   'no_found_rows' => true,
+ ]);
+ if ($diagnostics->have_posts()) {
+   while ($diagnostics->have_posts()) {
+     $diagnostics->the_post();
+     fms_card(get_the_ID());
+   }
+   wp_reset_postdata();
+ } else {
+   echo '<p class="content-intro">Model-specific troubleshooting is being prepared with manufacturer documentation.</p>';
+ }
+ ?>
+ </div>
+</div></section>
+<section class="section"><div class="wrap">
+ <div class="section-head">
+  <div><h2>Maintenance, comparisons & owner guides</h2><p>Service references, factory specs and buying checks, without repeating troubleshooting cards.</p></div>
+  <a href="<?php echo esc_url(home_url('/category/guides/')); ?>">Browse guides →</a>
+ </div>
+ <div class="card-grid">
+ <?php
+ $diagnostic_category = get_category_by_slug('troubleshooting');
+ $guide_args = [
+   'post_type' => 'post',
+   'post_status' => 'publish',
+   'posts_per_page' => 3,
+   'no_found_rows' => true,
+   'category__in' => array_values(array_filter(array_map(
+     static function($slug) {
+       $term = get_category_by_slug($slug);
+       return $term ? (int) $term->term_id : 0;
+     },
+     ['maintenance','buying-guides','comparisons','guides','parts-compatibility']
+   ))),
+ ];
+ if ($diagnostic_category) {
+   $guide_args['category__not_in'] = [(int) $diagnostic_category->term_id];
+ }
+ $other_guides = new WP_Query($guide_args);
+ if ($other_guides->have_posts()) {
+   while ($other_guides->have_posts()) {
+     $other_guides->the_post();
+     fms_card(get_the_ID());
+   }
+   wp_reset_postdata();
+ } else {
+   echo '<p class="content-intro">Explore source-checked machine specifications and OEM parts while new guides are reviewed.</p>';
+ }
+ ?>
+ </div>
+</div></section>
 <section class="section"><div class="wrap">
 <div class="section-head"><div><h2>OEM parts & serial-number references</h2><p>Check manufacturer part numbers and serial applicability before ordering a replacement.</p></div><a href="<?php echo esc_url(home_url('/parts/')); ?>">Browse all parts →</a></div>
 <div class="card-grid">
