@@ -36,5 +36,38 @@ wp --path="$DOCROOT" --no-color eval '
     }
     echo "Custom FMS plugin active: " . (post_type_exists("fms_machine") ? "yes" : "no") . "\n";
 '
+echo "=== Reviewed bundle reconciliation (read-only) ==="
+export FMS_STAGE="$STAGE"
+wp --path="$DOCROOT" --no-color eval '
+    $bundle_path = getenv("FMS_STAGE") . "/data/reviewed-content.json";
+    $bundle = json_decode(file_get_contents($bundle_path), true);
+    if (!is_array($bundle) || !is_array($bundle["records"] ?? null)) {
+        fwrite(STDERR, "Invalid staged content bundle\n");
+        exit(1);
+    }
+    $present = 0; $not_published = 0; $missing = 0;
+    $by_type = [];
+    foreach ($bundle["records"] as $record) {
+        $type = $record["type"];
+        $slug = $record["slug"];
+        $expected = $record["status"] ?? "draft";
+        $by_type[$type] = ($by_type[$type] ?? 0) + 1;
+        $post = get_page_by_path($slug, OBJECT, $type);
+        if (!$post) {
+            $missing++;
+            echo "MISSING: {$type}/{$slug} (expected {$expected})\n";
+        } elseif ($post->post_status !== $expected) {
+            $not_published++;
+            echo "STATUS MISMATCH: {$type}/{$slug} — {$post->post_status}, expected {$expected}\n";
+        } else {
+            $present++;
+        }
+    }
+    echo "Bundle entries matching their expected status: {$present}\n";
+    echo "Missing entries: {$missing}\n";
+    echo "Status mismatches: {$not_published}\n";
+    echo "Note: WordPress published counts may include pre-existing content not present in this bundle.\n";
+'
+
 echo "If Git-stage is older than GitHub main: inspect Hostinger Git Auto-deployment."
 echo "If stage is current but WordPress is older: inspect Hostinger Cron logs and sync-wordpress.sh."
