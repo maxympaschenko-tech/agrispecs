@@ -160,6 +160,10 @@ while (have_posts()) {
             'john-deere-1025r' => [
                 'john-deere-lva21036-filter-pak-1025r',
                 'john-deere-ta25769-filter-pak-1025r',
+                'john-deere-m806418-engine-oil-filter-1025r',
+                'john-deere-lva16054-hydraulic-oil-filter-1025r',
+                'john-deere-m131802-primary-air-filter-1025r-early-serial',
+                'john-deere-lvu34503-primary-air-filter-1025r-late-serial',
             ],
             'john-deere-3025e' => [
                 'john-deere-bxx10240-third-function-valve-3e-my22',
