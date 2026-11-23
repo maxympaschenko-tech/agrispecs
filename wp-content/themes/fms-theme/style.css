@@ -33,3 +33,14 @@ Text Domain: fms
 .fms-compare-notes h4{font-size:16px;margin:0 0 5px}
 .fms-compare-notes p{font-size:14px;color:var(--muted);margin:5px 0}
 @media(max-width:720px){.fms-model-filters{flex-direction:column;align-items:stretch}.fms-model-filters label{width:100%;min-width:0}.fms-model-filters .btn{width:100%}}
+
+
+/* Reference-page navigation */
+.fms-breadcrumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:16px}
+.fms-breadcrumbs a{color:var(--pine);font-weight:650;text-decoration:none}
+.fms-breadcrumbs a:hover{text-decoration:underline}
+.fms-related-machines{margin-top:44px;border-top:1px solid var(--line);padding-top:22px}
+.fms-related-machines h2{margin:0 0 20px;font-size:25px}
+.fms-related-machines .data-card h3{font-size:17px;line-height:1.35}
+.fms-related-machines .data-card .read-more{font-size:13px}
+.fms-related-machines .data-card{padding:18px}
