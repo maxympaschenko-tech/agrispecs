@@ -315,3 +315,23 @@ function fms_register_public_status() {
     ]);
 }
 add_action('rest_api_init', 'fms_register_public_status');
+
+
+/** Filter the parts archive by manufacturer, without generating extra index pages. */
+function fms_data_part_brand_filter($query) {
+    if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive('fms_part')) {
+        return;
+    }
+    if (!isset($_GET['fms_filter_brand']) || !is_scalar($_GET['fms_filter_brand'])) {
+        return;
+    }
+    $brand = sanitize_title(wp_unslash($_GET['fms_filter_brand']));
+    if ($brand !== '') {
+        $query->set('tax_query', [[
+            'taxonomy' => 'fms_brand',
+            'field' => 'slug',
+            'terms' => [$brand],
+        ]]);
+    }
+}
+add_action('pre_get_posts', 'fms_data_part_brand_filter');
