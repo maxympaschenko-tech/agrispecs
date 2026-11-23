@@ -24,12 +24,19 @@ for source_dir in "$STAGE/wp-content/themes/fms-theme" "$STAGE/wp-content/plugin
     echo "Missing source directory: $source_dir" >&2
     exit 1
   fi
-  while IFS= read -r -d '' php_file; do
-    if ! php -l "$php_file" >/dev/null; then
-      echo "Invalid PHP syntax: $php_file. Nothing was deployed." >&2
-      exit 1
-    fi
-  done < <(find "$source_dir" -type f -name '*.php' -print0)
+  # Portable: no Bash process substitution or /dev/fd dependency.
+  # With -exec ... {} +, find propagates lint failures as a nonzero status.
+  if ! find "$source_dir" -type f -name '*.php' -exec sh -c '
+    for php_file do
+      if ! php -l "$php_file" >/dev/null; then
+        printf "PHP syntax error: %s\n" "$php_file" >&2
+        exit 1
+      fi
+    done
+  ' sh {} +; then
+    echo "PHP validation failed; nothing was deployed." >&2
+    exit 1
+  fi
 done
 
 for kind in themes/fms-theme plugins/fms-equipment-data; do
