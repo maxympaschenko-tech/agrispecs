@@ -46,11 +46,13 @@ while (have_posts()) {
             ],
             'john-deere-3025e' => [
                 'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
+                'john-deere-300e-loader-lift-capacity-pivot-vs-500mm',
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
             ],
             'john-deere-3032e' => [
                 'john-deere-3025e-vs-3032e-specs-2026-pto-hydraulics-hitch',
+                'john-deere-300e-loader-lift-capacity-pivot-vs-500mm',
                 'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
                 'used-compact-tractor-inspection-checklist-before-buying',
             ],
