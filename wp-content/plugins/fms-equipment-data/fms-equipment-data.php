@@ -202,7 +202,7 @@ function fms_converter_shortcode(){
 add_shortcode('fms_unit_converter','fms_converter_shortcode');
 function fms_data_search_types($query){
     if(is_admin()||!$query->is_main_query()||!$query->is_search())return;
-    if(isset($_GET['post_type'])&&is_scalar($_GET['post_type'])){ $requested=sanitize_key(wp_unslash($_GET['post_type'])); if(in_array($requested,['fms_machine','fms_part'],true)){ $query->set('post_type',$requested); return; } }
+    if(isset($_GET['post_type'])&&is_scalar($_GET['post_type'])){ $requested=sanitize_key(wp_unslash($_GET['post_type'])); if(in_array($requested,['fms_machine','fms_part','post'],true)){ $query->set('post_type',$requested); return; } }
     $query->set('post_type',['post','page','fms_machine','fms_part']);
 }
 add_action('pre_get_posts','fms_data_search_types');
