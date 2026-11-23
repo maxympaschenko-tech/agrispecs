@@ -111,3 +111,97 @@ function fms_theme_hide_user_sitemap($provider, $name) {
     return $provider;
 }
 add_filter('wp_sitemaps_add_provider', 'fms_theme_hide_user_sitemap', 10, 2);
+
+
+/**
+ * Schema.org fallbacks for factual machine records and practical editorials.
+ * No reviews, offers, author credentials or prices are invented.
+ */
+function fms_theme_structured_data() {
+    if (is_admin() || fms_theme_has_seo_plugin() || !is_singular(['fms_machine','post'])) {
+        return;
+    }
+    $id = get_queried_object_id();
+    if (!$id || get_post_status($id) !== 'publish') {
+        return;
+    }
+    $url = get_permalink($id);
+    $website = [
+        '@type' => 'Organization',
+        'name' => 'Farm Machine Specs',
+        'url' => home_url('/'),
+    ];
+    $common = [
+        '@context' => 'https://schema.org',
+        'name' => get_the_title($id),
+        'url' => $url,
+        'mainEntityOfPage' => $url,
+        'description' => fms_theme_description(),
+    ];
+    if (get_post_type($id) === 'fms_machine') {
+        $schema = array_merge($common, ['@type' => 'Product']);
+        $brands = wp_get_post_terms($id, 'fms_brand');
+        if (!is_wp_error($brands) && $brands) {
+            $schema['brand'] = ['@type' => 'Brand','name' => $brands[0]->name];
+        }
+        if (has_post_thumbnail($id)) {
+            $image = get_the_post_thumbnail_url($id, 'full');
+            if ($image) { $schema['image'] = $image; }
+        }
+        $spec_fields = [
+            'fms_engine_hp' => 'Rated engine horsepower (HP; verify rating standard)',
+            'fms_pto_hp' => 'PTO horsepower (HP)',
+            'fms_hitch_category' => 'Three-point hitch category',
+            'fms_hitch_lift_24_lb' => 'Hitch lift capacity at 24 inches (lb)',
+            'fms_hydraulic_flow_gpm' => 'Published hydraulic pump flow (US GPM)',
+            'fms_operating_weight_lb' => 'Manufacturer-listed tractor weight (lb; see configuration)',
+            'fms_fuel_capacity_gal' => 'Fuel capacity (US gallons)',
+        ];
+        $properties = [];
+        foreach ($spec_fields as $key => $label) {
+            $value = get_post_meta($id, $key, true);
+            if ($value !== '') {
+                $properties[] = ['@type' => 'PropertyValue', 'name' => $label, 'value' => (string) $value];
+            }
+        }
+        if ($properties) { $schema['additionalProperty'] = $properties; }
+        $source = get_post_meta($id, 'fms_source_url', true);
+        if ($source) { $schema['subjectOf'] = ['@type' => 'CreativeWork', 'url' => esc_url_raw($source)]; }
+    } else {
+        $schema = array_merge($common, [
+            '@type' => 'TechArticle',
+            'datePublished' => get_post_time('c', true, $id),
+            'dateModified' => get_post_modified_time('c', true, $id),
+            'author' => $website,
+            'publisher' => $website,
+            'isAccessibleForFree' => true,
+        ]);
+        $source = get_post_meta($id, '_fms_primary_source', true);
+        if ($source) { $schema['citation'] = esc_url_raw($source); }
+        if (has_post_thumbnail($id)) {
+            $image = get_the_post_thumbnail_url($id, 'full');
+            if ($image) { $schema['image'] = $image; }
+        }
+    }
+    $json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    if ($json) {
+        echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
+    }
+}
+add_action('wp_head','fms_theme_structured_data', 9);
+
+/** Unimportant GET-filter combinations should not become duplicate search pages. */
+function fms_theme_filtered_archive_robots($robots) {
+    if (!is_post_type_archive('fms_machine')) {
+        return $robots;
+    }
+    foreach (['fms_filter_brand','fms_filter_type'] as $key) {
+        if (isset($_GET[$key]) && is_scalar($_GET[$key]) && trim((string) $_GET[$key]) !== '') {
+            $robots['noindex'] = true;
+            $robots['follow'] = true;
+            break;
+        }
+    }
+    return $robots;
+}
+add_filter('wp_robots','fms_theme_filtered_archive_robots');
