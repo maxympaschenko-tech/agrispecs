@@ -285,3 +285,33 @@ function fms_service_hour_planner_shortcode() {
     </section>';
 }
 add_shortcode('fms_service_hour_planner','fms_service_hour_planner_shortcode');
+
+
+/**
+ * Public read-only catalogue import check. Contains no private WordPress state.
+ * Useful to distinguish a GitHub commit from a completed Hostinger import.
+ */
+function fms_public_catalog_status() {
+    $published_counts = [];
+    foreach (['fms_machine' => 'machines', 'post' => 'guides', 'fms_part' => 'parts'] as $type => $key) {
+        $counts = wp_count_posts($type);
+        $published_counts[$key] = isset($counts->publish) ? (int) $counts->publish : 0;
+    }
+    $version = (string) get_option('fms_public_catalog_version', '');
+    $response = new WP_REST_Response([
+        'site' => 'Farm Machine Specs',
+        'public_catalog_version' => $version !== '' ? $version : 'not-recorded',
+        'published' => $published_counts,
+        'note' => 'Only public record counts; individual source pages remain the source of truth.',
+    ], 200);
+    $response->header('Cache-Control', 'public, max-age=60');
+    return $response;
+}
+function fms_register_public_status() {
+    register_rest_route('fms/v1', '/catalog-status', [
+        'methods' => 'GET',
+        'callback' => 'fms_public_catalog_status',
+        'permission_callback' => '__return_true',
+    ]);
+}
+add_action('rest_api_init', 'fms_register_public_status');
