@@ -32,6 +32,22 @@ while (have_posts()) {
         <?php
         the_content();
         $fms_slug = get_post_field('post_name', $id);
+        // These existing articles cite Kubota's BX1880-AU / BX2380-AU /
+        // BX2680-AU operator manual. Disclose region differences explicitly
+        // rather than representing that edition as a US serial-specific manual.
+        if (in_array($fms_slug, [
+            'kubota-bx2380-wont-crank-starter-neutral-pto-battery',
+            'kubota-bx2380-engine-stalls-when-standing-or-pto-engaged',
+            'kubota-bx80-50-hour-maintenance-grease-safety-checks',
+            'kubota-bx80-100-hour-service-battery-air-filter-fuel',
+            'kubota-bx80-200-hour-oil-filter-hst-maintenance',
+        ], true)) {
+            echo '<aside class="fms-edition-note" aria-label="Source publication edition">'
+              . '<h2>Check your U.S. manual and serial number</h2>'
+              . '<p>The detailed BX80 operator manual discussed here is labeled BX1880-AU / BX2380-AU / BX2680-AU (Australian edition). Kubota offers BX80 maintenance information for U.S. owners, but equipment configurations and maintenance schedules can differ by region or production revision. Do not apply an AU-only service interval, fluid specification, electrical test or PTO instruction to a U.S. tractor without checking its correct manual.</p>'
+              . '<p><a href="https://www.kubotausa.com/equipment-series/bx-series" target="_blank" rel="noopener noreferrer">View Kubota USA BX80 owner information →</a></p>'
+              . '</aside>';
+        }
         if ($fms_slug === 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769'
             && shortcode_exists('fms_1025r_filter_kit_checker')) {
             echo do_shortcode('[fms_1025r_filter_kit_checker]');
