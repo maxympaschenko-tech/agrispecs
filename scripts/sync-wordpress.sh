@@ -13,6 +13,25 @@ if [[ ! -f "$DOCROOT/wp-config.php" || ! -d "$DOCROOT/wp-includes" || ! -d "$DOC
   echo "No WordPress installation detected in $DOCROOT" >&2
   exit 1
 fi
+# Fail safely before writing anything if a staged PHP file has a syntax error.
+# The original Brands template contained an unescaped apostrophe and caused HTTP 500.
+if ! command -v php >/dev/null 2>&1; then
+  echo "PHP CLI unavailable; refusing to sync without syntax validation" >&2
+  exit 1
+fi
+for source_dir in "$STAGE/wp-content/themes/fms-theme" "$STAGE/wp-content/plugins/fms-equipment-data"; do
+  if [[ ! -d "$source_dir" ]]; then
+    echo "Missing source directory: $source_dir" >&2
+    exit 1
+  fi
+  while IFS= read -r -d '' php_file; do
+    if ! php -l "$php_file" >/dev/null; then
+      echo "Invalid PHP syntax: $php_file. Nothing was deployed." >&2
+      exit 1
+    fi
+  done < <(find "$source_dir" -type f -name '*.php' -print0)
+done
+
 for kind in themes/fms-theme plugins/fms-equipment-data; do
   src="$STAGE/wp-content/$kind"
   dst="$DOCROOT/wp-content/$kind"
