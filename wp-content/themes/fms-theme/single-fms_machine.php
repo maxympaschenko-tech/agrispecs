@@ -34,6 +34,15 @@ while (have_posts()) {
                 'john-deere-1025r-air-filter-serial-numbers-m131802-lvu34503',
                 'john-deere-1025r-fluid-capacities-engine-transmission-hydraulic',
                 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769',
+                'john-deere-1m-25-vs-1025r-tractor-comparison',
+            ],
+            'john-deere-1m-25' => [
+                'john-deere-1m-25-vs-1025r-tractor-comparison',
+                'used-compact-tractor-inspection-checklist-before-buying',
+            ],
+            'john-deere-5050e' => [
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+                'used-compact-tractor-inspection-checklist-before-buying',
             ],
             'kubota-bx2380' => [
                 'kubota-bx2380-fluid-capacities-engine-oil-coolant-transmission',
