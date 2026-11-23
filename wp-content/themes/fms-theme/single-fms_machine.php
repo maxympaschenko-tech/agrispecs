@@ -1,5 +1,5 @@
 <?php get_header(); while(have_posts()){the_post(); $id=get_the_ID(); ?>
-<div class="page-heading"><div class="wrap"><span class="kicker">Equipment data & specifications</span><h1><?php the_title(); ?> — Specs, Capacity & Service References</h1><p>For comparison and identification. Specifications can differ by production year and configuration.</p></div></div>
+<div class="page-heading"><div class="wrap"><span class="kicker">Equipment data & specifications</span><h1><?php the_title(); ?></h1><p>For comparison and identification. Specifications can differ by production year and configuration.</p></div></div>
 <div class="wrap content-layout"><article class="entry-content">
 <?php if(has_post_thumbnail()){the_post_thumbnail('large',['loading'=>'eager']);} ?>
 <?php the_content(); ?>
