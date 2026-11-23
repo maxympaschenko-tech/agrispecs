@@ -1,11 +1,82 @@
-<?php get_header(); while(have_posts()){the_post(); ?><div class="page-heading"><div class="wrap"><span class="kicker"><?php echo esc_html(get_post_type()==='post'?'Farm equipment guide':'Reference'); ?></span><h1><?php the_title(); ?></h1><?php if(has_excerpt()){echo '<p>'.esc_html(get_the_excerpt()).'</p>';} ?></div></div><div class="wrap content-layout"><article class="entry-content"><?php if(has_post_thumbnail()){the_post_thumbnail('large',['loading'=>'eager']);} the_content();
-$fms_slug = get_post_field('post_name', get_the_ID());
-if ($fms_slug === 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769'
-    && shortcode_exists('fms_1025r_filter_kit_checker')) {
-    echo do_shortcode('[fms_1025r_filter_kit_checker]');
-}
-if ($fms_slug === 'john-deere-1025r-200-hour-service-filters-oil-checklist'
-    && shortcode_exists('fms_service_hour_planner')) {
-    echo do_shortcode('[fms_service_hour_planner]');
-}
-?><div class="notice">Consult the correct model-specific manual and follow manufacturer safety instructions before performing repairs or maintenance.</div></article><aside class="sidebar"><div class="sidebar-box"><h3>Useful resources</h3><a href="<?php echo esc_url(home_url('/machines/')); ?>">Machine specifications →</a><a href="<?php echo esc_url(home_url('/compare/')); ?>">Compare models →</a><a href="<?php echo esc_url(home_url('/methodology/')); ?>">Source methodology →</a></div></aside></div><?php }get_footer(); ?>
+<?php
+if (!defined('ABSPATH')) { exit; }
+get_header();
+while (have_posts()) {
+    the_post();
+    $id = get_the_ID();
+    $cats = get_the_category($id);
+    $preferred = ['troubleshooting','maintenance','comparisons','parts-compatibility','buying-guides','guides'];
+    $primary = null;
+    foreach ($preferred as $slug) {
+        foreach ($cats as $cat) {
+            if ($cat->slug === $slug) { $primary = $cat; break 2; }
+        }
+    }
+?>
+<section class="page-heading"><div class="wrap">
+    <nav class="fms-breadcrumbs" aria-label="Breadcrumbs">
+       <a href="<?php echo esc_url(home_url('/')); ?>">Home</a><span aria-hidden="true">/</span>
+       <?php if ($primary) : ?>
+          <a href="<?php echo esc_url(get_category_link($primary->term_id)); ?>"><?php echo esc_html($primary->name); ?></a>
+       <?php else : ?>
+          <a href="<?php echo esc_url(home_url('/category/guides/')); ?>">Guides</a>
+       <?php endif; ?>
+    </nav>
+    <span class="kicker"><?php echo esc_html($primary ? $primary->name : 'Farm equipment guide'); ?></span>
+    <h1><?php the_title(); ?></h1>
+    <?php if (has_excerpt()) { echo '<p>' . esc_html(get_the_excerpt()) . '</p>'; } ?>
+</div></section>
+<div class="wrap content-layout">
+    <article class="entry-content">
+        <?php if (has_post_thumbnail()) { the_post_thumbnail('large', ['loading' => 'eager']); } ?>
+        <?php
+        the_content();
+        $fms_slug = get_post_field('post_name', $id);
+        if ($fms_slug === 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769'
+            && shortcode_exists('fms_1025r_filter_kit_checker')) {
+            echo do_shortcode('[fms_1025r_filter_kit_checker]');
+        }
+        if ($fms_slug === 'john-deere-1025r-200-hour-service-filters-oil-checklist'
+            && shortcode_exists('fms_service_hour_planner')) {
+            echo do_shortcode('[fms_service_hour_planner]');
+        }
+        ?>
+        <div class="notice"><strong>Safety & source note:</strong> Confirm the exact model, equipment configuration and current manufacturer manual before repairing, servicing or installing attachments.</div>
+        <?php
+        if ($primary) {
+            $related = new WP_Query([
+                'post_type' => 'post',
+                'post_status' => 'publish',
+                'category__in' => [(int) $primary->term_id],
+                'post__not_in' => [$id],
+                'posts_per_page' => 3,
+                'no_found_rows' => true,
+            ]);
+            if ($related->have_posts()) {
+                echo '<section class="fms-related-guides"><h2>Related guides & references</h2><div class="card-grid">';
+                while ($related->have_posts()) {
+                    $related->the_post();
+                    fms_card(get_the_ID());
+                }
+                echo '</div></section>';
+                wp_reset_postdata();
+            }
+        }
+        ?>
+    </article>
+    <aside class="sidebar">
+      <div class="sidebar-box"><h3>Explore equipment</h3>
+         <a href="<?php echo esc_url(home_url('/machines/')); ?>">Machine specifications →</a>
+         <a href="<?php echo esc_url(home_url('/compare/')); ?>">Compare models →</a>
+         <a href="<?php echo esc_url(home_url('/parts/')); ?>">OEM parts references →</a>
+         <a href="<?php echo esc_url(home_url('/methodology/')); ?>">Source methodology →</a>
+      </div>
+      <?php if ($primary): ?>
+      <div class="sidebar-box"><h3>More in this topic</h3>
+        <a href="<?php echo esc_url(get_category_link($primary->term_id)); ?>"><?php echo esc_html($primary->name); ?> articles →</a>
+      </div>
+      <?php endif; ?>
+    </aside>
+</div>
+<?php }
+get_footer();
