@@ -234,3 +234,25 @@ function fms_serial_filter_checker_shortcode() {
     </section>';
 }
 add_shortcode('fms_1025r_filter_kit_checker','fms_serial_filter_checker_shortcode');
+
+
+/**
+ * Generic arithmetic helper; explicitly not a manufacturer service schedule.
+ * Does not store user readings or communicate with the server.
+ */
+function fms_service_hour_planner_shortcode() {
+    return '<section class="fms-hour-planner" data-fms-hour-planner>
+        <span class="kicker">Owner maintenance tool</span>
+        <h2>Calculate your next hour-meter checkpoint</h2>
+        <p>Enter your last recorded service hour and the interval in hours stated in the <em>correct official manual</em>. This calculator performs simple hour arithmetic only; annual, first-service and severe-duty limits may require attention sooner.</p>
+        <div class="fms-hour-grid">
+          <label>Hours at last service<input type="number" min="0" max="999999" step="0.1" inputmode="decimal" placeholder="e.g. 200" data-fms-last required></label>
+          <label>Service interval (hours)<input type="number" min="1" max="10000" step="1" inputmode="numeric" value="200" data-fms-interval required></label>
+          <label>Current hour meter<input type="number" min="0" max="999999" step="0.1" inputmode="decimal" placeholder="e.g. 265" data-fms-now required></label>
+        </div>
+        <button type="button" class="btn" data-fms-calculate>Calculate checkpoint</button>
+        <p class="fms-hour-result" data-fms-hour-result role="status" aria-live="polite">Enter your readings to calculate a numerical checkpoint.</p>
+        <p class="tagline">This tool does not decide whether a specific oil, filter or service is due. Confirm model-specific hours, annual limits, first-service exceptions and safety instructions against the current operator manual.</p>
+    </section>';
+}
+add_shortcode('fms_service_hour_planner','fms_service_hour_planner_shortcode');
