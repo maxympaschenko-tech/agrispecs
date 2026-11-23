@@ -207,3 +207,26 @@ function fms_data_archive_filters($query) {
 }
 add_action('pre_get_posts','fms_data_archive_filters');
 
+
+
+/**
+ * A client-side aid only: Deere 1025R Filter Pak reference by numeric serial.
+ * It does not check machine configuration, kit supersession or dealer inventory.
+ */
+function fms_serial_filter_checker_shortcode() {
+    $lva = 'https://shop.deere.com/us/product/LVA21036%3A-Filter-Pak/p/LVA21036';
+    $ta = 'https://shop.deere.com/us/product/TA25769%3A-Filter-Pak/p/TA25769';
+    return '<section class="fms-serial-checker" data-fms-1025r-checker aria-labelledby="fms-1025r-heading">
+      <span class="kicker">Free owner tool</span>
+      <h2 id="fms-1025r-heading">John Deere 1025R filter kit serial-range lookup</h2>
+      <p>Enter the numerical serial sequence used in Deere\'s filter-kit listings. The checker runs locally in your browser. It does not verify the full machine identifier, part revisions or the actual fitment of a kit.</p>
+      <div class="fms-serial-controls">
+        <label for="fms-1025r-serial">1025R numeric serial sequence</label>
+        <input type="text" id="fms-1025r-serial" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="e.g. 153037">
+        <button type="button" class="btn" data-fms-check>Check range</button>
+      </div>
+      <p class="fms-serial-result" data-fms-result role="status" aria-live="polite">Result appears here when you enter a number.</p>
+      <p class="tagline">Manufacturer sources: <a href="'.esc_url($lva).'" target="_blank" rel="noopener noreferrer">LVA21036</a> and <a href="'.esc_url($ta).'" target="_blank" rel="noopener noreferrer">TA25769</a>. John Deere calls these kits <em>generally compatible</em>. Always confirm complete serial-number fitment and supersessions in the official parts catalog.</p>
+    </section>';
+}
+add_shortcode('fms_1025r_filter_kit_checker','fms_serial_filter_checker_shortcode');
