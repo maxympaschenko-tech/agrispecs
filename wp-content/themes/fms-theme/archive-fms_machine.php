@@ -7,6 +7,14 @@ $brand = isset($_GET['fms_filter_brand']) && is_scalar($_GET['fms_filter_brand']
     ? sanitize_title(wp_unslash($_GET['fms_filter_brand'])) : '';
 $type  = isset($_GET['fms_filter_type']) && is_scalar($_GET['fms_filter_type'])
     ? sanitize_title(wp_unslash($_GET['fms_filter_type'])) : '';
+$hp_min = function_exists('fms_data_engine_hp_bound') ? fms_data_engine_hp_bound('fms_filter_hp_min') : '';
+$hp_max = function_exists('fms_data_engine_hp_bound') ? fms_data_engine_hp_bound('fms_filter_hp_max') : '';
+$active = array_filter([
+    'fms_filter_brand' => $brand,
+    'fms_filter_type' => $type,
+    'fms_filter_hp_min' => $hp_min,
+    'fms_filter_hp_max' => $hp_max,
+], static fn($value) => $value !== '');
 ?>
 <section class="page-heading"><div class="wrap">
   <span class="kicker">Independent machinery reference</span>
@@ -42,16 +50,28 @@ $type  = isset($_GET['fms_filter_type']) && is_scalar($_GET['fms_filter_type'])
         <?php endforeach; endif; ?>
       </select>
     </label>
+    <label class="fms-hp-bound"><span>Min engine HP</span>
+      <input type="number" inputmode="decimal" min="0" max="2000" step="0.1"
+        name="fms_filter_hp_min" placeholder="e.g. 20" value="<?php echo esc_attr($hp_min); ?>">
+    </label>
+    <label class="fms-hp-bound"><span>Max engine HP</span>
+      <input type="number" inputmode="decimal" min="0" max="2000" step="0.1"
+        name="fms_filter_hp_max" placeholder="e.g. 40" value="<?php echo esc_attr($hp_max); ?>">
+    </label>
     <button class="btn" type="submit">Apply filters</button>
-    <?php if ($brand !== '' || $type !== ''): ?>
+    <?php if ($active): ?>
       <a href="<?php echo esc_url(get_post_type_archive_link('fms_machine')); ?>">Clear filters</a>
     <?php endif; ?>
   </form>
+  <p class="fms-filters-note">The horsepower range applies to engine ratings, not PTO output. Blank manufacturer values do not match an active HP range.</p>
  </div>
 </section>
 <section class="wrap archive-grid">
   <div class="section-head">
-    <div><h2>Published machine records</h2><p>Specifications are marked as not verified when the original source does not provide a comparable value.</p></div>
+    <div>
+      <h2><?php echo esc_html(number_format_i18n((int) $GLOBALS['wp_query']->found_posts)); ?> matching machine records</h2>
+      <p>Engine HP range uses only documented gross/rated engine figures. Check source notes for differences in rating standards and model years.</p>
+    </div>
     <a href="<?php echo esc_url(home_url('/compare/')); ?>">Compare two machines →</a>
   </div>
   <div class="card-grid">
@@ -62,7 +82,7 @@ $type  = isset($_GET['fms_filter_type']) && is_scalar($_GET['fms_filter_type'])
   </div>
   <div class="pagination">
     <?php the_posts_pagination(['mid_size' => 2,
-      'add_args' => array_filter(['fms_filter_brand' => $brand, 'fms_filter_type' => $type])]); ?>
+      'add_args' => $active]); ?>
   </div>
 </section>
 <?php get_footer(); ?>
