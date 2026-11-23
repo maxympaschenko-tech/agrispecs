@@ -1,11 +1,11 @@
 <?php if(!defined('ABSPATH')){exit;} ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
-<head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width, initial-scale=1"><?php wp_head(); ?></head>
+<head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width, initial-scale=1"><?php wp_head(); ?><link rel="icon" href="<?php echo esc_url(get_template_directory_uri().'/assets/fms-favicon.svg'); ?>" type="image/svg+xml" sizes="any"></head>
 <body <?php body_class(); ?>><?php wp_body_open(); ?>
 <a class="skip" href="#main-content">Skip to content</a>
 <header class="site-header"><div class="wrap header-inner">
-<a class="brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Farm Machine Specs home"><span class="brand-mark" aria-hidden="true">⚙</span><span>Farm Machine Specs<small>Repair · Compare · Maintain</small></span></a>
+<a class="brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Farm Machine Specs home"><img class="brand-logo" src="<?php echo esc_url(get_template_directory_uri().'/assets/fms-logo.svg'); ?>" alt="Farm Machine Specs" width="345" height="75" decoding="async"></a>
 <button class="nav-toggle" type="button" aria-controls="fms-menu" aria-expanded="false">☰ Menu</button>
 <nav class="main-nav" id="fms-menu" aria-label="Main navigation">
 <?php
