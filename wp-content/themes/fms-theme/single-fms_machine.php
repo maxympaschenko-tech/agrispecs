@@ -94,6 +94,7 @@ while (have_posts()) {
                 'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
             ],
             'kubota-bx2380' => [
+                'kubota-bx80-maintenance-schedule-50-100-200-hours',
                 'kubota-bx80-100-hour-service-battery-air-filter-fuel',
                 'kubota-bx80-200-hour-oil-filter-hst-maintenance',
                 'kubota-bx2380-wont-crank-starter-neutral-pto-battery',
@@ -104,6 +105,7 @@ while (have_posts()) {
                 'kubota-bx90-vs-bx80-2027-models-specifications',
             ],
             'kubota-bx1880' => [
+                'kubota-bx80-maintenance-schedule-50-100-200-hours',
                 'kubota-bx80-100-hour-service-battery-air-filter-fuel',
                 'kubota-bx80-200-hour-oil-filter-hst-maintenance',
                 'kubota-bx2380-wont-crank-starter-neutral-pto-battery',
@@ -113,6 +115,7 @@ while (have_posts()) {
                 'kubota-bx90-vs-bx80-2027-models-specifications',
             ],
             'kubota-bx2680' => [
+                'kubota-bx80-maintenance-schedule-50-100-200-hours',
                 'kubota-bx80-100-hour-service-battery-air-filter-fuel',
                 'kubota-bx80-200-hour-oil-filter-hst-maintenance',
                 'kubota-bx2380-wont-crank-starter-neutral-pto-battery',
