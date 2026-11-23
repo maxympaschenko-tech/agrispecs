@@ -198,3 +198,10 @@ Text Domain: fms
 .fms-brand-actions{display:flex;flex-direction:column;gap:10px;border:1px solid #dae9dd;border-radius:12px;background:#f6faf6;padding:18px 21px}
 .fms-brand-actions a{font-weight:700;font-size:14px}
 @media(max-width:700px){.fms-brand-followup{grid-template-columns:1fr;gap:17px}.fms-brand-statline span{font-size:13px}}
+
+/* First-party tractor/specs brand; crisp SVG with mobile-safe dimensions. */
+.site-header .brand{display:flex;align-items:center;flex:0 0 auto;min-width:0;line-height:1}
+.site-header .brand-logo{display:block;width:clamp(198px,22vw,275px);height:auto;max-height:67px;object-fit:contain}
+@media(max-width:1080px){.site-header .brand-logo{width:225px}.header-inner{gap:16px}.main-menu{gap:13px}}
+@media(max-width:760px){.site-header .brand-logo{width:clamp(190px,56vw,250px);max-height:62px}.header-inner{gap:11px;min-height:72px}}
+@media(max-width:420px){.site-header .brand-logo{width:min(56vw,205px)}.header-inner{gap:8px}}
