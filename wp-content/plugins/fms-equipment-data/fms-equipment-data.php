@@ -42,7 +42,7 @@ function fms_data_fields(){
         'fms_pto_rpm'=>['PTO speed (RPM)','PTO & hitch'],
         'fms_hitch_category'=>['Three-point hitch category','PTO & hitch'],
         'fms_hitch_lift_24_lb'=>['3-point hitch lift capacity at 24 in behind lift points (lb)','PTO & hitch'],
-        'fms_hydraulic_flow_gpm'=>['Hydraulic flow (US GPM)','Hydraulics'],
+        'fms_hydraulic_flow_gpm'=>['Published hydraulic pump flow (US GPM; see notes)','Hydraulics'],
         'fms_loader_lift_lb'=>['Loader lift capacity (lb; specify test point in notes)','Hydraulics'],
         'fms_operating_weight_lb'=>['Published base/ROPS weight (lb; verify configuration)','Dimensions & weight'],
         'fms_fuel_capacity_gal'=>['Fuel capacity (US gal)','Capacities'],
@@ -125,7 +125,23 @@ function fms_compare_shortcode(){
         if($va===''&&$vb==='')continue;
         $html.='<tr><th scope="row">'.esc_html($info[0]).'</th><td>'.esc_html($va!==''?$va:'Not verified').'</td><td>'.esc_html($vb!==''?$vb:'Not verified').'</td></tr>';
     }
-    $html.='</tbody></table></div><p class="tagline">Numbers are not necessarily directly comparable across different loader test points, model years, transmission options and markets. Check the original sources on each machine page.</p></div>';
+    $html.='</tbody></table></div>';
+    $html.='<div class="fms-compare-notes"><h3>Source and configuration notes</h3>';
+    foreach ([$a, $b] as $machine_id) {
+        $context = get_post_meta($machine_id, 'fms_configuration_notes', true);
+        $source_url = get_post_meta($machine_id, 'fms_source_url', true);
+        $html.='<section><h4>'.esc_html(get_the_title($machine_id)).'</h4>';
+        if ($context !== '') {
+            $html.='<p>'.esc_html($context).'</p>';
+        } else {
+            $html.='<p>Configuration details not recorded. Verify the exact serial and equipment package.</p>';
+        }
+        if ($source_url !== '') {
+            $html.='<p><a href="'.esc_url($source_url).'" rel="noopener noreferrer" target="_blank">View manufacturer reference →</a></p>';
+        }
+        $html.='</section>';
+    }
+    $html.='</div><p class="tagline">Horsepower ratings, hydraulic pump totals, hitch capacities and bare tractor weights are not necessarily measured the same way. Compare the manufacturer notes before selecting equipment.</p></div>';
     return $html;
 }
 add_shortcode('fms_compare','fms_compare_shortcode');
@@ -161,3 +177,33 @@ function fms_data_search_types($query){
     $query->set('post_type',['post','page','fms_machine','fms_part']);
 }
 add_action('pre_get_posts','fms_data_search_types');
+
+/**
+ * Archive filtering: simple public GET filters rather than many empty SEO-indexed
+ * URLs. Canonical always points at the main /machines/ archive, not combinations.
+ */
+function fms_data_archive_filters($query) {
+    if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive('fms_machine')) {
+        return;
+    }
+    $filters = [
+        'fms_filter_brand' => 'fms_brand',
+        'fms_filter_type' => 'fms_equipment_type',
+    ];
+    $tax_query = [];
+    foreach ($filters as $get_key => $taxonomy) {
+        if (!isset($_GET[$get_key]) || !is_scalar($_GET[$get_key])) {
+            continue;
+        }
+        $slug = sanitize_title(wp_unslash($_GET[$get_key]));
+        if ($slug === '') {
+            continue;
+        }
+        $tax_query[] = ['taxonomy' => $taxonomy, 'field' => 'slug', 'terms' => [$slug]];
+    }
+    if ($tax_query) {
+        $query->set('tax_query', $tax_query);
+    }
+}
+add_action('pre_get_posts','fms_data_archive_filters');
+
