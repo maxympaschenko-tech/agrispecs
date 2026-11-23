@@ -166,3 +166,12 @@ Text Domain: fms
 .fms-parts-results{padding-bottom:70px}
 .fms-parts-results .section-head h2{font-size:clamp(22px,2.7vw,29px)}
 @media(max-width:720px){.fms-parts-intro{grid-template-columns:1fr;gap:17px;padding-top:22px;padding-bottom:22px}.fms-parts-shortcuts{padding:15px}}
+
+
+/* Verified engine-horsepower filtering; spacious enough for four controls. */
+.fms-model-filters{display:flex;flex-wrap:wrap;align-items:end;gap:12px}
+.fms-model-filters label{display:flex;flex-direction:column;gap:6px;min-width:155px;flex:1}
+.fms-model-filters .fms-hp-bound{flex:0 1 142px;min-width:112px}
+.fms-model-filters input[type=number]{display:block;width:100%;min-height:45px;padding:9px 12px;background:#fff;border:1px solid #c5d4c7;border-radius:9px;color:var(--ink);font-size:15px}
+.fms-filters-note{font-size:13px;color:#52665a;margin:12px 0 0;max-width:84ch}
+@media(max-width:600px){.fms-model-filters label{flex:1 1 100%}.fms-model-filters .fms-hp-bound{flex:1 1 calc(50% - 8px)}.fms-model-filters>.btn{flex:1 1 100%}}
