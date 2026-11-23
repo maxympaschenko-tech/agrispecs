@@ -110,3 +110,16 @@ Text Domain: fms
 .fms-power-fill{display:block;height:100%;border-radius:50px;background:#245847}
 .fms-power-fill.fms-power-pto{background:#df9a3e}
 @media(max-width:640px){.fms-power-compare{padding:14px}.fms-power-row{grid-template-columns:75px minmax(0,1fr) 65px;gap:7px;font-size:12px}}
+
+
+/* Topic hubs: give maintenance and diagnosis archives unique, useful guidance. */
+.fms-topic-layout{padding:38px 0 68px}
+.fms-topic-intro{padding:24px 28px;margin-bottom:37px;background:#f4f8f3;border:1px solid #dce8d9;border-radius:16px}
+.fms-topic-intro h2{margin:0 0 12px;font-size:clamp(21px,2.8vw,28px);letter-spacing:-.025em}
+.fms-topic-intro ul{margin:0 0 17px;padding-left:22px;max-width:900px}
+.fms-topic-intro li{margin:8px 0}
+.fms-topic-tools{display:flex;flex-wrap:wrap;gap:10px 20px;padding-top:9px;border-top:1px solid #dce8d9}
+.fms-topic-tools a{font-size:14px;font-weight:750}
+.fms-topic-list .section-head{margin-bottom:17px}
+.fms-topic-list .section-head h2{font-size:clamp(22px,3vw,29px)}
+@media(max-width:660px){.fms-topic-layout{padding:24px 0 50px}.fms-topic-intro{padding:16px;margin-bottom:25px}}
