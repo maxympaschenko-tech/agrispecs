@@ -44,3 +44,11 @@ Text Domain: fms
 .fms-related-machines .data-card h3{font-size:17px;line-height:1.35}
 .fms-related-machines .data-card .read-more{font-size:13px}
 .fms-related-machines .data-card{padding:18px}
+
+
+/* Manufacturer-referenced parts are not commerce offers: show fitment before long descriptions. */
+.fms-part-facts{display:grid;grid-template-columns:minmax(160px,1fr) minmax(240px,2fr);gap:12px;padding:18px;margin:0 0 26px;border:1px solid #d9e4dc;background:#f4f8f4;border-radius:14px}
+.fms-part-facts>div{display:flex;flex-direction:column;gap:7px;line-height:1.5}
+.fms-part-facts strong{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#42675b}
+.fms-part-facts span{font-size:15px;font-weight:650;color:#163c31}
+@media(max-width:620px){.fms-part-facts{grid-template-columns:1fr;gap:16px;padding:14px}}
