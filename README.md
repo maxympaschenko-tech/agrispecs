@@ -1,87 +1,38 @@
-# Farm Machine Specs
+# Farm Machine Specs — WordPress Rebuild
 
-Farm Machine Specs is an English-language farm equipment specifications, maintenance and parts reference built for US search traffic.
+Production domain: https://farmmachinespecs.com/
+Audience: English-speaking US tractor owners, farmers, acreage owners, used-equipment buyers and DIY mechanics.
 
-Production domain: https://farmmachinespecs.com
+This repository contains **only the custom WordPress theme and companion data plugin**. WordPress core and its database are installed and maintained on Hostinger, not committed here. This replaces the previous Next.js application.
 
-## Stack
+## Install on Hostinger
 
-- Next.js 16.3.3
-- React 19.2
-- Node.js 22+
-- MariaDB / MySQL
-- mysql2
-- Hostinger Business Web Hosting
+1. Create a fresh WordPress site on farmmachinespecs.com (US/Boston hosting). Use HTTPS and non-www as canonical.
+2. Upload the \`wp-content/themes/fms-theme\` directory into the site's themes directory, then activate **Farm Machine Specs**.
+3. Upload \`wp-content/plugins/fms-equipment-data\` into the plugins directory, then activate **FMS Equipment Data**.
+4. In Settings → Permalinks choose **Post name**, and save.
+5. Create pages **Compare** (slug \`compare\`, shortcode \`[fms_compare]\`), **Unit Converter** (slug \`unit-converter\`, shortcode \`[fms_unit_converter]\`), **Methodology**, **Editorial Policy**, **About**, **Contact**, **Privacy Policy**. Publish real text before indexing.
+6. In Settings → Reading select a static front page if desired; the theme has its own homepage template.
+7. Set site title "Farm Machine Specs" and tagline "Farm Equipment Data, Repairs & Buying Tools".
+8. Add a trusted SEO plugin and validate XML sitemap, canonical, breadcrumbs and schema without duplicates.
+9. Connect Google Search Console and GA4; check 404s before releasing the new site.
 
-## Local setup
+### Content architecture
+- Machines: \`/machines/{model}/\` (CPT)
+- Brands: \`/brands/{brand}/\` (machine taxonomy)
+- Equipment types: \`/equipment-types/{type}/\` (machine taxonomy)
+- Parts: \`/parts/{part}/\` (CPT; **no unverified fitment assertions**)
+- Repair / maintenance / buyer guides: normal WP posts + categories
+- Comparison tool: \`/compare/\` (page shortcode)
+- Unit converter: \`/unit-converter/\` (page shortcode)
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
-```
+### Provenance requirement
+Each published model's specs should come from manufacturer manuals, official brochures or other traceable references. Record source URL and verification date. "Not available" is better than a guessed number. Do not manufacture owner reviews, prices, serial-number ranges or part interchangeability.
 
-## Production build
+### SEO migration caution
+The old Next.js site exposed model URLs of the form \`/tractors/{brand}/{model}/\`. Those legacy URLs will require **model-by-model 301 redirects** to matching verified new WP pages before significant reindexing. Do not blanket-redirect the entire old directory to the homepage or pretend non-existent content has moved.
 
-```bash
-npm install
-npm run build
-npm start
-```
+### Deployment
+This repo is a versioned code source, **not** an automatic deployment to Hostinger WordPress. Upload/sync the theme and plugin directories to WordPress. Never deploy the repo root over a WordPress installation. Do not commit \`wp-config.php\`, credentials, media, or the database.
 
-## Environment variables
-
-Set these in Hostinger hPanel for the Node.js app:
-
-```text
-NEXT_PUBLIC_SITE_URL=https://farmmachinespecs.com
-DB_HOST=...
-DB_PORT=3306
-DB_USER=...
-DB_PASSWORD=...
-DB_NAME=...
-```
-
-The current frontend can run before the database is connected because initial seed entities live in `lib/catalog.ts`.
-
-## Database
-
-The normalized MariaDB schema is in `db/schema.sql` and includes:
-
-- manufacturers
-- equipment types
-- machine series
-- machines
-- specification definitions
-- machine specifications
-- part categories
-- parts
-- machine-to-part fitment
-- part cross references / replacements / supersessions
-- sources and source records
-
-Every imported technical fact is designed to retain source provenance and confidence.
-
-## SEO routes
-
-```text
-/tractors/
-/tractors/{brand}/{model}/
-/brands/
-/brands/{brand}/
-/parts/
-/compare/
-/search?q=...
-/sitemap.xml
-/robots.txt
-```
-
-Search result pages are `noindex`; canonical model pages are indexable.
-
-## Hostinger deployment
-
-Create a Node.js Web App in hPanel and connect this GitHub repository. Hostinger should detect Next.js automatically. Use Node.js 22 and the standard build command `npm run build`. Set `NEXT_PUBLIC_SITE_URL=https://farmmachinespecs.com` before launch. The MariaDB variables can be added after the first frontend deployment.
-
-## Data quality rule
-
-Do not publish unverified numerical specifications as facts. Seed records may identify real machine models, but technical values should move to publishable status only after source verification.
+The prior Next.js source remains available in Git commit history before the reset, but no former application files remain in main.

@@ -1,0 +1,24 @@
+<?php get_header(); ?>
+<section class="hero"><div class="wrap hero-inner"><div>
+<span class="eyebrow">Built for working equipment owners</span>
+<h1>Know your machine.<br>Fix it. Keep it working.</h1>
+<p>Find <b>tractor and farm equipment specifications</b>, service references, troubleshooting advice and side-by-side comparisons — with sources you can check.</p>
+<form class="search-form" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>"><label><span class="screen-reader-text">Search farm equipment</span><input name="s" type="search" placeholder="Search model, problem, or part number..." required></label><button class="btn btn-warm" type="submit">Search</button></form>
+<div class="hero-links"><a href="<?php echo esc_url(home_url('/machines/')); ?>">Browse models</a><a href="<?php echo esc_url(home_url('/category/troubleshooting/')); ?>">Troubleshooting</a><a href="<?php echo esc_url(home_url('/category/maintenance/')); ?>">Service & fluids</a><a href="<?php echo esc_url(home_url('/parts/')); ?>">Parts reference</a></div>
+</div><aside class="hero-panel"><span class="eyebrow">Tools for real jobs</span><h2>Get the information you need before you start.</h2><ul><li>Compare engine HP, PTO and machine weight</li><li>Check model and configuration differences</li><li>Find official source-backed specifications</li><li>Convert US and metric service units</li></ul><a class="btn" href="<?php echo esc_url(home_url('/compare/')); ?>">Compare equipment →</a></aside>
+</div></section>
+<section class="section section-tint"><div class="wrap"><div class="section-head"><div><h2>What are you working on?</h2><p>Go straight to the information that helps solve your job.</p></div></div>
+<div class="topic-grid">
+<a class="topic-card" href="<?php echo esc_url(home_url('/machines/')); ?>"><span class="topic-icon" aria-hidden="true">⚙</span><h3>Equipment specs</h3><p>Engine, PTO, lifting, hydraulics and dimensions by exact model.</p></a>
+<a class="topic-card" href="<?php echo esc_url(home_url('/category/troubleshooting/')); ?>"><span class="topic-icon" aria-hidden="true">🔧</span><h3>Faults & diagnostics</h3><p>Symptoms, probable causes, checks and safe next steps.</p></a>
+<a class="topic-card" href="<?php echo esc_url(home_url('/category/maintenance/')); ?>"><span class="topic-icon" aria-hidden="true">🛢</span><h3>Maintenance guides</h3><p>Service intervals, fluid references, filters and practical care.</p></a>
+<a class="topic-card" href="<?php echo esc_url(home_url('/parts/')); ?>"><span class="topic-icon" aria-hidden="true">🧩</span><h3>Parts & compatibility</h3><p>OEM part references and carefully verified equipment fitment.</p></a>
+</div></div></section>
+<section class="section"><div class="wrap"><div class="section-head"><div><h2>Explore equipment models</h2><p>Browse verified information, with source references and configuration notes.</p></div><a href="<?php echo esc_url(home_url('/machines/')); ?>">Browse all models →</a></div><div class="card-grid">
+<?php $machines=new WP_Query(['post_type'=>'fms_machine','posts_per_page'=>6,'post_status'=>'publish','no_found_rows'=>true]); if($machines->have_posts()){while($machines->have_posts()){$machines->the_post(); fms_card(get_the_ID());}wp_reset_postdata();}else{echo '<p class="content-intro">The new equipment catalog is being prepared. See our guides below or search for a topic.</p>';} ?>
+</div></div></section>
+<section class="section section-tint"><div class="wrap"><div class="section-head"><div><h2>Repair, maintain & choose smarter</h2><p>Editorial guides written around real questions, not generic model lists.</p></div><a href="<?php echo esc_url(home_url('/category/guides/')); ?>">All guides →</a></div><div class="card-grid">
+<?php $guides=new WP_Query(['post_type'=>'post','posts_per_page'=>6,'post_status'=>'publish','no_found_rows'=>true]);if($guides->have_posts()){while($guides->have_posts()){$guides->the_post();fms_card(get_the_ID());}wp_reset_postdata();}else{echo '<p class="content-intro">In-depth maintenance and troubleshooting guides will appear here as they are sourced and reviewed.</p>';} ?>
+</div></div></section>
+<section class="section"><div class="wrap"><div class="section-head"><div><h2>Better data. Better decisions.</h2><p>We favor independently checkable facts over guessed numbers or fabricated compatibility claims.</p></div><a href="<?php echo esc_url(home_url('/methodology/')); ?>">Our methodology →</a></div><p class="content-intro">Machine specifications can vary by model year, country, engine, axle, transmission and optional equipment. Check the original manual or manufacturer before servicing, repairing, lifting loads or buying parts.</p></div></section>
+<?php get_footer(); ?>
