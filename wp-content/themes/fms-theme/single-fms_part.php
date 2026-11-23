@@ -31,6 +31,12 @@ while (have_posts()) {
         </div>
         <?php endif; ?>
         <?php the_content(); ?>
+        <?php
+        if (in_array($part_number, ['LVA21036', 'TA25769'], true)
+            && shortcode_exists('fms_1025r_filter_kit_checker')) {
+            echo do_shortcode('[fms_1025r_filter_kit_checker]');
+        }
+        ?>
         <div class="notice"><strong>Compatibility warning:</strong> Manufacturer listings described as generally compatible are not guaranteed fits. Confirm current part supersession, model configuration, serial range and service requirements through the original equipment manufacturer before purchase or installation.</div>
         <?php if ($primary_source) : ?>
           <section class="sources"><h2>Original OEM reference</h2>
