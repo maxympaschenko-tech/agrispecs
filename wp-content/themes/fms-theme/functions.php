@@ -167,7 +167,7 @@ function fms_theme_structured_data() {
             'fms_pto_hp' => 'PTO horsepower (HP)',
             'fms_hitch_category' => 'Three-point hitch category',
             'fms_hitch_lift_24_lb' => 'Hitch lift capacity at 24 inches (lb)',
-            'fms_hydraulic_flow_gpm' => 'Published hydraulic pump flow (US GPM)',
+            'fms_hydraulic_flow_gpm' => 'Published hydraulic flow (US GPM; see source notes)',
             'fms_operating_weight_lb' => 'Manufacturer-listed tractor weight (lb; see configuration)',
             'fms_fuel_capacity_gal' => 'Fuel capacity (US gallons)',
         ];
