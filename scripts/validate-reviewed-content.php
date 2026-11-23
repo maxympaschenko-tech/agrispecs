@@ -33,7 +33,7 @@ $numericFields = [
     'fms_hydraulic_flow_gpm','fms_loader_lift_lb','fms_operating_weight_lb','fms_fuel_capacity_gal',
 ];
 foreach ($data['records'] as $index => $record) {
-    $issue = static function (string $reason) use ($index): never {
+    $issue = static function (string $reason) use ($index): void {
         fwrite(STDERR, "FMS content record " . ($index + 1) . ": {$reason}\n");
         exit(1);
     };
@@ -45,7 +45,7 @@ foreach ($data['records'] as $index => $record) {
     if (!in_array($type, $validTypes, true)) { $issue('invalid post type'); }
     if (!in_array($status, $validStatuses, true)) { $issue('invalid publication status'); }
     if (!is_string($record['title'] ?? null) || strlen(trim($record['title'])) < 15) { $issue('missing/short title'); }
-    if (!is_string($record['content'] ?? null) || mb_strlen(trim($record['content'])) < 750) { $issue('content too short'); }
+    if (!is_string($record['content'] ?? null) || strlen(trim($record['content'])) < 750) { $issue('content too short'); }
     $key = $type . ':' . $slug;
     if (isset($seen[$key])) { $issue('duplicate slug in content bundle'); }
     $seen[$key] = true;
