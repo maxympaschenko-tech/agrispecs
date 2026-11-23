@@ -233,8 +233,41 @@ function fms_data_archive_filters($query) {
     if ($tax_query) {
         $query->set('tax_query', $tax_query);
     }
+    // Only confirmed numeric engine horsepower fields are eligible for the
+    // range filter. Models without a published HP figure are excluded while
+    // filtering, but remain visible in the unfiltered catalog.
+    $minimum = fms_data_engine_hp_bound('fms_filter_hp_min');
+    $maximum = fms_data_engine_hp_bound('fms_filter_hp_max');
+    if ($minimum !== '' || $maximum !== '') {
+        $clause = ['key' => 'fms_engine_hp', 'type' => 'DECIMAL(10,2)'];
+        if ($minimum !== '' && $maximum !== '') {
+            $clause['value'] = [(float) $minimum, (float) $maximum];
+            $clause['compare'] = 'BETWEEN';
+        } elseif ($minimum !== '') {
+            $clause['value'] = (float) $minimum;
+            $clause['compare'] = '>=';
+        } else {
+            $clause['value'] = (float) $maximum;
+            $clause['compare'] = '<=';
+        }
+        $query->set('meta_query', [$clause]);
+    }
 }
 add_action('pre_get_posts','fms_data_archive_filters');
+
+/**
+ * Validated query-string value; also used to retain filters across pagination.
+ */
+function fms_data_engine_hp_bound($key) {
+    if (!isset($_GET[$key]) || !is_scalar($_GET[$key])) {
+        return '';
+    }
+    $value = trim((string) wp_unslash($_GET[$key]));
+    if ($value === '' || !preg_match('/^\\d{1,4}(?:\\.\\d{1,2})?$/D', $value)) {
+        return '';
+    }
+    return (float) $value <= 2000 ? $value : '';
+}
 
 
 
