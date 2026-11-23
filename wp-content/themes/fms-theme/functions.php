@@ -66,7 +66,16 @@ function fms_theme_description() {
     }
     if (is_category()) {
         $term = get_queried_object();
-        return $term && !is_wp_error($term) ? sprintf('Explore practical %s articles and tractor equipment guidance for US farm and property owners.', $term->name) : '';
+        if (!$term || is_wp_error($term)) { return ''; }
+        $descriptions = [
+            'maintenance' => 'Tractor service and maintenance references: oil capacities, OEM filter kits, serial-number checks and owner checklists based on manufacturer documentation.',
+            'troubleshooting' => 'Practical farm tractor troubleshooting: start with engine symptoms and safety checks before choosing parts or calling for repair.',
+            'comparisons' => 'Compare tractor engine horsepower, PTO, hitch capacity and weight, with manufacturer source notes and realistic buying considerations.',
+            'buying-guides' => 'Source-checked compact tractor buying guides and equipment comparisons for US property owners and small farms.',
+            'parts-compatibility' => 'Find manufacturer part numbers, filter kits, model-specific fitment notes and serial restrictions before ordering tractor parts.',
+            'guides' => 'Owner guides for tractors and agricultural machinery: maintenance, troubleshooting, technical specifications and safer buying decisions.',
+        ];
+        return $descriptions[$term->slug] ?? sprintf('Explore practical %s articles and tractor equipment guidance for US farm and property owners.', $term->name);
     }
     if (is_singular()) {
         $id = get_queried_object_id();
