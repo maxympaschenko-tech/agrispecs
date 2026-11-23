@@ -52,3 +52,18 @@ Text Domain: fms
 .fms-part-facts strong{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#42675b}
 .fms-part-facts span{font-size:15px;font-weight:650;color:#163c31}
 @media(max-width:620px){.fms-part-facts{grid-template-columns:1fr;gap:16px;padding:14px}}
+
+
+/* Serial-range lookup for OEM filter kits (runs entirely inside the browser). */
+.fms-serial-checker{border:1px solid #c9dfd0;border-radius:16px;padding:24px;margin:28px 0;background:linear-gradient(135deg,#f3f8f2,#fff)}
+.fms-serial-checker h2{margin:4px 0 10px;font-size:clamp(21px,2.7vw,28px);line-height:1.25}
+.fms-serial-checker>p{max-width:70ch}
+.fms-serial-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:20px 0 12px}
+.fms-serial-controls label{width:100%;font-weight:700;font-size:13px}
+.fms-serial-controls input{flex:1;min-width:180px;max-width:300px;padding:11px 12px;border-radius:9px;border:1px solid #afc5b7;background:#fff}
+.fms-serial-controls .btn{padding:12px 19px;min-height:48px}
+.fms-serial-result{padding:15px 16px;border:1px dashed #abc9b2;border-radius:10px;background:#fff;color:#23493d;font-weight:600}
+.fms-serial-result[data-state=invalid]{border-color:#d3ac86;color:#754117;background:#fff9f0}
+.fms-serial-result[data-state=found]{border-color:#72a988;color:#124a31;background:#eef8ef}
+.fms-serial-checker .tagline{font-size:13px;color:#52695d}
+@media(max-width:620px){.fms-serial-checker{padding:16px}.fms-serial-controls input{max-width:none;width:100%}.fms-serial-controls .btn{width:100%}}
