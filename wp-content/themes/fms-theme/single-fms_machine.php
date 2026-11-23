@@ -49,6 +49,7 @@ while (have_posts()) {
             'john-deere-1025r' => [
                 'john-deere-1025r-200-hour-service-filters-oil-checklist',
                 'john-deere-1025r-air-filter-serial-numbers-m131802-lvu34503',
+                'john-deere-1025r-air-filter-restriction-indicator-red',
                 'john-deere-1025r-fluid-capacities-engine-transmission-hydraulic',
                 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769',
                 'john-deere-1m-25-vs-1025r-tractor-comparison',
@@ -164,6 +165,7 @@ while (have_posts()) {
                 'john-deere-lva16054-hydraulic-oil-filter-1025r',
                 'john-deere-m131802-primary-air-filter-1025r-early-serial',
                 'john-deere-lvu34503-primary-air-filter-1025r-late-serial',
+                'john-deere-at25983-air-restriction-indicator-1025r',
             ],
             'john-deere-3025e' => [
                 'john-deere-bxx10240-third-function-valve-3e-my22',
