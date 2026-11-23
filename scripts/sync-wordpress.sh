@@ -19,7 +19,7 @@ if ! command -v php >/dev/null 2>&1; then
   echo "PHP CLI unavailable; refusing to sync without syntax validation" >&2
   exit 1
 fi
-for source_dir in "$STAGE/wp-content/themes/fms-theme" "$STAGE/wp-content/plugins/fms-equipment-data"; do
+for source_dir in "$STAGE/wp-content/themes/fms-theme" "$STAGE/wp-content/plugins/fms-equipment-data" "$STAGE/scripts"; do
   if [[ ! -d "$source_dir" ]]; then
     echo "Missing source directory: $source_dir" >&2
     exit 1
@@ -55,4 +55,18 @@ for kind in themes/fms-theme plugins/fms-equipment-data; do
   fi
   echo "Synced $kind"
 done
+# Publish the reviewed content bundle after the theme and plugin have synced.
+# The importer is idempotent and does not overwrite existing editorial content.
+if [[ -f "$STAGE/scripts/import-reviewed-content.php" && -f "$STAGE/data/reviewed-content.json" ]]; then
+  export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+  if ! command -v wp >/dev/null 2>&1; then
+    echo "WP-CLI missing from Cron PATH; theme/plugin synced, content import skipped." >&2
+    exit 1
+  fi
+  if ! wp --path="$DOCROOT" --no-color eval-file "$STAGE/scripts/import-reviewed-content.php"; then
+    echo "Reviewed content import failed; check the above error before retrying." >&2
+    exit 1
+  fi
+fi
+
 printf 'FMS code synchronized at %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
