@@ -70,6 +70,7 @@ function fms_data_save($post_id){
         if($key==='fms_source_url'){$value=esc_url_raw($value);}
         elseif($key==='fms_source_checked'){$value=sanitize_text_field($value); if($value!==''&&!preg_match('/^\d{4}-\d{2}-\d{2}$/',$value))$value='';}
         else {$value=sanitize_text_field($value);}
+        if(in_array($key,fms_data_numeric_fields(),true)&&$value!==''&&(!is_numeric($value)||(float)$value<0))$value='';
         if($value===''){delete_post_meta($post_id,$key);}else{update_post_meta($post_id,$key,$value);}
     }
 }
@@ -155,7 +156,7 @@ function fms_converter_shortcode(){
 add_shortcode('fms_unit_converter','fms_converter_shortcode');
 function fms_data_search_types($query){
     if(is_admin()||!$query->is_main_query()||!$query->is_search())return;
-    if(isset($_GET['post_type'])&&sanitize_key(wp_unslash($_GET['post_type']))==='fms_machine'){$query->set('post_type','fms_machine');return;}
+    if(isset($_GET['post_type'])&&is_scalar($_GET['post_type'])){ $requested=sanitize_key(wp_unslash($_GET['post_type'])); if(in_array($requested,['fms_machine','fms_part'],true)){ $query->set('post_type',$requested); return; } }
     $query->set('post_type',['post','page','fms_machine','fms_part']);
 }
 add_action('pre_get_posts','fms_data_search_types');
