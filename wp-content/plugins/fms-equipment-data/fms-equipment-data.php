@@ -41,9 +41,10 @@ function fms_data_fields(){
         'fms_pto_hp'=>['PTO horsepower (HP)','PTO & hitch'],
         'fms_pto_rpm'=>['PTO speed (RPM)','PTO & hitch'],
         'fms_hitch_category'=>['Three-point hitch category','PTO & hitch'],
+        'fms_hitch_lift_24_lb'=>['3-point hitch lift capacity at 24 in behind lift points (lb)','PTO & hitch'],
         'fms_hydraulic_flow_gpm'=>['Hydraulic flow (US GPM)','Hydraulics'],
         'fms_loader_lift_lb'=>['Loader lift capacity (lb; specify test point in notes)','Hydraulics'],
-        'fms_operating_weight_lb'=>['Operating weight (lb)','Dimensions & weight'],
+        'fms_operating_weight_lb'=>['Published base/ROPS weight (lb; verify configuration)','Dimensions & weight'],
         'fms_fuel_capacity_gal'=>['Fuel capacity (US gal)','Capacities'],
         'fms_configuration_notes'=>['Model year / drive / loader / test-point notes','Identification'],
         'fms_source_url'=>['Primary source URL','Provenance'],
@@ -76,7 +77,7 @@ function fms_data_save($post_id){
 }
 add_action('save_post_fms_machine','fms_data_save');
 
-function fms_data_numeric_fields(){return ['fms_engine_hp','fms_pto_hp','fms_pto_rpm','fms_hydraulic_flow_gpm','fms_loader_lift_lb','fms_operating_weight_lb','fms_fuel_capacity_gal'];}
+function fms_data_numeric_fields(){return ['fms_engine_hp','fms_pto_hp','fms_pto_rpm','fms_hitch_lift_24_lb','fms_hydraulic_flow_gpm','fms_loader_lift_lb','fms_operating_weight_lb','fms_fuel_capacity_gal'];}
 function fms_render_specs($id){
     $fields=fms_data_fields();$grouped=[];
     foreach($fields as $key=>$info){
