@@ -47,12 +47,23 @@ while (have_posts()) {
         /* Hand-reviewed internal links, not fuzzy keyword matching. */
         $fms_owner_guides = [
             'john-deere-1025r' => [
+                'new-holland-workmaster-25s-vs-john-deere-1025r',
                 'john-deere-1025r-200-hour-service-filters-oil-checklist',
                 'john-deere-1025r-air-filter-serial-numbers-m131802-lvu34503',
                 'john-deere-1025r-air-filter-restriction-indicator-red',
                 'john-deere-1025r-fluid-capacities-engine-transmission-hydraulic',
                 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769',
                 'john-deere-1m-25-vs-1025r-tractor-comparison',
+            ],
+            'new-holland-workmaster-25s' => [
+                'new-holland-workmaster-25s-vs-john-deere-1025r',
+                'engine-horsepower-vs-pto-horsepower-tractors',
+                'used-compact-tractor-inspection-checklist-before-buying',
+            ],
+            'new-holland-workmaster-35' => [
+                'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+                'tractor-3-point-hitch-lift-capacity-at-lift-points-vs-24-inches',
+                'used-compact-tractor-inspection-checklist-before-buying',
             ],
             'john-deere-1m-25' => [
                 'john-deere-1m-25-vs-1025r-tractor-comparison',
@@ -183,6 +194,8 @@ while (have_posts()) {
                 'john-deere-lva16054-hydraulic-oil-filter-1025r',
                 'john-deere-m131802-primary-air-filter-1025r-early-serial',
                 'john-deere-lvu34503-primary-air-filter-1025r-late-serial',
+                'john-deere-m131803-secondary-air-filter-1025r-early-serial',
+                'john-deere-miu804763-fuel-filter-element-1025r',
                 'john-deere-at25983-air-restriction-indicator-1025r',
             ],
             'john-deere-3025e' => [
