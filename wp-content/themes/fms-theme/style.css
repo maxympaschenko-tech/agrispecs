@@ -67,3 +67,12 @@ Text Domain: fms
 .fms-serial-result[data-state=found]{border-color:#72a988;color:#124a31;background:#eef8ef}
 .fms-serial-checker .tagline{font-size:13px;color:#52695d}
 @media(max-width:620px){.fms-serial-checker{padding:16px}.fms-serial-controls input{max-width:none;width:100%}.fms-serial-controls .btn{width:100%}}
+
+
+.fms-serial-split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.fms-serial-split>div{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:12px;background:#e8f2ea;border:1px solid #bfdac5;position:relative}
+.fms-serial-split>div+div{background:#fff3e6;border-color:#efd2ae}
+.fms-serial-split strong{font-size:24px;line-height:1.25;color:#153d2e;letter-spacing:-.02em}
+.fms-serial-split small{font-size:12px;color:#576a60}
+.fms-serial-interval{font-size:12px;letter-spacing:.03em;font-weight:750;text-transform:uppercase;color:#396f52}
+@media(max-width:520px){.fms-serial-split{grid-template-columns:1fr}.fms-serial-split strong{font-size:22px}}
