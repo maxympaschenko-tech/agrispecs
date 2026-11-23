@@ -1,0 +1,9 @@
+# Git checkout staging folder. All web requests must be blocked.
+# This file belongs at public_html/fms-git-stage/.htaccess
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
