@@ -368,3 +368,40 @@ function fms_data_part_brand_filter($query) {
     }
 }
 add_action('pre_get_posts', 'fms_data_part_brand_filter');
+
+
+/**
+ * Approved Kubota USA maintenance videos. Embed in the article itself; do not
+ * redirect visitors to YouTube for playback or load an external poster file.
+ */
+function fms_kubota_bx_video_shortcode($atts) {
+    $atts = shortcode_atts(['lesson' => ''], (array) $atts, 'fms_kubota_bx_video');
+    $video_map = [
+        '100' => [
+            'id' => 'RN4h9ggenm4',
+            'title' => 'Kubota Tractor Corporation: BX2380 100-hour maintenance',
+        ],
+        '200' => [
+            'id' => 'ETQqgYBpk5k',
+            'title' => 'Kubota Tractor Corporation: Protect Your BX 200-hour maintenance',
+        ],
+    ];
+    $key = (string) $atts['lesson'];
+    if (!isset($video_map[$key])) { return ''; }
+    $video = $video_map[$key];
+    $id = $video['id'];
+    $title = $video['title'];
+    $embed_url = 'https://www.youtube-nocookie.com/embed/' . $id;
+    $original_url = 'https://www.youtube.com/watch?v=' . $id;
+    return '<figure class="fms-official-video">'
+        . '<div class="fms-video-frame"><iframe loading="lazy" src="' . esc_url($embed_url) . '"'
+        . ' title="' . esc_attr($title) . '"'
+        . ' referrerpolicy="strict-origin-when-cross-origin"'
+        . ' allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"'
+        . ' allowfullscreen></iframe></div>'
+        . '<figcaption>Video by Kubota Tractor Corporation. '
+        . '<a target="_blank" rel="noopener noreferrer" href="' . esc_url($original_url) . '">Official source and video details</a>.'
+        . ' Instructions must be matched to your exact U.S. tractor manual and serial number.</figcaption>'
+        . '</figure>';
+}
+add_shortcode('fms_kubota_bx_video', 'fms_kubota_bx_video_shortcode');
