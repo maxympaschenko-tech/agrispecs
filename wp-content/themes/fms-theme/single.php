@@ -30,7 +30,6 @@ while (have_posts()) {
     <article class="entry-content">
         <?php if (has_post_thumbnail()) { the_post_thumbnail('large', ['loading' => 'eager']); } ?>
         <?php
-        the_content();
         $fms_slug = get_post_field('post_name', $id);
         // These existing articles cite Kubota's BX1880-AU / BX2380-AU /
         // BX2680-AU operator manual. Disclose region differences explicitly
@@ -48,6 +47,7 @@ while (have_posts()) {
               . '<p><a href="https://www.kubotausa.com/equipment-series/bx-series" target="_blank" rel="noopener noreferrer">View Kubota USA BX80 owner information →</a></p>'
               . '</aside>';
         }
+        the_content();
         if ($fms_slug === 'john-deere-1025r-filter-kits-serial-number-lva21036-vs-ta25769'
             && shortcode_exists('fms_1025r_filter_kit_checker')) {
             echo do_shortcode('[fms_1025r_filter_kit_checker]');
