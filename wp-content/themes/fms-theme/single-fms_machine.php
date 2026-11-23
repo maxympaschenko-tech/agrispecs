@@ -37,6 +37,15 @@ while (have_posts()) {
             ],
             'kubota-bx2380' => [
                 'kubota-bx2380-fluid-capacities-engine-oil-coolant-transmission',
+                'kubota-bx1880-vs-bx2380-vs-bx2680-comparison',
+                'kubota-bx90-vs-bx80-2027-models-specifications',
+            ],
+            'kubota-bx1880' => [
+                'kubota-bx1880-vs-bx2380-vs-bx2680-comparison',
+                'kubota-bx90-vs-bx80-2027-models-specifications',
+            ],
+            'kubota-bx2680' => [
+                'kubota-bx1880-vs-bx2380-vs-bx2680-comparison',
                 'kubota-bx90-vs-bx80-2027-models-specifications',
             ],
             'kioti-ck2620' => ['kioti-ck2620-vs-ck2620h-gear-vs-hst-tractor'],
