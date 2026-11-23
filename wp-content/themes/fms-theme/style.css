@@ -175,3 +175,11 @@ Text Domain: fms
 .fms-model-filters input[type=number]{display:block;width:100%;min-height:45px;padding:9px 12px;background:#fff;border:1px solid #c5d4c7;border-radius:9px;color:var(--ink);font-size:15px}
 .fms-filters-note{font-size:13px;color:#52665a;margin:12px 0 0;max-width:84ch}
 @media(max-width:600px){.fms-model-filters label{flex:1 1 100%}.fms-model-filters .fms-hp-bound{flex:1 1 calc(50% - 8px)}.fms-model-filters>.btn{flex:1 1 100%}}
+
+
+/* Clear text-first diagnostic tree for model-specific troubleshooting. */
+.fms-diagnostic-steps{margin:22px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fms-diagnostic-steps>div{padding:16px 18px;border-radius:12px;border:1px solid #d6e4d8;background:#f7faf7;display:flex;flex-direction:column;gap:7px;min-width:0}
+.fms-diagnostic-steps strong{font-size:15px;line-height:1.35;color:#1d4939}
+.fms-diagnostic-steps span{font-size:14px;line-height:1.55;color:#42574b}
+@media(max-width:620px){.fms-diagnostic-steps{grid-template-columns:1fr;gap:9px}.fms-diagnostic-steps>div{padding:14px}}
