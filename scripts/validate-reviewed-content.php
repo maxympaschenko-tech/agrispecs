@@ -27,7 +27,7 @@ if (!is_array($data) || empty($data['records']) || !is_array($data['records'])) 
 }
 $seen = [];
 $validStatuses = ['draft', 'publish'];
-$validTypes = ['post', 'fms_machine'];
+$validTypes = ['post', 'fms_machine', 'fms_part'];
 $numericFields = [
     'fms_engine_hp','fms_pto_hp','fms_pto_rpm','fms_hitch_lift_24_lb',
     'fms_hydraulic_flow_gpm','fms_loader_lift_lb','fms_operating_weight_lb','fms_fuel_capacity_gal',
@@ -53,6 +53,17 @@ foreach ($data['records'] as $index => $record) {
     if (!is_string($src) || !filter_var($src, FILTER_VALIDATE_URL)
         || strtolower((string) parse_url($src, PHP_URL_SCHEME)) !== 'https') {
         $issue('missing/invalid HTTPS source URL');
+    }
+    if ($type === 'fms_part') {
+        if (!is_string($record['part_number'] ?? null) || !preg_match('/^[A-Z0-9-]{4,40}$/D', $record['part_number'])) {
+            $issue('missing or invalid OEM part number');
+        }
+        if (!is_string($record['brand'] ?? null) || trim($record['brand']) === '') {
+            $issue('missing part manufacturer');
+        }
+        if (!is_string($record['serial_scope'] ?? null) || strlen(trim($record['serial_scope'])) < 10) {
+            $issue('missing serial/model applicability notes');
+        }
     }
     if ($type === 'fms_machine') {
         foreach (['brand','equipment_type','specs'] as $required) {
