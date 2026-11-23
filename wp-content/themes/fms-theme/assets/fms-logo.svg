@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 690 150" role="img" aria-labelledby="title desc"><title id="title">Farm Machine Specs</title><desc id="desc">Green tractor beside a technical specification sheet, with Farm Machine Specs wordmark</desc>
+<g transform="translate(5 7)">
+<path d="M72 9h40a9 9 0 0 1 9 9v7h12a9 9 0 0 1 9 9v96H58V34a9 9 0 0 1 9-9h5z" fill="#fff" stroke="#222d2a" stroke-width="7" stroke-linejoin="round"/>
+<path d="M83 11v-5h22v5h6v16H77V11z" fill="#222d2a"/><circle cx="94" cy="13" r="3" fill="#fff"/>
+<circle cx="103" cy="51" r="11" fill="#25312d"/><circle cx="103" cy="51" r="4" fill="#fff"/>
+<path d="M120 47h13m-13 9h12M89 73h42m-42 9h42m-42 9h42" stroke="#08622b" stroke-width="5" stroke-linecap="round"/>
+<path d="M72 104h56v11H72" fill="none" stroke="#28332f" stroke-width="4"/>
+<path d="M5 80h19l9-33h37l13 33h17v34H5z" fill="#0a672e" stroke="#26332d" stroke-width="5" stroke-linejoin="round"/>
+<path d="M38 53h26l8 25H30z" fill="#f7faf8" stroke="#27332e" stroke-width="4"/>
+<path d="M2 72h76" stroke="#097334" stroke-width="8" stroke-linecap="round"/>
+<path d="M85 86h18l7 16H79" fill="#0d692e"/><path d="M80 93h19" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<circle cx="27" cy="106" r="25" fill="#252e2b"/><circle cx="27" cy="106" r="12" fill="#f7faf8"/><circle cx="27" cy="106" r="5" fill="#252e2b"/>
+<circle cx="89" cy="110" r="16" fill="#252e2b"/><circle cx="89" cy="110" r="8" fill="#f7faf8"/><circle cx="89" cy="110" r="3.5" fill="#252e2b"/>
+<path d="M4 141q39-15 69-12t75-2M17 145q45-9 78-7t47-3" fill="none" stroke="#08752e" stroke-width="5" stroke-linecap="round"/>
+</g>
+<text x="165" y="82" fill="#202925" font-family="Arial,Helvetica,sans-serif" font-size="51" font-weight="800" letter-spacing="-2.5">Farm Machine</text>
+<text x="518" y="82" fill="#08652e" font-family="Arial,Helvetica,sans-serif" font-size="51" font-weight="800" letter-spacing="-2.5">Specs</text>
+<path d="M168 97H663l-9 9H168Z" fill="#07652e"/><path d="M658 95l16-9h8l-16 19h-8z" fill="#08652e"/>
+</svg>
