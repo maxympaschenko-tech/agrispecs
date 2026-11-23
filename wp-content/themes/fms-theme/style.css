@@ -134,3 +134,14 @@ Text Domain: fms
 .fms-empty-search{background:#f5f8f4;padding:28px;border:1px solid #e0e7df;border-radius:14px}
 .fms-empty-search h2{margin-top:0}
 @media(max-width:760px){.fms-search-filters{grid-template-columns:1fr}.fms-search-filters .btn{width:100%}}
+
+
+/* Direct comparison of Deere's two published loader load-centre positions. */
+.fms-lift-capacity-visual{margin:24px 0;padding:20px 22px;border:1px solid #d4e3d7;border-radius:14px;background:#f5f9f4;max-width:820px}
+.fms-lift-line{display:grid;grid-template-columns:130px minmax(0,1fr) 78px;align-items:center;gap:14px;margin:13px 0;font-size:14px}
+.fms-lift-line>span{font-weight:700}
+.fms-lift-line strong{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.fms-lift-track{background:#dce8dd;height:18px;border-radius:999px;overflow:hidden}
+.fms-lift-track i{display:block;height:100%;background:#285f49;border-radius:999px}
+.fms-lift-line:nth-child(2) .fms-lift-track i{background:#d79b45}
+@media(max-width:620px){.fms-lift-capacity-visual{padding:14px}.fms-lift-line{grid-template-columns:92px minmax(0,1fr) 65px;gap:8px;font-size:12px}.fms-lift-track{height:15px}}
