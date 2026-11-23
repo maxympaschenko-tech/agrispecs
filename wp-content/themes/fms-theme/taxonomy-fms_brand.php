@@ -109,6 +109,10 @@ $brand_guide_map = [
     'massey-ferguson' => [
         'massey-ferguson-gc1723e-vs-gc1725m-specifications',
     ],
+    'new-holland' => [
+        'new-holland-workmaster-25s-vs-john-deere-1025r',
+        'tractor-hydraulic-flow-gpm-pump-vs-implement-circuit',
+    ],
 ];
 $selected_guide_slugs = $brand_guide_map[$brand_term->slug] ?? [];
 if ($selected_guide_slugs):
