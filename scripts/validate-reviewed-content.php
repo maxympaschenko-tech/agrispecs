@@ -85,4 +85,40 @@ foreach ($data['records'] as $index => $record) {
         }
     }
 }
+
+// Refuse to deploy broken links between version-controlled reference pages.
+$knownPaths = [
+    '/' => true,
+    '/machines/' => true,
+    '/parts/' => true,
+    '/brands/' => true,
+    '/compare/' => true,
+    '/unit-converter/' => true,
+    '/methodology/' => true,
+    '/editorial-policy/' => true,
+    '/about/' => true,
+];
+foreach (['maintenance', 'troubleshooting', 'guides', 'buying-guides',
+          'comparisons', 'parts-compatibility'] as $category) {
+    $knownPaths['/category/' . $category . '/'] = true;
+}
+foreach ($data['records'] as $record) {
+    $prefix = $record['type'] === 'fms_machine' ? '/machines/' :
+        ($record['type'] === 'fms_part' ? '/parts/' : '/');
+    $knownPaths[$prefix . $record['slug'] . '/'] = true;
+}
+foreach ($data['records'] as $index => $record) {
+    $matches = [];
+    if (!preg_match_all('~href="(/[^"#?]+)"~i', $record['content'], $matches)) {
+        continue;
+    }
+    foreach ($matches[1] as $href) {
+        if (!isset($knownPaths[$href])) {
+            fwrite(STDERR, "FMS record " . ($index + 1) .
+                " (" . $record['slug'] . ") links to an unknown local URL: {$href}\n");
+            exit(1);
+        }
+    }
+}
+
 printf("FMS content validation OK: %d reviewed records; %s\n", count($data['records']), hash('sha256', $json));
