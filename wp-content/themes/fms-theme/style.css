@@ -19,3 +19,17 @@ Text Domain: fms
 .site-footer{background:var(--pine-dark);color:#d4e6dc;padding:50px 0 28px}.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:42px}.site-footer .brand{color:#fff}.site-footer a{color:#e1ede2}.site-footer h3{color:#fff;margin:0 0 15px;font-size:16px}.site-footer ul{list-style:none;padding:0;margin:0}.site-footer li{margin:8px 0;font-size:14px}.copyright{border-top:1px solid #ffffff25;padding-top:20px;margin-top:34px;color:#a4bdb0;font-size:13px}
 @media(max-width:980px){.topic-grid{grid-template-columns:repeat(2,1fr)}.card-grid{grid-template-columns:repeat(2,1fr)}.hero-inner{gap:24px}.content-layout{grid-template-columns:1fr}.sidebar{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:24px}}
 @media(max-width:720px){.header-inner{min-height:68px}.brand{font-size:17px}.brand-mark{width:38px;height:38px}.nav-toggle{display:block}.header-cta{display:none}.main-nav{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);padding:15px 18px;box-shadow:0 13px 20px #00000012}.main-nav.is-open{display:block}.main-menu{align-items:stretch;flex-direction:column;gap:0}.main-menu a{display:block;padding:11px}.hero{padding:44px 0}.hero-inner{grid-template-columns:1fr;gap:28px}.hero-panel{padding:22px}.hero h1{font-size:39px}.section{padding:45px 0}.topic-grid,.card-grid{grid-template-columns:1fr}.topic-card{min-height:0}.section-head{align-items:start;flex-direction:column}.footer-top{grid-template-columns:1fr;gap:25px}.form-grid{grid-template-columns:1fr}.search-form{flex-direction:column}.search-form input{padding:8px}.search-form .btn{width:100%}}
+
+
+/* Browse by brand / equipment type; keep the catalog filters usable on small screens. */
+.fms-model-filters{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px}
+.fms-model-filters label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:13px;min-width:180px;flex:1}
+.fms-model-filters select{width:100%;border:1px solid #cbd7cc;background:#fff;color:var(--ink);padding:10px 12px;border-radius:9px}
+.fms-model-filters .btn{min-height:45px}
+.fms-model-filters>a{font-size:14px;font-weight:650;padding:12px}
+.fms-compare-notes{margin-top:24px;border-top:1px solid var(--line);padding-top:18px}
+.fms-compare-notes h3{margin:0 0 12px;font-size:19px}
+.fms-compare-notes section{border-left:3px solid #d2dfd4;padding:7px 0 8px 15px;margin:15px 0}
+.fms-compare-notes h4{font-size:16px;margin:0 0 5px}
+.fms-compare-notes p{font-size:14px;color:var(--muted);margin:5px 0}
+@media(max-width:720px){.fms-model-filters{flex-direction:column;align-items:stretch}.fms-model-filters label{width:100%;min-width:0}.fms-model-filters .btn{width:100%}}
