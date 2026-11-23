@@ -95,6 +95,42 @@ while (have_posts()) {
                 wp_reset_postdata();
             }
         }
+        /* Explicit family references; never infer compatibility from model-name similarity. */
+        $fms_owner_part_slugs = [
+            'john-deere-1025r' => [
+                'john-deere-lva21036-filter-pak-1025r',
+                'john-deere-ta25769-filter-pak-1025r',
+            ],
+            'john-deere-3025e' => [
+                'john-deere-bxx10240-third-function-valve-3e-my22',
+                'john-deere-bxx10808-third-function-valve-3e-my23',
+            ],
+            'john-deere-3032e' => [
+                'john-deere-bxx10240-third-function-valve-3e-my22',
+                'john-deere-bxx10808-third-function-valve-3e-my23',
+            ],
+        ];
+        $fms_part_slugs = $fms_owner_part_slugs[get_post_field('post_name', $id)] ?? [];
+        if ($fms_part_slugs) {
+            $fms_parts = new WP_Query([
+                'post_type' => 'fms_part',
+                'post_status' => 'publish',
+                'post_name__in' => $fms_part_slugs,
+                'orderby' => 'post_name__in',
+                'posts_per_page' => count($fms_part_slugs),
+                'no_found_rows' => true,
+            ]);
+            if ($fms_parts->have_posts()) {
+                echo '<section class="fms-related-guides"><h2>OEM parts &amp; serial-year references</h2>';
+                echo '<p class="tagline">General manufacturer-listed applicability only. Verify actual machine serial, year, installed options and current part supersession before purchase.</p><div class="card-grid">';
+                while ($fms_parts->have_posts()) {
+                    $fms_parts->the_post();
+                    fms_card(get_the_ID());
+                }
+                echo '</div></section>';
+                wp_reset_postdata();
+            }
+        }
         $related_args = [
             'post_type' => 'fms_machine',
             'post_status' => 'publish',
