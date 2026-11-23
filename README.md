@@ -11,7 +11,7 @@ This repository contains **only the custom WordPress theme and companion data pl
 2. Upload the \`wp-content/themes/fms-theme\` directory into the site's themes directory, then activate **Farm Machine Specs**.
 3. Upload \`wp-content/plugins/fms-equipment-data\` into the plugins directory, then activate **FMS Equipment Data**.
 4. In Settings → Permalinks choose **Post name**, and save.
-5. Create pages **Compare** (slug \`compare\`, shortcode \`[fms_compare]\`), **Unit Converter** (slug \`unit-converter\`, shortcode \`[fms_unit_converter]\`), **Methodology**, **Editorial Policy**, **About**, **Contact**, **Privacy Policy**. Publish real text before indexing.
+5. Create an empty **Brands** page (slug `brands`) for the manufacturer directory, then pages **Compare** (slug \`compare\`, shortcode \`[fms_compare]\`), **Unit Converter** (slug \`unit-converter\`, shortcode \`[fms_unit_converter]\`), **Methodology**, **Editorial Policy**, **About**, **Contact**, **Privacy Policy**. Publish real text before indexing.
 6. In Settings → Reading select a static front page if desired; the theme has its own homepage template.
 7. Set site title "Farm Machine Specs" and tagline "Farm Equipment Data, Repairs & Buying Tools".
 8. Add a trusted SEO plugin and validate XML sitemap, canonical, breadcrumbs and schema without duplicates.
