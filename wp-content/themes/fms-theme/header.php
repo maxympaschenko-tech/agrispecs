@@ -10,7 +10,7 @@
 <nav class="main-nav" id="fms-menu" aria-label="Main navigation">
 <?php
 if(has_nav_menu('primary')) { wp_nav_menu(['theme_location'=>'primary','container'=>false,'menu_class'=>'main-menu','depth'=>1]); }
-else { echo '<ul class="main-menu"><li><a href="'.esc_url(home_url('/machines/')).'">Machines</a></li><li><a href="'.esc_url(home_url('/brands/')).'">Brands</a></li><li><a href="'.esc_url(home_url('/category/troubleshooting/')).'">Troubleshooting</a></li><li><a href="'.esc_url(home_url('/category/maintenance/')).'">Maintenance</a></li><li><a href="'.esc_url(home_url('/compare/')).'">Compare</a></li></ul>'; }
+else { echo '<ul class="main-menu"><li><a href="'.esc_url(home_url('/machines/')).'">Machines</a></li><li><a href="'.esc_url(home_url('/brands/')).'">Brands</a></li><li><a href="'.esc_url(home_url('/parts/')).'">Parts</a></li><li><a href="'.esc_url(home_url('/category/troubleshooting/')).'">Troubleshooting</a></li><li><a href="'.esc_url(home_url('/category/maintenance/')).'">Maintenance</a></li><li><a href="'.esc_url(home_url('/compare/')).'">Compare</a></li></ul>'; }
 ?>
 </nav><a class="header-cta" href="<?php echo esc_url(home_url('/compare/')); ?>">Compare models</a></div></header>
 <main id="main-content">
