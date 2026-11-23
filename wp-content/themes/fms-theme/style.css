@@ -89,3 +89,10 @@ Text Domain: fms
 .fms-hour-result[data-state=found]{background:#edf7ee;border-color:#75ab86}
 .fms-hour-result[data-state=invalid]{background:#fff6eb;border-color:#d2aa7c;color:#7e3b20}
 @media(max-width:700px){.fms-hour-grid{grid-template-columns:1fr}.fms-hour-planner{padding:16px}}
+
+
+.fms-related-guides{margin-top:42px;padding-top:22px;border-top:1px solid var(--line)}
+.fms-related-guides h2{margin:0 0 20px;font-size:clamp(23px,2.8vw,28px)}
+.fms-related-guides .data-card{padding:18px}
+.fms-related-guides .data-card h3{font-size:17px;line-height:1.4}
+.fms-related-guides .data-card p{font-size:13px}
