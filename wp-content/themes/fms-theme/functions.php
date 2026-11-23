@@ -266,3 +266,61 @@ function fms_theme_part_reference_schema() {
     }
 }
 add_action('wp_head','fms_theme_part_reference_schema',9);
+
+
+/** Breadcrumb structured data matching the visible on-page navigation. */
+function fms_theme_breadcrumb_schema() {
+    if (is_admin() || fms_theme_has_seo_plugin() || !is_singular(['post','fms_machine','fms_part'])) {
+        return;
+    }
+    $id = get_queried_object_id();
+    if (!$id || get_post_status($id) !== 'publish') { return; }
+    $list = [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => home_url('/')],
+    ];
+    $type = get_post_type($id);
+    if ($type === 'fms_machine') {
+        $list[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Machines', 'item' => home_url('/machines/')];
+        $terms = wp_get_post_terms($id, 'fms_brand');
+        if (!is_wp_error($terms) && $terms) {
+            $url = get_term_link($terms[0]);
+            if (!is_wp_error($url)) {
+                $list[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $terms[0]->name, 'item' => $url];
+            }
+        }
+    } elseif ($type === 'fms_part') {
+        $list[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Parts references', 'item' => home_url('/parts/')];
+    } else {
+        $cats = get_the_category($id);
+        $preferred = ['troubleshooting','maintenance','comparisons','parts-compatibility','buying-guides','guides'];
+        $primary = null;
+        foreach ($preferred as $slug) {
+            foreach ($cats as $category) {
+                if ($category->slug === $slug) { $primary = $category; break 2; }
+            }
+        }
+        if ($primary) {
+            $list[] = [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => $primary->name,
+                'item' => get_category_link($primary->term_id),
+            ];
+        } else {
+            $list[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guides', 'item' => home_url('/category/guides/')];
+        }
+    }
+    $list[] = [
+        '@type' => 'ListItem',
+        'position' => count($list) + 1,
+        'name' => get_the_title($id),
+        'item' => get_permalink($id),
+    ];
+    $json = wp_json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $list,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    if ($json) { echo '<script type="application/ld+json">' . $json . '</script>' . "\n"; }
+}
+add_action('wp_head','fms_theme_breadcrumb_schema',10);
