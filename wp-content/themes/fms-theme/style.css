@@ -96,3 +96,17 @@ Text Domain: fms
 .fms-related-guides .data-card{padding:18px}
 .fms-related-guides .data-card h3{font-size:17px;line-height:1.4}
 .fms-related-guides .data-card p{font-size:13px}
+
+
+/* Evidence-backed visual comparison: bars are relative within two selected machines only. */
+.fms-power-compare{margin:27px 0;padding:22px;border:1px solid var(--line);border-radius:14px;background:#f7faf7}
+.fms-power-compare h3{font-size:22px;margin:0 0 16px}
+.fms-power-group{padding:10px 0 16px}
+.fms-power-group+.fms-power-group{border-top:1px solid #dfe9e1;padding-top:19px}
+.fms-power-group h4{font-size:15px;margin:0 0 11px;line-height:1.4}
+.fms-power-row{display:grid;grid-template-columns:80px minmax(0,1fr) 75px;align-items:center;gap:12px;margin:8px 0;font-size:13px}
+.fms-power-row strong{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fms-power-track{height:13px;background:#e0e8e0;border-radius:50px;overflow:hidden}
+.fms-power-fill{display:block;height:100%;border-radius:50px;background:#245847}
+.fms-power-fill.fms-power-pto{background:#df9a3e}
+@media(max-width:640px){.fms-power-compare{padding:14px}.fms-power-row{grid-template-columns:75px minmax(0,1fr) 65px;gap:7px;font-size:12px}}
