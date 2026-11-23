@@ -324,3 +324,14 @@ function fms_theme_breadcrumb_schema() {
     if ($json) { echo '<script type="application/ld+json">' . $json . '</script>' . "\n"; }
 }
 add_action('wp_head','fms_theme_breadcrumb_schema',10);
+
+
+/* Avoid indexing empty/repetitive author, attachment and date pages. */
+function fms_theme_unhelpful_archives_noindex($robots) {
+    if (is_author() || is_date() || is_attachment() || is_search()) {
+        $robots['noindex'] = true;
+        $robots['follow'] = true;
+    }
+    return $robots;
+}
+add_filter('wp_robots', 'fms_theme_unhelpful_archives_noindex');
