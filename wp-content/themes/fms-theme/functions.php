@@ -25,6 +25,10 @@ add_filter('excerpt_length','fms_theme_excerpt_length',999);
 function fms_card($post_id) {
     $id=(int)$post_id; $type=get_post_type($id);
     echo '<article class="data-card"><span class="kicker">'.esc_html($type==='fms_machine'?'Machine specs':($type==='fms_part'?'Parts reference':'Practical guide')).'</span>';
+    if (has_post_thumbnail($id)) {
+        echo '<a class="fms-card-photo" href="'.esc_url(get_permalink($id)).'">' .
+          get_the_post_thumbnail($id, 'fms-card', ['loading' => 'lazy', 'decoding' => 'async']) . '</a>';
+    }
     echo '<a href="'.esc_url(get_permalink($id)).'"><h3>'.esc_html(get_the_title($id)).'</h3></a>';
     if($type==='fms_machine') {
         $power=get_post_meta($id,'fms_engine_hp',true);
