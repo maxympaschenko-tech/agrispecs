@@ -22,6 +22,7 @@ while (have_posts()) {
 <div class="wrap content-layout">
     <article class="entry-content">
         <?php if (has_post_thumbnail()) { the_post_thumbnail('large',['loading'=>'eager']); } ?>
+        <?php if (has_post_thumbnail()) { fms_featured_image_credit($id); } ?>
         <?php the_content(); ?>
         <?php
         // Show the source-edition distinction instead of silently overwriting
