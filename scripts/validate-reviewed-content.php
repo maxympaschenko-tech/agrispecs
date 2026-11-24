@@ -54,6 +54,25 @@ foreach ($data['records'] as $index => $record) {
         || strtolower((string) parse_url($src, PHP_URL_SCHEME)) !== 'https') {
         $issue('missing/invalid HTTPS source URL');
     }
+    // A curated photo is optional, but partial or unattributed image records are rejected.
+    if (isset($record['image_url'])) {
+        foreach (['image_url', 'image_source_url', 'image_alt', 'image_credit', 'image_license'] as $image_field) {
+            if (!is_string($record[$image_field] ?? null) || trim($record[$image_field]) === '') {
+                $issue("missing photo metadata: {$image_field}");
+            }
+        }
+        foreach (['image_url', 'image_source_url'] as $image_field) {
+            $photo_url = $record[$image_field];
+            if (!filter_var($photo_url, FILTER_VALIDATE_URL) ||
+                strtolower((string) parse_url($photo_url, PHP_URL_SCHEME)) !== 'https') {
+                $issue("invalid curated photo URL: {$image_field}");
+            }
+        }
+        $image_host = strtolower((string) parse_url($record['image_url'], PHP_URL_HOST));
+        if (!in_array($image_host, ['commons.wikimedia.org', 'upload.wikimedia.org'], true)) {
+            $issue('photo host must be an approved source, not an arbitrary downloader');
+        }
+    }
     if ($type === 'fms_part') {
         if (!is_string($record['part_number'] ?? null) || !preg_match('/^[A-Z0-9-]{4,40}$/D', $record['part_number'])) {
             $issue('missing or invalid OEM part number');
