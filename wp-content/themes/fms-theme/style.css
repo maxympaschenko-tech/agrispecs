@@ -213,3 +213,7 @@ Text Domain: fms
 .fms-card-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .fms-photo-credit{font-size:.86rem;color:#5c6a62;line-height:1.45;margin:.4rem 0 1.2rem}
 .fms-photo-credit a{overflow-wrap:anywhere}
+
+/* Attribution stays readable on image cards, including mobile layouts. */
+.fms-card-credit{display:block;color:#65746b;font-size:.76rem;line-height:1.4;margin:-6px 0 11px;overflow-wrap:anywhere}
+.fms-card-credit a{color:#365c4f}
