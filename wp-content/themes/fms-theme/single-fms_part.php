@@ -20,6 +20,7 @@ while (have_posts()) {
 <div class="wrap content-layout">
     <article class="entry-content">
         <?php if (has_post_thumbnail()) { the_post_thumbnail('large', ['loading' => 'eager']); } ?>
+        <?php if (has_post_thumbnail()) { fms_featured_image_credit($id); } ?>
         <?php if ($part_number || $serial_scope) : ?>
         <div class="fms-part-facts">
             <?php if ($part_number) : ?>
