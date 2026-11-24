@@ -30,6 +30,48 @@ if (!is_array($data) || empty($data['records']) || !is_array($data['records'])) 
     fwrite(STDERR, "Invalid content bundle JSON.\n");
     exit(1);
 }
+/**
+ * Attach a source-verified photograph to a seeded record.
+ * Editors own the existing featured image; the importer only fills blanks.
+ * Image URLs must be explicitly curated and attributed in the dataset.
+ */
+function fms_attach_reviewed_image(int $post_id, array $record): bool {
+    if (has_post_thumbnail($post_id)) { return true; }
+    $url = $record['image_url'] ?? '';
+    $credit = $record['image_credit'] ?? '';
+    $source = $record['image_source_url'] ?? '';
+    $license = $record['image_license'] ?? '';
+    if (!$url || !$credit || !$source || !$license) { return false; }
+    if (!is_string($url) || !wp_http_validate_url($url) ||
+        !is_string($source) || !wp_http_validate_url($source)) { return false; }
+    $host = strtolower((string) wp_parse_url($url, PHP_URL_HOST));
+    // No arbitrary external fetches or untrusted upload endpoints.
+    if (!in_array($host, ['commons.wikimedia.org', 'upload.wikimedia.org'], true)) { return false; }
+    if (!function_exists('media_sideload_image')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+    }
+    $alt = sanitize_text_field($record['image_alt'] ?? $record['title'] ?? '');
+    $attachment = media_sideload_image($url, $post_id, $alt, 'id');
+    if (is_wp_error($attachment)) {
+        error_log('FMS image import failed for ' . ($record['slug'] ?? '?') . ': ' . $attachment->get_error_message());
+        return false;
+    }
+    $attachment_id = (int) $attachment;
+    update_post_meta($attachment_id, '_wp_attachment_image_alt', $alt);
+    update_post_meta($attachment_id, '_fms_credit', sanitize_text_field($credit));
+    update_post_meta($attachment_id, '_fms_license', sanitize_text_field($license));
+    update_post_meta($attachment_id, '_fms_source_url', esc_url_raw($source));
+    // Keep attribution visible on the attachment itself and the article.
+    wp_update_post(['ID' => $attachment_id, 'post_excerpt' => sanitize_text_field($credit . ' — ' . $license),
+        'post_content' => '<p>Photo: ' . esc_html($credit) . '. Licensed ' . esc_html($license) .
+            '. <a href="' . esc_url($source) . '">Original image and license details</a>.</p>']);
+    set_post_thumbnail($post_id, $attachment_id);
+    echo 'Added local featured image: ' . ($record['slug'] ?? '?') . "\\n";
+    return true;
+}
+
 $digest = hash('sha256', $json);
 if (get_option('fms_content_bundle_digest') === $digest) {
     echo "Verified content bundle unchanged; no import necessary.\n";
@@ -59,6 +101,8 @@ foreach ($data['records'] as $record) {
     }
     $existing = get_page_by_path($slug, OBJECT, $type);
     if ($existing) {
+        // Backfill missing images, but never overwrite editors' text or thumbnails.
+        fms_attach_reviewed_image((int) $existing->ID, $record);
         echo "Already exists; retaining edits: {$type}/{$slug}\n";
         $skipped++;
         continue;
