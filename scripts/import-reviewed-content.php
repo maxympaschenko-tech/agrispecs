@@ -181,6 +181,7 @@ foreach ($data['records'] as $record) {
         }
         update_post_meta($id, '_fms_primary_source', esc_url_raw($record['source_url']));
     }
+    fms_attach_reviewed_image((int) $id, $record);
     echo "Created {$type}/{$slug} ({$status}, post ID {$id})\n";
     $created++;
 }
