@@ -68,13 +68,22 @@ function fms_attach_reviewed_image(int $post_id, array $record): bool {
         'post_content' => '<p>Photo: ' . esc_html($credit) . '. Licensed ' . esc_html($license) .
             '. <a href="' . esc_url($source) . '">Original image and license details</a>.</p>']);
     set_post_thumbnail($post_id, $attachment_id);
-    echo 'Added local featured image: ' . ($record['slug'] ?? '?') . "\\n";
+    echo 'Added local featured image: ' . ($record['slug'] ?? '?') . "\n";
     return true;
 }
 
 $digest = hash('sha256', $json);
 if (get_option('fms_content_bundle_digest') === $digest) {
-    echo "Verified content bundle unchanged; no import necessary.\n";
+    // Retry failed media downloads on a later cron run without importing again.
+    $pending_images = 0;
+    foreach ($data['records'] as $record) {
+        if (empty($record['image_url'])) { continue; }
+        $p = get_page_by_path($record['slug'], OBJECT, $record['type']);
+        if ($p && !has_post_thumbnail($p->ID)) {
+            if (!fms_attach_reviewed_image((int) $p->ID, $record)) { $pending_images++; }
+        }
+    }
+    echo "Verified content bundle unchanged; pending featured images: {$pending_images}.\n";
     return;
 }
 $admin_ids = get_users(['role' => 'administrator', 'number' => 1, 'fields' => 'ids']);
