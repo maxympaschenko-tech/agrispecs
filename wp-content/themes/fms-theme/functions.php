@@ -339,3 +339,16 @@ function fms_theme_unhelpful_archives_noindex($robots) {
     return $robots;
 }
 add_filter('wp_robots', 'fms_theme_unhelpful_archives_noindex');
+
+/** Credit the original author and license for imported editorial photography. */
+function fms_featured_image_credit($post_id) {
+    $attachment_id = get_post_thumbnail_id((int) $post_id);
+    if (!$attachment_id) { return; }
+    $credit = get_post_meta($attachment_id, '_fms_credit', true);
+    $license = get_post_meta($attachment_id, '_fms_license', true);
+    $source = get_post_meta($attachment_id, '_fms_source_url', true);
+    if (!$credit || !$license || !$source) { return; }
+    echo '<p class="fms-photo-credit">Photo: ' . esc_html($credit) .
+        ' · ' . esc_html($license) . ' · <a href="' .
+        esc_url($source) . '" rel="license noopener noreferrer" target="_blank">Original &amp; license</a></p>';
+}
