@@ -28,6 +28,15 @@ function fms_card($post_id) {
     if (has_post_thumbnail($id)) {
         echo '<a class="fms-card-photo" href="'.esc_url(get_permalink($id)).'">' .
           get_the_post_thumbnail($id, 'fms-card', ['loading' => 'lazy', 'decoding' => 'async']) . '</a>';
+        $photo_id = get_post_thumbnail_id($id);
+        $photo_credit = get_post_meta($photo_id, '_fms_credit', true);
+        $photo_license = get_post_meta($photo_id, '_fms_license', true);
+        $photo_source = get_post_meta($photo_id, '_fms_source_url', true);
+        if ($photo_credit && $photo_license && $photo_source) {
+            echo '<small class="fms-card-credit">Photo: ' . esc_html($photo_credit) .
+                 ' · ' . esc_html($photo_license) . ' · <a href="' .
+                 esc_url($photo_source) . '" target="_blank" rel="license noopener noreferrer">Source</a></small>';
+        }
     }
     echo '<a href="'.esc_url(get_permalink($id)).'"><h3>'.esc_html(get_the_title($id)).'</h3></a>';
     if($type==='fms_machine') {
