@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-24-reviewed-118",
+  "version": "2026-11-24-reviewed-118-images-1",
   "checked_at": "2026-11-24",
   "records": [
     {
@@ -47,7 +47,12 @@
         "fms_configuration_notes": "US John Deere 1025R listing; rated engine power (SAE J1995); 6.3 US gpm rated pump output; weight is base machine weight, without optional attachments/ballast. Confirm model year and installed configuration.",
         "fms_source_url": "https://www.deere.com/en-us/products-and-solutions/tractors/compact-tractors/1025r-sub-compact-tractor-mdi4mexw",
         "fms_source_checked": "2026-11-23"
-      }
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Man_driving_John_Deere_1025R_on_street%2C_Petrolia%2C_Ontario%2C_2026-05-17.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Man_driving_John_Deere_1025R_on_street,_Petrolia,_Ontario,_2026-05-17.jpg",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Chris Woodrich / Wikimedia Commons",
+      "image_alt": "John Deere 1025R sub-compact tractor driven on a street in Petrolia, Ontario"
     },
     {
       "type": "fms_machine",
