@@ -87,6 +87,29 @@ function fms_attach_reviewed_image(int $post_id, array $record): bool {
     return true;
 }
 
+/**
+ * Report failed featured-image imports for the next verification run.
+ * This is a read-only status option: it does not overwrite editorial images.
+ */
+function fms_report_image_import_status(array $records): void {
+    $ready = 0; $pending = []; $missing_record = 0;
+    foreach ($records as $record) {
+        if (empty($record['image_url'])) { continue; }
+        $post = get_page_by_path($record['slug'], OBJECT, $record['type']);
+        if (!$post) { $missing_record++; continue; }
+        if (has_post_thumbnail($post->ID)) { $ready++; }
+        else { $pending[] = $record['type'] . '/' . $record['slug']; }
+    }
+    update_option('fms_image_import_status', [
+        'checked_at' => gmdate('c'),
+        'ready' => $ready, 'pending_count' => count($pending),
+        'pending_slugs' => array_slice($pending, 0, 60),
+        'content_records_missing' => $missing_record,
+    ], false);
+    echo 'FMS local featured images: ' . $ready . ' ready, ' . count($pending) .
+         ' pending, ' . $missing_record . " without matching record.\n";
+}
+
 $digest = hash('sha256', $json);
 if (get_option('fms_content_bundle_digest') === $digest) {
     // Retry failed media downloads on a later cron run without importing again.
@@ -98,6 +121,7 @@ if (get_option('fms_content_bundle_digest') === $digest) {
             if (!fms_attach_reviewed_image((int) $p->ID, $record)) { $pending_images++; }
         }
     }
+    fms_report_image_import_status($data['records']);
     echo "Verified content bundle unchanged; pending featured images: {$pending_images}.\n";
     return;
 }
@@ -209,6 +233,7 @@ foreach ($data['records'] as $record) {
     echo "Created {$type}/{$slug} ({$status}, post ID {$id})\n";
     $created++;
 }
+fms_report_image_import_status($data['records']);
 update_option('fms_content_bundle_digest', $digest, false);
 // Track only the public editorial dataset revision; never expose credentials or WP paths.
 update_option('fms_public_catalog_version', sanitize_text_field((string) ($data['version'] ?? 'unversioned')), false);
