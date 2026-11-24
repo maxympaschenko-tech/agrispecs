@@ -44,6 +44,21 @@ function fms_attach_reviewed_image(int $post_id, array $record): bool {
     if (!$url || !$credit || !$source || !$license) { return false; }
     if (!is_string($url) || !wp_http_validate_url($url) ||
         !is_string($source) || !wp_http_validate_url($source)) { return false; }
+    // Reuse a previously imported local media attachment for the same source.
+    // Multiple comparisons can illustrate one specific machine without duplicate uploads.
+    $shared = get_posts([
+        'post_type' => 'attachment', 'post_status' => 'inherit',
+        'posts_per_page' => 1, 'fields' => 'ids',
+        'meta_key' => '_fms_source_url', 'meta_value' => esc_url_raw($source),
+    ]);
+    if ($shared) {
+        $shared_id = (int) $shared[0];
+        if (wp_attachment_is_image($shared_id) && get_attached_file($shared_id) && is_file(get_attached_file($shared_id))) {
+            set_post_thumbnail($post_id, $shared_id);
+            echo 'Reused local featured image: ' . ($record['slug'] ?? '?') . "\\n";
+            return true;
+        }
+    }
     $host = strtolower((string) wp_parse_url($url, PHP_URL_HOST));
     // No arbitrary external fetches or untrusted upload endpoints.
     if (!in_array($host, ['commons.wikimedia.org', 'upload.wikimedia.org'], true)) { return false; }
