@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-136-images-34",
+  "version": "2026-11-25-reviewed-140-images-38",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2206,6 +2206,102 @@
       "image_credit": "Antti Leppänen / Wikimedia Commons",
       "image_license": "CC BY 4.0",
       "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-rcr1242",
+      "title": "Land Pride RCR1242 Rotary Cutter Specs: 42-Inch Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Rotary Cutters",
+      "source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+      "excerpt": "RCR1242 specifications: 42-inch cutting width, 385-lb documented weight, 18–40 tractor HP, Category I hitch and 540-rpm PTO.",
+      "content": "<p>The Land Pride RCR1242 is a rear-mounted rotary cutter for maintaining rough grass, weeds and light brush. Its 42-inch cutting width is only one part of the fitment decision: tractor power, hitch geometry, actual implement mass and storage clearance must also be considered.</p><h2>Dimensions and power requirements</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Working width</td><td>42 in</td></tr><tr><td>Overall width</td><td>45 1/4 in</td></tr><tr><td>Length with tailwheel (2024 extract)</td><td>83 in</td></tr><tr><td>Weight in specified configuration</td><td>385 lb</td></tr><tr><td>Recommended tractor horsepower</td><td>18–40 hp</td></tr><tr><td>Cutting height range</td><td>1.25–10 in</td></tr><tr><td>PTO input speed</td><td>540 rpm</td></tr><tr><td>Gearbox speed-up ratio</td><td>1:1.93</td></tr></tbody></table><p>The smallest deck in this family is useful to investigate where gates and turning space are restricted. The documented mass excludes a rear guard; the cited sheet lists rear rubber guard as unavailable for this version. Confirm the current approved guarding configuration.</p><h2>Tractor and implement matching</h2><p>The manufacturer's power range refers to tractor horsepower. It is not a published minimum PTO horsepower rating. Confirm the exact tractor's approved hitch, shaft arrangement and lift performance before pairing. Consider the complete implement weight with all installed options, the load center, steering and ballast requirements. A quick-hitch-ready Category I frame is not proof of universal compatibility.</p><h2>Maintenance and ownership</h2><p>The specified configuration includes a shear-bolt driveline and laminated tailwheel; a clutch option is listed. Identify the actual gearbox and driveline before ordering service parts or selecting lubricant. Different gearbox versions have different lubricant capacities. Never substitute a stronger shear bolt or work around a rotating shaft. Stop, secure and isolate equipment according to the operator manual before inspection.</p><h2>Compare related cutters</h2><p>Review <a href=\"/land-pride-rcr1242-rcr1248-rcr1260-rcr1272-specs/\">all four RCR12 models</a> for dimensional differences, the <a href=\"/rotary-cutter-size-for-25-hp-tractor-4ft-5ft-6ft/\">tractor horsepower and cutter width guide</a> and the <a href=\"/rotary-cutter-shear-bolt-vs-slip-clutch-protection/\">driveline protection guide</a>. The photograph illustrates a generic rotary cutter rather than a verified RCR1242.</p><h2>Source</h2><p><a href=\"https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf\">Land Pride specification extract 326-047M, April 16, 2024, page 40</a>. Cross-reference the exact production version before purchase or service.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "385",
+        "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 18–40 hp; this is not the implement's engine or PTO output. Weight excludes rear guard. Cutting width 42 in.",
+        "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
+      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
+      "image_credit": "Jim Rosebery / Wikimedia Commons",
+      "image_license": "CC BY 2.0"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-rcr1248",
+      "title": "Land Pride RCR1248 Rotary Cutter Specs: 48-Inch Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Rotary Cutters",
+      "source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+      "excerpt": "RCR1248 specifications: 48-inch cutting width, 413-lb documented weight, 20–60 tractor HP, Category I hitch and 540-rpm PTO.",
+      "content": "<p>The Land Pride RCR1248 is a rear-mounted rotary cutter for maintaining rough grass, weeds and light brush. Its 48-inch cutting width is only one part of the fitment decision: tractor power, hitch geometry, actual implement mass and storage clearance must also be considered.</p><h2>Dimensions and power requirements</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Working width</td><td>48 in</td></tr><tr><td>Overall width</td><td>53 5/8 in</td></tr><tr><td>Length with tailwheel (2024 extract)</td><td>89 1/8 in</td></tr><tr><td>Weight in specified configuration</td><td>413 lb</td></tr><tr><td>Recommended tractor horsepower</td><td>20–60 hp</td></tr><tr><td>Cutting height range</td><td>1.25–10 in</td></tr><tr><td>PTO input speed</td><td>540 rpm</td></tr><tr><td>Gearbox speed-up ratio</td><td>1:1.93</td></tr></tbody></table><p>This four-foot model offers a wider swath than the RCR1242 while retaining formed deck skids. Its nominal working width is not the actual clearance required through a gate.</p><h2>Tractor and implement matching</h2><p>The manufacturer's power range refers to tractor horsepower. It is not a published minimum PTO horsepower rating. Confirm the exact tractor's approved hitch, shaft arrangement and lift performance before pairing. Consider the complete implement weight with all installed options, the load center, steering and ballast requirements. A quick-hitch-ready Category I frame is not proof of universal compatibility.</p><h2>Maintenance and ownership</h2><p>The specified configuration includes a shear-bolt driveline and laminated tailwheel; a clutch option is listed. Identify the actual gearbox and driveline before ordering service parts or selecting lubricant. Different gearbox versions have different lubricant capacities. Never substitute a stronger shear bolt or work around a rotating shaft. Stop, secure and isolate equipment according to the operator manual before inspection.</p><h2>Compare related cutters</h2><p>Review <a href=\"/land-pride-rcr1242-rcr1248-rcr1260-rcr1272-specs/\">all four RCR12 models</a> for dimensional differences, the <a href=\"/rotary-cutter-size-for-25-hp-tractor-4ft-5ft-6ft/\">tractor horsepower and cutter width guide</a> and the <a href=\"/rotary-cutter-shear-bolt-vs-slip-clutch-protection/\">driveline protection guide</a>. The photograph illustrates a generic rotary cutter rather than a verified RCR1248.</p><h2>Source</h2><p><a href=\"https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf\">Land Pride specification extract 326-047M, April 16, 2024, page 40</a>. Cross-reference the exact production version before purchase or service.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "413",
+        "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 20–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 48 in.",
+        "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
+      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
+      "image_credit": "Jim Rosebery / Wikimedia Commons",
+      "image_license": "CC BY 2.0"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-rcr1260",
+      "title": "Land Pride RCR1260 Rotary Cutter Specs: 60-Inch Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Rotary Cutters",
+      "source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+      "excerpt": "RCR1260 specifications: 60-inch cutting width, 496-lb documented weight, 20–60 tractor HP, Category I hitch and 540-rpm PTO.",
+      "content": "<p>The Land Pride RCR1260 is a rear-mounted rotary cutter for maintaining rough grass, weeds and light brush. Its 60-inch cutting width is only one part of the fitment decision: tractor power, hitch geometry, actual implement mass and storage clearance must also be considered.</p><h2>Dimensions and power requirements</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Working width</td><td>60 in</td></tr><tr><td>Overall width</td><td>64 1/4 in</td></tr><tr><td>Length with tailwheel (2024 extract)</td><td>97 3/4 in</td></tr><tr><td>Weight in specified configuration</td><td>496 lb</td></tr><tr><td>Recommended tractor horsepower</td><td>20–60 hp</td></tr><tr><td>Cutting height range</td><td>1.25–10 in</td></tr><tr><td>PTO input speed</td><td>540 rpm</td></tr><tr><td>Gearbox speed-up ratio</td><td>1:1.93</td></tr></tbody></table><p>The five-foot cutter has welded deck skids and separately available replaceable skid shoes according to the cited sheet. The sales brochure and technical extract list different overall lengths; measure the actual cutter before transport.</p><h2>Tractor and implement matching</h2><p>The manufacturer's power range refers to tractor horsepower. It is not a published minimum PTO horsepower rating. Confirm the exact tractor's approved hitch, shaft arrangement and lift performance before pairing. Consider the complete implement weight with all installed options, the load center, steering and ballast requirements. A quick-hitch-ready Category I frame is not proof of universal compatibility.</p><h2>Maintenance and ownership</h2><p>The specified configuration includes a shear-bolt driveline and laminated tailwheel; a clutch option is listed. Identify the actual gearbox and driveline before ordering service parts or selecting lubricant. Different gearbox versions have different lubricant capacities. Never substitute a stronger shear bolt or work around a rotating shaft. Stop, secure and isolate equipment according to the operator manual before inspection.</p><h2>Compare related cutters</h2><p>Review <a href=\"/land-pride-rcr1242-rcr1248-rcr1260-rcr1272-specs/\">all four RCR12 models</a> for dimensional differences, the <a href=\"/rotary-cutter-size-for-25-hp-tractor-4ft-5ft-6ft/\">tractor horsepower and cutter width guide</a> and the <a href=\"/rotary-cutter-shear-bolt-vs-slip-clutch-protection/\">driveline protection guide</a>. The photograph illustrates a generic rotary cutter rather than a verified RCR1260.</p><h2>Source</h2><p><a href=\"https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf\">Land Pride specification extract 326-047M, April 16, 2024, page 40</a>. Cross-reference the exact production version before purchase or service.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "496",
+        "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 20–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 60 in.",
+        "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
+      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
+      "image_credit": "Jim Rosebery / Wikimedia Commons",
+      "image_license": "CC BY 2.0"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-rcr1272",
+      "title": "Land Pride RCR1272 Rotary Cutter Specs: 72-Inch Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Rotary Cutters",
+      "source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+      "excerpt": "RCR1272 specifications: 72-inch cutting width, 568-lb documented weight, 25–60 tractor HP, Category I hitch and 540-rpm PTO.",
+      "content": "<p>The Land Pride RCR1272 is a rear-mounted rotary cutter for maintaining rough grass, weeds and light brush. Its 72-inch cutting width is only one part of the fitment decision: tractor power, hitch geometry, actual implement mass and storage clearance must also be considered.</p><h2>Dimensions and power requirements</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Working width</td><td>72 in</td></tr><tr><td>Overall width</td><td>76 1/2 in</td></tr><tr><td>Length with tailwheel (2024 extract)</td><td>110 in</td></tr><tr><td>Weight in specified configuration</td><td>568 lb</td></tr><tr><td>Recommended tractor horsepower</td><td>25–60 hp</td></tr><tr><td>Cutting height range</td><td>1.25–10 in</td></tr><tr><td>PTO input speed</td><td>540 rpm</td></tr><tr><td>Gearbox speed-up ratio</td><td>1:1.47</td></tr></tbody></table><p>The six-foot model has a two-piece reinforced deck and a different gearbox ratio from the other three cutters. Verify the exact gearbox and parts diagram instead of assuming interchangeability. Brochure and technical extract lengths differ.</p><h2>Tractor and implement matching</h2><p>The manufacturer's power range refers to tractor horsepower. It is not a published minimum PTO horsepower rating. Confirm the exact tractor's approved hitch, shaft arrangement and lift performance before pairing. Consider the complete implement weight with all installed options, the load center, steering and ballast requirements. A quick-hitch-ready Category I frame is not proof of universal compatibility.</p><h2>Maintenance and ownership</h2><p>The specified configuration includes a shear-bolt driveline and laminated tailwheel; a clutch option is listed. Identify the actual gearbox and driveline before ordering service parts or selecting lubricant. Different gearbox versions have different lubricant capacities. Never substitute a stronger shear bolt or work around a rotating shaft. Stop, secure and isolate equipment according to the operator manual before inspection.</p><h2>Compare related cutters</h2><p>Review <a href=\"/land-pride-rcr1242-rcr1248-rcr1260-rcr1272-specs/\">all four RCR12 models</a> for dimensional differences, the <a href=\"/rotary-cutter-size-for-25-hp-tractor-4ft-5ft-6ft/\">tractor horsepower and cutter width guide</a> and the <a href=\"/rotary-cutter-shear-bolt-vs-slip-clutch-protection/\">driveline protection guide</a>. The photograph illustrates a generic rotary cutter rather than a verified RCR1272.</p><h2>Source</h2><p><a href=\"https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf\">Land Pride specification extract 326-047M, April 16, 2024, page 40</a>. Cross-reference the exact production version before purchase or service.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "568",
+        "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 25–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 72 in.",
+        "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
+      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
+      "image_credit": "Jim Rosebery / Wikimedia Commons",
+      "image_license": "CC BY 2.0"
     }
   ]
 }
