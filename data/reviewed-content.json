@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-140-images-38",
+  "version": "2026-11-25-reviewed-144-images-42",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2302,6 +2302,102 @@
       "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
       "image_credit": "Jim Rosebery / Wikimedia Commons",
       "image_license": "CC BY 2.0"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-sb1051",
+      "title": "Land Pride SB1051 Snowblower Specs: 51-Inch Clearing Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Snowblowers",
+      "source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+      "excerpt": "Land Pride SB1051 rear PTO snowblower: 51-inch clearing width, 400-lb base weight, 18–32 tractor HP, Category I hitch and 540-rpm PTO input.",
+      "content": "<p>The Land Pride SB1051 is a rear-mounted snowblower documented in operator manual 370-430M for serial numbers 881641 and above. These specifications describe the listed implement, not a complete tractor and snowblower combination.</p><h2>Published model specifications</h2><table><thead><tr><th>Parameter</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Clearing width</td><td>51 in</td></tr><tr><td>Overall width with inner skid shoes</td><td>52.75 in</td></tr><tr><td>Base weight without options</td><td>400 lb</td></tr><tr><td>Tractor horsepower range</td><td>18–32 hp</td></tr><tr><td>Hitch category</td><td>Category I</td></tr><tr><td>PTO input</td><td>540 rpm</td></tr></tbody></table><p>Smallest clearing width and lowest base mass in this four-model comparison. Measure the tractor track width and confirm front ballast and hitch geometry.</p><h2>Tractor compatibility and storage</h2><p>The published tractor horsepower range is not a measured minimum PTO horsepower figure. Confirm the tractor's permitted attachment mass, hitch geometry, rear lift performance at the applicable load center, PTO shaft requirements, front ballast and axle limits. Measure actual overall width with installed options before planning storage or transport. Do not infer approved fitment from horsepower or hitch category alone.</p><h2>Chute controls and service</h2><p>Manual, electric and hydraulic chute-control arrangements are described in the family documentation. Verify the exact option and connections for this model and serial number. Before seasonal service, inspect visible guards, hitch hardware and wear components only with all power isolated. Use the factory manual for lubricant and replacement shear hardware; never replace overload protection with stronger unapproved bolts. Keep hands and feet out of the auger housing and chute even after stopping.</p><h2>Related reference pages</h2><p>See <a href=\"/land-pride-sb1051-sb1064-sb1574-sb2584-snowblower-specs/\">the four-model comparison</a>, <a href=\"/land-pride-snowblower-auger-not-turning-chute-blockage/\">snowblower troubleshooting</a> and <a href=\"/tractor-snow-removal-gravel-driveway-blade-vs-pusher-vs-blower/\">snow equipment selection for gravel driveways</a>. The photograph illustrates tractor snow removal, not a verified photograph of the SB1051.</p><h2>Manufacturer source</h2><p><a href=\"https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf\">Land Pride operator manual 370-430M</a>, November 5, 2024, sections 1 and 7, serial numbers 881641 and above. Confirm the exact serial and any subsequent revisions before purchase or operation.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "400",
+        "fms_configuration_notes": "Base implement weight without options. Clearing width 51 in. Tractor horsepower range 18–32 hp, not PTO output. Serial 881641 and above. ",
+        "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
+      "image_credit": "Leo-setä / Wikimedia Commons",
+      "image_license": "CC BY 2.0",
+      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-sb1064",
+      "title": "Land Pride SB1064 Snowblower Specs: 64-Inch Clearing Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Snowblowers",
+      "source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+      "excerpt": "Land Pride SB1064 rear PTO snowblower: 64-inch clearing width, 494-lb base weight, 18–59 tractor HP, Category I hitch and 540-rpm PTO input.",
+      "content": "<p>The Land Pride SB1064 is a rear-mounted snowblower documented in operator manual 370-430M for serial numbers 881641 and above. These specifications describe the listed implement, not a complete tractor and snowblower combination.</p><h2>Published model specifications</h2><table><thead><tr><th>Parameter</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Clearing width</td><td>64 in</td></tr><tr><td>Overall width with inner skid shoes</td><td>65.75 in</td></tr><tr><td>Base weight without options</td><td>494 lb</td></tr><tr><td>Tractor horsepower range</td><td>18–59 hp</td></tr><tr><td>Hitch category</td><td>Category I</td></tr><tr><td>PTO input</td><td>540 rpm</td></tr></tbody></table><p>The model-specific table gives 18–59 tractor HP, but the general SB10 setup instructions give a narrower range. Obtain confirmation from Land Pride for your serial number before selecting a tractor outside the narrower range.</p><h2>Tractor compatibility and storage</h2><p>The published tractor horsepower range is not a measured minimum PTO horsepower figure. Confirm the tractor's permitted attachment mass, hitch geometry, rear lift performance at the applicable load center, PTO shaft requirements, front ballast and axle limits. Measure actual overall width with installed options before planning storage or transport. Do not infer approved fitment from horsepower or hitch category alone.</p><h2>Chute controls and service</h2><p>Manual, electric and hydraulic chute-control arrangements are described in the family documentation. Verify the exact option and connections for this model and serial number. Before seasonal service, inspect visible guards, hitch hardware and wear components only with all power isolated. Use the factory manual for lubricant and replacement shear hardware; never replace overload protection with stronger unapproved bolts. Keep hands and feet out of the auger housing and chute even after stopping.</p><h2>Related reference pages</h2><p>See <a href=\"/land-pride-sb1051-sb1064-sb1574-sb2584-snowblower-specs/\">the four-model comparison</a>, <a href=\"/land-pride-snowblower-auger-not-turning-chute-blockage/\">snowblower troubleshooting</a> and <a href=\"/tractor-snow-removal-gravel-driveway-blade-vs-pusher-vs-blower/\">snow equipment selection for gravel driveways</a>. The photograph illustrates tractor snow removal, not a verified photograph of the SB1064.</p><h2>Manufacturer source</h2><p><a href=\"https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf\">Land Pride operator manual 370-430M</a>, November 5, 2024, sections 1 and 7, serial numbers 881641 and above. Confirm the exact serial and any subsequent revisions before purchase or operation.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "494",
+        "fms_configuration_notes": "Base implement weight without options. Clearing width 64 in. Tractor horsepower range 18–59 hp, not PTO output. Serial 881641 and above. General setup and model table power ranges differ; obtain manufacturer confirmation.",
+        "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
+      "image_credit": "Leo-setä / Wikimedia Commons",
+      "image_license": "CC BY 2.0",
+      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-sb1574",
+      "title": "Land Pride SB1574 Snowblower Specs: 74-Inch Clearing Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Snowblowers",
+      "source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+      "excerpt": "Land Pride SB1574 rear PTO snowblower: 74-inch clearing width, 640-lb base weight, 30–59 tractor HP, Category I hitch and 540-rpm PTO input.",
+      "content": "<p>The Land Pride SB1574 is a rear-mounted snowblower documented in operator manual 370-430M for serial numbers 881641 and above. These specifications describe the listed implement, not a complete tractor and snowblower combination.</p><h2>Published model specifications</h2><table><thead><tr><th>Parameter</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Clearing width</td><td>74 in</td></tr><tr><td>Overall width with inner skid shoes</td><td>75.75 in</td></tr><tr><td>Base weight without options</td><td>640 lb</td></tr><tr><td>Tractor horsepower range</td><td>30–59 hp</td></tr><tr><td>Hitch category</td><td>Category I</td></tr><tr><td>PTO input</td><td>540 rpm</td></tr></tbody></table><p>The 74-inch working width requires more maneuvering space and the published base weight is 146 lb greater than SB1064. Check available rear lift and steering authority.</p><h2>Tractor compatibility and storage</h2><p>The published tractor horsepower range is not a measured minimum PTO horsepower figure. Confirm the tractor's permitted attachment mass, hitch geometry, rear lift performance at the applicable load center, PTO shaft requirements, front ballast and axle limits. Measure actual overall width with installed options before planning storage or transport. Do not infer approved fitment from horsepower or hitch category alone.</p><h2>Chute controls and service</h2><p>Manual, electric and hydraulic chute-control arrangements are described in the family documentation. Verify the exact option and connections for this model and serial number. Before seasonal service, inspect visible guards, hitch hardware and wear components only with all power isolated. Use the factory manual for lubricant and replacement shear hardware; never replace overload protection with stronger unapproved bolts. Keep hands and feet out of the auger housing and chute even after stopping.</p><h2>Related reference pages</h2><p>See <a href=\"/land-pride-sb1051-sb1064-sb1574-sb2584-snowblower-specs/\">the four-model comparison</a>, <a href=\"/land-pride-snowblower-auger-not-turning-chute-blockage/\">snowblower troubleshooting</a> and <a href=\"/tractor-snow-removal-gravel-driveway-blade-vs-pusher-vs-blower/\">snow equipment selection for gravel driveways</a>. The photograph illustrates tractor snow removal, not a verified photograph of the SB1574.</p><h2>Manufacturer source</h2><p><a href=\"https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf\">Land Pride operator manual 370-430M</a>, November 5, 2024, sections 1 and 7, serial numbers 881641 and above. Confirm the exact serial and any subsequent revisions before purchase or operation.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I",
+        "fms_operating_weight_lb": "640",
+        "fms_configuration_notes": "Base implement weight without options. Clearing width 74 in. Tractor horsepower range 30–59 hp, not PTO output. Serial 881641 and above. ",
+        "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
+      "image_credit": "Leo-setä / Wikimedia Commons",
+      "image_license": "CC BY 2.0",
+      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "land-pride-sb2584",
+      "title": "Land Pride SB2584 Snowblower Specs: 84-Inch Clearing Width, Weight & PTO",
+      "brand": "Land Pride",
+      "equipment_type": "Snowblowers",
+      "source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+      "excerpt": "Land Pride SB2584 rear PTO snowblower: 84-inch clearing width, 762-lb base weight, 43–105 tractor HP, Category I / II hitch and 540-rpm PTO input.",
+      "content": "<p>The Land Pride SB2584 is a rear-mounted snowblower documented in operator manual 370-430M for serial numbers 881641 and above. These specifications describe the listed implement, not a complete tractor and snowblower combination.</p><h2>Published model specifications</h2><table><thead><tr><th>Parameter</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Clearing width</td><td>84 in</td></tr><tr><td>Overall width with inner skid shoes</td><td>85.75 in</td></tr><tr><td>Base weight without options</td><td>762 lb</td></tr><tr><td>Tractor horsepower range</td><td>43–105 hp</td></tr><tr><td>Hitch category</td><td>Category I / II</td></tr><tr><td>PTO input</td><td>540 rpm</td></tr></tbody></table><p>The largest model in this comparison has the highest listed base mass and tractor power range. Confirm which hitch arrangement and driveline configuration are approved for the actual tractor.</p><h2>Tractor compatibility and storage</h2><p>The published tractor horsepower range is not a measured minimum PTO horsepower figure. Confirm the tractor's permitted attachment mass, hitch geometry, rear lift performance at the applicable load center, PTO shaft requirements, front ballast and axle limits. Measure actual overall width with installed options before planning storage or transport. Do not infer approved fitment from horsepower or hitch category alone.</p><h2>Chute controls and service</h2><p>Manual, electric and hydraulic chute-control arrangements are described in the family documentation. Verify the exact option and connections for this model and serial number. Before seasonal service, inspect visible guards, hitch hardware and wear components only with all power isolated. Use the factory manual for lubricant and replacement shear hardware; never replace overload protection with stronger unapproved bolts. Keep hands and feet out of the auger housing and chute even after stopping.</p><h2>Related reference pages</h2><p>See <a href=\"/land-pride-sb1051-sb1064-sb1574-sb2584-snowblower-specs/\">the four-model comparison</a>, <a href=\"/land-pride-snowblower-auger-not-turning-chute-blockage/\">snowblower troubleshooting</a> and <a href=\"/tractor-snow-removal-gravel-driveway-blade-vs-pusher-vs-blower/\">snow equipment selection for gravel driveways</a>. The photograph illustrates tractor snow removal, not a verified photograph of the SB2584.</p><h2>Manufacturer source</h2><p><a href=\"https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf\">Land Pride operator manual 370-430M</a>, November 5, 2024, sections 1 and 7, serial numbers 881641 and above. Confirm the exact serial and any subsequent revisions before purchase or operation.</p>",
+      "specs": {
+        "fms_pto_rpm": "540",
+        "fms_hitch_category": "Category I / II",
+        "fms_operating_weight_lb": "762",
+        "fms_configuration_notes": "Base implement weight without options. Clearing width 84 in. Tractor horsepower range 43–105 hp, not PTO output. Serial 881641 and above. ",
+        "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
+        "fms_source_checked": "2026-11-25"
+      },
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
+      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
+      "image_credit": "Leo-setä / Wikimedia Commons",
+      "image_license": "CC BY 2.0",
+      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
     }
   ]
 }
