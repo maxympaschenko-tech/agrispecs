@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-167-images-65",
+  "version": "2026-11-25-reviewed-167-images-38",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2320,12 +2320,7 @@
         "fms_configuration_notes": "Base implement weight without options. Clearing width 51 in. Tractor horsepower range 18–32 hp, not PTO output. Serial 881641 and above. ",
         "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
-      "image_credit": "Leo-setä / Wikimedia Commons",
-      "image_license": "CC BY 2.0",
-      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2344,12 +2339,7 @@
         "fms_configuration_notes": "Base implement weight without options. Clearing width 64 in. Tractor horsepower range 18–59 hp, not PTO output. Serial 881641 and above. General setup and model table power ranges differ; obtain manufacturer confirmation.",
         "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
-      "image_credit": "Leo-setä / Wikimedia Commons",
-      "image_license": "CC BY 2.0",
-      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2368,12 +2358,7 @@
         "fms_configuration_notes": "Base implement weight without options. Clearing width 74 in. Tractor horsepower range 30–59 hp, not PTO output. Serial 881641 and above. ",
         "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
-      "image_credit": "Leo-setä / Wikimedia Commons",
-      "image_license": "CC BY 2.0",
-      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2392,12 +2377,7 @@
         "fms_configuration_notes": "Base implement weight without options. Clearing width 84 in. Tractor horsepower range 43–105 hp, not PTO output. Serial 881641 and above. ",
         "fms_source_url": "https://www.landpride.com/ari/attach/lp/public/manuals/370-430m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tractor_with_a_snowblower_in_Kuopio.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg",
-      "image_credit": "Leo-setä / Wikimedia Commons",
-      "image_license": "CC BY 2.0",
-      "image_alt": "Tractor with a snowblower in Kuopio, Finland; illustrative photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2416,12 +2396,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 42 in nominal working width; forward rotation; recommended tractor PTO power 15–40 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2440,12 +2415,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 42 in nominal working width; reverse rotation; recommended tractor PTO power 15–40 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2464,12 +2434,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 50 in nominal working width; forward rotation; recommended tractor PTO power 15–40 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2488,12 +2453,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 50 in nominal working width; reverse rotation; recommended tractor PTO power 15–40 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2512,12 +2472,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 58 in nominal working width; forward rotation; recommended tractor PTO power 20–50 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2536,12 +2491,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 58 in nominal working width; reverse rotation; recommended tractor PTO power 20–50 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2560,12 +2510,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 66 in nominal working width; forward rotation; recommended tractor PTO power 20–50 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2584,12 +2529,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 66 in nominal working width; reverse rotation; recommended tractor PTO power 20–50 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2608,12 +2548,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 74 in nominal working width; forward rotation; recommended tractor PTO power 25–60 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2632,12 +2567,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 74 in nominal working width; reverse rotation; recommended tractor PTO power 25–60 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2656,12 +2586,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 82 in nominal working width; forward rotation; recommended tractor PTO power 30–60 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2680,12 +2605,7 @@
         "fms_configuration_notes": "Implement weight, not tractor mass. 82 in nominal working width; reverse rotation; recommended tractor PTO power 30–60 hp, not implement power output. Serial 884765 and above.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/311-883m.pdf",
         "fms_source_checked": "2026-11-24"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/TractorWithMountedRototiller.JPG?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG",
-      "image_credit": "KVDP / Wikimedia Commons",
-      "image_license": "Public domain (PD-self)",
-      "image_alt": "New Holland tractor with a mounted rotary tiller; illustrative equipment photograph, not a Land Pride model"
+      }
     },
     {
       "type": "fms_machine",
@@ -2703,12 +2623,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 48 in; recommended tractor power 17–25 hp, not PTO power. Source edition: 301-143M, July 7, 2025, section 6, page 18.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/301-143m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2726,12 +2641,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 60 in; recommended tractor power 17–25 hp, not PTO power. Source edition: 301-143M, July 7, 2025, section 6, page 18.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/301-143m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2749,12 +2659,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 60 in; recommended tractor power 17–40 hp, not PTO power. Source edition: 301-143M, July 7, 2025, section 6, page 18.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/301-143m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2772,12 +2677,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 72 in; recommended tractor power 17–40 hp, not PTO power. Source edition: 301-143M, July 7, 2025, section 6, page 18.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/301-143m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2795,12 +2695,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 84 in; recommended tractor power 17–40 hp, not PTO power. Source edition: 301-143M, July 7, 2025, section 6, page 18.",
         "fms_source_url": "https://cdn-assets.landpride.com/ari/attach/lp/public/manuals/301-143m.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2818,12 +2713,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 60 in; recommended tractor power 20–40 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2841,12 +2731,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 72 in; recommended tractor power 20–40 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2864,12 +2749,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 84 in; recommended tractor power 20–40 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2887,12 +2767,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 72 in; recommended tractor power 25–60 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2910,12 +2785,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 84 in; recommended tractor power 25–60 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     },
     {
       "type": "fms_machine",
@@ -2933,12 +2803,7 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 96 in; recommended tractor power 25–60 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg",
-      "image_credit": "Antti Leppänen / Wikimedia Commons",
-      "image_license": "CC BY 4.0",
-      "image_alt": "Kubota L2-622 tractor with a snowplow at Winter Road Congress in Finland; illustrative photograph"
+      }
     }
   ]
 }
