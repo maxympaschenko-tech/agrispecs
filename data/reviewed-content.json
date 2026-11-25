@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-167-images-38",
+  "version": "2026-11-25-reviewed-169-images-34",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2224,12 +2224,7 @@
         "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 18–40 hp; this is not the implement's engine or PTO output. Weight excludes rear guard. Cutting width 42 in.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
-      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
-      "image_credit": "Jim Rosebery / Wikimedia Commons",
-      "image_license": "CC BY 2.0"
+      }
     },
     {
       "type": "fms_machine",
@@ -2248,12 +2243,7 @@
         "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 20–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 48 in.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
-      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
-      "image_credit": "Jim Rosebery / Wikimedia Commons",
-      "image_license": "CC BY 2.0"
+      }
     },
     {
       "type": "fms_machine",
@@ -2272,12 +2262,7 @@
         "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 20–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 60 in.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
-      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
-      "image_credit": "Jim Rosebery / Wikimedia Commons",
-      "image_license": "CC BY 2.0"
+      }
     },
     {
       "type": "fms_machine",
@@ -2296,12 +2281,7 @@
         "fms_configuration_notes": "Implement mass, not tractor weight. Recommended tractor power 25–60 hp; this is not the implement's engine or PTO output. Weight includes specified guards, shear-bolt driveline and laminated tire. Cutting width 72 in.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/326-047s.pdf",
         "fms_source_checked": "2026-11-25"
-      },
-      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Brush_hog.jpg?width=1280",
-      "image_source_url": "https://commons.wikimedia.org/wiki/File:Brush_hog.jpg",
-      "image_alt": "Rear-mounted red brush hog rotary cutter photographed on a farm",
-      "image_credit": "Jim Rosebery / Wikimedia Commons",
-      "image_license": "CC BY 2.0"
+      }
     },
     {
       "type": "fms_machine",
@@ -2803,6 +2783,40 @@
         "fms_configuration_notes": "Approximate implement mass, not tractor weight. Nominal blade width 96 in; recommended tractor power 25–60 hp, not PTO power. Source edition: 301-375M specification extract, September 28, 2018, page 22.",
         "fms_source_url": "https://assets.landpride.com/ari/attach/lp/public/specs/301-375s.pdf",
         "fms_source_checked": "2026-11-25"
+      }
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "john-deere-300e",
+      "title": "John Deere 300E Front Loader Specs: Lift Capacity & Tractor Compatibility",
+      "brand": "John Deere",
+      "equipment_type": "Front Loaders",
+      "source_url": "https://www.deere.com/en-us/products-solutions/loaders/front-end-loaders/300e-loader-mtm2mva",
+      "excerpt": "John Deere 300E loader: 1,186 lb published full-height pivot-pin lift, Approximately 84 in maximum pivot height, configuration and compatibility notes.",
+      "content": "<p>The <strong>John Deere 300E</strong> is a tractor-mounted front loader. Its advertised lifting capacity is meaningful only when the measurement height, load position and equipment configuration are identified. This reference separates the manufacturer's published ratings instead of treating them as interchangeable payload limits.</p><h2>Published loader specifications</h2><table><thead><tr><th>Measurement</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Lift at maximum height, pivot pin</td><td>1,186 lb</td></tr><tr><td>Maximum pivot-pin lift height</td><td>Approximately 84 in</td></tr><tr><td>Lift at full height, 500 mm forward of pivot</td><td>845 lb</td></tr><tr><td>Configuration</td><td>Non-self-leveling (NSL)</td></tr></tbody></table><p>These are documented ratings for specified configurations, not a safe working load for arbitrary attachments or operating conditions.</p><h2>Compatible tractors and mounting options</h2><p>The cited US manufacturer listing includes selected 3D and 3E tractors, including the 3025E, 3032E and 3038E. Confirm the model year, loader mount, boom option and hydraulic package. The NSL figures must not be applied to mechanical-self-leveling versions without checking their own specification.</p><p>See the <a href=\"/machines/john-deere-3032e/\">associated tractor specification page</a> for separate tractor power and hitch information.</p><h2>How to interpret the lift ratings</h2><p>Load position and height change the leverage acting on a loader. The center of mass of a pallet on forks is not located at the bucket pivot. The attachment itself also adds mass. Obtain the complete manufacturer rating for the actual carrier, attachment, lift height and load center rather than estimating a payload from a single brochure figure. A loader rating does not override tractor axle or tire limits, stability requirements or approved rear ballast.</p><h2>Inspection and service references</h2><p>With the loader lowered and safely isolated, inspect visible mounting hardware, locking mechanisms, hoses and wear points according to the operator manual. Never work beneath an unsupported raised loader or search for hydraulic leaks with your hands. Identify the exact boom and attachment package before ordering pins, bushings, seals or hydraulic parts.</p><h2>Related equipment guides</h2><p>Read <a href=\"/john-deere-300e-loader-lift-capacity-pivot-vs-500mm/\">the detailed lift capacity explanation</a>, <a href=\"/john-deere-300e-vs-kubota-la526-loader-capacity/\">the 300E versus LA526 comparison</a> and <a href=\"/tractor-loader-quick-attach-bucket-pallet-forks-compatibility/\">the loader carrier compatibility guide</a>.</p><h2>Manufacturer reference</h2><p><a href=\"https://www.deere.com/en-us/products-solutions/loaders/front-end-loaders/300e-loader-mtm2mva\">John Deere US product specifications</a>. Source figures recorded November 23, 2026. Verify the exact configuration and current manufacturer instructions before purchase or operation.</p>",
+      "specs": {
+        "fms_loader_lift_lb": "1186",
+        "fms_configuration_notes": "NSL configuration: full-height pivot-pin lift 1,186 lb; full-height lift 500 mm forward 845 lb. Approximate pivot height 84 in.",
+        "fms_source_url": "https://www.deere.com/en-us/products-solutions/loaders/front-end-loaders/300e-loader-mtm2mva",
+        "fms_source_checked": "2026-11-23"
+      }
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "kubota-la526",
+      "title": "Kubota LA526 Front Loader Specs: Lift Capacity & Tractor Compatibility",
+      "brand": "Kubota",
+      "equipment_type": "Front Loaders",
+      "source_url": "https://www.kubotausa.com/equipment-series/standard-l-series",
+      "excerpt": "Kubota LA526 loader: 1,144 lb published full-height pivot-pin lift, 94.2 in maximum pivot height, configuration and compatibility notes.",
+      "content": "<p>The <strong>Kubota LA526</strong> is a tractor-mounted front loader. Its advertised lifting capacity is meaningful only when the measurement height, load position and equipment configuration are identified. This reference separates the manufacturer's published ratings instead of treating them as interchangeable payload limits.</p><h2>Published loader specifications</h2><table><thead><tr><th>Measurement</th><th>Manufacturer-listed value</th></tr></thead><tbody><tr><td>Lift at maximum height, pivot pin</td><td>1,144 lb</td></tr><tr><td>Maximum pivot-pin lift height</td><td>94.2 in</td></tr><tr><td>Pivot lift at 1.5 m on L2502</td><td>1,446 lb</td></tr><tr><td>Pivot lift at 1.5 m on L3302 or L3902</td><td>1,506 lb</td></tr></tbody></table><p>These are documented ratings for specified configurations, not a safe working load for arbitrary attachments or operating conditions.</p><h2>Compatible tractors and mounting options</h2><p>Kubota USA lists the LA526 as a performance-matched loader for the L2502, L3302 and L3902 Standard L tractors. Packages with and without a two-lever quick coupler are described. Verify actual carrier, tractor configuration, rear ballast and mounting requirements before purchasing equipment.</p><p>See the <a href=\"/machines/kubota-l2502-hst/\">associated tractor specification page</a> for separate tractor power and hitch information.</p><h2>How to interpret the lift ratings</h2><p>Load position and height change the leverage acting on a loader. The center of mass of a pallet on forks is not located at the bucket pivot. The attachment itself also adds mass. Obtain the complete manufacturer rating for the actual carrier, attachment, lift height and load center rather than estimating a payload from a single brochure figure. A loader rating does not override tractor axle or tire limits, stability requirements or approved rear ballast.</p><h2>Inspection and service references</h2><p>With the loader lowered and safely isolated, inspect visible mounting hardware, locking mechanisms, hoses and wear points according to the operator manual. Never work beneath an unsupported raised loader or search for hydraulic leaks with your hands. Identify the exact boom and attachment package before ordering pins, bushings, seals or hydraulic parts.</p><h2>Related equipment guides</h2><p>Read <a href=\"/kubota-la526-loader-lift-capacity-height-comparison/\">the detailed lift capacity explanation</a>, <a href=\"/john-deere-300e-vs-kubota-la526-loader-capacity/\">the 300E versus LA526 comparison</a> and <a href=\"/tractor-loader-quick-attach-bucket-pallet-forks-compatibility/\">the loader carrier compatibility guide</a>.</p><h2>Manufacturer reference</h2><p><a href=\"https://www.kubotausa.com/equipment-series/standard-l-series\">Kubota US product specifications</a>. Source figures recorded November 23, 2026. Verify the exact configuration and current manufacturer instructions before purchase or operation.</p>",
+      "specs": {
+        "fms_loader_lift_lb": "1144",
+        "fms_configuration_notes": "Full-height pivot-pin lift 1,144 lb; pivot height 94.2 in. At 1.5 m, pivot lift 1,446 lb with L2502 and 1,506 lb with L3302/L3902.",
+        "fms_source_url": "https://www.kubotausa.com/equipment-series/standard-l-series",
+        "fms_source_checked": "2026-11-23"
       }
     }
   ]
