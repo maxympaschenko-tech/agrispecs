@@ -42,11 +42,27 @@ function fms_card($post_id) {
     if($type==='fms_machine') {
         $power=get_post_meta($id,'fms_engine_hp',true);
         $pto=get_post_meta($id,'fms_pto_hp',true);
-        if($power!=='' || $pto!=='') {
+        $lift=get_post_meta($id,'fms_loader_lift_lb',true);
+        $weight=get_post_meta($id,'fms_operating_weight_lb',true);
+        $rpm=get_post_meta($id,'fms_pto_rpm',true);
+        $hitch=get_post_meta($id,'fms_hitch_category',true);
+        $types=wp_get_post_terms($id,'fms_equipment_type',['fields'=>'names']);
+        if (!is_wp_error($types) && $types) {
+            echo '<p class="tagline">'.esc_html(implode(' · ',$types)).'</p>';
+        }
+        if($power!=='' || $pto!=='' || $lift!=='' || $weight!=='' || $rpm!=='' || $hitch!=='') {
             echo '<div class="card-meta">';
             if($power!=='') echo '<span>'.esc_html($power).' engine HP</span>';
             if($pto!=='') echo '<span>'.esc_html($pto).' PTO HP</span>';
+            if($lift!=='') echo '<span>'.esc_html($lift).' lb loader lift*</span>';
+            if($weight!=='') echo '<span>'.esc_html($weight).' lb listed weight</span>';
+            if($rpm!=='' && $power==='') echo '<span>'.esc_html($rpm).' rpm PTO</span>';
+            if($hitch!=='' && $power==='') echo '<span>'.esc_html($hitch).'</span>';
             echo '</div>';
+            if($lift!=='') echo '<p class="tagline">*See measurement position and configuration.</p>';
+        }
+        if (!has_post_thumbnail($id) || $power==='') {
+            echo '<p>'.esc_html(wp_trim_words(get_the_excerpt($id),30)).'</p>';
         }
     } else {
         echo '<p>'.esc_html(wp_trim_words(get_the_excerpt($id),20)).'</p>';
