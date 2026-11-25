@@ -53,6 +53,14 @@ function fms_attach_reviewed_image(int $post_id, array $record): bool {
     ]);
     if ($shared) {
         $shared_id = (int) $shared[0];
+        if (($record['type'] ?? '') === 'fms_machine') {
+            $other_models = get_posts([
+                'post_type' => 'fms_machine', 'post_status' => 'any',
+                'post__not_in' => [$post_id], 'posts_per_page' => 1, 'fields' => 'ids',
+                'meta_key' => '_thumbnail_id', 'meta_value' => $shared_id,
+            ]);
+            if ($other_models) { return false; }
+        }
         if (wp_attachment_is_image($shared_id) && get_attached_file($shared_id) && is_file(get_attached_file($shared_id))) {
             set_post_thumbnail($post_id, $shared_id);
             echo 'Reused local featured image: ' . ($record['slug'] ?? '?') . "\\n";
@@ -110,6 +118,26 @@ function fms_report_image_import_status(array $records): void {
          ' pending, ' . $missing_record . " without matching record.\n";
 }
 
+// Remove only previously imported, attributed generic equipment photos.
+// Preserve manually assigned media and retain library files for editorial guides.
+foreach ($data['records'] as $record) {
+    if (($record['type'] ?? '') !== 'fms_machine') { continue; }
+    $p = get_page_by_path($record['slug'], OBJECT, 'fms_machine');
+    if (!$p || get_post_meta($p->ID, '_fms_reviewed_seed', true) !== $record['slug']) { continue; }
+    $attachment = get_post_thumbnail_id($p->ID);
+    if (!$attachment) { continue; }
+    $source = get_post_meta($attachment, '_fms_source_url', true);
+    $generic_sources = [
+        'https://commons.wikimedia.org/wiki/File:Brush_hog.jpg',
+        'https://commons.wikimedia.org/wiki/File:Tractor_with_a_snowblower_in_Kuopio.jpg',
+        'https://commons.wikimedia.org/wiki/File:TractorWithMountedRototiller.JPG',
+        'https://commons.wikimedia.org/wiki/File:Kubota_L2-622_with_snowplow_Winter_Road_Congress.jpg',
+    ];
+    if (in_array($source, $generic_sources, true)) {
+        delete_post_thumbnail($p->ID);
+        echo 'Removed generic equipment thumbnail: ' . $record['slug'] . "\n";
+    }
+}
 $digest = hash('sha256', $json);
 if (get_option('fms_content_bundle_digest') === $digest) {
     // Retry failed media downloads on a later cron run without importing again.
