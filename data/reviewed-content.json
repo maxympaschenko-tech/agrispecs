@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-172-images-34",
+  "version": "2026-11-25-reviewed-175-images-34",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2854,6 +2854,62 @@
       "serial_scope": "Dealer-documented supersession reference; verify exact engine and tractor serial before ordering.",
       "excerpt": "Kubota HH1J0-32430 oil filter, predecessor HH150-32430 and later HH1J0-32432 reference.",
       "content": "<p>The Messick's Kubota parts listing identifies HH1J0-32430 as replacing HH150-32430 and as itself replaced by HH1J0-32432. These are catalog relationships, not a universal interchange guarantee for every engine.</p><h2>Where this number appears</h2><p>The older <a href=\"/parts/kubota-hh150-32430-bx2380-engine-oil-filter-old-number/\">HH150-32430</a> appears in the dealer description of the BX2380 maintenance kit. A customer searching for the older number may therefore encounter HH1J0-32430 or <a href=\"/parts/kubota-hh1j0-32432-engine-oil-filter-bx2380/\">HH1J0-32432</a> in later catalogs.</p><h2>Ordering checks</h2><p>Record the complete tractor model, PIN and engine serial. Ask for the current serial-specific OEM number and confirm the actual package contents if purchasing a kit. Do not infer filter pressure, bypass characteristics or thread dimensions from external appearance. Use the correct operator manual for maintenance timing.</p><h2>Source</h2><p><a href=\"https://www.messicks.com/parts/kubota/hh1j0-32430\">Messick's HH1J0-32430 part listing</a>, source information recorded November 24, 2026. See the <a href=\"/kubota-bx2380-filter-kit-oil-fuel-hydraulic-air-guide/\">BX2380 filter guide</a> for context.</p>"
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "john-deere-3038e",
+      "title": "John Deere 3038E Tractor Specs: Engine, PTO & Transmission (2026)",
+      "brand": "John Deere",
+      "equipment_type": "Compact Tractors",
+      "source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+      "excerpt": "John Deere 3038E US factory specifications, engine and PTO power, transmission options and equipment configuration. May 2026 reference.",
+      "content": "<p>The John Deere 3038E compact utility tractor is listed under factory code 148CLV in Deere's North American equipment document dated May 5, 2026. This reference describes that edition and distinguishes engine power from implement-driving PTO power.</p><h2>Manufacturer specifications</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Engine</td><td>Yanmar liquid-cooled diesel, 1.568 L</td></tr><tr><td>Gross engine power (source HP/PS label)</td><td>37.3</td></tr><tr><td>PTO horsepower (source figure)</td><td>30.0</td></tr><tr><td>Rated engine speed</td><td>2500 rpm</td></tr><tr><td>Transmission</td><td>Two-range hydrostatic, 4WD</td></tr><tr><td>Implement pump</td><td>5.3 US gpm</td></tr><tr><td>Steering pump</td><td>4.0 US gpm</td></tr><tr><td>Total hydraulic flow</td><td>9.3 US gpm</td></tr><tr><td>Rear PTO</td><td>540 rpm, independent</td></tr></tbody></table><p>The factory sheet uses a PS notation in its gross engine rating footnote. The displayed figures retain the manufacturer's numeric values and should not be treated as an independently converted mechanical horsepower rating.</p><h2>Configuration and implement selection</h2><p>The implement pump rating excludes the steering pump. The combined flow is not a guaranteed remote-circuit flow. Deere lists the 300E loader as an option; verify boom and ballast requirements. Confirm the tractor's actual serial number, hitch geometry, axle limits, ballast, hydraulic connections and approved implement specifications before purchasing attachments. Engine power alone does not establish compatibility.</p><h2>Ownership and maintenance</h2><p>Use the serial-specific operator manual to determine fluid grades, service intervals and replacement filters. Inspect the equipment with attachments safely lowered and the engine isolated. Do not substitute parts from another tractor merely because its engine rating is similar.</p><h2>Related equipment</h2><p>Compare <a href=\"/machines/john-deere-3032e/\">the related Deere tractor</a>, read <a href=\"/engine-horsepower-vs-pto-horsepower-tractors/\">engine versus PTO horsepower</a> and consult <a href=\"/tractor-hydraulic-flow-gpm-pump-vs-implement-circuit/\">hydraulic flow measurement guidance</a>.</p><h2>Source</h2><p><a href=\"https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf#page=145\">John Deere factory documentation, May 5, 2026, code 148CLV</a>. Missing weight, hitch and fluid values are not inferred from other models.</p>",
+      "specs": {
+        "fms_engine_make": "Yanmar liquid-cooled diesel, 1.568 L",
+        "fms_pto_hp": "30.0",
+        "fms_configuration_notes": "Factory code 148CLV. Gross engine figure 37.3 as printed (PS notation in footnote); Two-range hydrostatic, 4WD. The implement pump rating excludes the steering pump. The combined flow is not a guaranteed remote-circuit flow. Deere lists the 300E loader as an option; verify boom and ballast requirements.",
+        "fms_pto_rpm": "540",
+        "fms_hydraulic_flow_gpm": "5.3",
+        "fms_source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+        "fms_source_checked": "2026-11-25"
+      }
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "john-deere-4044m",
+      "title": "John Deere 4044M Tractor Specs: Engine, PTO & Transmission (2026)",
+      "brand": "John Deere",
+      "equipment_type": "Compact Tractors",
+      "source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+      "excerpt": "John Deere 4044M US factory specifications, engine and PTO power, transmission options and equipment configuration. May 2026 reference.",
+      "content": "<p>The John Deere 4044M compact utility tractor is listed under factory code 031ALV in Deere's North American equipment document dated May 5, 2026. This reference describes that edition and distinguishes engine power from implement-driving PTO power.</p><h2>Manufacturer specifications</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Engine</td><td>Yanmar naturally aspirated four-cylinder diesel, 2.2 L</td></tr><tr><td>Gross engine power (source HP/PS label)</td><td>43.1</td></tr><tr><td>PTO horsepower (source figure)</td><td>32.5</td></tr><tr><td>Rated engine speed</td><td>2600 rpm</td></tr><tr><td>Transmission</td><td>12F/12R PowrReverser or eHydro factory options</td></tr><tr><td>Alternator</td><td>75 A</td></tr><tr><td>Battery rating</td><td>770 CCA</td></tr><tr><td>Drive</td><td>4WD</td></tr></tbody></table><p>The factory sheet uses a PS notation in its gross engine rating footnote. The displayed figures retain the manufacturer's numeric values and should not be treated as an independently converted mechanical horsepower rating.</p><h2>Configuration and implement selection</h2><p>The first page describes PowrReverser while the factory options table also lists eHydro. Do not assume the single published PTO figure applies identically to all transmission configurations; confirm the selected option. The source lists hydraulic equipment separately from the base configuration. Confirm the tractor's actual serial number, hitch geometry, axle limits, ballast, hydraulic connections and approved implement specifications before purchasing attachments. Engine power alone does not establish compatibility.</p><h2>Ownership and maintenance</h2><p>Use the serial-specific operator manual to determine fluid grades, service intervals and replacement filters. Inspect the equipment with attachments safely lowered and the engine isolated. Do not substitute parts from another tractor merely because its engine rating is similar.</p><h2>Related equipment</h2><p>Compare <a href=\"/machines/john-deere-4044r/\">the related Deere tractor</a>, read <a href=\"/engine-horsepower-vs-pto-horsepower-tractors/\">engine versus PTO horsepower</a> and consult <a href=\"/tractor-hydraulic-flow-gpm-pump-vs-implement-circuit/\">hydraulic flow measurement guidance</a>.</p><h2>Source</h2><p><a href=\"https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf#page=159\">John Deere factory documentation, May 5, 2026, code 031ALV</a>. Missing weight, hitch and fluid values are not inferred from other models.</p>",
+      "specs": {
+        "fms_engine_make": "Yanmar naturally aspirated four-cylinder diesel, 2.2 L",
+        "fms_pto_hp": "32.5",
+        "fms_configuration_notes": "Factory code 031ALV. Gross engine figure 43.1 as printed (PS notation in footnote); 12F/12R PowrReverser or eHydro factory options. The first page describes PowrReverser while the factory options table also lists eHydro. Do not assume the single published PTO figure applies identically to all transmission configurations; confirm the selected option. The source lists hydraulic equipment separately from the base configuration.",
+        "fms_source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+        "fms_source_checked": "2026-11-25"
+      }
+    },
+    {
+      "type": "fms_machine",
+      "status": "publish",
+      "slug": "john-deere-4044r",
+      "title": "John Deere 4044R Tractor Specs: Engine, PTO & Transmission (2026)",
+      "brand": "John Deere",
+      "equipment_type": "Compact Tractors",
+      "source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+      "excerpt": "John Deere 4044R US factory specifications, engine and PTO power, transmission options and equipment configuration. May 2026 reference.",
+      "content": "<p>The John Deere 4044R compact utility tractor is listed under factory code 032ALV in Deere's North American equipment document dated May 5, 2026. This reference describes that edition and distinguishes engine power from implement-driving PTO power.</p><h2>Manufacturer specifications</h2><table><thead><tr><th>Parameter</th><th>Published value</th></tr></thead><tbody><tr><td>Engine</td><td>Yanmar naturally aspirated four-cylinder diesel, 2.2 L</td></tr><tr><td>Gross engine power (source HP/PS label)</td><td>43.1</td></tr><tr><td>PTO horsepower (source figure)</td><td>32.5</td></tr><tr><td>Rated engine speed</td><td>2600 rpm</td></tr><tr><td>Transmission</td><td>Three-range hydrostatic, 4WD</td></tr><tr><td>Alternator</td><td>75 A</td></tr><tr><td>Battery rating</td><td>770 CCA</td></tr><tr><td>Mid hydraulic controls</td><td>Dual SCV</td></tr><tr><td>Operator station</td><td>Open station or optional cab</td></tr></tbody></table><p>The factory sheet uses a PS notation in its gross engine rating footnote. The displayed figures retain the manufacturer's numeric values and should not be treated as an independently converted mechanical horsepower rating.</p><h2>Configuration and implement selection</h2><p>The factory record identifies the PTO figure with HST and includes HitchAssist and electronic hydrostatic control features. The optional cab and loader packages can affect mass and clearance; use the exact configuration for comparison. Confirm the tractor's actual serial number, hitch geometry, axle limits, ballast, hydraulic connections and approved implement specifications before purchasing attachments. Engine power alone does not establish compatibility.</p><h2>Ownership and maintenance</h2><p>Use the serial-specific operator manual to determine fluid grades, service intervals and replacement filters. Inspect the equipment with attachments safely lowered and the engine isolated. Do not substitute parts from another tractor merely because its engine rating is similar.</p><h2>Related equipment</h2><p>Compare <a href=\"/machines/john-deere-4044m/\">the related Deere tractor</a>, read <a href=\"/engine-horsepower-vs-pto-horsepower-tractors/\">engine versus PTO horsepower</a> and consult <a href=\"/tractor-hydraulic-flow-gpm-pump-vs-implement-circuit/\">hydraulic flow measurement guidance</a>.</p><h2>Source</h2><p><a href=\"https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf#page=180\">John Deere factory documentation, May 5, 2026, code 032ALV</a>. Missing weight, hitch and fluid values are not inferred from other models.</p>",
+      "specs": {
+        "fms_engine_make": "Yanmar naturally aspirated four-cylinder diesel, 2.2 L",
+        "fms_pto_hp": "32.5",
+        "fms_configuration_notes": "Factory code 032ALV. Gross engine figure 43.1 as printed (PS notation in footnote); Three-range hydrostatic, 4WD. The factory record identifies the PTO figure with HST and includes HitchAssist and electronic hydrostatic control features. The optional cab and loader packages can affect mass and clearance; use the exact configuration for comparison.",
+        "fms_source_url": "https://www.deere.com/assets/pdfs/region-4/industries/government-and-military-sales/contracts/price-pages/agricultural/TRACTORS_1000-4000-CUTS_05May2026.pdf",
+        "fms_source_checked": "2026-11-25"
+      }
     }
   ]
 }
