@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25-reviewed-169-images-34",
+  "version": "2026-11-25-reviewed-172-images-34",
   "checked_at": "2026-11-25",
   "records": [
     {
@@ -2818,6 +2818,42 @@
         "fms_source_url": "https://www.kubotausa.com/equipment-series/standard-l-series",
         "fms_source_checked": "2026-11-23"
       }
+    },
+    {
+      "type": "fms_part",
+      "status": "publish",
+      "slug": "john-deere-ta15270-filter-kit-1025r",
+      "brand": "John Deere",
+      "part_number": "TA15270",
+      "title": "John Deere TA15270 Filter Kit: 1025R Supersession to TA25769",
+      "source_url": "https://shop.deere.com/us/product/TA15270%3A-Compact-Utility-Tractor-Filter-Kit/p/TA15270/",
+      "serial_scope": "1025R later air-filter configuration from JJ153037 in June 2022 guide; verify full PIN and current substitute.",
+      "excerpt": "Historical Deere TA15270 five-filter kit, documented substitute TA25769 and serial-specific ordering checks.",
+      "content": "<p>TA15270 is a Deere compact utility tractor filter package identified in the June 2022 1025R replacement parts guide for the later air-cleaner configuration. Deere's US product listing names TA25769 as a substitute. This is an older catalog reference, not a statement of current inventory.</p><h2>Documented components</h2><table><thead><tr><th>Number</th><th>Component</th></tr></thead><tbody><tr><td>M806418</td><td>Engine oil filter</td></tr><tr><td>LVA16054</td><td>Hydraulic filter</td></tr><tr><td>AM116304</td><td>Inline fuel filter</td></tr><tr><td>MIU804763</td><td>Fuel filter element</td></tr><tr><td>LVU34503</td><td>Primary air element</td></tr></tbody></table><p>The later secondary air element LVU34504 is not listed among these five components. Check its service requirement separately.</p><h2>Replacement and fitment</h2><p>Compare <a href=\"/parts/john-deere-ta25769-filter-pak-1025r/\">TA25769</a> and <a href=\"/parts/john-deere-lva21036-filter-pak-1025r/\">LVA21036</a>. The 2022 guide distinguishes the earlier and later air-filter configurations at JJ153036/JJ153037. Confirm the full PIN rather than relying on a shortened serial number or model badge. The kit is not a maintenance schedule.</p><h2>References</h2><p><a href=\"https://shop.deere.com/us/product/TA15270%3A-Compact-Utility-Tractor-Filter-Kit/p/TA15270/\">Deere TA15270 listing</a> and <a href=\"/john-deere-1025r-filter-kit-ta15270-ta25769-supersession/\">documented kit comparison</a>. Source information recorded November 24, 2026. Verify current substitutions before purchase.</p>"
+    },
+    {
+      "type": "fms_part",
+      "status": "publish",
+      "slug": "kubota-hh150-32430-bx2380-engine-oil-filter-old-number",
+      "brand": "Kubota",
+      "part_number": "HH150-32430",
+      "title": "Kubota HH150-32430 Oil Filter: BX2380 Historical Reference",
+      "source_url": "https://www.messicks.com/parts/kubota/77700-03362",
+      "serial_scope": "Historical 77700-03362 BX2380 kit listing; confirm tractor and engine serial, current replacement.",
+      "excerpt": "Older Kubota HH150-32430 oil filter reference in the BX2380 service kit and dealer-documented supersession chain.",
+      "content": "<p>HH150-32430 is the engine oil filter number listed in the Messick's description of Kubota maintenance kit 77700-03362 for the BX2380. An older kit description is not proof that the same number is currently supplied.</p><h2>Documented replacement chain</h2><table><thead><tr><th>Reference</th><th>Role in dealer documentation</th></tr></thead><tbody><tr><td>HH150-32430</td><td>Older kit-listed oil filter</td></tr><tr><td>HH1J0-32430</td><td>Dealer-listed replacement for HH150-32430</td></tr><tr><td>HH1J0-32432</td><td>Later replacement listed for HH1J0-32430</td></tr></tbody></table><p>Do not assume this chain establishes fit for every engine or market. Ask a Kubota dealer to confirm the current number using the complete tractor and engine identification.</p><h2>Related records</h2><p>See the <a href=\"/parts/kubota-77700-03362-bx2380-filter-maintenance-kit/\">maintenance kit reference</a>, <a href=\"/parts/kubota-hh1j0-32432-engine-oil-filter-bx2380/\">HH1J0-32432 oil filter</a> and <a href=\"/kubota-bx2380-filter-kit-oil-fuel-hydraulic-air-guide/\">BX2380 filter selection guide</a>. Follow the matching operator manual for oil grade, replacement interval and service procedure.</p><h2>Sources</h2><p><a href=\"https://www.messicks.com/parts/kubota/77700-03362\">Dealer kit listing</a> and <a href=\"https://www.messicks.com/parts/kubota/hh1j0-32430\">dealer supersession listing</a>, recorded November 24, 2026.</p>"
+    },
+    {
+      "type": "fms_part",
+      "status": "publish",
+      "slug": "kubota-hh1j0-32430-engine-oil-filter-supersession",
+      "brand": "Kubota",
+      "part_number": "HH1J0-32430",
+      "title": "Kubota HH1J0-32430 Engine Oil Filter: Replacement Reference",
+      "source_url": "https://www.messicks.com/parts/kubota/hh1j0-32430",
+      "serial_scope": "Dealer-documented supersession reference; verify exact engine and tractor serial before ordering.",
+      "excerpt": "Kubota HH1J0-32430 oil filter, predecessor HH150-32430 and later HH1J0-32432 reference.",
+      "content": "<p>The Messick's Kubota parts listing identifies HH1J0-32430 as replacing HH150-32430 and as itself replaced by HH1J0-32432. These are catalog relationships, not a universal interchange guarantee for every engine.</p><h2>Where this number appears</h2><p>The older <a href=\"/parts/kubota-hh150-32430-bx2380-engine-oil-filter-old-number/\">HH150-32430</a> appears in the dealer description of the BX2380 maintenance kit. A customer searching for the older number may therefore encounter HH1J0-32430 or <a href=\"/parts/kubota-hh1j0-32432-engine-oil-filter-bx2380/\">HH1J0-32432</a> in later catalogs.</p><h2>Ordering checks</h2><p>Record the complete tractor model, PIN and engine serial. Ask for the current serial-specific OEM number and confirm the actual package contents if purchasing a kit. Do not infer filter pressure, bypass characteristics or thread dimensions from external appearance. Use the correct operator manual for maintenance timing.</p><h2>Source</h2><p><a href=\"https://www.messicks.com/parts/kubota/hh1j0-32430\">Messick's HH1J0-32430 part listing</a>, source information recorded November 24, 2026. See the <a href=\"/kubota-bx2380-filter-kit-oil-fuel-hydraulic-air-guide/\">BX2380 filter guide</a> for context.</p>"
     }
   ]
 }
