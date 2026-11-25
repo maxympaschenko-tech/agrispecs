@@ -203,7 +203,7 @@ foreach ($data['records'] as $record) {
     update_post_meta($id, '_fms_reviewed_seed', $slug);
     if ($type === 'fms_machine') {
         foreach (['fms_engine_make','fms_engine_hp','fms_pto_hp','fms_pto_rpm','fms_hitch_category',
-                  'fms_hitch_lift_24_lb','fms_hydraulic_flow_gpm','fms_operating_weight_lb','fms_fuel_capacity_gal',
+                  'fms_hitch_lift_24_lb','fms_hydraulic_flow_gpm','fms_loader_lift_lb','fms_operating_weight_lb','fms_fuel_capacity_gal',
                   'fms_configuration_notes','fms_source_url','fms_source_checked'] as $field) {
             if (isset($record['specs'][$field]) && $record['specs'][$field] !== '') {
                 update_post_meta($id, $field,
